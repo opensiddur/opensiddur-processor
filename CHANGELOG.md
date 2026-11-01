@@ -50,6 +50,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **Asher's names are spelled by the table** (#266): 317 registered URNs and 160 files (80 in
+  each language) in the Asher book, with the old URNs recorded as aliases. Het is `ch` and
+  tzadi `tz` where Asher's reading IDs had `h` and `ts`, dagesh hazak is doubled, and tsere +
+  yod is `ei`. Words that are right for another word (Asher's `selah` is סְלַח, `selach`) are
+  respelled by a list of the Asher importer's own, `asher_selichot/spellings.yaml`, applied to
+  that book alone; it also renames whole names where a word cannot be respelled. Ten names
+  that did not spell the printed words now do (`eleh_behanufat` is `eleh_behagafat`). A few
+  Birnbaum and expanded-siddur names are respelled too (`ana_bekhoach` is `anna_bekhoach`,
+  `el_erekh_apayim` is `el_erekh_appayim`, `veatah_qadosh` is `veattah_qadosh`). The table now
+  says that the yod of the suffix ֶיךָ is not written (`lefanekha`); `eleikha` is `elekha`.
 - **URNs that broke the URN grammar are fixed** (#266), so that every name in the corpus now
   passes `validate_names`, and the projects check's gate runs it in full:
   - The Humash's triennial divisions are a path below the parshah:

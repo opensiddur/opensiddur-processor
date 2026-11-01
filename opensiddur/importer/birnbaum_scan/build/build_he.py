@@ -390,7 +390,7 @@ KORBANOT_ORDER = (
     "korbanot_vearvah",
     ("citation", "מסכת יומא לג, א", "Talmud Yoma 33a"),
     "korbanot_abaye",
-    "poem_ana_bekhoach",
+    "poem_anna_bekhoach",
     ("transclude", SHEMA_BARUKH_SHEM),
     "korbanot_ribbon_haolamim",
     ("conditional", "cond_musaf_shabbat", "On Sabbath say:",

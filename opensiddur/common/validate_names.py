@@ -93,13 +93,13 @@ def respell(name: str, spellings: Spellings | None = None) -> str:
 
 #: A text, instruction or notes URN's path: what respell_urns respells. The project and fragment
 #: are not.
-_URN_PATH = re.compile(re.escape(SCHEME) + r"((?:text:[a-z_]+:|instruction:|notes:))([^\s\"'<>@#]+)")
+URN_PATH = re.compile(re.escape(SCHEME) + r"((?:text:[a-z_]+:|instruction:|notes:))([^\s\"'<>@#]+)")
 
 
 def respell_urns(text: str, spellings: Spellings | None = None) -> str:
     """``text`` with the path of every text, instruction or notes URN in it respelled."""
     spellings = spellings or load_spellings()
-    return _URN_PATH.sub(lambda m: SCHEME + m.group(1) + respell(m.group(2), spellings), text)
+    return URN_PATH.sub(lambda m: SCHEME + m.group(1) + respell(m.group(2), spellings), text)
 
 
 def words(name: str) -> Iterator[str]:

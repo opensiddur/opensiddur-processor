@@ -226,7 +226,7 @@ K.append(block("korbanot_vearvah", "The offering of Judah and Jerusalem",
                "korbanot/vearvah", 34, 34, [(34, 5)]))
 K.append(block("korbanot_abaye", "Abbaye recounted the daily order",
                "korbanot/seder_hamaarakhah", 34, 34, [(34, 6)]))
-K.append(verse_block("poem_ana_bekhoach", "By the great power", "ana_bekhoach", 34, 36,
+K.append(verse_block("poem_anna_bekhoach", "By the great power", "anna_bekhoach", 34, 36,
                      [(34, 7), (34, 8), (36, 0), (36, 1), (36, 2), (36, 3), (36, 4)],
                      base=True,
                      comment="#: Seven lines, as the Hebrew has -- Birnbaum's footnote says\n"

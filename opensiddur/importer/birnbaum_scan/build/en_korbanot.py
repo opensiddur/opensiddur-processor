@@ -209,8 +209,8 @@ prayer("korbanot_abaye", "Abbaye recounted the daily order", "korbanot/seder_ham
 
 #: Seven lines, as the Hebrew has -- Birnbaum's footnote says
 #: six words to each of seven lines and describes the Hebrew.
-prayer("poem_ana_bekhoach", "By the great power", "ana_bekhoach", 34, 36,
-       verses(P + "ana_bekhoach", [
+prayer("poem_anna_bekhoach", "By the great power", "anna_bekhoach", 34, 36,
+       verses(P + "anna_bekhoach", [
            "By the great power of thy right hand, O set the captive free.",
            "Revered God, accept thy people's prayer; strengthen us, cleanse us.",
            f"{pb(36)}Almighty God, guard as the apple of the eye those who seek thee.",

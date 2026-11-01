@@ -7,12 +7,14 @@ this edition, never substituted from another project's prayer text.
 from opensiddur.importer.scan.authoring import element, marker, choice, italicize, conditional_scope, write_documents, apply_corrections, apply_editorial_notes
 
 import argparse
+import functools
 import json
 from pathlib import Path
 from lxml import etree
 from opensiddur.common.constants import SOURCETEXTS_ROOT, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import SCHEME
-from opensiddur.common.validate_names import load_spellings, respell, respell_urns
+import yaml
+from opensiddur.common.validate_names import URN_PATH, Spellings, load_spellings, respell
 from opensiddur.importer.util.validation import validate
 from .identities import project_name
 
@@ -188,27 +190,52 @@ def build(source_root,project_directory):
     return write_documents(documents, validator=validate, obsolete_paths=obsolete)
 
 
+#: Respellings for this book alone, on top of specs/naming/spellings.yaml.
+BOOK_SPELLINGS = Path(__file__).with_name('spellings.yaml')
+
+
+@functools.cache
+def _book():
+    """This book's spellings (the shared list with its own added) and its whole-name renames."""
+    shared, own = load_spellings(), load_spellings(BOOK_SPELLINGS)
+    renames = yaml.safe_load(BOOK_SPELLINGS.read_text(encoding='utf-8')).get('renames') or {}
+    standards = set(shared.variants.values()) | shared.exceptions
+    for variant, standard in own.variants.items():
+        if variant in shared.variants or variant in standards or standard in shared.variants:
+            raise ValueError(f'{BOOK_SPELLINGS}: {variant!r}: {standard!r} repeats or contradicts '
+                             'the shared spelling list')
+    return Spellings(shared.exceptions, {**shared.variants, **own.variants}), renames
+
+
+def book_spellings():
+    """The shared spelling list with this book's own respellings added to it."""
+    return _book()[0]
+
+
 def spelled_name(name):
-    """The name a file the readings know as ``name`` has in the book (see :func:`respelled`)."""
-    return respell(name)
+    """The name a file the readings know as ``name`` has in the book (see :func:`respelled`):
+    respelled word by word, then renamed whole, part by part of a URN path."""
+    spellings, renames = _book()
+    return '/'.join(renames.get(part, part) for part in respell(name, spellings).split('/'))
 
 
-def spelled_urn(urn):
-    """The URN a text the readings know as ``urn`` has in the book (see :func:`respelled`)."""
-    return respell_urns(urn)
+def spelled_urn(text):
+    """``text`` with the path of every URN in it named as the book names it (see
+    :func:`respelled`)."""
+    return URN_PATH.sub(lambda m: SCHEME + m.group(1) + spelled_name(m.group(2)), text)
 
 
 def respelled(documents):
-    """The documents with their file names and URNs spelled by specs/naming/spellings.yaml, and
-    the paths they were renamed from.
+    """The documents with their file names and URNs spelled by specs/naming/spellings.yaml and
+    this book's own list, ``spellings.yaml`` beside this module, and the paths they were renamed
+    from.
 
     The readings' IDs and file names are evidence, and keep the spelling they were made under;
     the book's names are respelled here, once everything else has located its files by them.
     """
-    spellings = load_spellings()
     out, renamed = [], []
     for path, root in documents:
-        new = path.with_name(respell(path.stem, spellings) + path.suffix)
+        new = path.with_name(spelled_name(path.stem) + path.suffix)
         if new != path:
             renamed.append(path)
         for node in root.iter():
@@ -216,9 +243,9 @@ def respelled(documents):
                 continue
             for key, value in node.attrib.items():
                 if SCHEME in value:
-                    node.set(key, respell_urns(value, spellings))
+                    node.set(key, spelled_urn(value))
             if node.text and SCHEME in node.text:
-                node.text = respell_urns(node.text, spellings)
+                node.text = spelled_urn(node.text)
         out.append((new, root))
     return out, renamed
 

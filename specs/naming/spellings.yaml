@@ -23,23 +23,82 @@ variants:
   qaddish: kaddish
   qiddush: kiddush
   # Het is ch, never h or kh
+  aharei: acharei
+  ahazatnu: achazatnu
+  ahor: achor
   anahnu: anachnu
+  batehu: batechu
   berahamim: berachamim
+  berahoq: berachoq
+  chonenu: chonnenu
   ehad: echad
+  eshkeha: ashkechah
+  ezrahi: ezrachi
+  hahesed: hachesed
+  hahomer: hachomer
+  hamudot: chamudot
+  haqarta: chaqarta
+  hashuvah: chashuvah
+  hasin: chasin
+  hataenu: chataeinu
+  hatanu: chatanu
+  hattotai: chattotai
   hayyim: chayyim
+  helqi: chelqi
+  hesed: chesed
+  hillah: chillah
+  hillinu: chillinu
+  hinnun: chinnun
+  hithaneni: hitchanneni
+  hizqu: chizqu
   hodesh: chodesh
+  honenu: chonnenu
+  hoqer: choqer
+  keraham: kerachem
+  lehahaziq: lehachaziq
+  leheqer: lecheqer
+  mahaseh: machaseh
+  mashiah: mashiach
+  meharon: mecharon
   menuhah: menuchah
+  merhaqim: merchaqqim
+  meshiah: meshiach
   minhat: minchat
+  mizbeah: mizbeach
+  niftah: niftach
+  nimtehu: nimtechu
   pahdekha: pachdekha
   rahamekha: rachamekha
   rahamim: rachamim
   rahem: rachem
+  rahmana: rachamana
   rahum: rachum
+  ruhot: ruchot
   selihah: selichah
   selihot: selichot
+  shahar: shachar
+  shakhahnu: shakhachnu
+  shalehah: shalechah
+  shiharnukha: shicharnukha
+  sihi: sichi
   tahanun: tachanun
+  tashhet: tashchet
+  tehesheh: techesheh
+  tehinnah: techinnah
+  teqah: tiqqach
+  terahamenu: terachamenu
+  tivhar: tivchar
+  tohelet: tochelet
+  umahati: umachati
+  umeholeli: umecholeli
   vaanahnu: vaanachnu
+  vatehu: vatechu
+  vehanun: vechannun
   vehartanu: vechartanu
+  vehashakh: vechashakh
+  veleharishah: velacharishah
+  venithazzaqah: venitchazzeqah
+  yehabbienu: yachbienu
   # Khaf is kh, not ch
   barech: barekh
   baruch: barukh
@@ -55,44 +114,99 @@ variants:
   kolenu: qolenu
   pesukim: pesuqim
   # Tzadi is tz, not ts
+  atsmi: atzmi
+  behimamtseo: behimmatzeo
+  betsa: betza
+  betsedeq: betzedeq
+  betsidqat: betzidqat
   haarets: haaretz
+  hatsedaqah: hatzedaqah
   hatsel: hatzel
+  matsoq: matzoq
+  meerets: meeretz
   mitratseh: mitratzeh
   mitsvah: mitzvah
+  omets: ometz
   ratson: ratzon
-  tsaddiq: tzaddiq
+  tiqtsof: tiqtzof
   tsaar: tzaar
+  tsaddiq: tzaddiq
   tsarah: tzarah
+  tsel: tzel
+  tsevaot: tzevaot
+  tsibbur: tzibbur
+  tsidqekha: tzidqekha
+  tsidqotenu: tzidqoteinu
+  tsiyon: tziyyon
   tsom: tzom
   tsur: tzur
+  tsurenu: tzurenu
+  tsuri: tzuri
+  vetsinnati: vetzinnati
+  vetsur: vetzur
+  virtsonkha: virtzonkha
+  yertseh: yirtzeh
+  yitsdaq: yitzdaq
   yotser: yotzer
+  yotserenu: yotzerenu
+  yotseri: yotzeri
+  yotsri: yotzeri
   # Dagesh hazak doubles within a word
   amekha: ammekha
+  amkha: ammekha
+  apayim: appayim
   atah: attah
+  ayeh: ayyeh
+  bematei: bemattei
+  biqshanukha: biqqashnukha
   chayim: chayyim
+  eiyyeh: ayyeh
+  habet: habbet
   hakahal: haqahal
   hateh: hatteh
   imanu: immanu
   imekha: immekha
   kama: kammah
   kamah: kammah
+  kemidat: kemiddat
   kiviti: qivviti
+  limed: limmed
+  magenni: maginni
   makot: makkot
+  midotekha: middotekha
   nekadesh: neqaddesh
   neqadesh: neqaddesh
+  qidamti: qiddamti
+  qivitikha: qivvitikha
+  rabu: rabbu
+  ranen: rannen
   ribono: ribbono
   tefilah: tefillah
   tefilat: tefillat
+  tehila: tehillah
   tikanta: tiqqanta
   tiqanta: tiqqanta
+  titnu: tittenu
   tsadiq: tzaddiq
-  tzadiqim: tzaddiqim
   tzaddikim: tzaddiqim
+  tzadiqim: tzaddiqim
+  umasi: umassei
+  uneshalmah: uneshallemah
+  vaamitkha: vaamittekha
+  veatah: veattah
   # but not after a prefix
   bammeh: bameh
+  hannahar: hanahar
+  labbeqarim: labeqarim
+  lakkol: lakol
   mikkol: mikol
   miqqedem: miqedem
-  # Segol + yod is ei
+  # Tsere or segol + yod is ei, except before the suffix -kha (lefanekha)
+  amarenu: amareinu
+  eleikha: elekha
+  leenenu: leeineinu
+  lule: lulei
+  makhnise: makhnisei
   vetechezenah: vetechezeinah
   vetehezena: vetechezeinah
   # A final heh is written
@@ -103,3 +217,6 @@ variants:
   retze: retzeh
   shuva: shuvah
   yehuda: yehudah
+  # Other
+  neessar: neesar
+  vehasqat: vehasket

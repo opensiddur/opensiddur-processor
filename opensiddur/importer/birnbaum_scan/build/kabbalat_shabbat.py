@@ -11,7 +11,7 @@ from .kabbalat_shabbat_data import (HE, EN, EN_JOIN, PAGES, READER, REFRAIN,
 ROOT = SIDDUR+'shabbat/kabbalat_shabbat'
 SIGIL = '1949 shabbat/kabbalat_shabbat'
 DODI = POEM+'lecha_dodi'
-ANA = POEM+'ana_bekhoach'
+ANA = POEM+'anna_bekhoach'
 WELCOME = PRAYER+'nichum_avelim/hamakom_yenachem'
 FESTIVAL = feature(AGG, 'yom-tov')
 # The caller names the incoming Shabbat. AFTER_FESTIVAL uses that night's Hebrew
@@ -46,7 +46,7 @@ def shared(lang, prayers):
                 return m[1].replace(biblical,local)+f'<tei:seg source="{biblical}">'+m[2]+'</tei:seg>'
             p['body'], count=re.subn(pattern,move,p['body'],flags=re.S)
             if count!=1: raise ValueError(f'Expected one earlier occurrence of {biblical}')
-        if p['name']=='poem_ana_bekhoach':
+        if p['name']=='poem_anna_bekhoach':
             count=0
             def line(m):
                 nonlocal count
@@ -54,7 +54,7 @@ def shared(lang, prayers):
                 return '<tei:l>'+marked(ANA+'/'+str(count),m[1],unit='stanza')+'</tei:l>'
             p['body']=re.sub(r'<tei:l>(.*?)</tei:l>',line,p['body'],flags=re.S)
             if count!=7: raise ValueError('Expected seven Ana Bekoach lines')
-        page={'poem_ana_bekhoach':243, 'conclusion_psalm_93':249,
+        page={'poem_anna_bekhoach':243, 'conclusion_psalm_93':249,
               'kaddish_derabbanan_yitgadal':249, 'kaddish_derabbanan_yehe_shmeh':249,
               'kaddish_derabbanan_yitbarakh':249, 'kaddish_yatom':249}.get(p['name'])
         if page:
@@ -131,7 +131,7 @@ def units(project):
             body=f'<tei:div corresp="{urn}">'+(editorial_head(lang,he,en) if head else '')+body+'</tei:div>'))
     ana=(pb(243+side,sigil=SIGIL)+transclude(ANA)
          +transclude(PRAYER+'shema/barukh_shem'))
-    add('kabbalat_ana_bekhoach',ROOT+'/ana_bekhoach','אנא בכח','Ana Bekoach',243,243,ana)
+    add('kabbalat_anna_bekhoach',ROOT+'/anna_bekhoach','אנא בכח','Ana Bekoach',243,243,ana)
     # Psalm 93 is already encoded in the psalm-of-the-day sequence.
     add('kabbalat_psalm_93',ROOT+'/psalm_93','תהלים צג','Psalm 93',249,249,
         pb(249+side,sigil=SIGIL)+transclude(BIBLE+'psalms/93'),head=False)
@@ -140,7 +140,7 @@ def units(project):
     add('kabbalat_kaddish',ROOT+'/kaddish','קדיש יתום','MOURNERS’ KADDISH',249,249,
         pb(249+side,sigil=SIGIL)+conditional('minyan','When a minyan holds service:',MINYAN,kad))
     before=''.join(transclude(BIBLE+f'psalms/{n}') for n in (95,96,97,98,99,29))
-    before+=transclude(ROOT+'/ana_bekhoach')+transclude(DODI)
+    before+=transclude(ROOT+'/anna_bekhoach')+transclude(DODI)
     before+=conditional('mourners',CONDOLENCE_RUBRIC,PRESENT_MOURNERS,transclude(WELCOME))
     content=conditional('friday_festival',FRIDAY_RUBRIC,FULL,before)
     content+=instruction('If a festival occurs on Friday, the evening service begins here.')

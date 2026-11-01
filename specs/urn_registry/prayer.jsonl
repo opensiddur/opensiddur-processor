@@ -210,7 +210,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:amidah/zokhraynu_hashem_elohaynu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah", "label_he": "זׇכְרֵֽנוּ יְיָ אֱלֹהֵֽינוּ"}
 {"urn": "urn:x-opensiddur:text:prayer:asher_yatzar", "status": "canonical", "label_en": "Asher Yatzar", "label_he": "אֲשֶׁר יָצַר"}
 {"urn": "urn:x-opensiddur:text:prayer:ashrei", "status": "canonical", "label_en": "Ashrei"}
-{"urn": "urn:x-opensiddur:text:prayer:ashrei/tehila_ledavid", "parent": "urn:x-opensiddur:text:prayer:ashrei", "status": "canonical"}
+{"urn": "urn:x-opensiddur:text:prayer:ashrei/tehillah_ledavid", "parent": "urn:x-opensiddur:text:prayer:ashrei", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:attah_hu", "status": "context", "note": "A grouping only. Printed 25 parts the passage at a Reader label, so its two halves are separate texts; nothing says the whole."}
 {"urn": "urn:x-opensiddur:text:prayer:attah_hu/ad_shelo", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:attah_hu", "label_he": "אַתָּה הוּא עַד שֶׁלֹּא נִבְרָא הָעוֹלָם", "label_en": "Thou wast the same before the world was created"}
 {"urn": "urn:x-opensiddur:text:prayer:attah_hu/bashamayim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:attah_hu", "label_he": "אַתָּה הוּא בַּשָּׁמַֽיִם וּבָאָֽרֶץ", "label_en": "Thou, Lord our God, art in heaven and on earth"}
@@ -232,7 +232,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/chadesh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
 {"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/chamol", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
 {"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/chatanu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
-{"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/chonenu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
+{"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/chonnenu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
 {"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/ein_lanu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
 {"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/hachazirenu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
 {"urn": "urn:x-opensiddur:text:prayer:avinu_malkenu/hafer", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:avinu_malkenu"}
@@ -342,8 +342,8 @@
 {"urn": "urn:x-opensiddur:text:prayer:eizehu_mekoman/6", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:eizehu_mekoman", "label_he": "אֵיזֶֽהוּ מְקוֹמָן ו", "label_en": "Zevaḥim 5:6"}
 {"urn": "urn:x-opensiddur:text:prayer:eizehu_mekoman/7", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:eizehu_mekoman", "label_he": "אֵיזֶֽהוּ מְקוֹמָן ז", "label_en": "Zevaḥim 5:7"}
 {"urn": "urn:x-opensiddur:text:prayer:eizehu_mekoman/8", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:eizehu_mekoman", "label_he": "אֵיזֶֽהוּ מְקוֹמָן ח", "label_en": "Zevaḥim 5:8"}
-{"urn": "urn:x-opensiddur:text:prayer:el_erekh_apayim", "status": "canonical", "label_en": "El erekh apayim"}
-{"urn": "urn:x-opensiddur:text:prayer:el_erekh_apayim/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:el_erekh_apayim"}
+{"urn": "urn:x-opensiddur:text:prayer:el_erekh_appayim", "status": "canonical", "label_en": "El erekh apayim"}
+{"urn": "urn:x-opensiddur:text:prayer:el_erekh_appayim/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:el_erekh_appayim"}
 {"urn": "urn:x-opensiddur:text:prayer:elohai_neshamah", "status": "canonical", "label_en": "Elohai Neshamah", "label_he": "אֱלֹהַי נְשָׁמָה"}
 {"urn": "urn:x-opensiddur:text:prayer:elu_devarim", "status": "canonical", "label_en": "Elu Devarim (Mishnah Peah 1:1; Shabbath 127a)", "label_he": "אֵֽלּוּ דְבָרִים"}
 {"urn": "urn:x-opensiddur:text:prayer:emet_veyatziv", "status": "canonical", "label_en": "emet veyatziv"}
@@ -449,20 +449,20 @@
 {"urn": "urn:x-opensiddur:text:prayer:tachanun", "status": "canonical", "label_en": "Tachanun"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/adonai_elohei", "status": "canonical", "label_en": "Adonai elohei", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/adonai_elohei/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/adonai_elohei"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/ana_melekh", "status": "canonical", "label_en": "Ana melekh", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/ana_melekh/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/ana_melekh"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/ana_shuv", "status": "canonical", "label_en": "Ana shuv", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/ana_shuv/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/ana_shuv"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/anna_melekh", "status": "canonical", "label_en": "Ana melekh", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/anna_melekh/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/anna_melekh"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/anna_shuv", "status": "canonical", "label_en": "Ana shuv", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/anna_shuv/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/anna_shuv"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/chusah", "status": "canonical", "label_en": "Chusah", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/chusah/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/chusah"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/ein_kamokha", "status": "canonical", "label_en": "Ein kamokha", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/ein_kamokha/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/ein_kamokha"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/el_rachum", "status": "canonical", "label_en": "El rachum", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/el_rachum/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/el_rachum"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/habet_mishamayim", "status": "canonical", "label_en": "Habet mishamayim", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/habet_mishamayim/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/habet_mishamayim"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/habet_na", "status": "canonical", "label_en": "Habet na", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
-{"urn": "urn:x-opensiddur:text:prayer:tachanun/habet_na/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/habet_na"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/habbet_mishamayim", "status": "canonical", "label_en": "Habet mishamayim", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/habbet_mishamayim/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/habbet_mishamayim"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/habbet_na", "status": "canonical", "label_en": "Habet na", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
+{"urn": "urn:x-opensiddur:text:prayer:tachanun/habbet_na/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/habbet_na"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/hapoteach", "status": "canonical", "label_en": "Hapoteach", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/hapoteach/text", "status": "canonical", "label_en": "Text", "parent": "urn:x-opensiddur:text:prayer:tachanun/hapoteach"}
 {"urn": "urn:x-opensiddur:text:prayer:tachanun/qolenu", "status": "canonical", "label_en": "Kolenu", "parent": "urn:x-opensiddur:text:prayer:tachanun"}
@@ -717,8 +717,8 @@
 {"urn": "urn:x-opensiddur:text:prayer:ufetah_lanu", "status": "canonical", "label_en": "ufetah lanu"}
 {"urn": "urn:x-opensiddur:text:prayer:ufetah_lanu/text", "status": "canonical", "label_en": "ufetah lanu — text"}
 {"urn": "urn:x-opensiddur:text:prayer:ashrei/quoted_115_18", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashrei"}
-{"urn": "urn:x-opensiddur:text:prayer:hallel/ana/hatzlicha", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel/ana"}
-{"urn": "urn:x-opensiddur:text:prayer:hallel/ana/hoshia", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel/ana"}
+{"urn": "urn:x-opensiddur:text:prayer:hallel/anna/hatzlicha", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel/ana"}
+{"urn": "urn:x-opensiddur:text:prayer:hallel/anna/hoshia", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel/ana"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/blessing", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/ana", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/chadesh_aleinu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah"}
@@ -741,14 +741,14 @@
 {"urn": "urn:x-opensiddur:text:prayer:tefillat_tal", "status": "canonical", "label_en": "Festival Musaf: tefillat tal"}
 {"urn": "urn:x-opensiddur:text:prayer:el_male_rachamim", "status": "canonical", "label_en": "El Male Rachamim"}
 {"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/after_counting", "status": "canonical", "label_en": "sefirat haomer — after counting", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach", "status": "canonical", "label_en": "sefirat haomer — ana bekoach", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/1", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 1", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/2", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 2", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/3", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 3", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/4", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 4", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/5", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 5", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/6", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 6", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
-{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach/7", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 7", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/ana_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach", "status": "canonical", "label_en": "sefirat haomer — ana bekoach", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/1", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 1", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/2", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 2", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/3", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 3", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/4", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 4", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/5", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 5", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/6", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 6", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
+{"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach/7", "status": "canonical", "label_en": "sefirat haomer — ana bekoach — 7", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer/anna_bekoach"}
 {"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/barukh_shem", "status": "canonical", "label_en": "sefirat haomer — baruch shem", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer"}
 {"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/blessing", "status": "canonical", "label_en": "sefirat haomer — blessing", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer"}
 {"urn": "urn:x-opensiddur:text:prayer:sefirat_haomer/counting", "status": "canonical", "label_en": "sefirat haomer — counting", "parent": "urn:x-opensiddur:text:prayer:sefirat_haomer"}
@@ -1037,30 +1037,30 @@
 {"urn": "urn:x-opensiddur:text:prayer:el_melekh_yoshev", "status": "canonical", "label_en": "el melekh yoshev"}
 {"urn": "urn:x-opensiddur:text:prayer:vayaavor", "status": "canonical", "label_en": "vayaavor"}
 {"urn": "urn:x-opensiddur:text:prayer:kaddish/shalem", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:kaddish", "label_he": "קדיש שלם", "label_en": "Full Kaddish"}
-{"urn": "urn:x-opensiddur:text:prayer:lekha_adonai_hatsedaqah", "status": "canonical", "label_en": "lekha adonai hatsedaqah"}
+{"urn": "urn:x-opensiddur:text:prayer:lekha_adonai_hatzedaqah", "status": "canonical", "label_en": "lekha adonai hatsedaqah"}
 {"urn": "urn:x-opensiddur:text:prayer:shomea_tefillah", "status": "canonical", "label_en": "shomea tefillah"}
-{"urn": "urn:x-opensiddur:text:prayer:selah_lanu_avinu", "status": "canonical", "label_en": "selah lanu avinu"}
+{"urn": "urn:x-opensiddur:text:prayer:selach_lanu_avinu", "status": "canonical", "label_en": "selah lanu avinu"}
 {"urn": "urn:x-opensiddur:text:prayer:ki_al_rachamekha", "status": "canonical", "label_en": "ki al rahamekha"}
 {"urn": "urn:x-opensiddur:text:prayer:vayaavor/selichot_preliminary", "status": "canonical", "label_en": "vayaavor/selichot preliminary", "parent": "urn:x-opensiddur:text:prayer:vayaavor"}
 {"urn": "urn:x-opensiddur:text:prayer:adonai_boqer_tishma_qoli", "status": "canonical", "label_en": "adonai boqer tishma qoli"}
-{"urn": "urn:x-opensiddur:text:prayer:selah_na", "status": "canonical", "label_en": "selah na"}
+{"urn": "urn:x-opensiddur:text:prayer:selach_na", "status": "canonical", "label_en": "selah na"}
 {"urn": "urn:x-opensiddur:text:prayer:hatteh_elohai_oznekha", "status": "canonical", "label_en": "hateh elohai oznekha"}
 {"urn": "urn:x-opensiddur:text:prayer:miqveh_yisrael", "status": "canonical", "label_en": "miqveh yisrael"}
 {"urn": "urn:x-opensiddur:text:prayer:tavo_lefanekha_tefillatenu", "status": "canonical", "label_en": "tavo lefanekha tefillatenu"}
 {"urn": "urn:x-opensiddur:text:prayer:zekhor_rachamekha", "status": "canonical", "label_en": "zekhor rahamekha"}
 {"urn": "urn:x-opensiddur:text:prayer:zekhor_lanu_berit_rishonim", "status": "canonical", "label_en": "zekhor lanu berit rishonim"}
 {"urn": "urn:x-opensiddur:text:prayer:shema_qolenu", "status": "canonical", "label_en": "shema qolenu"}
-{"urn": "urn:x-opensiddur:text:prayer:amarenu_haazinah", "status": "canonical", "label_en": "amarenu haazinah"}
+{"urn": "urn:x-opensiddur:text:prayer:amareinu_haazinah", "status": "canonical", "label_en": "amarenu haazinah"}
 {"urn": "urn:x-opensiddur:text:prayer:viduy", "status": "canonical", "label_en": "viduy"}
 {"urn": "urn:x-opensiddur:text:prayer:viduy/introduction", "status": "canonical", "label_en": "viduy/introduction", "parent": "urn:x-opensiddur:text:prayer:viduy"}
 {"urn": "urn:x-opensiddur:text:prayer:ashamnu", "status": "canonical", "label_en": "ashamnu"}
-{"urn": "urn:x-opensiddur:text:prayer:meshiah_tsidqekha", "status": "canonical", "label_en": "meshiah tsidqekha"}
+{"urn": "urn:x-opensiddur:text:prayer:meshiach_tzidqekha", "status": "canonical", "label_en": "meshiah tsidqekha"}
 {"urn": "urn:x-opensiddur:text:prayer:anenu", "status": "canonical", "label_en": "anenu"}
 {"urn": "urn:x-opensiddur:text:prayer:mi_sheanah", "status": "canonical", "label_en": "mi sheanah"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana", "status": "canonical", "label_en": "rahmana"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana", "status": "canonical", "label_en": "rahmana"}
 {"urn": "urn:x-opensiddur:text:prayer:vayomer_david", "status": "canonical", "label_en": "vayomer david"}
-{"urn": "urn:x-opensiddur:text:prayer:rachum_vehanun", "status": "canonical", "label_en": "rahum vehanun"}
-{"urn": "urn:x-opensiddur:text:prayer:mahi_umasi", "status": "canonical", "label_en": "mahi umasi"}
+{"urn": "urn:x-opensiddur:text:prayer:rachum_vechannun", "status": "canonical", "label_en": "rahum vehanun"}
+{"urn": "urn:x-opensiddur:text:prayer:machei_umassei", "status": "canonical", "label_en": "mahi umasi"}
 {"urn": "urn:x-opensiddur:text:prayer:mitratzeh_berachamim", "status": "canonical", "label_en": "mitratseh berahamim"}
 {"urn": "urn:x-opensiddur:text:prayer:vaanachnu_lo_neda", "status": "canonical", "label_en": "vaanahnu lo neda"}
 {"urn": "urn:x-opensiddur:text:prayer:kaddish/selichot_preface", "status": "canonical", "label_en": "kaddish/selichot preface", "parent": "urn:x-opensiddur:text:prayer:kaddish"}
@@ -1069,31 +1069,31 @@
 {"urn": "urn:x-opensiddur:text:prayer:ein_qore_beshimkha", "status": "canonical", "label_en": "ein qore beshimkha"}
 {"urn": "urn:x-opensiddur:text:prayer:selichot/rachamekha_rabbim", "status": "canonical", "label_en": "selichot/rahamekha rabbim"}
 {"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_shetehe_hashanah", "status": "canonical", "label_en": "yehi ratson shetehe hashanah"}
-{"urn": "urn:x-opensiddur:text:prayer:keraham_av", "status": "canonical", "label_en": "Like a father has compassion: scriptural petitions"}
-{"urn": "urn:x-opensiddur:text:prayer:selichot/ki_lo_al_tsidqotenu", "status": "canonical", "label_en": "For we do not presume: Daniel petitions"}
+{"urn": "urn:x-opensiddur:text:prayer:kerachem_av", "status": "canonical", "label_en": "Like a father has compassion: scriptural petitions"}
+{"urn": "urn:x-opensiddur:text:prayer:selichot/ki_lo_al_tzidqoteinu", "status": "canonical", "label_en": "For we do not presume: Daniel petitions"}
 {"urn": "urn:x-opensiddur:text:prayer:beit_qodshenu_vetifartenu", "status": "canonical", "label_en": "beit qodshenu vetifartenu"}
-{"urn": "urn:x-opensiddur:text:prayer:dirshu_adonai_behimamtseo", "status": "canonical", "label_en": "dirshu adonai behimamtseo"}
-{"urn": "urn:x-opensiddur:text:prayer:elohim_lanu_mahaseh_vaoz", "status": "canonical", "label_en": "elohim lanu mahaseh vaoz"}
-{"urn": "urn:x-opensiddur:text:prayer:hetivah_virtsonkha_et_tsiyon", "status": "canonical", "label_en": "hetivah virtsonkha et tsiyon"}
+{"urn": "urn:x-opensiddur:text:prayer:dirshu_adonai_behimmatzeo", "status": "canonical", "label_en": "dirshu adonai behimamtseo"}
+{"urn": "urn:x-opensiddur:text:prayer:elohim_lanu_machaseh_vaoz", "status": "canonical", "label_en": "elohim lanu mahaseh vaoz"}
+{"urn": "urn:x-opensiddur:text:prayer:heitivah_virtzonkha_et_tziyyon", "status": "canonical", "label_en": "hetivah virtsonkha et tsiyon"}
 {"urn": "urn:x-opensiddur:text:prayer:shuvah_yisrael_ad_adonai", "status": "canonical", "label_en": "shuvah yisrael ad adonai"}
-{"urn": "urn:x-opensiddur:text:prayer:tashuv_terahamenu_vetikhbosh", "status": "canonical", "label_en": "tashuv terahamenu vetikhbosh"}
+{"urn": "urn:x-opensiddur:text:prayer:tashuv_terachamenu_vetikhbosh", "status": "canonical", "label_en": "tashuv terahamenu vetikhbosh"}
 {"urn": "urn:x-opensiddur:text:prayer:selichot/rachamekha_rabbim/al_tavo", "status": "canonical", "label_en": "selichot/rahamekha rabbim/al tavo", "parent": "urn:x-opensiddur:text:prayer:selichot/rachamekha_rabbim"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan", "status": "canonical", "label_en": "rahmana adkar lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan", "status": "canonical", "label_en": "rahmana adkar lan"}
 {"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_im_amadti", "status": "canonical", "label_en": "ribbon haolamim im amadti"}
-{"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_lo_al_atsmi", "status": "canonical", "label_en": "ribbon haolamim lo al atsmi"}
-{"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_lule_hataenu", "status": "canonical", "label_en": "ribbon haolamim lule hataenu"}
-{"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_minhag_bet_dinekha", "status": "canonical", "label_en": "ribbon haolamim minhag bet dinekha"}
+{"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_lo_al_atzmi", "status": "canonical", "label_en": "ribbon haolamim lo al atsmi"}
+{"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_lulei_chataeinu", "status": "canonical", "label_en": "ribbon haolamim lule hataenu"}
+{"urn": "urn:x-opensiddur:text:prayer:ribbon_haolamim_minhag_beit_dinekha", "status": "canonical", "label_en": "ribbon haolamim minhag bet dinekha"}
 {"urn": "urn:x-opensiddur:text:prayer:ribbon_olamim_qodem_kol_davar", "status": "canonical", "label_en": "ribbon olamim qodem kol davar"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_1", "status": "canonical", "label_en": "rahmana adkar lan/stanza 1", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_10", "status": "canonical", "label_en": "rahmana adkar lan/stanza 10", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_2", "status": "canonical", "label_en": "rahmana adkar lan/stanza 2", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_3", "status": "canonical", "label_en": "rahmana adkar lan/stanza 3", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_4", "status": "canonical", "label_en": "rahmana adkar lan/stanza 4", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_5", "status": "canonical", "label_en": "rahmana adkar lan/stanza 5", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_6", "status": "canonical", "label_en": "rahmana adkar lan/stanza 6", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_7", "status": "canonical", "label_en": "rahmana adkar lan/stanza 7", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_8", "status": "canonical", "label_en": "rahmana adkar lan/stanza 8", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
-{"urn": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan/stanza_9", "status": "canonical", "label_en": "rahmana adkar lan/stanza 9", "parent": "urn:x-opensiddur:text:prayer:rahmana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_1", "status": "canonical", "label_en": "rahmana adkar lan/stanza 1", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_10", "status": "canonical", "label_en": "rahmana adkar lan/stanza 10", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_2", "status": "canonical", "label_en": "rahmana adkar lan/stanza 2", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_3", "status": "canonical", "label_en": "rahmana adkar lan/stanza 3", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_4", "status": "canonical", "label_en": "rahmana adkar lan/stanza 4", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_5", "status": "canonical", "label_en": "rahmana adkar lan/stanza 5", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_6", "status": "canonical", "label_en": "rahmana adkar lan/stanza 6", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_7", "status": "canonical", "label_en": "rahmana adkar lan/stanza 7", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_8", "status": "canonical", "label_en": "rahmana adkar lan/stanza 8", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
+{"urn": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan/stanza_9", "status": "canonical", "label_en": "rahmana adkar lan/stanza 9", "parent": "urn:x-opensiddur:text:prayer:rachamana_adkar_lan"}
 {"urn": "urn:x-opensiddur:text:prayer:die_segensspruche_beim_anzunden_der_chanukah_lichter", "status": "canonical", "label_en": "Die Segenssprüche beim Anzünden der Ḥanukkah-Lichter (German trans. by Chajm Guski)", "label_he": "ברכות לנרות חנוכה"}
 {"urn": "urn:x-opensiddur:text:prayer:die_segensspruche_beim_anzunden_der_chanukah_lichter/1", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:die_segensspruche_beim_anzunden_der_chanukah_lichter", "label_en": "Die Segenssprüche beim Anzünden der Ḥanukkah-Lichter (German trans. by Chajm Guski) / 1"}
 {"urn": "urn:x-opensiddur:text:prayer:die_segensspruche_beim_anzunden_der_chanukah_lichter/4", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:die_segensspruche_beim_anzunden_der_chanukah_lichter", "label_en": "Die Segenssprüche beim Anzünden der Ḥanukkah-Lichter (German trans. by Chajm Guski) / 4"}

@@ -890,7 +890,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:poem:ana_bekhoach",
+        target="urn:x-opensiddur:text:poem:anna_bekhoach",
         lemma="אנא בכח",
         paras=[
             dict(text=(

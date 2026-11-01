@@ -1,0 +1,3 @@
+# A synthetic book spelling list for test_respelling.py: only its renames are read from the file.
+renames:
+  al_tzom_tachanun: al_tzom_techinnah

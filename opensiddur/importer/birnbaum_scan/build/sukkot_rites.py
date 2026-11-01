@@ -168,7 +168,7 @@ def units(project):
     rab_keys=[r['key'] for r in ROWS if r['group']=='hoshanot']
     rab_keys=rab_keys[rab_keys.index('hoshanot_ani_vaho_rabbah'):]
     rb=''
-    before={'ani_vaho_rabbah':('686','rabbah'),'ana_hoshia':('687','response'),'ana_el_na':('688','response'),'ana_avinu':('689','response'),'hosha_na_el_na':('692','response'),'taaneh_emunim_first':('692','willows'),'kol_mevaser_response':('694','response'),'kol_mevaser_end':('696','response'),'yehi_ratzon_aravah':('696','strike')}
+    before={'ani_vaho_rabbah':('686','rabbah'),'anna_hoshia':('687','response'),'anna_el_na':('688','response'),'anna_avinu':('689','response'),'hosha_na_el_na':('692','response'),'taaneh_emunim_first':('692','willows'),'kol_mevaser_response':('694','response'),'kol_mevaser_end':('696','response'),'yehi_ratzon_aravah':('696','strike')}
     for k in rab_keys:
         short=k.removeprefix('hoshanot_')
         if short in before:

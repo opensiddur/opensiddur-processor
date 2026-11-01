@@ -65,7 +65,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                                  'כִּי דַלּֽוֹנוּ מְאֹד. ',
                            'en': 'O mind not our former iniquities; may thy compassion hasten to our aid, '
                                  'for we are brought very low. '},
-                          {'anchor': 'chonenu',
+                          {'anchor': 'chonnenu',
                            'source': 'psalms/123/3',
                            'he': 'חָנֵּֽנוּ יְיָ חָנֵּֽנוּ, כִּי רַב שָׂבַֽעְנוּ בוּז. ',
                            'en': 'Take pity on us, O Lord, take pity on us, for we are exceedingly sated '
@@ -145,7 +145,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                             'deal charitably with us for thy name’s sake. Our Lord God, hear our '
                             'supplications; remember in our favor the covenant of our fathers, and save us '
                             'for thy name’s sake. '},
-                     {'anchor': 'veatah',
+                     {'anchor': 'veattah',
                       'source': 'daniel/9/15',
                       'he': 'וְעַתָּה אֲדֹנָי אֱלֹהֵֽינוּ, אֲשֶׁר הוֹצֵֽאתָ אֶת עַמְּךָ מֵאֶֽרֶץ מִצְרַֽיִם '
                             'בְּיָד חֲזָקָה וַתַּֽעַשׂ לְךָ שֵׁם כַּיּוֹם הַזֶּה, חָטָֽאנוּ רָשָֽׁעְנוּ. ',
@@ -161,7 +161,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                             'fury turn from Jerusalem thy city, thy holy mountain; for through our sins, and '
                             'through the iniquities of our fathers, Jerusalem and thy people are held in '
                             'disgrace by all who surround us. '},
-                     {'anchor': 'veatah_shema',
+                     {'anchor': 'veattah_shema',
                       'source': 'daniel/9/17',
                       'he': 'וְעַתָּה שְׁמַע, אֱלֹהֵֽינוּ, אֶל תְּפִלַּת עַבְדְּךָ וְאֶל תַּחֲנוּנָיו, '
                             'וְהָאֵר פָּנֶֽיךָ עַל מִקְדָּשְׁךָ הַשָּׁמֵם, לְמַֽעַן אֲדֹנָי.',
@@ -194,7 +194,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                        'en': 'Our Father, merciful Father, show us a sign for happiness, and gather our '
                              'dispersed from the four corners of the earth; let all the nations realize and '
                              'know that thou art the Lord our God. '},
-                      {'anchor': 'veatah',
+                      {'anchor': 'veattah',
                        'source': 'isaiah/64/7',
                        'he': 'וְעַתָּה יְיָ, אָבִֽינוּ אָֽתָּה; אֲנַֽחְנוּ הַחֹֽמֶר וְאַתָּה יוֹצְרֵֽנוּ, '
                              'וּמַעֲשֵׂה יָדְךָ כֻּלָּֽנוּ. ',
@@ -226,7 +226,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                              '{pb:110}name’s sake. Have compassion on thy people; have mercy on thy '
                              'heritage; spare us in thy great mercy; take pity on us and answer us, for '
                              'righteousness is thine, O Lord, who doest wonders at all times.'}]},
- 'habet_na': {'he': 'הַבֶּט־נָא, רַחֶם־נָא עַל עַמְּךָ מְהֵרָה לְמַֽעַן שְׁמֶךָ. בְּרַחֲמֶֽיךָ הָרַבִּים, '
+ 'habbet_na': {'he': 'הַבֶּט־נָא, רַחֶם־נָא עַל עַמְּךָ מְהֵרָה לְמַֽעַן שְׁמֶךָ. בְּרַחֲמֶֽיךָ הָרַבִּים, '
                     'יְיָ אֱלֹהֵֽינוּ, חוּס וְרַחֵם וְהוֹשִֽׁיעָה צֹאן מַרְעִיתֶֽךָ, וְאַל יִמְשָׁל־בָּֽנוּ '
                     'קֶֽצֶף, כִּי לְךָ עֵינֵֽינוּ תְלוּיוֹת; הוֹשִׁיעֵֽנוּ לְמַֽעַן שְׁמֶֽךָ. רַחֵם '
                     'עָלֵֽינוּ לְמַֽעַן בְּרִיתֶֽךָ; הַבִּֽיטָה וַעֲנֵֽנוּ בְּעֵת צָרָה, כִּי לְךָ יְיָ '
@@ -241,7 +241,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                     'King.',
               'first': 109,
               'last': 109},
- 'ana_melekh': {'he': 'אָֽנָּא, מֶֽלֶךְ חַנּוּן וְרַחוּם, זְכוֹר וְהַבֵּט לִבְרִית בֵּין הַבְּתָרִים, '
+ 'anna_melekh': {'he': 'אָֽנָּא, מֶֽלֶךְ חַנּוּן וְרַחוּם, זְכוֹר וְהַבֵּט לִבְרִית בֵּין הַבְּתָרִים, '
                       'וְתֵרָאֶה לְפָנֶֽיךָ עֲקֵדַת יָחִיד לְמַֽעַן יִשְׂרָאֵל. אָבִֽינוּ מַלְכֵּֽנוּ, '
                       'חָנֵּֽנוּ וַעֲנֵֽנוּ, כִּי שִׁמְךָ הַגָּדוֹל נִקְרָא עָלֵֽינוּ; עֹשֵׂה נִפְלָאוֹת '
                       'בְּכָל עֵת, עֲשֵׂה עִמָּֽנוּ כְּחַסְדֶּֽךָ; חַנּוּן וְרַחוּם, הַבִּֽיטָה וַעֲנֵֽנוּ '
@@ -359,7 +359,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                          'evil to thy people.',
                    'first': 113,
                    'last': 115},
- 'habet_mishamayim': {'he': 'הַבֵּט מִשָּׁמַֽיִם וּרְאֵה, כִּי הָיִֽינוּ לַֽעַג וָקֶֽלֶס בַּגּוֹיִם, '
+ 'habbet_mishamayim': {'he': 'הַבֵּט מִשָּׁמַֽיִם וּרְאֵה, כִּי הָיִֽינוּ לַֽעַג וָקֶֽלֶס בַּגּוֹיִם, '
                             'נֶחְשַֽׁבְנוּ כְּצֹאן לָטֶֽבַח יוּבָל, לַהֲרוֹג וּלְאַבֵּד וּלְמַכָּה '
                             'וּלְחֶרְפָּה.',
                       'en': 'Look down from heaven and see how we have become an object of contempt and '
@@ -379,7 +379,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                  'thy mercy hold back thy anger from us.',
            'first': 115,
            'last': 115},
- 'ana_shuv': {'he': 'אָנָּא, שׁוּב מֵחֲרוֹנֶֽךָ, וְרַחֵם סְגֻלָּה אֲשֶׁר בָּחָֽרְתָּ.',
+ 'anna_shuv': {'he': 'אָנָּא, שׁוּב מֵחֲרוֹנֶֽךָ, וְרַחֵם סְגֻלָּה אֲשֶׁר בָּחָֽרְתָּ.',
               'en': 'O turn from thy wrath, and have pity on the people thou hast chosen.',
               'first': 115,
               'last': 115},
@@ -405,7 +405,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                   'sins for thy name’s sake.',
             'first': 115,
             'last': 115},
- 'el_erekh_apayim': {'he': 'אֵל אֶֽרֶךְ אַפַּֽיִם וְרַב חֶֽסֶד וֶאֱמֶת, אַל בְּאַפְּךָ תוֹכִיחֵֽנוּ. חֽוּסָה '
+ 'el_erekh_appayim': {'he': 'אֵל אֶֽרֶךְ אַפַּֽיִם וְרַב חֶֽסֶד וֶאֱמֶת, אַל בְּאַפְּךָ תוֹכִיחֵֽנוּ. חֽוּסָה '
                            'יְיָ עַל עַמֶּֽךָ, וְהוֹשִׁיעֵֽנוּ מִכָּל רָע. חָטָֽאנוּ לָךְ, אָדוֹן; סְלַח נָא '
                            'כְּרֹב רַחֲמֶֽיךָ, אֵל.',
                      'en': 'O God who art slow to anger and abounding in kindness and truth, hide not thy '
