@@ -322,7 +322,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/yiru_et_adonai", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_hu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun"}
-{"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_she_akhalnu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun"}
+{"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_sheakhalnu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_umevorakh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/hav_lan", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/nevarekh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun"}
@@ -591,11 +591,11 @@
 {"urn": "urn:x-opensiddur:text:prayer:birkat_horim/daughters", "status": "canonical", "label_en": "Parental blessing for daughters", "label_he": "ברכת הבנות", "parent": "urn:x-opensiddur:text:prayer:birkat_horim"}
 {"urn": "urn:x-opensiddur:text:prayer:nichum_avelim", "status": "context", "label_en": "Comforting mourners", "note": "Organizational parent for condolence formulas; no shared text at this level."}
 {"urn": "urn:x-opensiddur:text:prayer:nichum_avelim/hamaqom_yenachem", "status": "canonical", "label_en": "May God console you among the mourners of Zion and Jerusalem", "parent": "urn:x-opensiddur:text:prayer:nichum_avelim"}
-{"urn": "urn:x-opensiddur:text:prayer:me_ein_sheva", "status": "canonical", "label_en": "Blessing embodying the seven blessings"}
+{"urn": "urn:x-opensiddur:text:prayer:meein_sheva", "status": "canonical", "label_en": "Blessing embodying the seven blessings"}
 {"urn": "urn:x-opensiddur:text:prayer:borei_peri_hagafen/text", "status": "canonical", "label_en": "Shabbat evening service — text", "parent": "urn:x-opensiddur:text:prayer:borei_peri_hagafen"}
 {"urn": "urn:x-opensiddur:text:prayer:hashkivenu/hapores_sukkat_shalom", "status": "canonical", "label_en": "Who spreadest the shelter of peace", "parent": "urn:x-opensiddur:text:prayer:hashkivenu"}
 {"urn": "urn:x-opensiddur:text:prayer:kiddush/asher_qiddeshanu", "status": "canonical", "label_en": "Kiddush: who hast sanctified us"}
-{"urn": "urn:x-opensiddur:text:prayer:me_ein_sheva/retzeh", "status": "canonical", "label_en": "Shabbat evening service — retzeh", "parent": "urn:x-opensiddur:text:prayer:me_ein_sheva"}
+{"urn": "urn:x-opensiddur:text:prayer:meein_sheva/retzeh", "status": "canonical", "label_en": "Shabbat evening service — retzeh", "parent": "urn:x-opensiddur:text:prayer:meein_sheva"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/attah_qidashta_et/text", "status": "canonical", "label_en": "Shabbat evening service — text", "parent": "urn:x-opensiddur:text:prayer:amidah/attah_qidashta_et"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/retzeh_vimnuchatenu/text", "status": "canonical", "label_en": "Shabbat evening service — text", "parent": "urn:x-opensiddur:text:prayer:amidah/retzeh_vimnuchatenu"}
 {"urn": "urn:x-opensiddur:text:prayer:hashkivenu/hapores_sukkat_shalom/text", "status": "canonical", "label_en": "Shabbat evening service — text", "parent": "urn:x-opensiddur:text:prayer:hashkivenu/hapores_sukkat_shalom"}

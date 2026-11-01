@@ -205,7 +205,7 @@ def units(project):
         rubric('leader')+p('milah_grace_invitation')+rubric('company')+p('milah_grace_response')
         +transclude(RESHUT)+rubric('grace')
         +transclude(PRAYER+'birkat_hamazon/zimmun/nevarekh')
-        +transclude(PRAYER+'birkat_hamazon/zimmun/barukh_she_akhalnu')
+        +transclude(PRAYER+'birkat_hamazon/zimmun/barukh_sheakhalnu')
         +transclude(PRAYER+'birkat_hamazon/zimmun/barukh_hu')
         +transclude(PRAYER+'birkat_hamazon/four_blessings')
         +transclude(PRAYER+'birkat_hamazon/harachaman/before_insert')

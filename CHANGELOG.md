@@ -50,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **Three names that split a prefix from its word are joined**, as the table writes them:
+  `prayer:birkat_hamazon/zimmun/barukh_she_akhalnu` is `…/barukh_sheakhalnu` (בָּרוּךְ
+  שֶׁאָכַלְנוּ), `prayer:me_ein_sheva` is `prayer:meein_sheva` (מֵעֵין שֶׁבַע), and the Chumash's
+  festival readings say `chol_hamoed`, not `chol_ha_moed` (`bible:reading/sukkot_chol_hamoed_day_1`
+  and its file); a reading's name now joins hebcal's hyphenated article.
 - **No URN aliases before 1.0.** Nothing outside these repositories depends on a URN yet, so the
   registry's 1,662 aliases are removed, and until the first stable release a renamed URN
   replaces the old one outright (`specs/NAMING_SCHEME.md`). The Haggadah's shared liturgy now

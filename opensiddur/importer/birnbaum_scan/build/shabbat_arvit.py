@@ -19,7 +19,7 @@ URNS = {'hashkivenu': PRAYER+'hashkivenu/hapores_sukkat_shalom',
         'veshamru':ROOT+'/verses/veshamru', 'vaydaber':BIBLE+'leviticus/23/44',
         'tiqu':ROOT+'/verses/tiqu', 'attah':PRAYER+'amidah/attah_qidashta_et',
         'vaykhulu':ROOT+'/vaykhulu', 'retzeh':PRAYER+'amidah/retzeh_vimnuchatenu',
-        'mein':PRAYER+'me_ein_sheva', 'kiddush':PRAYER+'kiddush/asher_qiddeshanu',
+        'mein':PRAYER+'meein_sheva', 'kiddush':PRAYER+'kiddush/asher_qiddeshanu',
         'wine':PRAYER+'borei_peri_hagafen'}
 
 
