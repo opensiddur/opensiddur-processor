@@ -314,7 +314,7 @@ as references or presume that explanatory notes exist. Its English
 body contains לשון הרע and needs an explicit Hebrew language span.
 
 When Erev cues refer to printed 52, use that page’s bounded reprinted petitions
-(`prayer:keraham_av`, `prayer:selichot/ki_lo_al_tsidqotenu`), preserving their
+(`prayer:kerachem_av`, `prayer:selichot/ki_lo_al_tzidqoteinu`), preserving their
 wording and punctuation. English cues citing 9/10 use the earlier ranges; do
 not assume that repeated passages are identical.
 

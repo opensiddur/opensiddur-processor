@@ -2,7 +2,7 @@
 """The English of the Akedah and the setting for the Shema, printed pages 20 to 26.
 
 **The Akedah is one paragraph in Hebrew and four in English.** Both sides carry one
-`prayer:akedah`, so the two columns join at the division and each parts its own prose.
+`prayer:aqedah`, so the two columns join at the division and each parts its own prose.
 
 **`לְפִיכָךְ` and `אַתָּה הוּא` are parted in Hebrew and not in English.** Printed 25 sets a
 `Reader` label inside each, which makes the second half its own text with its own URN;

@@ -146,11 +146,10 @@ class PrintedVerseBodyTest(unittest.TestCase):
             body,
         )
 
-    def test_div_keeps_its_haggadah_corresp(self) -> None:
+    def test_div_carries_its_sections_urn(self) -> None:
+        # Psalm 113 is shared liturgy, named by its own URN (sections.SHARED_TEXTS).
         body = printed_verse_body(self.psalms["psalm_113"])
-        self.assertIn(
-            '<tei:div corresp="urn:x-opensiddur:text:haggadah:maggid/psalm_113">', body
-        )
+        self.assertIn('<tei:div corresp="urn:x-opensiddur:text:prayer:hallel/psalm_113">', body)
 
     def test_a_folio_opening_a_psalm_is_marked_before_the_chapter(self) -> None:
         body = printed_verse_body(self.psalms["psalm_114"])

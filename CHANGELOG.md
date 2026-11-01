@@ -50,8 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **No URN aliases before 1.0.** Nothing outside these repositories depends on a URN yet, so the
+  registry's 1,662 aliases are removed, and until the first stable release a renamed URN
+  replaces the old one outright (`specs/NAMING_SCHEME.md`). The Haggadah's shared liturgy now
+  uses its `prayer:` URNs, as the aliases planned (`specs/SIDDUR_URN_SCHEME.md`): the Hallel
+  psalms (`prayer:hallel/psalm_113` … `psalm_118`, `prayer:hallel_hagadol`), Nishmat through
+  Yishtabbach, Birkat Hamazon's paragraphs (`prayer:birkat_hamazon/*`, `prayer:yaaleh_veyavo`),
+  Kiddush's (`prayer:kiddush/*`, `prayer:shehecheyanu`), Al Hagefen and the Omer count. Its
+  Yehalalukha variant is `condition:prayer:hallel/yehalelukha/al`. The examples' Yishtabbach is
+  `prayer:yishtabbach`.
 - **The opensiddur.org imports' names are spelled by the table** (#266): the Hebrew words of
-  the post titles that name their texts, with the old URNs recorded as aliases. A shva the
+  the post titles that name their texts. A shva the
   title elides is written (`avnei_yeqar`, `banu_choshekh_legaresh`, `shenei_zeitim`), a prefix
   is joined to its word (`ashirah_letzur_nora`, `hakhrazah_limei_hahodayah`), and doubling and
   a final heh follow the table (`al_hanissim`, `chanukkiyyah`). The importer now joins the
@@ -59,8 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   romanization. English, German, French, Yiddish, Ladino and Judeo-Arabic words are left as
   the titles give them, and a French post's title is not joined, since French elides the same
   way ("l’instruction").
-- **The Haggadah's names are spelled by the table** (#266), with the old URNs recorded as
-  aliases. The seder steps are `qaddesh`, `maggid`, `rachatz`, `korekh` and `shulchan_orekh`; a
+- **The Haggadah's names are spelled by the table** (#266). The seder steps are `qaddesh`, `maggid`, `rachatz`, `korekh` and `shulchan_orekh`; a
   word is no longer split by `_` (`asher_ge_alanu` is `asher_gealanu`, `u_v_moftim` is
   `uvemofetim`); and names that were English or glosses are the printed words
   (`it_happened_at_midnight` is `vayehi_bachatzi_halailah`, `pesach_mitzvah` is `pesach_shehayu`,
@@ -70,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Birnbaum's `qorbanot/ushchat` is `qorbanot/veshachat`, as printed (וְשָׁחַט). The Haggadah's
   variant conditions are renamed with their sections, so a settings file that chose one needs
   the new name (`condition:haggadah:maggid/lefikhakh/shirah_chadashah`).
-- **Birnbaum's names are spelled by the table** (#266), with the old URNs recorded as aliases.
+- **Birnbaum's names are spelled by the table** (#266).
   Qof is `q` (`qodesh`, `yaaqov`, `qabbalat_shabbat`, `pirqei_avot`), khaf `kh`
   (`shalom_aleikhem`, `lekhah_dodi`), het `ch`, dagesh hazak is doubled (`kullam`, `yitgaddal`,
   `yishtabbach`), a final heh is written (`pesuqei_dezimrah`), tsere is `e` and tsere + yod `ei`
@@ -84,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   has a local address (`siddur:shabbat/musaf/amidah/qedushah/uvdivrei`); the two had been told
   apart only by their spelling.
 - **Asher's names are spelled by the table** (#266): 317 registered URNs and 160 files (80 in
-  each language) in the Asher book, with the old URNs recorded as aliases. Het is `ch` and
+  each language) in the Asher book. Het is `ch` and
   tzadi `tz` where Asher's reading IDs had `h` and `ts`, dagesh hazak is doubled, and tsere +
   yod is `ei`. Words that are right for another word (Asher's `selah` is סְלַח, `selach`) are
   respelled by a list of the Asher importer's own, `asher_selichot/spellings.yaml`, applied to
@@ -108,8 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   386 URNs and 383 file names, in every project at once, since many URNs are shared between
   books (Birnbaum's are transcluded by the expanded siddur, Asher and the opensiddur.org posts).
   `amidah/kedushah` is now `amidah/qedushah`, `tachanun/shomer_goy_kadosh` is
-  `tachanun/shomer_goy_qadosh`, and so on. Each old URN is recorded in the registry as an alias of
-  its new spelling; a text or settings file that names an old URN must use the new one. The
+  `tachanun/shomer_goy_qadosh`, and so on. A text or settings
+  file that names an old URN must use the new one. The
   registry's duplicate `amidah/qadosh_atah_venora` and `amidah/kadosh_atah_venora` are merged.
   Importers that name things from a source's own words respell them as they do
   (`validate_names.respell` and `respell_urns`): the Humash's reading names from hebcal, and the

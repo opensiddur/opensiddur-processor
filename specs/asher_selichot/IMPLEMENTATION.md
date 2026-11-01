@@ -161,8 +161,8 @@ The printed-52 extra-petition milestone has an explicit terminal same-unit marke
 The final Full Kaddish excludes first-day and Ten Days context. Preserve Tamid’s
 numbered note markers without inventing targets or presuming explanatory notes exist.
 
-Bound the page-52 repetitions separately under `prayer:keraham_av` and
-`prayer:selichot/ki_lo_al_tsidqotenu`; their translation differs from pages 9/10.
+Bound the page-52 repetitions separately under `prayer:kerachem_av` and
+`prayer:selichot/ki_lo_al_tzidqoteinu`; their translation differs from pages 9/10.
 Choose the version indicated by the cue, including the explicit English
 page-58 reference to 52.
 
