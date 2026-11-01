@@ -17,7 +17,7 @@ URNS = {key: (ROOT + '/' + key if key in AGGREGATES else PRAYER + 'tachanun/' + 
         for key in PASSAGES}
 URNS['vayomer'] = BIBLE + 'samuel_2/24/14'
 URNS['ozrenu'] = BIBLE + 'psalms/79/9'
-URNS['el_erekh_apayim'] = PRAYER + 'el_erekh_apayim'
+URNS['el_erekh_appayim'] = PRAYER + 'el_erekh_appayim'
 
 OMISSIONS = ('Taḥanun is omitted on the following occasions: Rosh Ḥodesh, the entire month '
     'of Nisan, Lag b’Omer, the first eight days of Sivan, the 9th and 15th of Av, '
@@ -30,9 +30,9 @@ EL_RUBRIC = ('The following paragraph is said on Mondays and Thursdays, except o
     'the 14th and 15th of Adar and Adar Sheni.')
 NEFILAH = ('vayomer', 'rachum', 'psalm6')
 CLOSING = ('shomer_yisrael', 'shomer_goy_echad', 'shomer_goy_qadosh', 'mitratzeh', 'vaanachnu')
-LONG_OPENING = ('vehu', 'hatteh', 'habet_na', 'ana_melekh', 'el_rachum', 'ein_kamokha', 'hapoteach')
-LONG_ENDING = ('adonai_elohei', 'habet_mishamayim', 'uvekhol', 'zarim',
-    'ana_shuv', 'chusah', 'ana_shuv', 'qolenu',
+LONG_OPENING = ('vehu', 'hatteh', 'habbet_na', 'anna_melekh', 'el_rachum', 'ein_kamokha', 'hapoteach')
+LONG_ENDING = ('adonai_elohei', 'habbet_mishamayim', 'uvekhol', 'zarim',
+    'anna_shuv', 'chusah', 'anna_shuv', 'qolenu',
     'uvekhol', 'ozrenu', 'adonai_elohei')
 
 
@@ -73,10 +73,10 @@ def prayers(lang):
             for i, paragraph in enumerate(row[lang].split('{p}')):
                 suffix = (f' <tei:seg source="{URNS["adonai_elohei"]}">'
                           + text_xml(PASSAGES['adonai_elohei'][lang]) + '</tei:seg>'
-                          if key in ('uvekhol', 'ana_shuv') else '')
+                          if key in ('uvekhol', 'anna_shuv') else '')
                 body.append('<tei:p>' + (marker if i == 0 else '') + text_xml(paragraph) + suffix + '</tei:p>')
         body.append('</tei:div>')
-        result.append(dict(name='tachanun_' + key if key != 'el_erekh_apayim' else key,
+        result.append(dict(name='tachanun_' + key if key != 'el_erekh_appayim' else key,
             title=('תהלים ו' if key == 'psalm6' else ' '.join(row.get('he', row.get('chunks', [{}])[0].get('he', '')).split()[:3])) if lang == 'he' else key.replace('_', ' ').capitalize(), urn=urn, body='\n'.join(body),
             first=row['first'] + side, last=row['last'] + side))
     return result
@@ -141,5 +141,5 @@ def torah_intro_body(project):
     return '\n'.join([f'<tei:div corresp="{SIDDUR}chol/shacharit/torah_intro">', declaration(),
         pb(page, sigil='1949 chol/shacharit/torah_intro'),
         cond('el_erekh_occasion', note=EL_RUBRIC, fs=EL_EREKH_OCCASION),
-        transclude('el_erekh_apayim'), endcond('el_erekh_occasion'),
+        transclude('el_erekh_appayim'), endcond('el_erekh_occasion'),
         '<j:endDeclare target="#unit_service"/>', '</tei:div>'])

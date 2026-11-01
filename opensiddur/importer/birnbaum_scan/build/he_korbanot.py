@@ -218,8 +218,8 @@ prayer("korbanot_abaye", "סֵֽדֶר הַמַּעֲרָכָה", "korbanot/sede
 #: words stand for the forty-two-letter Name. The break falls after the
 #: second line, and `Barukh Shem` follows the poem on printed 35 -- realised
 #: by the children's unit, so transcluded here and not emitted.
-prayer("poem_ana_bekhoach", "אָנָּא בְּכֹֽחַ", "ana_bekhoach", 33, 35,
-       verses(P + "ana_bekhoach", [
+prayer("poem_anna_bekhoach", "אָנָּא בְּכֹֽחַ", "anna_bekhoach", 33, 35,
+       verses(P + "anna_bekhoach", [
            "אָנָּא, בְּכֹֽחַ גְּדֻלַּת יְמִינְךָ תַּתִּיר צְרוּרָה.",
            "קַבֵּל רִנַּת עַמְּךָ, שַׂגְּבֵֽנוּ, טַהֲרֵֽנוּ, נוֹרָא.",
            f"{pb(35)}נָא, גִבּוֹר, דּוֹרְשֵׁי יִחוּדְךָ כְּבָבַת שָׁמְרֵם.",

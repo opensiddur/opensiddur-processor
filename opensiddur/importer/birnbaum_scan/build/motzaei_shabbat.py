@@ -121,9 +121,9 @@ def units(project,by_name):
     vihi=passage('vihi_noam/text',reading(537+side,'vihi_noam'),BIBLE+'psalms/90/17')+transclude(ROOT+'/psalm91')
     if not side:vihi+=passage('vihi_noam/repeat',reading(537,'repeat91_16'),BIBLE+'psalms/91/16')
     add('vihi_noam','ויהי נעם','Vihi Noam',537,537,vihi)
-    value=reading(537+side,'veatah_qadosh')+' {pb:'+str(539+side)+'} '
+    value=reading(537+side,'veattah_qadosh')+' {pb:'+str(539+side)+'} '
     if side:value+=' '.join(t for k,t in READINGS['540']['text'])
-    else:value+=reading(539,'veatah_qadosh_cont')
+    else:value+=reading(539,'veattah_qadosh_cont')
     from .motzaei_refs import split
     from .conclusion_data import PASSAGES
     from .conclusion import URNS as CONCLUSION
@@ -141,10 +141,10 @@ def units(project,by_name):
         encoded=xml(value)
         if key.startswith('targum'):
             encoded=('<tei:hi rend="italic">'+encoded+'</tei:hi>') if side else '<tei:foreign xml:lang="arc-Hebr">'+encoded+'</tei:foreign>'
-        body+='<tei:p>'+marked(ROOT+'/veatah_qadosh/'+key,'<tei:seg source="'+source+'">'+encoded+'</tei:seg>',unit='verse' if ref and not key.startswith('targum') else 'prayer-part')+'</tei:p>'
-    add('veatah_qadosh','ואתה קדוש','Veatah Kadosh',537,539,body)
+        body+='<tei:p>'+marked(ROOT+'/veattah_qadosh/'+key,'<tei:seg source="'+source+'">'+encoded+'</tei:seg>',unit='verse' if ref and not key.startswith('targum') else 'prayer-part')+'</tei:p>'
+    add('veattah_qadosh','ואתה קדוש','Veatah Kadosh',537,539,body)
     addition=conditional('motzaei_vihi','Except on Tish‘ah b’Av:',holiday('tisha-bav'),transclude(ROOT+'/vihi_noam'),negate=True)
-    addition+=transclude(ROOT+'/veatah_qadosh')
+    addition+=transclude(ROOT+'/veattah_qadosh')
     add('after_amidah','תוספות לאחר העמידה','Additions after the Amidah',537,539,
         conditional('motzaei_week','Unless Yom Tov occurs Sunday–Friday of the coming week:',NO_FESTIVAL,addition))
     # This printing has its own punctuation and Titkabal vowel/translation.

@@ -142,6 +142,9 @@ And:
   `chayyim`, `kammah`. The dagesh a prefix brings to the next letter does not: `hasiddur`,
   `hamasorah`, `birkat_hamazon`, `mikol`, `bameh`. A letter written with two characters (`sh`,
   `ch`, `kh`, `tz`) is never doubled: `mitratzeh`, not `mitratztzeh`.
+- **The yod of the suffix ֶיךָ is not written**: segol + yod is `ei` (`vetechezeinah`), but
+  before this suffix it is `e`, as it is said: `lefanekha`, `rachamekha`, `elekha`. Tsere + yod
+  is always `ei`: `eloheinu`, `aleinu`.
 - **A final heh is written** after its vowel: `minchah`, `retzeh`, `mosheh`. So is a mappiq heh.
 - **Prefixes join their word**: the article and the prepositions (`ha`, `ve`/`u`, `be`, `le`,
   `ke`, `mi`, `she`) are written as part of the word they precede, with nothing between:

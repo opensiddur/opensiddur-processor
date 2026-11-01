@@ -75,7 +75,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'אֲחַלְּצֵֽהוּ וַאֲכַבְּדֵֽהוּ. אֹֽרֶךְ יָמִים אַשְׂבִּיעֵֽהוּ, וְאַרְאֵֽהוּ '
                    'בִּישׁוּעָתִי.'],
                   ['repeat91_16', 'אֹֽרֶךְ יָמִים אַשְׂבִּיעֵֽהוּ, וְאַרְאֵֽהוּ בִּישׁוּעָתִי.'],
-                  ['veatah_qadosh',
+                  ['veattah_qadosh',
                    'וְאַתָּה קָדוֹשׁ, יוֹשֵׁב תְּהִלּוֹת יִשְׂרָאֵל. וְקָרָא זֶה אֶל זֶה וְאָמַר: קָדוֹשׁ, '
                    'קָדוֹשׁ, קָדוֹשׁ יְיָ צְבָאוֹת, מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ. וּמְקַבְּלִין דֵּן מִן '
                    'דֵּן וְאָמְרִין: קַדִּישׁ בִּשְׁמֵי מְרוֹמָא עִלָּאָה, בֵּית שְׁכִינְתֵּהּ; קַדִּישׁ עַל '
@@ -110,7 +110,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'him safe, because he loves my name. When he calls upon me, I will answer him; I will be '
                    'with him in trouble; I will rescue him and bring him to honor. With long life will I '
                    'satisfy him, and let him see my saving power.”'],
-                  ['veatah_qadosh',
+                  ['veattah_qadosh',
                    'Thou, holy God, art enthroned amidst the praises of Israel. They keep calling to one '
                    'another: “Holy, holy, holy is the Lord of hosts; the whole earth is full of his glory.” '
                    '*They receive it from one another, and say: “Holy in the highest heavens, his divine '
@@ -122,7 +122,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                      'Shemoneh Esreh. On Tish‘ah b’Av, the first verse and Psalm 91 are omitted.'],
          'notes': ['* The words in italics are the Targum paraphrase of the preceding verse.',
                    '1 Psalm 90:17. 2 Psalm 22:4. 3 Isaiah 6:3. 4 Ezekiel 3:12.']},
- '539': {'text': [['veatah_qadosh_cont',
+ '539': {'text': [['veattah_qadosh_cont',
                    'וּנְטָלַתְנִי רוּחָא, וְשִׁמְעֵת בַּתְרַי קָל זִֽיעַ סַגִּיא דִּי מְשַׁבְּחִין '
                    'וְאָמְרִין: בְּרִיךְ יְקָרָא דַייָ מֵאַתַר בֵּית שְׁכִינְתֵּהּ. יְיָ יִמְלֹךְ לְעֹלָם '
                    'וָעֶד. יְיָ מַלְכוּתֵהּ (קָאֵם) לְעָלַם וּלְעָלְמֵי עָלְמַיָּא. יְיָ אֱלֹהֵי אַבְרָהָם '
@@ -150,7 +150,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'Current Ashkenazic editions have here ולעשות (“and to do”), a reading that interferes '
                    'with the logical construction of the sentence. This is presumably the result of an '
                    'erroneous repetition of the letter ו in the immediately preceding יראתו.']},
- '540': {'text': [['veatah_qadosh_cont',
+ '540': {'text': [['veattah_qadosh_cont',
                    'me up and I heard behind me a great moving sound of those who uttered praises, saying: '
                    '“Blessed be the glory of the Lord from the place of his divine abode.” The Lord shall '
                    'reign forever and ever. The Lord’s kingship is established forever and to all eternity.'],

@@ -53,9 +53,9 @@ for key, number, citation in (
 ):
     anchor = {
         ('vehu', 'Psalm 78:38.'): 'vehu_rachum',
-        ('vehu', 'Daniel 9:15–17.'): 'veatah',
+        ('vehu', 'Daniel 9:15–17.'): 'veattah',
         ('hatteh', 'Daniel 9:18–19.'): 'hatteh',
-        ('hatteh', 'Isaiah 64:7.'): 'veatah',
+        ('hatteh', 'Isaiah 64:7.'): 'veattah',
         ('hatteh', 'Joel 2:17.'): 'chusah',
     }.get((key, citation))
     if key == 'vehu' and number == '1':

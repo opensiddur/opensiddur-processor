@@ -14,8 +14,8 @@ def xml(value):
 
 def notes():
     rows=[]
-    targets={536:ROOT+'/psalm144',537:ROOT+'/vihi_noam',538:ROOT+'/veatah_qadosh',
-        539:ROOT+'/veatah_qadosh',540:ROOT+'/veatah_qadosh',541:ROOT+'/veyitten_lekha',
+    targets={536:ROOT+'/psalm144',537:ROOT+'/vihi_noam',538:ROOT+'/veattah_qadosh',
+        539:ROOT+'/veattah_qadosh',540:ROOT+'/veattah_qadosh',541:ROOT+'/veyitten_lekha',
         542:ROOT+'/veyitten_lekha',544:ROOT+'/veyitten_lekha',545:ROOT+'/veyitten_lekha',
         546:ROOT+'/veyitten_lekha',547:ROOT+'/veyitten_lekha',548:ROOT+'/veyitten_lekha',
         549:ROOT+'/veyitten_lekha',550:ROOT+'/veyitten_lekha',551:ROOT+'/havdalah',552:ROOT+'/havdalah',

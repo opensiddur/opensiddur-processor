@@ -1,0 +1,57 @@
+# Respellings of the words in Asher's reading IDs that apply to this book alone, on top of
+# specs/naming/spellings.yaml. The readings keep the IDs they were made under; the book's file
+# names and URNs are respelled by both lists (build.respelled).
+#
+# A word belongs here, not in the shared list, when the spelling is right for another word:
+# Asher's `selah` is סְלַח, but `selah` is also סֶלָה. A word may not be one the shared list
+# already respells, or the standard spelling it respells to.
+
+variants:
+  # Het is ch, though the spelling with h is another word
+  hai: chai             # חַי
+  hazeh: chazeh         # חֲזֵה, not הַזֶּה
+  heli: cheli           # חֵלִי
+  hil: chil             # חִיל
+  mahi: machei          # מָחֵי
+  selah: selach         # סְלַח, not סֶלָה
+  shelah: shelach       # שְׁלַח, not שֵׁלָה
+  shevat: shevach       # שֶׁבַח, not שְׁבָט
+  tahan: tachan         # תַּחַן
+  tehin: techin         # תְּחִן
+  pohadim: pechudim     # פְּחוּדִים, not פּוֹחֲדִים
+  selihati: salachti    # סָלַחְתִּי, not סְלִיחָתִי
+  taharot: tacharot     # תַּחֲרוֹת, not טָהֳרוֹת
+  # Khaf without dagesh after a word ending in a vowel
+  kahataenu: khachataeinu   # לֹא כַחֲטָאֵינוּ
+  kehatainu: khachataeinu
+  kahomer: khachomer        # כִּי כַחֹמֶר
+  # Dagesh hazak doubles, though the single spelling is another word
+  ana: anna             # אָנָּא, not אֲנָא
+  qadem: qaddemah       # קַדְּמָה, not קַדֵּם
+  # A prefix's dagesh is not doubled, and הַמַּתְעֶה has no dagesh in its tav
+  hamatteh: hamateh     # not הַמַּטֶּה
+  # Tsere + yod is ei
+  are: arei             # עָרֵי
+  bet: beit             # בֵּית
+  mar: marei            # מָרֵי
+  tsarei: tzarai        # צָרַי, not צָרֵי (tzarei)
+  # Tsere without yod is e; the plene spelling is eilekh
+  eilekh: elekh         # אֵלֵךְ
+  # The book prints הֵטִיבָה and הֵיטִיבָה; both quote Psalm 51:20, הֵיטִיבָה
+  hetivah: heitivah
+  # Names that did not spell the printed words
+  behanufat: behagafat          # בְּהָגָפַת
+  belegyonam: beligyonim        # בְּלִגְיוֹנִים
+  bemaginam: bemaginnatam       # בְּמָגִנָּתָם
+  benitshonmo: benitzchuteimo   # בְּנִצְחֻתֵימוֹ
+  beshalishmo: beshalishimo     # בְּשָׁלִשִׁימוֹ
+  betsahelah: behatzhalah       # בְּהַצְהָלָה
+  shehaqim: shekhavim           # שְׁכָבִים
+  shemaenu: yashmienu           # יַשְׁמִיעֵנוּ
+  taniah: hanach                # הָנַח
+
+# Whole names renamed after the words are respelled, where a word cannot be: `tachanun` is
+# right in Asher's other names. Keys are names as respelled; they rename a whole file stem or
+# one part of a URN path.
+renames:
+  tefillah_tiqqach_tachanun_tivchar: tefillah_tiqqach_techinnah_tivchar   # תְּחִנָּה תִּבְחָר

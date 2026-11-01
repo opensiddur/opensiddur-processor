@@ -250,7 +250,7 @@ ROWS = [{'key': 'preparation',
                 'The peoples shall praise thee, O Lord; all the peoples shall praise thee!',
                 'The earth has yielded its produce; God, our own God, blesses us.',
                 'God blesses us; all the far ends of the earth shall revere him.']},
- {'key': 'ana_bekoach',
+ {'key': 'anna_bekoach',
   'page': 645,
   'he': 'אָנָּא, בְּכֹֽחַ גְּדֻלַּת יְמִינְךָ תַּתִּיר צְרוּרָה.\n'
         'קַבֵּל רִנַּת עַמְּךָ, שַׂגְּבֵֽנוּ, טַהֲרֵֽנוּ, נוֹרָא.\n'

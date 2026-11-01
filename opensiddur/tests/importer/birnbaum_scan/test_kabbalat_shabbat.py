@@ -54,7 +54,7 @@ class TestKabbalatCorrespondences(unittest.TestCase):
 
     def test_shared_poem_has_independent_stanza_ranges(self):
         body='<tei:lg>'+''.join('<tei:l>Line '+str(i)+'</tei:l>' for i in range(7))+'</tei:lg>'
-        result=fragment(shared('he',[dict(name='poem_ana_bekhoach',body=body)])[0]['body'])
+        result=fragment(shared('he',[dict(name='poem_anna_bekhoach',body=body)])[0]['body'])
         self.assertEqual([m.get('corresp') for m in result.findall('.//tei:milestone[@corresp]',NS)],
                          [ANA+'/'+str(i) for i in range(1,8)])
         for line in result.findall('.//tei:l',NS):

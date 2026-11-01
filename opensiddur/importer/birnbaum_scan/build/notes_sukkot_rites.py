@@ -8,7 +8,7 @@ TARGETS = {'אושפיזין':USHPIZIN,'נטילת לולב':LULAV,'הושענו
  'אדון המושיע':'hoshanot_hoshia_start','אדם ובהמה':'hoshanot_adam','אדמה מארר':'hoshanot_adamah',
  'למען איתן':'hoshanot_lemaan_eitan','אערוך שועי':'hoshanot_eerokh_start','אל למושעות':'hoshanot_el_lemoshaot',
  'אני והו':'hoshanot_ani_vaho_1','כהושעת אלים':'hoshanot_kehosha_start','אם נצורה כבבת':'hoshanot_om_netsurah_start',
- 'כהושעת אדם':'hoshanot_kehosha_adam_start','תתננו לשם':'hoshanot_titnenu_start','אנא אזון':'hoshanot_ana_azon_1',
+ 'כהושעת אדם':'hoshanot_kehosha_adam_start','תתננו לשם':'hoshanot_titnenu_start','אנא אזון':'hoshanot_anna_azon_1',
  'תעינו כשה':'hoshanot_el_na_1','למען תמים':'hoshanot_lemaan_tamim','תענה אמונים':'hoshanot_taaneh_emunim_first',
  'אז כעיני עבדים':'hoshanot_az_einei_first','קול מבשר':'hoshanot_kol_mevaser_response','אמץ ישעך':'hoshanot_kol_mevaser_first',
  'הושענא רבה':HOSHANOT+'/rabbah','יהי רצון':'hoshanot_yehi_ratzon_aravah','תפלת גשם':GESHEM,

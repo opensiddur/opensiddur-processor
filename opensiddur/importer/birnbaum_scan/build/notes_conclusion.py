@@ -55,7 +55,7 @@ def make_notes(anchors):
 
     for key, row, number, citation in (
         ('uva_letzion', 'uva', '1', 'Isaiah 59:20–21.'),
-        ('uva_letzion', 'veatah', '2', 'Psalm 22:4.'),
+        ('uva_letzion', 'veattah', '2', 'Psalm 22:4.'),
         ('uva_letzion', 'vekara', '3', 'Isaiah 6:3.'),
         ('uva_letzion', 'vatissa', '4', 'Ezekiel 3:12.'),
         ('uva_letzion', 'targum_qadosh', '*', 'The words in italics are the Targum paraphrase of the preceding verse.'),

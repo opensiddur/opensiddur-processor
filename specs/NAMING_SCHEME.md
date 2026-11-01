@@ -167,5 +167,11 @@ with an opensiddur-projects PR of the same branch name that regenerates them.
 
 The variant list catches known misspellings, not every one. A word is only a variant if it
 cannot be another word: `selah` (סֶלָה) and `selach` (סְלַח) are both correct, so neither is
-listed. Spellings are settled from the Hebrew, a family of books at a time, and each new
-decision is added here so the next book is held to it.
+listed. Where one book's reading IDs use such a word wrongly, its importer keeps a list of its
+own, applied after the shared one to that book alone: Asher's `selah` is סְלַח, so
+`opensiddur/importer/asher_selichot/spellings.yaml` respells it `selach` in Asher's names only.
+That list also renames the few reading IDs that did not spell the printed words, and has whole
+names to rename where a word is right in the book's other names (`renames`).
+
+Spellings are settled from the Hebrew, a family of books at a time, and each new decision is
+added here so the next book is held to it.

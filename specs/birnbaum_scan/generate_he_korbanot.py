@@ -199,8 +199,8 @@ for kind, name, title, slug, where, comment in ORDER:
         ana = lines(33, 5) + lines(35, 0)[:5]
         assert len(ana) == 7 and all(len(x.split()) == 6 for x in ana)
         emit(ANA_COMMENT)
-        emit('prayer("poem_ana_bekhoach", "אָנָּא בְּכֹֽחַ", "ana_bekhoach", 33, 35,\n'
-             '       verses(P + "ana_bekhoach", [\n'
+        emit('prayer("poem_anna_bekhoach", "אָנָּא בְּכֹֽחַ", "anna_bekhoach", 33, 35,\n'
+             '       verses(P + "anna_bekhoach", [\n'
              + "\n".join(f'           "{v}",' for v in ana[:2])
              + '\n           f"{pb(35)}' + ana[2] + '",\n'
              + "\n".join(f'           "{v}",' for v in ana[3:]) + "\n       ]), base=P)\n")

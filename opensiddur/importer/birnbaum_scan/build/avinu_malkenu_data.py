@@ -54,5 +54,5 @@ ROWS = [
     ('aseh_vehoshienu', 101, '', 'עֲשֵׂה לְמַעַנְךָ וְהוֹשִׁיעֵֽנוּ.', 'do it for thy sake and save us.'),
     ('aseh_rachamekha', 101, '', 'עֲשֵׂה לְמַֽעַן רַחֲמֶֽיךָ הָרַבִּים.', 'do it for the sake of thy abundant mercy.'),
     ('aseh_shimkha', 101, '', 'עֲשֵׂה לְמַֽעַן שִׁמְךָ הַגָּדוֹל הַגִּבּוֹר וְהַנּוֹרָא שֶׁנִּקְרָא עָלֵֽינוּ.', 'do it for the sake of thy great, mighty and revered name by which we are called.'),
-    ('chonenu', 101, '', 'חָנֵּֽנוּ וַעֲנֵֽנוּ, כִּי אֵין בָּֽנוּ מַעֲשִׂים; עֲשֵׂה עִמָּֽנוּ צְדָקָה וָחֶֽסֶד וְהוֹשִׁיעֵֽנוּ.', 'be gracious to us and answer us, though we have no merits; deal charitably and kindly with us and save us.'),
+    ('chonnenu', 101, '', 'חָנֵּֽנוּ וַעֲנֵֽנוּ, כִּי אֵין בָּֽנוּ מַעֲשִׂים; עֲשֵׂה עִמָּֽנוּ צְדָקָה וָחֶֽסֶד וְהוֹשִׁיעֵֽנוּ.', 'be gracious to us and answer us, though we have no merits; deal charitably and kindly with us and save us.'),
 ]
