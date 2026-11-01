@@ -10,7 +10,7 @@ from . import shabbat_day_meal_data as data
 
 ROOT = SIDDUR+'shabbat/day_meal'
 SIGIL = '1949 shabbat/day_meal'
-URNS = {key: POEM+key for key in ('barukh_adonai_yom_yom', 'barukh_el_elyon', 'yom_zeh_mekhubad')}
+URNS = {key: POEM+key for key in ('barukh_adonai_yom_yom', 'barukh_el_elyon', 'yom_zeh_mekhubbad')}
 
 
 def xml(value):
@@ -25,7 +25,7 @@ def shared(lang, prayers):
     side=int(lang=='en'); result=[dict(p) for p in prayers]
     for p in result:
         pages={ARVIT['wine']:(423,423), ARVIT['veshamru']:(423,423),
-               LEIL['yah_ribbon']:(433,435), LEIL['tzur_mishelo']:(435,435)}
+               LEIL['yah_ribbon']:(433,435), LEIL['tzur_mishello']:(435,435)}
         if p['urn'] in pages:
             a,b=pages[p['urn']]
             p['printings']=(*p.get('printings',()),(a+side,b+side))
@@ -51,9 +51,9 @@ def prayers(lang, earlier):
         stanzas('barukh_adonai_yom_yom',data.BARUKH_YOM))
     add('barukh_el_elyon','ברוך אל עליון','Barukh El Elyon',429,431,
         stanzas('barukh_el_elyon',data.BARUKH_EL,data.BARUKH_EL_SHORT,data.BARUKH_EL_REFRAIN))
-    add('yom_zeh_mekhubad','יום זה מכבד','Yom Zeh Mekhubad',431,433,
-        paragraph(URNS['yom_zeh_mekhubad']+'/refrain',data.YOM_ZEH_REFRAIN[side])+
-        stanzas('yom_zeh_mekhubad',data.YOM_ZEH,data.YOM_ZEH_SHORT))
+    add('yom_zeh_mekhubbad','יום זה מכבד','Yom Zeh Mekhubad',431,433,
+        paragraph(URNS['yom_zeh_mekhubbad']+'/refrain',data.YOM_ZEH_REFRAIN[side])+
+        stanzas('yom_zeh_mekhubbad',data.YOM_ZEH,data.YOM_ZEH_SHORT))
     return result
 
 
@@ -89,18 +89,18 @@ def units(project):
         else:yah+=transclude(LEIL['yah_ribbon']+'/'+str(i))
         yah+=transclude(LEIL['yah_ribbon']+'/refrain/'+str(i))
     add('yah_ribbon','יה רבון','Yah Ribbon',433,435,yah,editorial=True,aramaic=True)
-    tzur=transclude(LEIL['tzur_mishelo']+'/refrain')
+    tzur=transclude(LEIL['tzur_mishello']+'/refrain')
     for i,row in enumerate(old.TZUR,1):
         if i==3:
             value=(data.TZUR_VARIANT_HE,row[1])[side]
-            tzur+='<tei:p>'+marked(ROOT+'/tzur_mishelo/3',
-                f'<tei:seg source="{LEIL["tzur_mishelo"]}/3">'+xml(value)+'</tei:seg>',unit='stanza')+'</tei:p>'
-        else:tzur+=transclude(LEIL['tzur_mishelo']+'/'+str(i))
-        tzur+=transclude(LEIL['tzur_mishelo']+'/refrain/'+str(i))
-    add('tzur_mishelo','צור משלו','Tzur Mishelo',435,435,tzur,editorial=True)
+            tzur+='<tei:p>'+marked(ROOT+'/tzur_mishello/3',
+                f'<tei:seg source="{LEIL["tzur_mishello"]}/3">'+xml(value)+'</tei:seg>',unit='stanza')+'</tei:p>'
+        else:tzur+=transclude(LEIL['tzur_mishello']+'/'+str(i))
+        tzur+=transclude(LEIL['tzur_mishello']+'/refrain/'+str(i))
+    add('tzur_mishello','צור משלו','Tzur Mishelo',435,435,tzur,editorial=True)
     add('zemirot','זְמִירוֹת לְשַׁבָּת','SABBATH HYMNS',425,435,
         instruction('Chanted at the table')+''.join(transclude(u) for u in URNS.values())+
-        transclude(ROOT+'/yah_ribbon')+transclude(ROOT+'/tzur_mishelo'))
+        transclude(ROOT+'/yah_ribbon')+transclude(ROOT+'/tzur_mishello'))
     add('','סעודת יום השבת','Sabbath daytime meal',423,435,
         cond('day_meal_shabbat_kiddush', fs='<j:none>'+feature(AGG, 'yom-tov')+'</j:none>')+transclude(ROOT+'/kiddush')+endcond('day_meal_shabbat_kiddush')+transclude(ROOT+'/zemirot'),editorial=True)
     return tuple(result)

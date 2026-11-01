@@ -38,7 +38,7 @@ class TestRoshHashanah(unittest.TestCase):
                 self.assertEqual(len(doc.xpath('.//tei:milestone[@unit="verse"][not(@corresp)]',namespaces=NS)),count)
                 self.assertEqual(len(doc.xpath('.//tei:seg[starts-with(@source,"urn:x-opensiddur:text:bible:")]',namespaces=NS)),count-(key=='benei_adam'))
     def test_printed_alternatives_do_not_add_duplicate_parentheses(self):
-        keys=('vatiten_lanu','kadsheinu','kiddush','yk_candle_blessing','vatodienu','modim_derabbanan','fire','havdalah')
+        keys=('vattitten_lanu','kadsheinu','kiddush','yk_candle_blessing','vattodienu','modim_derabbanan','fire','havdalah')
         for lang in ('he','en'):
             prayers={p['urn']:p['body'] for p in r.prayers(lang)}
             for k in keys:

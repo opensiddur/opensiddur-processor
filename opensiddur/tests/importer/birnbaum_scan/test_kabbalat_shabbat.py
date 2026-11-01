@@ -33,12 +33,12 @@ class TestKabbalatOccasion(unittest.TestCase):
 
     def test_whole_service_condition_is_only_in_caller(self):
         files={x['name']:fragment(x['body']) for x in units(PROJECT_HE)}
-        gate=files['shabbat_kabbalat_service'].find('.//j:conditional',NS)
+        gate=files['shabbat_qabbalat_service'].find('.//j:conditional',NS)
         self.assertIsNotNone(gate.find('.//tei:f[@name="yom-tov"]',NS))
-        self.assertIsNone(files['kabbalat_shabbat'].find('.//tei:f[@name="yom-tov"]',NS))
+        self.assertIsNone(files['qabbalat_shabbat'].find('.//tei:f[@name="yom-tov"]',NS))
         # The Friday exception ends before Psalm 92, not after the whole service.
-        text=etree.tostring(files['kabbalat_shabbat']).decode()
-        self.assertLess(text.index('target="#kabbalat_friday_festival"'),text.index('target="'+BIBLE+'psalms/92"'))
+        text=etree.tostring(files['qabbalat_shabbat']).decode()
+        self.assertLess(text.index('target="#qabbalat_friday_festival"'),text.index('target="'+BIBLE+'psalms/92"'))
 
 
 class TestKabbalatCorrespondences(unittest.TestCase):

@@ -41,8 +41,8 @@ def d(urn, *paras, indent=8):
     return f'{pad}<tei:div corresp="{urn}">\n{inner}\n{pad}</tei:div>'
 
 
-prayer("tefillin_hineni_mekhaven", "הִנְנִי מְכַוֵּן", "tefillin/hineni_mekhaven", 5, 7,
-       d(U + "tefillin/hineni_mekhaven",
+prayer("tefillin_hineni_mekhavven", "הִנְנִי מְכַוֵּן", "tefillin/hineni_mekhavven", 5, 7,
+       d(U + "tefillin/hineni_mekhavven",
          "הִנְנִי מְכַוֵּן בְּהַנָּחַת תְּפִלִּין לְקַיֵּם מִצְוַת בּוֹרְאִי שֶׁצִּוָּֽנוּ "
          "לְהַנִּֽיחַ תְּפִלִּין, כַּכָּתוּב בַּתּוֹרָה: וּקְשַׁרְתָּם לְאוֹת עַל יָדֶֽךָ, "
          "וְהָיוּ לְטֹטָפֹת בֵּין עֵינֶֽיךָ. וְהֵם אַרְבַּע פָּרָשִׁיּוֹת אֵֽלּוּ: שְׁמַע, "
@@ -60,8 +60,8 @@ prayer("tefillin_hineni_mekhaven", "הִנְנִי מְכַוֵּן", "tefillin/
          "בָּֽנוּ יֵֽצֶר הָרָע, וְיַנִּיחֵֽנוּ לַעֲבוֹד אֶת יְיָ כַּאֲשֶׁר עִם לְבָבֵֽנוּ. "
          "אָמֵן."))
 
-prayer("tefillin_lehaniach", "בִּרְכַּת לְהָנִֽיחַ", "tefillin/lehaniach", 7, 7,
-       d(U + "tefillin/lehaniach",
+prayer("tefillin_lehanniach", "בִּרְכַּת לְהָנִֽיחַ", "tefillin/lehanniach", 7, 7,
+       d(U + "tefillin/lehanniach",
          "בָּרוּךְ אַתָּה, יְיָ אֱלֹהֵֽינוּ, מֶֽלֶךְ הָעוֹלָם, אֲשֶׁר קִדְּשָֽׁנוּ "
          "בְּמִצְוֺתָיו וְצִוָּֽנוּ לְהַנִּֽיחַ תְּפִלִּין."))
 
@@ -70,8 +70,8 @@ prayer("tefillin_al_mitzvat", "עַל מִצְוַת תְּפִלִּין", "tef
          "בָּרוּךְ אַתָּה, יְיָ אֱלֹהֵֽינוּ, מֶֽלֶךְ הָעוֹלָם, אֲשֶׁר קִדְּשָֽׁנוּ "
          "בְּמִצְוֺתָיו וְצִוָּֽנוּ עַל מִצְוַת תְּפִלִּין."))
 
-prayer("tefillin_umechokhmatkha", "וּמֵחָכְמָתְךָ", "tefillin/umechokhmatkha", 7, 7,
-       d(U + "tefillin/umechokhmatkha",
+prayer("tefillin_umechokhmatekha", "וּמֵחָכְמָתְךָ", "tefillin/umechokhmatekha", 7, 7,
+       d(U + "tefillin/umechokhmatekha",
          "וּמֵחָכְמָתְךָ, אֵל עֶלְיוֹן, תַּאֲצִיל עָלַי, וּמִבִּינָתְךָ תְּבִינֵֽנִי; "
          "וּבְחַסְדְּךָ תַּגְדִּיל עָלַי, וּבִגְבוּרָתְךָ תַּצְמִית אֹיְבַי וְקָמַי; "
          "וְשֶֽׁמֶן הַטּוֹב תָּרִיק עַל שִׁבְעָה קְנֵי הַמְּנוֹרָה לְהַשְׁפִּֽיעַ טוּבְךָ "

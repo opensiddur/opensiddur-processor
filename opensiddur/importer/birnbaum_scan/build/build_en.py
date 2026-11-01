@@ -116,7 +116,7 @@ U, S = PRAYER, SIDDUR
 BY_NAME = {p["name"]: p for p in PRAYERS}
 
 #: Which printed pages each unit spans, on the English side of the opening.
-EN_UNIT_PAGES = {"yeladim": (2, 2), "birkhot": (4, 48), "opening": (50, 52), "pesukei": (52, 70), "shema": (72, 82), "amidah": (82, 98), "avinu": (98, 102)}
+EN_UNIT_PAGES = {"yeladim": (2, 2), "birkhot": (4, 48), "opening": (50, 52), "pesuqei": (52, 70), "shema": (72, 82), "amidah": (82, 98), "avinu": (98, 102)}
 
 #: Birnbaum's footnotes, one apparatus file per unit. They are written here and not in
 #: `build_he` because the commentary is English prose, as his introduction is: the
@@ -189,7 +189,7 @@ APPARATUS = {
     "notes_chanukah_purim": dict(entries=HANUKKAH_PURIM_NOTES, slug="birnbaum_1949/chanukah_purim", title="Notes on Hanukkah, Megillat Hashmonaim and Purim", first=709, last=730),
     "notes_sukkot_rites": dict(entries=SUKKOT_RITES_NOTES, slug="birnbaum_1949/sukkot_rites", title="Notes on Sukkot rites", first=675, last=708),
     "notes_rosh_hashanah": dict(entries=ROSH_HASHANAH_NOTES, slug="birnbaum_1949/rosh_hashanah", title="Notes on Rosh Hashanah and Kapparot", first=655, last=674),
-    "notes_omer_akdamut": dict(entries=OMER_AKDAMUT_NOTES, slug="birnbaum_1949/omer_akdamut", title="Notes on the Omer and Akdamut", first=637, last=654),
+    "notes_omer_aqdamut": dict(entries=OMER_AKDAMUT_NOTES, slug="birnbaum_1949/omer_aqdamut", title="Notes on the Omer and Akdamut", first=637, last=654),
     "notes_festival_musaf": dict(entries=FESTIVAL_MUSAF_NOTES, slug="birnbaum_1949/festival_musaf", title="Notes on festival Musaf, priestly blessing, Kiddush and dew", first=609, last=636),
     "notes_yizkor": dict(entries=YIZKOR_NOTES, slug="birnbaum_1949/yizkor", title="Notes on the memorial service", first=601, last=608),
     "notes_festival": dict(entries=FESTIVAL_NOTES, slug="birnbaum_1949/regalim", title="Notes on the festival prayers", first=585, last=600),
@@ -203,7 +203,7 @@ APPARATUS = {
     "notes_shabbat_torah": dict(entries=SHABBAT_TORAH_NOTES, slug="birnbaum_1949/shabbat_torah", title="Notes on Sabbath and festival Torah reading", first=361, last=390),
     "notes_shabbat_amidah": dict(entries=SHABBAT_AMIDAH_NOTES, slug="birnbaum_1949/shabbat_amidah", title="Notes on Sabbath morning Amidah", first=352, last=360),
     "notes_shabbat_shema": dict(entries=SHABBAT_SHEMA_NOTES, slug="birnbaum_1949/shabbat_shema", title="Notes on Sabbath and festival Shema blessings", first=337, last=340),
-    "notes_shabbat_pesukei": dict(entries=SHABBAT_PESUKEI_NOTES, slug="birnbaum_1949/shabbat_pesukei",
+    "notes_shabbat_pesuqei": dict(entries=SHABBAT_PESUKEI_NOTES, slug="birnbaum_1949/shabbat_pesuqei",
         title="Notes on Sabbath and festival verses of praise", first=305, last=334),
     "notes_leil_shabbat": dict(entries=LEIL_SHABBAT_NOTES, slug="birnbaum_1949/leil_shabbat",
         title="Notes on the Friday-night home prayers and hymns", first=283, last=298),
@@ -211,7 +211,7 @@ APPARATUS = {
         title="Notes on the Sabbath and festival evening service", first=262, last=280),
     "notes_bameh_madlikin": dict(entries=BAMEH_NOTES, slug="birnbaum_1949/bameh_madlikin",
         title="Notes on Bameh Madlikin", first=251, last=256),
-    "notes_kabbalat_shabbat": dict(entries=KABBALAT_NOTES, slug="birnbaum_1949/kabbalat_shabbat",
+    "notes_qabbalat_shabbat": dict(entries=KABBALAT_NOTES, slug="birnbaum_1949/qabbalat_shabbat",
         title="Notes on welcoming the Sabbath", first=237, last=250),
     "notes_shabbat_opening": dict(entries=SHABBAT_OPENING_NOTES, slug="birnbaum_1949/shabbat_opening",
                         title="Notes on candle lighting, parental blessing and Song of Songs", first=221, last=236),
@@ -231,7 +231,7 @@ APPARATUS = {
                                 title="Notes on Avinu Malkenu", first=98, last=100),
     "notes_shema": dict(entries=SHEMA_NOTES, slug="birnbaum_1949/shema",
                         title="Notes on Shema and its blessings", first=71, last=82),
-    "notes_pesukei": dict(entries=PESUKEI_NOTES, slug="birnbaum_1949/pesukei_dezimra",
+    "notes_pesuqei": dict(entries=PESUKEI_NOTES, slug="birnbaum_1949/pesuqei_dezimrah",
                           title="Notes on the opening of the morning service", first=49, last=70),
     "notes_yeladim": dict(entries=apparatus.YELADIM_NOTES, slug="birnbaum_1949/yeladim",
                           title="Notes on Shaḥarith li-Yladim", first=1, last=1),

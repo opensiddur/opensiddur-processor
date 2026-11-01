@@ -143,7 +143,7 @@ cannot be described by either one.
 nowhere else, so the Amidah is genuinely part of what it is.
 
 `prayer:ashrei` is correctly **not** nested. Ashrei is said in P'sukei D'zimra, at
-Minchah, and at Ne'ilah. `prayer:pesukei_dezimra/ashrei` would name one of its homes and
+Minchah, and at Ne'ilah. `prayer:pesuqei_dezimrah/ashrei` would name one of its homes and
 lose the rest, and a Minchah service transcluding it would either have to use a URN that
 says P'sukei D'zimra or invent a second one for the same text.
 
@@ -192,11 +192,11 @@ distinct URN for each context, because what differs between the contexts is usua
 the words but the rubrics around them.
 
 Borei Pri Hagafen is the worked example: the same blessing over each of the seder's four
-cups, over qiddush, and over havdalah. It is one `prayer:borei_pri_hagafen`. Each context
+cups, over qiddush, and over havdalah. It is one `prayer:borei_peri_hagafen`. Each context
 keeps its own URN, which holds whatever is particular to it — the instruction for that
 cup, a note, a conditional — and reaches the shared words in one of two ways:
 
-- **Transclude it.** `<j:transclude target="urn:x-opensiddur:text:prayer:borei_pri_hagafen"/>`
+- **Transclude it.** `<j:transclude target="urn:x-opensiddur:text:prayer:borei_peri_hagafen"/>`
   inside the context's division. Right when the context adds nothing to the words.
 - **Declare partial correspondence with milestones.** The outer division carries the
   context URN; milestones inside it identify the shared text independently of paragraphs. This is the pattern
@@ -206,7 +206,7 @@ cup, a note, a conditional — and reaches the shared words in one of two ways:
 ```xml
 <tei:div corresp="urn:x-opensiddur:text:haggadah:barekh/kos_shlishi">
   <tei:note type="instruction" corresp="urn:x-opensiddur:instruction:…"/>
-  <tei:p><tei:milestone unit="prayer" corresp="urn:x-opensiddur:text:prayer:borei_pri_hagafen"/>…
+  <tei:p><tei:milestone unit="prayer" corresp="urn:x-opensiddur:text:prayer:borei_peri_hagafen"/>…
   <tei:milestone unit="prayer"/></tei:p>
 </tei:div>
 ```
@@ -526,7 +526,7 @@ A canonical record names the URN, its parent, what kind of thing it is, and its 
 An alias record binds a URN already in the corpus to its canonical name:
 
 ```json
-{"urn":"urn:x-opensiddur:text:haggadah:hallel/yishtabach","canonical":"urn:x-opensiddur:text:prayer:pesukei_dezimra/yishtabach","status":"alias"}
+{"urn":"urn:x-opensiddur:text:haggadah:hallel/yishtabach","canonical":"urn:x-opensiddur:text:prayer:pesuqei_dezimrah/yishtabbach","status":"alias"}
 ```
 
 Registry URNs carry **no** `@project` and no `#fragment`: they name texts, not their
@@ -568,7 +568,7 @@ no change.
 
 The Nishmat-to-Yishtabach block needs deciding under *Nest only what lives in one place*
 before it is renamed. It concludes P'sukei D'zimra on Shabbat and festivals and is also
-said at the seder, so whether these are `prayer:pesukei_dezimra/*` or top-level names
+said at the seder, so whether these are `prayer:pesuqei_dezimrah/*` or top-level names
 turns on whether the seder is quoting P'sukei D'zimra or the texts have two homes. The
 registry records them as needing review rather than guessing.
 
@@ -579,7 +579,7 @@ observances.
 ### Birnbaum's composite verse paragraphs
 
 The Hodu-to-Ashrei installment explicitly assigns its ordered composite paragraphs
-`siddur:chol/shacharit/pesukei_dezimra/{incipit}` URNs. This is a scoped extension of
+`siddur:chol/shacharit/pesuqei_dezimrah/{incipit}` URNs. This is a scoped extension of
 the skeleton-only convention above: the paragraph records this book's arrangement
 of verses, with the actual words in nested `bible:` segments. The liturgical joining
 phrase “יְיָ מֶלֶךְ, יְיָ מָלָךְ” has its own `siddur:` subpart identity rather than

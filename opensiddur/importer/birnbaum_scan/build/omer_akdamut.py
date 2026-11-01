@@ -8,9 +8,9 @@ from .tachanun_conditions import holiday
 from .omer_akdamut_data import ROWS, AKDAMUT
 
 OMER = PRAYER+'sefirat_haomer'
-AKDAMUT_URN = POEM+'akdamut'
+AKDAMUT_URN = POEM+'aqdamut'
 OMER_SERVICE = SIDDUR+'sefirat_haomer'
-AKDAMUT_SERVICE = SIDDUR+'regalim/akdamut'
+AKDAMUT_SERVICE = SIDDUR+'regalim/aqdamut'
 SIGIL = '1949 omer and akdamut'
 SEASON = holiday('omer',49)
 OMER_RUBRIC = 'After Ma‘ariv—from the second night of Pesaḥ until the night before Shavuoth'
@@ -23,7 +23,7 @@ def xml(value):
 
 
 def c(key,rubric,condition,body):
-    return conditional('omer_akdamut_'+key,rubric,condition,body)
+    return conditional('omer_aqdamut_'+key,rubric,condition,body)
 
 
 def quotation(value,key,lang):
@@ -48,7 +48,7 @@ def prayers(lang):
             # carried on every quoted verse, independently of occurrence addresses.
             verses=r[lang+'_verses']
             content='<tei:p>'+' '.join(marked(urn+'/'+str(i),f'<tei:seg source="{BIBLE}psalms/67/{i}">'+xml(v)+'</tei:seg>',unit='verse') for i,v in enumerate(verses,1))+'</tei:p>'
-        elif key=='anna_bekoach':
+        elif key=='anna_bekhoach':
             content='<tei:lg>'+'\n'.join('<tei:l>'+marked(urn+'/'+str(i),f'<tei:seg source="{POEM}anna_bekhoach/{i}">'+xml(line)+'</tei:seg>',unit='stanza')+'</tei:l>' for i,line in enumerate(value.splitlines(),1))+'</tei:lg>'
         else:content='<tei:p>'+xml(value)+'</tei:p>'
         out.append(dict(name='omer_'+key+'_text',urn=urn,title=key.replace('_',' '),first=r['page']+side,last=r['page']+side,
@@ -71,7 +71,7 @@ def units(project):
     add('omer_counting',OMER+'/counting','ספירת היום','Counting the day',637,643,counts)
     closing=instruction('After the counting:')+transclude(URNS['harachaman'])
     closing+='<tei:div>'+('<tei:head>Psalm 67</tei:head>' if side else '<tei:head>תהלים סז</tei:head>')+transclude(URNS['psalm_67'])+'</tei:div>'
-    closing+=''.join(transclude(URNS[k]) for k in ('anna_bekoach','barukh_shem','ribbono'))
+    closing+=''.join(transclude(URNS[k]) for k in ('anna_bekhoach','barukh_shem','ribbono'))
     add('omer_after_counting',OMER+'/after_counting','לאחר הספירה','After the counting',643,645,closing,heading=False)
     body=transclude(URNS['preparation'])+transclude(URNS['blessing'])+transclude(OMER+'/counting')+transclude(OMER+'/after_counting')
     add('sefirat_haomer',OMER,'סְפִירַת הָעֹמֶר','COUNTING OF THE OMER',637,645,body,True)
@@ -83,6 +83,6 @@ def units(project):
         if row['page']!=previous:body+=pb(row['page']+side,sigil=SIGIL);previous=row['page']
         pair=row['pair'];lines=row[lang].splitlines()
         body+='<tei:lg>'+marked(AKDAMUT_URN+'/'+str(pair),''.join('<tei:l>'+xml(line)+'</tei:l>' for line in lines),unit='stanza')+'</tei:lg>'
-    add('akdamut',AKDAMUT_URN,'אַקְדָּמוּת','AKDAMUTH',647,653,body,True)
-    add('akdamut_service',AKDAMUT_SERVICE,'אקדמות לשבועות','Akdamut for Shavuot',647,653,c('shavuot',AKDAMUT_RUBRIC,holiday('shavuot'),transclude(AKDAMUT_URN)),heading=False)
+    add('aqdamut',AKDAMUT_URN,'אַקְדָּמוּת','AKDAMUTH',647,653,body,True)
+    add('aqdamut_service',AKDAMUT_SERVICE,'אקדמות לשבועות','Akdamut for Shavuot',647,653,c('shavuot',AKDAMUT_RUBRIC,holiday('shavuot'),transclude(AKDAMUT_URN)),heading=False)
     return tuple(out)

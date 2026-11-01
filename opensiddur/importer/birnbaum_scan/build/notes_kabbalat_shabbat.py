@@ -2,8 +2,8 @@
 from .common import SIDDUR, POEM
 from .notes_minchah import note
 B = 'urn:x-opensiddur:text:bible:psalms/'
-ROOT = SIDDUR+'shabbat/kabbalat_shabbat'
-DODI = POEM+'lecha_dodi'
+ROOT = SIDDUR+'shabbat/qabbalat_shabbat'
+DODI = POEM+'lekhah_dodi'
 NOTES = [
 note(ROOT, 'the opening service on Friday evening, was introduced by the Kabbalists of the sixteenth century in Safed, Palestine. The six psalms, symbolizing the six working days of the week, were selected by Rabbi Moses Cordovero, whose brother-in-law Rabbi Solomon Alkabets composed the hymn welcoming the Sabbath bride (<tei:foreign xml:lang="he">לכה דודי</tei:foreign>). The initial letters of the six psalms (<tei:foreign xml:lang="he">ל, ש, י, מ, י, מ</tei:foreign>) have the numerical value of 430 which equals that of <tei:foreign xml:lang="he">נפש</tei:foreign> (“soul”). <tei:foreign xml:lang="he">מזמור לדוד</tei:foreign> (Psalm 29) contains the name of God eighteen times, a number corresponding to the eighteen blessings of the <tei:hi rend="italic">Shemoneh Esreh</tei:hi>.', lemma='קבלת שבת'),
 note(B+'95', 'Psalm 95 is a call to worship the Creator of the world and Guardian of his people. It contains a warning against disobedience, and alludes to the fate of the rebellious Israelites in the wilderness (Exodus 17:7; Numbers 20:13).'),

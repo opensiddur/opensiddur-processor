@@ -44,8 +44,8 @@ def verses(urn, ls, *, indent=8):
             % (pad, urn, pad, inner, pad, pad))
 
 
-prayer("korbanot_kiyor", "The laver", "korbanot/kiyor", 28, 28,
-       d(U + "korbanot/kiyor",
+prayer("qorbanot_kiyyor", "The laver", "qorbanot/kiyyor", 28, 28,
+       d(U + "qorbanot/kiyyor",
          "The Lord spoke to Moses, saying: You shall make a bronze laver with a "
          "bronze base for washing, and place it between the tent of meeting and the "
          "altar, and put water in it, so that Aaron and his sons may wash their "
@@ -55,16 +55,16 @@ prayer("korbanot_kiyor", "The laver", "korbanot/kiyor", 28, 28,
          "their hands and feet, that they die not; this shall be a perpetual statute "
          "for them, for him and his descendants, throughout their generations."))
 
-prayer("korbanot_yehi_ratzon_miqdash", "May it be thy will, to have mercy on us", "korbanot/yehi_ratzon_miqdash", 28, 28,
-       d(U + "korbanot/yehi_ratzon_miqdash",
+prayer("qorbanot_yehi_ratzon_miqdash", "May it be thy will, to have mercy on us", "qorbanot/yehi_ratzon_miqdash", 28, 28,
+       d(U + "qorbanot/yehi_ratzon_miqdash",
          "May it be thy will, Lord our God and God of our fathers, to have mercy on "
          "us and pardon all our sins, iniquities and transgressions; and rebuild the "
          "Temple speedily in our days, that we may offer before thee the daily "
          "burnt-offering to atone for us, as thou hast written in thy Torah through "
          "Moses thy servant, as it is said:"))
 
-prayer("korbanot_tamid", "The daily offering", "korbanot/tamid", 28, 30,
-       d(U + "korbanot/tamid",
+prayer("qorbanot_tamid", "The daily offering", "qorbanot/tamid", 28, 30,
+       d(U + "qorbanot/tamid",
          "The Lord spoke to Moses, saying: Command the children of Israel, and say "
          "to them: My food-offering, consumed by fire, a sweet savor to me, you "
          "shall be careful to offer me at its proper time. Say also to them: This is "
@@ -80,25 +80,25 @@ prayer("korbanot_tamid", "The daily offering", "korbanot/tamid", 28, 30,
          "evening, with the same meal-offering and the same oblation as in the "
          "morning, to be a burnt-offering of sweet savor to the Lord."))
 
-prayer("korbanot_ushchat", "He shall slaughter it", "korbanot/ushchat", 30, 30,
-       d(U + "korbanot/ushchat",
+prayer("qorbanot_ushchat", "He shall slaughter it", "qorbanot/ushchat", 30, 30,
+       d(U + "qorbanot/ushchat",
          "He shall slaughter it on the north side of the altar before the Lord; and "
          "Aaron’s sons, the priests, shall sprinkle its blood all around the altar."))
 
-prayer("korbanot_yehi_ratzon_amirah", "May it be thy will, that this recital", "korbanot/yehi_ratzon_amirah", 30, 30,
-       d(U + "korbanot/yehi_ratzon_amirah",
+prayer("qorbanot_yehi_ratzon_amirah", "May it be thy will, that this recital", "qorbanot/yehi_ratzon_amirah", 30, 30,
+       d(U + "qorbanot/yehi_ratzon_amirah",
          "May it be thy will, Lord our God and God of our fathers, that this recital "
          "be favorably regarded and accepted by thee as if we offered the daily "
          "offering at its proper time, its right place, and according to rule."))
 
-prayer("korbanot_attah_hu", "Thou art the Lord our God before whom", "korbanot/attah_hu", 30, 30,
-       d(U + "korbanot/attah_hu",
+prayer("qorbanot_attah_hu", "Thou art the Lord our God before whom", "qorbanot/attah_hu", 30, 30,
+       d(U + "qorbanot/attah_hu",
          "Thou art the Lord our God before whom our forefathers burned the incense "
          "of fragrant spices when the Temple was in existence, as thou didst command "
          "them through Moses thy prophet, as it is written in thy Torah:"))
 
-prayer("korbanot_ketoret", "The incense", "korbanot/ketoret", 30, 30,
-       d(U + "korbanot/ketoret",
+prayer("qorbanot_qetoret", "The incense", "qorbanot/qetoret", 30, 30,
+       d(U + "qorbanot/qetoret",
          "The Lord said to Moses: “Take fragrant spices, stacte, onycha, and "
          "galbanum, aromatics along with pure frankincense; of each shall there be a "
          "like weight. And you shall make of it incense, a compound after the art of "
@@ -111,8 +111,8 @@ prayer("korbanot_ketoret", "The incense", "korbanot/ketoret", 30, 30,
          "regular incense-offering before the Lord throughout your generations.”"))
 
 #: One paragraph in Hebrew, three here.
-prayer("korbanot_pittum", "The compounding of the incense", "korbanot/pittum_haketoret", 30, 32,
-       d(U + "korbanot/pittum_haketoret",
+prayer("qorbanot_pittum", "The compounding of the incense", "qorbanot/pittum_haqetoret", 30, 32,
+       d(U + "qorbanot/pittum_haqetoret",
          "The Rabbis have taught: How was the compounding of the incense performed? "
          "The [annual amount of] incense weighed three hundred and sixty-eight "
          "minas: three hundred and sixty-five corresponding to the number of the "
@@ -134,16 +134,16 @@ prayer("korbanot_pittum", "The compounding of the incense", "korbanot/pittum_hak
          "use; and if he left out any of its ingredients, he was subject to the "
          "penalty of death."))
 
-prayer("korbanot_rashbag", "Rabbi Simeon ben Gamaliel says", "korbanot/pittum_haketoret/rashbag", 32, 32,
-       d(U + "korbanot/pittum_haketoret/rashbag",
+prayer("qorbanot_rashbag", "Rabbi Simeon ben Gamaliel says", "qorbanot/pittum_haqetoret/rashbag", 32, 32,
+       d(U + "qorbanot/pittum_haqetoret/rashbag",
          "Rabbi Simeon ben Gamaliel says: The balm required for the incense is a "
          "resin exuding from the balsam trees. Why was Karsina lye used? To refine "
          "the onycha: Why was Cyprus wine employed? To steep the onycha in it so as "
          "to make it more pungent. Though mei raglayim might have been good for that "
          "purpose, it was not decent to bring it into the Temple."))
 
-prayer("korbanot_rabbi_natan", "Rabbi Nathan says", "korbanot/pittum_haketoret/rabbi_natan", 32, 32,
-       d(U + "korbanot/pittum_haketoret/rabbi_natan",
+prayer("qorbanot_rabbi_natan", "Rabbi Nathan says", "qorbanot/pittum_haqetoret/rabbi_natan", 32, 32,
+       d(U + "qorbanot/pittum_haqetoret/rabbi_natan",
          "It has been taught: Rabbi Nathan says: While the priest was grinding the "
          "incense, his superintendent would say: “Grind it very thin, grind it very "
          "thin,” because the [rhythmic] sound is good for the compounding of the "
@@ -155,8 +155,8 @@ prayer("korbanot_rabbi_natan", "Rabbi Nathan says", "korbanot/pittum_haketoret/r
          "instalments; if, however, one left out any of its ingredients he would be "
          "subject to the penalty of death."))
 
-prayer("korbanot_bar_kappara", "Bar Kappara says", "korbanot/pittum_haketoret/bar_kappara", 32, 34,
-       d(U + "korbanot/pittum_haketoret/bar_kappara",
+prayer("qorbanot_bar_kappara", "Bar Kappara says", "qorbanot/pittum_haqetoret/bar_kappara", 32, 34,
+       d(U + "qorbanot/pittum_haqetoret/bar_kappara",
          "It has been taught: Bar Kappara says: Once in sixty or seventy years a "
          "total of half the required amount came from the accumulated surpluses [the "
          "extra three minas of which the high priest took two handfuls on the Day of "
@@ -167,25 +167,25 @@ prayer("korbanot_bar_kappara", "Bar Kappara says", "korbanot/pittum_haketoret/ba
          "present any leaven or honey as a fire-offering to the Lord.”"))
 
 #: Centred lines on the Hebrew page, indented lines here.
-prayer("korbanot_pesuqim", "The Lord of hosts is with us", "korbanot/pesuqim", 34, 34,
-       verses(U + "korbanot/pesuqim", [
+prayer("qorbanot_pesuqim", "The Lord of hosts is with us", "qorbanot/pesuqim", 34, 34,
+       verses(U + "qorbanot/pesuqim", [
            "The Lord of hosts is with us; the God of Jacob is our fortress,",
            "Lord of hosts, happy is the man who trusts in thee.",
            "O Lord, save us; may the King answer us when we call.",
        ]))
 
-prayer("korbanot_attah_seter", "Thou art my shelter", "korbanot/attah_seter", 34, 34,
-       d(U + "korbanot/attah_seter",
+prayer("qorbanot_attah_seter", "Thou art my shelter", "qorbanot/attah_seter", 34, 34,
+       d(U + "qorbanot/attah_seter",
          "Thou art my shelter; from the foe thou wilt preserve me; with songs of "
          "deliverance thou wilt surround me."))
 
-prayer("korbanot_vearvah", "The offering of Judah and Jerusalem", "korbanot/vearvah", 34, 34,
-       d(U + "korbanot/vearvah",
+prayer("qorbanot_vearvah", "The offering of Judah and Jerusalem", "qorbanot/vearvah", 34, 34,
+       d(U + "qorbanot/vearvah",
          "The offering of Judah and Jerusalem will be pleasing to the Lord, as in "
          "the days of old and as in former years."))
 
-prayer("korbanot_abaye", "Abbaye recounted the daily order", "korbanot/seder_hamaarakhah", 34, 34,
-       d(U + "korbanot/seder_hamaarakhah",
+prayer("qorbanot_abaye", "Abbaye recounted the daily order", "qorbanot/seder_hamaarakhah", 34, 34,
+       d(U + "qorbanot/seder_hamaarakhah",
          "Abbaye recounted the daily order of the Temple service on the authority of "
          "tradition and according to Abba Saul: The large pile of wood was set in "
          "order on the altar before the second pile on the incense altar; the second "
@@ -220,8 +220,8 @@ prayer("poem_anna_bekhoach", "By the great power", "anna_bekhoach", 34, 36,
            "Accept our prayer, hear our cry, thou who knowest secret thoughts.",
        ]), base=P)
 
-prayer("korbanot_ribbon_haolamim", "Lord of the universe", "korbanot/ribbon_haolamim", 36, 36,
-       d(U + "korbanot/ribbon_haolamim",
+prayer("qorbanot_ribbon_haolamim", "Lord of the universe", "qorbanot/ribbon_haolamim", 36, 36,
+       d(U + "qorbanot/ribbon_haolamim",
          "Lord of the universe, thou hast commanded us to sacrifice the daily "
          "offering at its proper time with priests officiating, Levites [singing] on "
          "the platform, and lay representatives of Israel attending the Temple "
@@ -234,15 +234,15 @@ prayer("korbanot_ribbon_haolamim", "Lord of the universe", "korbanot/ribbon_haol
          "accepted by thee as if we offered the daily offering at its proper time "
          "and attended at its service."))
 
-prayer("korbanot_musaf_shabbat", "On the Sabbath day", "korbanot/musaf/shabbat", 36, 36,
-       d(U + "korbanot/musaf/shabbat",
+prayer("qorbanot_musaf_shabbat", "On the Sabbath day", "qorbanot/musaf/shabbat", 36, 36,
+       d(U + "qorbanot/musaf/shabbat",
          "On the Sabbath day two yearling male lambs without blemish [are to be "
          "offered], with two-tenths of an ephah of fine flour mixed with oil as a "
          "meal-offering, along with its libation. This is the burnt-offering of "
          "every Sabbath, in addition to the daily burnt-offering and its libation."))
 
-prayer("korbanot_musaf_rosh_chodesh", "And on your new moon festivals", "korbanot/musaf/rosh_chodesh", 36, 38,
-       d(U + "korbanot/musaf/rosh_chodesh",
+prayer("qorbanot_musaf_rosh_chodesh", "And on your new moon festivals", "qorbanot/musaf/rosh_chodesh", 36, 38,
+       d(U + "qorbanot/musaf/rosh_chodesh",
          "And on your new moon festivals you shall offer as a burnt-offering to the "
          "Lord two young bullocks, one ram, seven yearling male lambs without "
          "blemish, along with three-tenths of an ephah of fine flour mixed with oil "
@@ -257,8 +257,8 @@ prayer("korbanot_musaf_rosh_chodesh", "And on your new moon festivals", "korbano
          "as a sin-offering to the Lord, in addition to the daily burnt-offering and "
          "its libation."))
 
-prayer("eizehu_mekoman_1", "Which were the places of sacrifice 1", "eizehu_mekoman/1", 38, 38,
-       d(U + "eizehu_mekoman/1",
+prayer("eizehu_meqoman_1", "Which were the places of sacrifice 1", "eizehu_meqoman/1", 38, 38,
+       d(U + "eizehu_meqoman/1",
          "1. Which were the places of sacrifice in the Temple? The most holy "
          "offerings were slaughtered on the north side of the altar, as were also "
          "the bullock and the he-goat for the Day of Atonement. Their blood, which "
@@ -269,8 +269,8 @@ prayer("eizehu_mekoman_1", "Which were the places of sacrifice 1", "eizehu_mekom
          "the blood at the western base of the outer altar; if, however, he failed "
          "to do so, the omission did not invalidate the ceremony."))
 
-prayer("eizehu_mekoman_2", "Which were the places of sacrifice 2", "eizehu_mekoman/2", 38, 38,
-       d(U + "eizehu_mekoman/2",
+prayer("eizehu_meqoman_2", "Which were the places of sacrifice 2", "eizehu_meqoman/2", 38, 38,
+       d(U + "eizehu_meqoman/2",
          "2. The bullocks and the he-goats which were to be burned were slaughtered "
          "on the north side of the altar; their blood, which was there received in a "
          "sacred vessel, had to be sprinkled towards the curtain and upon the golden "
@@ -280,8 +280,8 @@ prayer("eizehu_mekoman_2", "Which were the places of sacrifice 2", "eizehu_mekom
          "invalidate the ceremony. All these offerings were burnt at the place where "
          "the ashes were deposited."))
 
-prayer("eizehu_mekoman_3", "Which were the places of sacrifice 3", "eizehu_mekoman/3", 38, 38,
-       d(U + "eizehu_mekoman/3",
+prayer("eizehu_meqoman_3", "Which were the places of sacrifice 3", "eizehu_meqoman/3", 38, 38,
+       d(U + "eizehu_meqoman/3",
          "3. The communal sin-offerings and those of individuals—the goats offered "
          "on new moon festivals and on major feasts are the communal "
          "sin-offerings—were slaughtered on the north side of the altar. Their "
@@ -294,16 +294,16 @@ prayer("eizehu_mekoman_3", "Which were the places of sacrifice 3", "eizehu_mekom
          "eaten within the Temple court only by the males of the priesthood during "
          "that day and evening—until midnight."))
 
-prayer("eizehu_mekoman_4", "Which were the places of sacrifice 4", "eizehu_mekoman/4", 40, 40,
-       d(U + "eizehu_mekoman/4",
+prayer("eizehu_meqoman_4", "Which were the places of sacrifice 4", "eizehu_meqoman/4", 40, 40,
+       d(U + "eizehu_meqoman/4",
          "4. The burnt-offering was one of the most holy sacrifices. It was "
          "slaughtered on the north side of the altar. Its blood, which was there "
          "received in a sacred vessel, required two sprinklings [at opposite angles "
          "of the altar] making four in all. This offering had to be flayed, severed "
          "into parts, and consumed by fire."))
 
-prayer("eizehu_mekoman_5", "Which were the places of sacrifice 5", "eizehu_mekoman/5", 40, 40,
-       d(U + "eizehu_mekoman/5",
+prayer("eizehu_meqoman_5", "Which were the places of sacrifice 5", "eizehu_meqoman/5", 40, 40,
+       d(U + "eizehu_meqoman/5",
          "5. As to the communal peace-offerings and the guilt-offerings—the "
          "following are the guilt-offerings: for robbery, for making improper use of "
          "sacred objects, for violating a betrothed handmaid, the offering of a "
@@ -316,8 +316,8 @@ prayer("eizehu_mekoman_5", "Which were the places of sacrifice 5", "eizehu_mekom
          "within the Temple court only by the males of the priesthood that day and "
          "evening—until midnight."))
 
-prayer("eizehu_mekoman_6", "Which were the places of sacrifice 6", "eizehu_mekoman/6", 40, 40,
-       d(U + "eizehu_mekoman/6",
+prayer("eizehu_meqoman_6", "Which were the places of sacrifice 6", "eizehu_meqoman/6", 40, 40,
+       d(U + "eizehu_meqoman/6",
          "6. The thanksgiving-offering and the ram offered by a nazirite [at the "
          "termination of his vow] were holy in a minor degree. These might be "
          "slaughtered anywhere in the Temple court. Their blood required two "
@@ -327,8 +327,8 @@ prayer("eizehu_mekoman_6", "Which were the places of sacrifice 6", "eizehu_mekom
          "to the priests’ share, except that the priests’ share might be eaten only "
          "by the priests, their wives, their children and their servants."))
 
-prayer("eizehu_mekoman_7", "Which were the places of sacrifice 7", "eizehu_mekoman/7", 40, 40,
-       d(U + "eizehu_mekoman/7",
+prayer("eizehu_meqoman_7", "Which were the places of sacrifice 7", "eizehu_meqoman/7", 40, 40,
+       d(U + "eizehu_meqoman/7",
          "7. The peace-offerings also were holy in a minor degree. These might be "
          "slaughtered anywhere in the Temple court. Their blood required two "
          "sprinklings [at opposite angles of the altar] making four in all. They "
@@ -337,8 +337,8 @@ prayer("eizehu_mekoman_7", "Which were the places of sacrifice 7", "eizehu_mekom
          "priests’ share, except that the priests’ share might be eaten only by the "
          "priests, their wives, their children and their servants."))
 
-prayer("eizehu_mekoman_8", "Which were the places of sacrifice 8", "eizehu_mekoman/8", 40, 42,
-       d(U + "eizehu_mekoman/8",
+prayer("eizehu_meqoman_8", "Which were the places of sacrifice 8", "eizehu_meqoman/8", 40, 42,
+       d(U + "eizehu_meqoman/8",
          "8. The firstlings of animals, the tithe of cattle, and the paschal lamb "
          "were likewise holy in a minor degree. These might be slaughtered anywhere "
          "in the Temple court. Their blood required one sprinkling only; this, "

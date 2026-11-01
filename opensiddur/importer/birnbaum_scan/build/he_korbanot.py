@@ -59,8 +59,8 @@ def verses(urn, ls, *, indent=8):
             % (pad, urn, pad, inner, pad, pad))
 
 
-prayer("korbanot_kiyor", "פָּרָשַׁת הַכִּיּוֹר", "korbanot/kiyor", 27, 27,
-       d(U + "korbanot/kiyor",
+prayer("qorbanot_kiyyor", "פָּרָשַׁת הַכִּיּוֹר", "qorbanot/kiyyor", 27, 27,
+       d(U + "qorbanot/kiyyor",
          "וַיְדַבֵּר יְיָ אֶל מֹשֶׁה לֵּאמֹר: וְעָשִֽׂיתָ כִּיּוֹר נְחֹֽשֶׁת, "
          "וְכַנּוֹ נְחֹֽשֶׁת, לְרָחְצָה. וְנָתַתָּ אֹתוֹ בֵּין אֹֽהֶל מוֹעֵד "
          "וּבֵין הַמִּזְבֵּֽחַ, וְנָתַתָּ שָֽׁמָּה מָֽיִם. וְרָחֲצוּ אַהֲרֹן "
@@ -70,8 +70,8 @@ prayer("korbanot_kiyor", "פָּרָשַׁת הַכִּיּוֹר", "korbanot/ki
          "וְרַגְלֵיהֶם וְלֹא יָמֻֽתוּ; וְהָיְתָה לָהֶם חָק־עוֹלָם, לוֹ וּלְזַרְעוֹ "
          "לְדֹרֹתָם."))
 
-prayer("korbanot_yehi_ratzon_miqdash", "יְהִי רָצוֹן שֶׁתְּרַחֵם עָלֵֽינוּ", "korbanot/yehi_ratzon_miqdash", 27, 27,
-       d(U + "korbanot/yehi_ratzon_miqdash",
+prayer("qorbanot_yehi_ratzon_miqdash", "יְהִי רָצוֹן שֶׁתְּרַחֵם עָלֵֽינוּ", "qorbanot/yehi_ratzon_miqdash", 27, 27,
+       d(U + "qorbanot/yehi_ratzon_miqdash",
          "יְהִי רָצוֹן מִלְּפָנֶֽיךָ, יְיָ אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ, "
          "שֶׁתְּרַחֵם עָלֵֽינוּ וְתִמְחָל־לָֽנוּ עַל כָּל חַטֹּאתֵֽינוּ, "
          "וּתְכַפֶּר־לָֽנוּ עַל כָּל עֲוֺנוֹתֵֽינוּ, וְתִסְלַח לְכָל "
@@ -81,8 +81,8 @@ prayer("korbanot_yehi_ratzon_miqdash", "יְהִי רָצוֹן שֶׁתְּרַ
          "עַבְדֶּֽךָ, מִפִּי כְבוֹדֶֽךָ, כָּאָמוּר:"))
 
 #: Runs across the page turn at `נֶֽסֶךְ שֵׁכָר לַייָ. | וְאֵת הַכֶּֽבֶשׂ`.
-prayer("korbanot_tamid", "פָּרָשַׁת הַתָּמִיד", "korbanot/tamid", 27, 29,
-       d(U + "korbanot/tamid",
+prayer("qorbanot_tamid", "פָּרָשַׁת הַתָּמִיד", "qorbanot/tamid", 27, 29,
+       d(U + "qorbanot/tamid",
          "וַיְדַבֵּר יְיָ אֶל מֹשֶׁה לֵּאמֹר: צַו אֶת בְּנֵי יִשְׂרָאֵל "
          "וְאָמַרְתָּ אֲלֵהֶם: אֶת קָרְבָּנִי לַחְמִי לְאִשַּׁי, רֵֽיחַ נִיחֹחִי, "
          "תִּשְׁמְרוּ לְהַקְרִיב לִי בְּמוֹעֲדוֹ. וְאָמַרְתָּ לָהֶם: זֶה "
@@ -96,28 +96,28 @@ prayer("korbanot_tamid", "פָּרָשַׁת הַתָּמִיד", "korbanot/tami
          f"{pb(29)}וְאֵת הַכֶּֽבֶשׂ הַשֵּׁנִי תַּעֲשֶׂה בֵּין הָעַרְבָּֽיִם; כְּמִנְחַת "
          "הַבֹּֽקֶר וּכְנִסְכּוֹ תַּעֲשֶׂה, אִשֵּׁה רֵֽיחַ נִיחֹֽחַ לַייָ."))
 
-prayer("korbanot_ushchat", "וְשָׁחַט אֹתוֹ", "korbanot/ushchat", 29, 29,
-       d(U + "korbanot/ushchat",
+prayer("qorbanot_ushchat", "וְשָׁחַט אֹתוֹ", "qorbanot/ushchat", 29, 29,
+       d(U + "qorbanot/ushchat",
          "וְשָׁחַט אֹתוֹ עַל יֶֽרֶךְ הַמִּזְבֵּֽחַ צָפֹֽנָה לִפְנֵי יְיָ; "
          "וְזָרְקוּ בְּנֵי אַהֲרֹן הַכֹּהֲנִים אֶת דָּמוֹ עַל הַמִּזְבֵּֽחַ "
          "סָבִיב."))
 
-prayer("korbanot_yehi_ratzon_amirah", "יְהִי רָצוֹן שֶׁתְּהֵא אֲמִירָה זוֹ", "korbanot/yehi_ratzon_amirah", 29, 29,
-       d(U + "korbanot/yehi_ratzon_amirah",
+prayer("qorbanot_yehi_ratzon_amirah", "יְהִי רָצוֹן שֶׁתְּהֵא אֲמִירָה זוֹ", "qorbanot/yehi_ratzon_amirah", 29, 29,
+       d(U + "qorbanot/yehi_ratzon_amirah",
          "יְהִי רָצוֹן מִלְּפָנֶֽיךָ, יְיָ אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ, "
          "שֶׁתְּהֵא אֲמִירָה זוֹ חֲשׁוּבָה וּמְקֻבֶּֽלֶת וּמְרֻצָּה לְפָנֶֽיךָ, "
          "כְּאִלּוּ הִקְרַֽבְנוּ קָרְבַּן הַתָּמִיד בְּמוֹעֲדוֹ וּבִמְקוֹמוֹ "
          "וּכְהִלְכָתוֹ."))
 
-prayer("korbanot_attah_hu", "אַתָּה הוּא יְיָ אֱלֹהֵֽינוּ שֶׁהִקְטִֽירוּ", "korbanot/attah_hu", 29, 29,
-       d(U + "korbanot/attah_hu",
+prayer("qorbanot_attah_hu", "אַתָּה הוּא יְיָ אֱלֹהֵֽינוּ שֶׁהִקְטִֽירוּ", "qorbanot/attah_hu", 29, 29,
+       d(U + "qorbanot/attah_hu",
          "אַתָּה הוּא יְיָ אֱלֹהֵֽינוּ שֶׁהִקְטִֽירוּ אֲבוֹתֵֽינוּ לְפָנֶֽיךָ אֶת "
          "קְטֹֽרֶת הַסַּמִּים בִּזְמַן שֶׁבֵּית הַמִּקְדָּשׁ הָיָה קַיָּם, "
          "כַּאֲשֶׁר צִוִּֽיתָ אוֹתָם עַל יְדֵי מֹשֶׁה נְבִיאֶֽךָ, כַּכָּתוּב "
          "בְּתוֹרָתֶֽךָ:"))
 
-prayer("korbanot_ketoret", "פָּרָשַׁת הַקְּטֹֽרֶת", "korbanot/ketoret", 29, 29,
-       d(U + "korbanot/ketoret",
+prayer("qorbanot_qetoret", "פָּרָשַׁת הַקְּטֹֽרֶת", "qorbanot/qetoret", 29, 29,
+       d(U + "qorbanot/qetoret",
          "וַיֹּֽאמֶר יְיָ אֶל מֹשֶׁה: קַח לְךָ סַמִּים, נָטָף וּשְׁחֵֽלֶת "
          "וְחֶלְבְּנָה, סַמִּים וּלְבֹנָה זַכָּה; בַּד בְּבַד יִהְיֶה. וְעָשִֽׂיתָ "
          "אֹתָהּ קְטֹֽרֶת, רֹֽקַח מַעֲשֵׂה רוֹקֵֽחַ, מְמֻלָּח, טָהוֹר קֹֽדֶשׁ. "
@@ -130,8 +130,8 @@ prayer("korbanot_ketoret", "פָּרָשַׁת הַקְּטֹֽרֶת", "korbano
 
 #: Runs across the page turn at `וְשׁוֹחֲקָן | יָפֶה יָפֶה`, which falls inside a
 #: phrase rather than between sentences.
-prayer("korbanot_pittum", "פִּטּוּם הַקְּטֹֽרֶת", "korbanot/pittum_haketoret", 29, 31,
-       d(U + "korbanot/pittum_haketoret",
+prayer("qorbanot_pittum", "פִּטּוּם הַקְּטֹֽרֶת", "qorbanot/pittum_haqetoret", 29, 31,
+       d(U + "qorbanot/pittum_haqetoret",
          "תָּנוּ רַבָּנָן, פִּטּוּם הַקְּטֹֽרֶת כֵּיצַד. שְׁלֹשׁ מֵאוֹת "
          "וְשִׁשִּׁים וּשְׁמוֹנָה מָנִים הָיוּ בָהּ: שְׁלֹשׁ מֵאוֹת וְשִׁשִּׁים "
          "וַחֲמִשָּׁה כְּמִנְיַן יְמוֹת הַחַמָּה, מָנֶה לְכָל יוֹם, פְּרַס "
@@ -150,8 +150,8 @@ prayer("korbanot_pittum", "פִּטּוּם הַקְּטֹֽרֶת", "korbanot/p
          "הַיַּרְדֵּן כָּל שֶׁהוּא. וְאִם נָֽתַן בָּהּ דְּבַשׁ, פְּסָלָהּ; וְאִם "
          "חִסַּר אַחַת מִכָּל סַמָּנֶֽיהָ, חַיָּב מִיתָה."))
 
-prayer("korbanot_rashbag", "רַבָּן שִׁמְעוֹן בֶּן גַּמְלִיאֵל", "korbanot/pittum_haketoret/rashbag", 31, 31,
-       d(U + "korbanot/pittum_haketoret/rashbag",
+prayer("qorbanot_rashbag", "רַבָּן שִׁמְעוֹן בֶּן גַּמְלִיאֵל", "qorbanot/pittum_haqetoret/rashbag", 31, 31,
+       d(U + "qorbanot/pittum_haqetoret/rashbag",
          "רַבָּן שִׁמְעוֹן בֶּן גַּמְלִיאֵל אוֹמֵר: הַצֳּרִי אֵינוֹ אֶלָּא שְׂרָף "
          "הַנּוֹטֵף מֵעֲצֵי הַקְּטָף. בֹּרִית כַּרְשִׁינָה לָמָה הִיא בָאָה, "
          "כְּדֵי לְיַפּוֹת בָּהּ אֶת הַצִּפֹּֽרֶן, כְּדֵי שֶׁתְּהֵא נָאָה. יֵין "
@@ -159,8 +159,8 @@ prayer("korbanot_rashbag", "רַבָּן שִׁמְעוֹן בֶּן גַּמְ�
          "כְּדֵי שֶׁתְּהֵא עַזָּה. וַהֲלֹא מֵי רַגְלַֽיִם יָפִין לָהּ, אֶלָּא "
          "שֶׁאֵין מַכְנִיסִין מֵי רַגְלַֽיִם בָּעֲזָרָה מִפְּנֵי הַכָּבוֹד."))
 
-prayer("korbanot_rabbi_natan", "תַּנְיָא, רַבִּי נָתָן אוֹמֵר", "korbanot/pittum_haketoret/rabbi_natan", 31, 31,
-       d(U + "korbanot/pittum_haketoret/rabbi_natan",
+prayer("qorbanot_rabbi_natan", "תַּנְיָא, רַבִּי נָתָן אוֹמֵר", "qorbanot/pittum_haqetoret/rabbi_natan", 31, 31,
+       d(U + "qorbanot/pittum_haqetoret/rabbi_natan",
          "תַּנְיָא, רַבִּי נָתָן אוֹמֵר: כְּשֶׁהוּא שׁוֹחֵק, אוֹמֵר הָדֵק הֵיטֵב, "
          "הֵיטֵב הָדֵק, מִפְּנֵי שֶׁהַקּוֹל יָפֶה לַבְּשָׂמִים. פִּטְּמָהּ "
          "לַחֲצָאִין, כְּשֵׁרָה; לִשְׁלִישׁ וְלִרְבִֽיעַ, לֹא שָׁמַֽעְנוּ. אָמַר "
@@ -168,8 +168,8 @@ prayer("korbanot_rabbi_natan", "תַּנְיָא, רַבִּי נָתָן אוֹ
          "וְאִם חִסַּר אַחַת מִכָּל סַמָּנֶֽיהָ, חַיָּב מִיתָה."))
 
 #: Runs across the page turn at `לַעֲמֹד מִפְּנֵי | רֵיחָהּ`.
-prayer("korbanot_bar_kappara", "תַּנְיָא, בַּר קַפָּרָא אוֹמֵר", "korbanot/pittum_haketoret/bar_kappara", 31, 33,
-       d(U + "korbanot/pittum_haketoret/bar_kappara",
+prayer("qorbanot_bar_kappara", "תַּנְיָא, בַּר קַפָּרָא אוֹמֵר", "qorbanot/pittum_haqetoret/bar_kappara", 31, 33,
+       d(U + "qorbanot/pittum_haqetoret/bar_kappara",
          "תַּנְיָא, בַּר קַפָּרָא אוֹמֵר: אַחַת לְשִׁשִּׁים אוֹ לְשִׁבְעִים שָׁנָה "
          "הָיְתָה בָאָה שֶׁל שִׁירַֽיִם לַחֲצָאִין. וְעוֹד תָּנֵי בַּר קַפָּרָא: "
          "אִלּוּ הָיָה נוֹתֵן בָּהּ קֹרְטוֹב שֶׁל דְּבַשׁ, אֵין אָדָם יָכוֹל "
@@ -180,25 +180,25 @@ prayer("korbanot_bar_kappara", "תַּנְיָא, בַּר קַפָּרָא או
 
 #: Three verses, each on its own centred line in the print. The English page sets
 #: them as indented lines instead -- see `readings/english_28_48.md`.
-prayer("korbanot_pesuqim", "יְיָ צְבָאוֹת עִמָּֽנוּ", "korbanot/pesuqim", 33, 33,
-       verses(U + "korbanot/pesuqim", [
+prayer("qorbanot_pesuqim", "יְיָ צְבָאוֹת עִמָּֽנוּ", "qorbanot/pesuqim", 33, 33,
+       verses(U + "qorbanot/pesuqim", [
            "יְיָ צְבָאוֹת עִמָּֽנוּ, מִשְׂגָּב־לָֽנוּ אֱלֹהֵי יַעֲקֹב, סֶֽלָה.",
            "יְיָ צְבָאוֹת, אַשְׁרֵי אָדָם בֹּטֵֽחַ בָּךְ.",
            "יְיָ, הוֹשִֽׁיעָה; הַמֶּֽלֶךְ יַעֲנֵֽנוּ בְיוֹם קָרְאֵֽנוּ.",
        ]))
 
-prayer("korbanot_attah_seter", "אַתָּה סֵֽתֶר לִי", "korbanot/attah_seter", 33, 33,
-       d(U + "korbanot/attah_seter",
+prayer("qorbanot_attah_seter", "אַתָּה סֵֽתֶר לִי", "qorbanot/attah_seter", 33, 33,
+       d(U + "qorbanot/attah_seter",
          "אַתָּה סֵֽתֶר לִי, מִצַּר תִּצְּרֵֽנִי; רָנֵּי פַלֵּט תְּסוֹבְבֵֽנִי, "
          "סֶֽלָה."))
 
-prayer("korbanot_vearvah", "וְעָרְבָה לַייָ", "korbanot/vearvah", 33, 33,
-       d(U + "korbanot/vearvah",
+prayer("qorbanot_vearvah", "וְעָרְבָה לַייָ", "qorbanot/vearvah", 33, 33,
+       d(U + "qorbanot/vearvah",
          "וְעָרְבָה לַייָ מִנְחַת יְהוּדָה וִירוּשָׁלָֽיִם, כִּימֵי עוֹלָם "
          "וּכְשָׁנִים קַדְמוֹנִיּוֹת."))
 
-prayer("korbanot_abaye", "סֵֽדֶר הַמַּעֲרָכָה", "korbanot/seder_hamaarakhah", 33, 33,
-       d(U + "korbanot/seder_hamaarakhah",
+prayer("qorbanot_abaye", "סֵֽדֶר הַמַּעֲרָכָה", "qorbanot/seder_hamaarakhah", 33, 33,
+       d(U + "qorbanot/seder_hamaarakhah",
          "אַבַּיֵּי הֲוָה מְסַדֵּר סֵֽדֶר הַמַּעֲרָכָה מִשְּׁמָא דִגְמָרָא "
          "וַאֲלִבָּא דְאַבָּא שָׁאוּל: מַעֲרָכָה גְדוֹלָה קוֹדֶֽמֶת לְמַעֲרָכָה "
          "שְׁנִיָּה שֶׁל קְטֹֽרֶת, וּמַעֲרָכָה שְׁנִיָּה שֶׁל קְטֹֽרֶת קוֹדֶֽמֶת "
@@ -229,8 +229,8 @@ prayer("poem_anna_bekhoach", "אָנָּא בְּכֹֽחַ", "anna_bekhoach", 3
            "שַׁוְעָתֵֽנוּ קַבֵּל וּשְׁמַע צַעֲקָתֵֽנוּ, יוֹדֵֽעַ תַּעֲלוּמוֹת.",
        ]), base=P)
 
-prayer("korbanot_ribbon_haolamim", "רִבּוֹן הָעוֹלָמִים", "korbanot/ribbon_haolamim", 35, 35,
-       d(U + "korbanot/ribbon_haolamim",
+prayer("qorbanot_ribbon_haolamim", "רִבּוֹן הָעוֹלָמִים", "qorbanot/ribbon_haolamim", 35, 35,
+       d(U + "qorbanot/ribbon_haolamim",
          "רִבּוֹן הָעוֹלָמִים, אַתָּה צִוִּיתָֽנוּ לְהַקְרִיב קָרְבַּן הַתָּמִיד "
          "בְּמוֹעֲדוֹ, וְלִהְיוֹת כֹּהֲנִים בַּעֲבוֹדָתָם, וּלְוִיִּם בְּדוּכָנָם, "
          "וְיִשְׂרָאֵל בְּמַעֲמָדָם; וְעַתָּה בַּעֲוֺנוֹתֵֽינוּ חָרֵב בֵּית "
@@ -244,14 +244,14 @@ prayer("korbanot_ribbon_haolamim", "רִבּוֹן הָעוֹלָמִים", "kor
 #: Said only on the day its rubric names, and nothing is negated when it is not:
 #: on an ordinary weekday the page simply has less on it. A plain conditional, and
 #: not the negated pair the Amidah's inserts need.
-prayer("korbanot_musaf_shabbat", "מוּסַף שֶׁל שַׁבָּת", "korbanot/musaf/shabbat", 35, 35,
-       d(U + "korbanot/musaf/shabbat",
+prayer("qorbanot_musaf_shabbat", "מוּסַף שֶׁל שַׁבָּת", "qorbanot/musaf/shabbat", 35, 35,
+       d(U + "qorbanot/musaf/shabbat",
          "וּבְיוֹם הַשַּׁבָּת שְׁנֵי כְבָשִׂים בְּנֵי שָׁנָה תְּמִימִם, וּשְׁנֵי "
          "עֶשְׂרֹנִים סֹֽלֶת מִנְחָה בְּלוּלָה בַשֶּֽׁמֶן, וְנִסְכּוֹ. עֹלַת "
          "שַׁבַּת בְּשַׁבַּתּוֹ עַל עֹלַת הַתָּמִיד וְנִסְכָּהּ."))
 
-prayer("korbanot_musaf_rosh_chodesh", "מוּסַף שֶׁל רֹאשׁ חֹֽדֶשׁ", "korbanot/musaf/rosh_chodesh", 35, 37,
-       d(U + "korbanot/musaf/rosh_chodesh",
+prayer("qorbanot_musaf_rosh_chodesh", "מוּסַף שֶׁל רֹאשׁ חֹֽדֶשׁ", "qorbanot/musaf/rosh_chodesh", 35, 37,
+       d(U + "qorbanot/musaf/rosh_chodesh",
          "וּבְרָאשֵׁי חָדְשֵׁיכֶם תַּקְרִֽיבוּ עֹלָה לַייָ: פָּרִים בְּנֵי בָקָר "
          "שְׁנַֽיִם, וְאַֽיִל אֶחָד, כְּבָשִׂים בְּנֵי שָׁנָה שִׁבְעָה, תְּמִימִם. "
          "וּשְׁלֹשָׁה עֶשְׂרֹנִים סֹֽלֶת מִנְחָה בְּלוּלָה בַשֶּֽׁמֶן לַפָּר "
@@ -266,8 +266,8 @@ prayer("korbanot_musaf_rosh_chodesh", "מוּסַף שֶׁל רֹאשׁ חֹֽד
 #: Eizehu Mekoman. Each mishnah opens with its Hebrew numeral and a full stop, set
 #: inline with the words -- the numeral is text and not a heading, and the English
 #: side sets `1.` where this sets `א.`.
-prayer("eizehu_mekoman_1", "אֵיזֶֽהוּ מְקוֹמָן א", "eizehu_mekoman/1", 37, 37,
-       d(U + "eizehu_mekoman/1",
+prayer("eizehu_meqoman_1", "אֵיזֶֽהוּ מְקוֹמָן א", "eizehu_meqoman/1", 37, 37,
+       d(U + "eizehu_meqoman/1",
          "א. אֵיזֶֽהוּ מְקוֹמָן שֶׁל זְבָחִים. קָדְשֵׁי קָדָשִׁים שְׁחִיטָתָן "
          "בַּצָּפוֹן, פָּר וְשָׂעִיר שֶׁל יוֹם הַכִּפּוּרִים שְׁחִיטָתָן "
          "בַּצָּפוֹן, וְקִבּוּל דָּמָן בִּכְלִי שָׁרֵת בַּצָּפוֹן. וְדָמָן טָעוּן "
@@ -275,8 +275,8 @@ prayer("eizehu_mekoman_1", "אֵיזֶֽהוּ מְקוֹמָן א", "eizehu_mek
          "מַתָּנָה אַחַת מֵהֶן מְעַכָּֽבֶת. שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל "
          "יְסוֹד מַעֲרָבִי שֶׁל מִזְבֵּֽחַ הַחִיצוֹן; אִם לֹא נָתַן, לֹא עִכֵּב."))
 
-prayer("eizehu_mekoman_2", "אֵיזֶֽהוּ מְקוֹמָן ב", "eizehu_mekoman/2", 37, 37,
-       d(U + "eizehu_mekoman/2",
+prayer("eizehu_meqoman_2", "אֵיזֶֽהוּ מְקוֹמָן ב", "eizehu_meqoman/2", 37, 37,
+       d(U + "eizehu_meqoman/2",
          "ב. פָּרִים הַנִּשְׂרָפִים וּשְׂעִירִים הַנִּשְׂרָפִים שְׁחִיטָתָן "
          "בַּצָּפוֹן, וְקִבּוּל דָּמָן בִּכְלִי שָׁרֵת בַּצָּפוֹן. וְדָמָן טָעוּן "
          "הַזָּיָה עַל הַפָּרֹֽכֶת וְעַל מִזְבַּח הַזָּהָב; מַתָּנָה אַחַת מֵהֶן "
@@ -284,8 +284,8 @@ prayer("eizehu_mekoman_2", "אֵיזֶֽהוּ מְקוֹמָן ב", "eizehu_mek
          "מִזְבֵּֽחַ הַחִיצוֹן; אִם לֹא נָתַן, לֹא עִכֵּב. אֵֽלּוּ וָאֵֽלּוּ "
          "נִשְׂרָפִין בְּבֵית הַדָּֽשֶׁן."))
 
-prayer("eizehu_mekoman_3", "אֵיזֶֽהוּ מְקוֹמָן ג", "eizehu_mekoman/3", 37, 37,
-       d(U + "eizehu_mekoman/3",
+prayer("eizehu_meqoman_3", "אֵיזֶֽהוּ מְקוֹמָן ג", "eizehu_meqoman/3", 37, 37,
+       d(U + "eizehu_meqoman/3",
          "ג. חַטֹּאת הַצִּבּוּר וְהַיָּחִיד, אֵֽלּוּ הֵן חַטֹּאת הַצִּבּוּר: "
          "שְׂעִירֵי רָאשֵׁי חֳדָשִׁים וְשֶׁל מוֹעֲדוֹת, שְׁחִיטָתָן בַּצָּפוֹן, "
          "וְקִבּוּל דָּמָן בִּכְלִי שָׁרֵת בַּצָּפוֹן. וְדָמָן טָעוּן אַרְבַּע "
@@ -296,14 +296,14 @@ prayer("eizehu_mekoman_3", "אֵיזֶֽהוּ מְקוֹמָן ג", "eizehu_mek
          "הַקְּלָעִים לְזִכְרֵי כְהֻנָּה, בְּכָל מַאֲכָל, לְיוֹם וָלַֽיְלָה, עַד "
          "חֲצוֹת."))
 
-prayer("eizehu_mekoman_4", "אֵיזֶֽהוּ מְקוֹמָן ד", "eizehu_mekoman/4", 39, 39,
-       d(U + "eizehu_mekoman/4",
+prayer("eizehu_meqoman_4", "אֵיזֶֽהוּ מְקוֹמָן ד", "eizehu_meqoman/4", 39, 39,
+       d(U + "eizehu_meqoman/4",
          "ד. הָעוֹלָה קֹֽדֶשׁ קָדָשִׁים. שְׁחִיטָתָהּ בַּצָּפוֹן, וְקִבּוּל "
          "דָּמָהּ בִּכְלִי שָׁרֵת בַּצָּפוֹן. וְדָמָהּ טָעוּן שְׁתֵּי מַתָּנוֹת "
          "שֶׁהֵן אַרְבַּע; וּטְעוּנָה הַפְשֵׁט, וְנִתּֽוּחַ, וְכָלִיל לָאִשִּׁים."))
 
-prayer("eizehu_mekoman_5", "אֵיזֶֽהוּ מְקוֹמָן ה", "eizehu_mekoman/5", 39, 39,
-       d(U + "eizehu_mekoman/5",
+prayer("eizehu_meqoman_5", "אֵיזֶֽהוּ מְקוֹמָן ה", "eizehu_meqoman/5", 39, 39,
+       d(U + "eizehu_meqoman/5",
          "ה. זִבְחֵי שַׁלְמֵי צִבּוּר וַאֲשָׁמוֹת, אֵֽלּוּ הֵן אֲשָׁמוֹת: אֲשַׁם "
          "גְּזֵלוֹת, אֲשַׁם מְעִילוֹת, אֲשַׁם שִׁפְחָה חֲרוּפָה, אֲשַׁם נָזִיר, "
          "אֲשַׁם מְצֹרָע, אָשָׁם תָּלוּי. שְׁחִיטָתָן בַּצָּפוֹן, וְקִבּוּל דָּמָן "
@@ -311,8 +311,8 @@ prayer("eizehu_mekoman_5", "אֵיזֶֽהוּ מְקוֹמָן ה", "eizehu_mek
          "אַרְבַּע. וְנֶאֱכָלִין לִפְנִים מִן הַקְּלָעִים לְזִכְרֵי כְהֻנָּה, "
          "בְּכָל מַאֲכָל, לְיוֹם וָלַֽיְלָה, עַד חֲצוֹת."))
 
-prayer("eizehu_mekoman_6", "אֵיזֶֽהוּ מְקוֹמָן ו", "eizehu_mekoman/6", 39, 39,
-       d(U + "eizehu_mekoman/6",
+prayer("eizehu_meqoman_6", "אֵיזֶֽהוּ מְקוֹמָן ו", "eizehu_meqoman/6", 39, 39,
+       d(U + "eizehu_meqoman/6",
          "ו. הַתּוֹדָה וְאֵיל נָזִיר קָדָשִׁים קַלִּים. שְׁחִיטָתָן בְּכָל מָקוֹם "
          "בָּעֲזָרָה, וְדָמָן טָעוּן שְׁתֵּי מַתָּנוֹת שֶׁהֵן אַרְבַּע. "
          "וְנֶאֱכָלִין בְּכָל הָעִיר, לְכָל אָדָם, בְּכָל מַאֲכָל, לְיוֹם "
@@ -320,8 +320,8 @@ prayer("eizehu_mekoman_6", "אֵיזֶֽהוּ מְקוֹמָן ו", "eizehu_mek
          "שֶׁהַמּוּרָם נֶאֱכָל לַכֹּהֲנִים, לִנְשֵׁיהֶם וְלִבְנֵיהֶם "
          "וּלְעַבְדֵיהֶם."))
 
-prayer("eizehu_mekoman_7", "אֵיזֶֽהוּ מְקוֹמָן ז", "eizehu_mekoman/7", 39, 39,
-       d(U + "eizehu_mekoman/7",
+prayer("eizehu_meqoman_7", "אֵיזֶֽהוּ מְקוֹמָן ז", "eizehu_meqoman/7", 39, 39,
+       d(U + "eizehu_meqoman/7",
          "ז. שְׁלָמִים קָדָשִׁים קַלִּים. שְׁחִיטָתָן בְּכָל מָקוֹם בָּעֲזָרָה, "
          "וְדָמָן טָעוּן שְׁתֵּי מַתָּנוֹת שֶׁהֵן אַרְבַּע. וְנֶאֱכָלִין בְּכָל "
          "הָעִיר, לְכָל אָדָם, בְּכָל מַאֲכָל, לִשְׁנֵי יָמִים וְלַֽיְלָה אֶחָד. "
@@ -329,8 +329,8 @@ prayer("eizehu_mekoman_7", "אֵיזֶֽהוּ מְקוֹמָן ז", "eizehu_mek
          "לַכֹּהֲנִים, לִנְשֵׁיהֶם וְלִבְנֵיהֶם וּלְעַבְדֵיהֶם."))
 
 #: The eighth runs onto printed 41, where Rabbi Ishmael's rules begin.
-prayer("eizehu_mekoman_8", "אֵיזֶֽהוּ מְקוֹמָן ח", "eizehu_mekoman/8", 39, 41,
-       d(U + "eizehu_mekoman/8",
+prayer("eizehu_meqoman_8", "אֵיזֶֽהוּ מְקוֹמָן ח", "eizehu_meqoman/8", 39, 41,
+       d(U + "eizehu_meqoman/8",
          "ח. הַבְּכוֹר וְהַמַּעֲשֵׂר וְהַפֶּֽסַח קָדָשִׁים קַלִּים. שְׁחִיטָתָן "
          "בְּכָל מָקוֹם בָּעֲזָרָה, וְדָמָן טָעוּן מַתָּנָה אֶחָת, וּבִלְבָד "
          "שֶׁיִּתֵּן כְּנֶֽגֶד הַיְסוֹד. שִׁנָּה בַאֲכִילָתָן: הַבְּכוֹר נֶאֱכָל "

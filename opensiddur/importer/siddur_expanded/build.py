@@ -72,7 +72,7 @@ class Builder:
             self.section('המשך הוצאת ספר תורה לאחר ההקפות','Torah procession after the hakafot',continuation),
             'On Simchat Torah, continue after Gadlu at the end of the hakafot:')
         weekday=self.s('siddur:chol/shacharit/torah_intro')+instruction('Open the ark and take out the Torah.')
-        weekday+=''.join(self.s(u) for u in [prefix+'vayehi_binsoa','prayer:berikh_shemeh',prefix+'gadelu',prefix+'lekha_adonai','prayer:av_harachamim/hu_yerachem',prefix+'vetiggaleh'])
+        weekday+=''.join(self.s(u) for u in [prefix+'vayehi_binsoa','prayer:berikh_shemeh',prefix+'gaddelu',prefix+'lekha_adonai','prayer:av_harachamim/hu_yerachem',prefix+'vetiggaleh'])
         return opening+self.gate(none_of(MAJOR),weekday)
     def torah(self,service_name,major=False):
         selected=[e for e in self.readings if e.service==service_name]
@@ -90,14 +90,14 @@ class Builder:
             # One reading spine serves weekdays, Shabbat and festivals. The
             # opening and communal prayers differ; the selected aliyot do not
             # need to be compiled twice under those alternatives.
-            replacements[TEXT+prefix+'asher_bachar']=self.gate(holiday('shavuot',1),self.s('siddur:regalim/akdamut'))+reading['torah']
+            replacements[TEXT+prefix+'asher_bachar']=self.gate(holiday('shavuot',1),self.s('siddur:regalim/aqdamut'))+reading['torah']
             replacements[TEXT+'prayer:kaddish/chatzi']=self.s('prayer:kaddish/chatzi')+reading['maftir']
             replacements[TEXT+'prayer:birkhot_haftarah/after']=reading['haftarah']+self.s('prayer:birkhot_haftarah/after')
             for name in ['barukh_shepetrani','mi_sheberakh/oleh_latorah','mi_sheberakh/yoledet_ubat','mi_sheberakh/choleh','mi_sheberakh/cholah']:
                 replacements[TEXT+'prayer:'+name]=self.gate(MAJOR,self.s('prayer:'+name))
             body=self.morning_torah_opening()+self.s('siddur:shabbat/shacharit/torah/reading',replace=replacements)
             body+=self.gate(any_of(MAJOR,TISHA),self.s('siddur:shabbat/shacharit/torah/haftarah',replace=replacements))
-            for part in ['yekum_purkan','government','month','memorial']:
+            for part in ['yequm_purqan','government','month','memorial']:
                 body+=self.gate(MAJOR,self.s('siddur:shabbat/shacharit/torah/'+part))
             body+=self.gate(MAJOR,self.s('siddur:yizkor')+self.s('siddur:shabbat/shacharit/torah/ashrei'))
             body+=self.gate(none_of(MAJOR),self.s('prayer:yehi_ratzon_milifnei_avinu'))
@@ -128,7 +128,7 @@ class Builder:
         blessings=parse_fragment(self.s('siddur:all/shacharit/birkhot_hashachar'))
         label_morning_blessings(blessings)
         body=children+''.join(serialize(e) for e in blessings)
-        for suffix in ['opening','pesukei_dezimra','shema']:
+        for suffix in ['opening','pesuqei_dezimrah','shema']:
             body+=self.gate(none_of(MAJOR),self.s('siddur:chol/shacharit/'+suffix))
             body+=self.gate(MAJOR,self.s('siddur:shabbat/shacharit/'+suffix))
         body+=self.gate(none_of(MAJOR),self.amidah('siddur:chol/shacharit/amidah','shaharit'))
@@ -138,7 +138,7 @@ class Builder:
         body+=self.gate(all_of(holiday('sukkot',1,7),none_of(SHABBAT)),self.s('prayer:netilat_lulav'))
         body+=self.gate(HALLEL,self.s('siddur:hallel'))
         body+=self.gate(none_of(HALLEL),self.gate(MAJOR,self.s('siddur:shabbat/shacharit/kaddish'))+self.gate(none_of(MAJOR),self.s('siddur:chol/shacharit/kaddish_after_tachanun')))
-        body+=self.gate(SIMCHAT,self.s('prayer:hakafot_simchat_torah'))
+        body+=self.gate(SIMCHAT,self.s('prayer:haqqafot_simchat_torah'))
         body+=self.torah('morning')
         body+=self.gate(holiday('purim-observed'),self.purim())
         # Weekday Ashrei and Uva Letzion precede Musaf. The final Aleinu is
@@ -173,29 +173,29 @@ class Builder:
         festival=self.amidah('siddur:regalim/amidah','minha')
         rh=self.amidah('siddur:rosh_hashanah/minchah_maariv/amidah','minha')
         replace={TEXT+'siddur:chol/minchah/amidah':self.gate(none_of(RH),ordinary)+self.gate(RH,rh),TEXT+'siddur:shabbat/minchah/amidah':major,TEXT+'siddur:regalim/amidah':festival,TEXT+'siddur:shabbat/minchah/torah':self.torah('afternoon')}
-        replace[TEXT+'siddur:shabbat/minchah/uva_letzion']=self.s('siddur:chol/shacharit/conclusion/uva_letzion')
+        replace[TEXT+'siddur:shabbat/minchah/uva_letziyyon']=self.s('siddur:chol/shacharit/conclusion/uva_letziyyon')
         # The fast-day reading belongs between Ashrei and the Amidah.
         replace[TEXT+'siddur:chol/minchah/opening']=self.s('siddur:chol/minchah/opening')+self.gate(any_of(SHABBAT,FAST,TISHA),self.torah('afternoon')+self.s('siddur:shabbat/minchah/torah_kaddish'))
-        preparations=self.gate(TISHA,self.section('טלית ותפילין','Tallit and tefillin for Tisha B’Av afternoon',''.join(self.s('prayer:'+u) for u in ['tallith/barkhi_nafshi','tallith/hineni_mitatef','tallith/lehitatef','tallith/mah_yakar','tallith/yehi_ratzon','tefillin/hineni_mekhaven','tefillin/lehaniach','tefillin/al_mitzvat','shema/barukh_shem','tefillin/umechokhmatkha','tefillin/verastikh','tefillin/yehi_ratzon'])))
+        preparations=self.gate(TISHA,self.section('טלית ותפילין','Tallit and tefillin for Tisha B’Av afternoon',''.join(self.s('prayer:'+u) for u in ['tallith/barkhi_nafshi','tallith/hineni_mitattef','tallith/lehitattef','tallith/mah_yaqar','tallith/yehi_ratzon','tefillin/hineni_mekhavven','tefillin/lehanniach','tefillin/al_mitzvat','shema/barukh_shem','tefillin/umechokhmatekha','tefillin/verastikh','tefillin/yehi_ratzon'])))
         body=preparations+self.gate(any_of(none_of(MAJOR),RH),self.s('siddur:chol/minchah',replace=replace,include_heading=False))
         body+=self.gate(all_of(MAJOR,none_of(HIGH)),self.s('siddur:shabbat/minchah',replace=replace))
-        body+=self.gate(all_of(SHABBAT,feature('pirkei-avot','season')),self.s('siddur:pirkei_avot'))
+        body+=self.gate(all_of(SHABBAT,feature('pirkei-avot','season')),self.s('siddur:pirqei_avot'))
         body+=self.gate(holiday('yom-kippur'),instruction('Birnbaum does not contain Yom Kippur Minchah; use a mahzor.'))
         erev_hanukkah=all_of(feature('hebrew-date','month',9),feature('hebrew-date','day',24))
         friday_lights=self.s('siddur:chanukah',conditions={'festival_chanukah_first_night':erev_hanukkah})
         body+=self.gate(all_of(day(6),any_of(holiday('hanukkah',1,7),erev_hanukkah)),self.section('נרות חנוכה בערב שבת','Chanukah lights before Shabbat',instruction('On Friday, light the Chanukah candles before the Shabbat candles. The first-night blessing follows the night that is about to begin.')+friday_lights))
-        body+=self.gate(day(6),self.s('siddur:shabbat/preparations',omit=(TEXT+'prayer:birkat_horim',))+self.s('siddur:shabbat/kabbalat_service'))
+        body+=self.gate(day(6),self.s('siddur:shabbat/preparations',omit=(TEXT+'prayer:birkat_horim',))+self.s('siddur:shabbat/qabbalat_service'))
         return self.gate(service('minha'),self.section('תפילת מנחה','Afternoon service',self.a.context(body,'minha')))
     def purim(self):
         return self.s('siddur:purim',replace={TEXT+'prayer:harav_et_riveinu':transclude(TEXT+'bible:esther')+self.s('prayer:harav_et_riveinu')})
     def evening(self):
         ordinary=self.amidah('siddur:chol/arvit/amidah','maariv',False)
         rh=self.amidah('siddur:rosh_hashanah/minchah_maariv/amidah','maariv',False)
-        seasonal=self.gate(holiday('purim-observed'),self.purim())+self.gate(all_of(HAN,none_of(SHABBAT)),self.s('siddur:chanukah'))+self.gate(holiday('omer',1,49),self.s('siddur:sefirat_haomer'))+self.gate(SIMCHAT,self.s('prayer:hakafot_simchat_torah'))
+        seasonal=self.gate(holiday('purim-observed'),self.purim())+self.gate(all_of(HAN,none_of(SHABBAT)),self.s('siddur:chanukah'))+self.gate(holiday('omer',1,49),self.s('siddur:sefirat_haomer'))+self.gate(SIMCHAT,self.s('prayer:haqqafot_simchat_torah'))
         replace={TEXT+'siddur:chol/arvit/amidah':self.gate(none_of(RH),ordinary)+self.gate(RH,rh),TEXT+'siddur:shabbat/arvit/amidah':self.amidah('siddur:shabbat/arvit/amidah','maariv',False),TEXT+'siddur:regalim/amidah':self.amidah('siddur:regalim/amidah','maariv',False)}
         for u in ['siddur:chol/arvit/conclusion','siddur:shabbat/arvit/conclusion']:replace[TEXT+u]=seasonal+self.s(u)
         motzaei=aggregate('motzaei-shabbat')
-        body=self.gate(all_of(SHABBAT,none_of(RH)),self.s('siddur:shabbat/kabbalat_service'))
+        body=self.gate(all_of(SHABBAT,none_of(RH)),self.s('siddur:shabbat/qabbalat_service'))
         body+=self.gate(all_of(none_of(MAJOR,motzaei,HIGH)),self.s('siddur:chol/arvit',replace=replace,include_heading=False))
         body+=self.gate(all_of(motzaei,none_of(YT)),self.s('siddur:shabbat/conclusion',replace=replace))
         body+=self.gate(all_of(MAJOR,none_of(HIGH)),self.s('siddur:shabbat/arvit',replace=replace))
@@ -216,13 +216,13 @@ class Builder:
         standalone_body=self.gate(none_of(HIGH),self.musaf()+self.conclusion()+self.gate(any_of(SHABBAT,FESTIVAL),self.day_meal()))+self.gate(HIGH,instruction('Birnbaum does not contain a complete High Holiday Musaf; use a mahzor.'))
         standalone=self.gate(all_of(service('musaf'),none_of(service('shaharit'),service('minha'),service('maariv'))),self.section('מוסף בפני עצמו','Musaf selected separately',standalone_body),'An alternative starting point when selecting Musaf separately from the morning service.')
         self.modules['musaf']=('מוסף','Musaf selected separately',standalone)
-        roots=['siddur:regalim/eruv_tavshilin','siddur:regalim/candles','siddur:rosh_hashanah/tashlikh','siddur:yom_kippur/kapparot','prayer:hadlakat_ner_yom_kippur','siddur:berakhot/birkat_halevanah']
+        roots=['siddur:regalim/eruv_tavshilin','siddur:regalim/candles','siddur:rosh_hashanah/tashlikh','siddur:yom_kippur/kapparot','prayer:hadlaqat_ner_yom_kippur','siddur:berakhot/birkat_halevanah']
         # Use the source index's eligibility for each occasional item. This
         # retains user customs and dates instead of forcing them by declaration.
         index=self.c.units[TEXT+'siddur:siddur']
         occasion=''
         for u in roots:
-            if u=='prayer:hadlakat_ner_yom_kippur':
+            if u=='prayer:hadlaqat_ner_yom_kippur':
                 occasion+=self.gate(all_of(feature('hebrew-date','month',7),any_of(feature('hebrew-date','day',9),all_of(holiday('yom-kippur'),service('maariv')))),self.s(u));continue
             if u=='siddur:regalim/eruv_tavshilin':
                 occasion+=self.gate(aggregate('eruv-tavshilin'),self.s(u));continue
@@ -237,7 +237,7 @@ class Builder:
                     occasion+=self.gate(condition,self.s(u));continue
             occasion+=self.s(u)
         self.modules['occasions']=('מועדים ומנהגים','Occasional rites',occasion)
-        roots=['siddur:meals','siddur:marriage','siddur:brit_milah','siddur:pidyon_haben','siddur:tefillat_haderekh','siddur:tefillah_lecholeh','siddur:viddui_shekhiv_mera','siddur:burial','siddur:berakhot/various','siddur:kriat_shema_al_hamitah','siddur:kriat_shema_al_hamitah/yeladim','prayer:tefillah_lishlom_medinat_yisrael','prayer:amidah/havinenu']
+        roots=['siddur:meals','siddur:marriage','siddur:berit_milah','siddur:pidyon_haben','siddur:tefillat_haderekh','siddur:tefillah_lecholeh','siddur:viddui_shekhiv_mera','siddur:burial','siddur:berakhot/various','siddur:qeriat_shema_al_hamittah','siddur:qeriat_shema_al_hamittah/yeladim','prayer:tefillah_lishlom_medinat_yisrael','prayer:amidah/havinenu']
         appendix=''
         for u in roots:
             if TEXT+u in self.c.units:appendix+=self.s(u)

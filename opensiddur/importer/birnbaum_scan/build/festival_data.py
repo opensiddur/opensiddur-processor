@@ -88,7 +88,7 @@ ROWS = [{'page': 585,
   'he': 'בָּרוּךְ כְּבוֹד יְיָ מִמְּקוֹמוֹ.',
   'en': 'Blessed be the glory of the Lord from his abode.'},
  {'page': 587,
-  'key': 'mimkomekha',
+  'key': 'mimeqomekha',
   'he': 'מִמְּקוֹמְךָ מַלְכֵּֽנוּ תוֹפִֽיעַ וְתִמְלֹךְ עָלֵֽינוּ, כִּי מְחַכִּים אֲנַֽחְנוּ לָךְ. מָתַי '
         'תִּמְלֹךְ בְּצִיּוֹן, בְּקָרוֹב בְּיָמֵֽינוּ לְעוֹלָם וָעֶד תִּשְׁכֹּן. תִּתְגַּדַּל וְתִתְקַדַּשׁ '
         'בְּתוֹךְ יְרוּשָׁלַֽיִם עִירְךָ לְדוֹר וָדוֹר וּלְנֵֽצַח נְצָחִים. וְעֵינֵֽינוּ תִרְאֶֽינָה '
@@ -112,7 +112,7 @@ ROWS = [{'page': 585,
   'he': 'קָדוֹשׁ, קָדוֹשׁ, קָדוֹשׁ יְיָ צְבָאוֹת; מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ.',
   'en': 'Holy, holy, holy is the Lord of hosts;\nThe whole earth is full of his glory.”'},
  {'page': 589,
-  'key': 'leumatam',
+  'key': 'leummatam',
   'he': 'לְעֻמָּתָם בָּרוּךְ יֹאמֵֽרוּ—',
   'en': 'Those opposite them say: Blessed—'},
  {'page': 589,
@@ -150,7 +150,7 @@ ROWS = [{'page': 585,
         'above all tongues and sanctify us with thy commandments. Thou, our King, didst draw us near to thy '
         'service and call us by thy great and holy name.'},
  {'page': 589,
-  'key': 'vatodienu',
+  'key': 'vattodienu',
   'he': '(וַתּוֹדִיעֵֽנוּ, יְיָ אֱלֹהֵֽינוּ, אֶת מִשְׁפְּטֵי צִדְקֶֽךָ, וַתְּלַמְּדֵֽנוּ לַעֲשׂוֹת חֻקֵּי '
         'רְצוֹנֶֽךָ. וַתִּתֶּן־לָֽנוּ, יְיָ אֱלֹהֵֽינוּ, מִשְׁפָּטִים יְשָׁרִים וְתוֹרוֹת אֱמֶת, חֻקִּים '
         'וּמִצְוֹת טוֹבִים; וַתַּנְחִילֵֽנוּ זְמַנֵּי שָׂשׂוֹן וּמֽוֹעֲדֵי קֹֽדֶשׁ וְחַגֵּי נְדָבָה, '
@@ -169,7 +169,7 @@ ROWS = [{'page': 585,
         'of the festival, and hast hallowed the seventh day above the six working days; thou hast '
         'distinguished and sanctified thy people Israel with thy holiness.)'},
  {'page': 591,
-  'key': 'vatiten',
+  'key': 'vattitten',
   'he': 'וַתִּתֶּן־לָֽנוּ, יְיָ אֱלֹהֵֽינוּ, בְּאַהֲבָה (שַׁבָּתוֹת לִמְנוּחָה וּ)מוֹעֲדִים לְשִׂמְחָה, '
         'חַגִּים וּזְמַנִּים לְשָׂשׂוֹן, אֶת יוֹם (הַשַּׁבָּת הַזֶּה וְאֶת יוֹם)',
   'en': 'Thou, Lord our God, hast graciously given us (Sabbaths for rest,) holidays for gladness and festive '
@@ -191,7 +191,7 @@ ROWS = [{'page': 585,
   'he': 'הַשְּׁמִינִי, חַג הָעֲצֶֽרֶת הַזֶּה, זְמַן שִׂמְחָתֵֽנוּ,',
   'en': 'Eighth Day Feast, our Festival of Rejoicing,'},
  {'page': 591,
-  'key': 'mikra',
+  'key': 'miqra',
   'he': ' (בְּאַהֲבָה) מִקְרָא קֹֽדֶשׁ, זֵֽכֶר לִיצִיאַת מִצְרָֽיִם.',
   'en': 'a holy convocation in remembrance of the exodus from Egypt.'},
  {'page': 591,
@@ -280,7 +280,7 @@ ROWS = [{'page': 585,
         'gather our exiles to thy holy courts to observe thy laws, to do thy will, and to serve thee with a '
         'perfect heart. For this we thank thee. Blessed be God to whom all thanks are due.)'},
  {'page': 593,
-  'key': 'veal_kulam',
+  'key': 'veal_kullam',
   'he': 'וְעַל כֻּלָּם יִתְבָּרַךְ וְיִתְרוֹמַם שִׁמְךָ, מַלְכֵּֽנוּ, תָּמִיד לְעוֹלָם וָעֶד.',
   'en': 'For all these acts may thy name, our King, be blessed and exalted forever and ever.'},
  {'page': 595,

@@ -336,7 +336,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'בְּכָל הָאָֽרֶץ. צַהֲלִי וָרֹֽנִּי, יוֹשֶֽׁבֶת צִיּוֹן, כִּי גָדוֹל בְּקִרְבֵּךְ קְדוֹשׁ '
                    'יִשְׂרָאֵל. וְאָמַר בַּיּוֹם הַהוּא, הִנֵּה אֱלֹהֵֽינוּ זֶה קִוִּֽינוּ לוֹ '
                    'וְיוֹשִׁיעֵֽנוּ; זֶה יְיָ קִוִּֽינוּ לוֹ, נָגִֽילָה וְנִשְׂמְחָה בִּישׁוּעָתוֹ.'],
-                  ['beit_yaakov',
+                  ['beit_yaaqov',
                    'בֵּית יַעֲקֹב, לְכוּ וְנֵלְכָה בְּאוֹר יְיָ. וְהָיָה אֱמוּנַת עִתֶּֽיךָ חֹֽסֶן '
                    'יְשׁוּעֹת, חָכְמַת וָדָֽעַת, יִרְאַת יְיָ הִיא אוֹצָרוֹ. וַיְהִי דָוִד לְכָל דְּרָכָיו '
                    'מַשְׂכִּיל, וַייָ עִמּוֹ. פָּדָה בְשָׁלוֹם נַפְשִׁי מִקְּרָב־לִי, כִּי בְרַבִּים הָיוּ '
@@ -374,7 +374,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                   ['veamar',
                    'On that day men shall say: “Here is our God, for whom we waited that he should save us; '
                    'this is the Lord, for whom we waited; let us rejoice and be happy with his salvation.”'],
-                  ['beit_yaakov',
+                  ['beit_yaaqov',
                    'O house of Jacob, come, let us walk in the light of the Lord! A saving wealth of wisdom '
                    'and knowledge shall be your steady experience; godliness is one’s treasure.'],
                   ['vayehi_david', 'David prospered in all his ways, and the Lord was with him.'],
@@ -401,7 +401,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'דָּוִיד, וַיִּתְּנֵם בְּרָאשֵׁי הַגְּדוּד. וַאֲמַרְתֶּם כֹּה לֶחָי: וְאַתָּה שָׁלוֹם, '
                    'וּבֵיתְךָ שָׁלוֹם, וְכֹל אֲשֶׁר לְךָ שָׁלוֹם. יְיָ עֹז לְעַמּוֹ יִתֵּן; יְיָ יְבָרֵךְ '
                    'אֶת עַמּוֹ בַשָּׁלוֹם.'],
-                  ['amar_rabbi_yohanan',
+                  ['amar_rabbi_yochanan',
                    'אָמַר רַבִּי יוֹחָנָן: בְּכָל מָקוֹם שָׁאַתָּה מוֹצֵא גְדֻלָּתוֹ שֶׁל הַקָּדוֹשׁ '
                    'בָּרוּךְ הוּא, שָׁם אַתָּה מוֹצֵא עַנְוְתָנוּתוֹ. דָּבָר זֶה כָּתוּב בַּתּוֹרָה, '
                    'וְשָׁנוּי בַּנְּבִיאִים, וּמְשֻׁלָּשׁ בַּכְּתוּבִים. כָּתוּב בַּתּוֹרָה: כִּי יְיָ '
@@ -443,7 +443,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'have.”'],
                   ['hashem_oz',
                    'The Lord will give strength to his people; the Lord will bless his people with peace.'],
-                  ['amar_rabbi_yohanan',
+                  ['amar_rabbi_yochanan',
                    'Rabbi Yoḥanan said: Wherever you find the Lord’s greatness mentioned you find his '
                    'gentleness indicated. This is so in the Torah, again in the Prophets, and a third time '
                    'in the Psalms.'],
@@ -456,7 +456,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
          'notes': ['1 I Samuel 14:45. 2 Isaiah 35:10. 3 Psalm 30:12. 4 Deuteronomy 23:6. 5 Jeremiah 31:12. 6 '
                    'Isaiah 57:19. 7 I Chronicles 12:18. 8 I Samuel 25:6. 9 Psalm 29:11. 10 Deuteronomy '
                    '10:17-18.']},
- '549': {'text': [['amar_rabbi_yohanan_cont',
+ '549': {'text': [['amar_rabbi_yochanan_cont',
                    'לֶֽחֶם וְשִׂמְלָה. שָׁנוּי בַּנְּבִיאִים, דִּכְתִיב: כִּי כֹה אָמַר רָם וְנִשָּׂא, '
                    'שֹׁכֵן עַד וְקָדוֹשׁ שְׁמוֹ, מָרוֹם וְקָדוֹשׁ אֶשְׁכּוֹן. וּכְתִיב בָּתְרֵהּ: וְאֶת '
                    'דַּכָּא וּשְׁפַל רֽוּחַ, לְהַחֲיוֹת רֽוּחַ שְׁפָלִים וּלְהַחֲיוֹת לֵב נִדְכָּאִים. '
@@ -487,7 +487,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                    'fruit of his own labor than he who is merely pious; for with regard to the pious it is '
                    'written: ‘Happy is everyone who reveres the Lord,’ but with regard to one who enjoys the '
                    'fruit of his labor it is written: ‘When you eat of the toil of your hands, you']},
- '550': {'text': [['amar_rabbi_yohanan_cont',
+ '550': {'text': [['amar_rabbi_yochanan_cont',
                    'in the Prophets: “Thus says the High and Lofty One, who inhabits eternity, whose name is '
                    'Holy: “I dwell in the high and holy place”; and immediately afterwards it says: “but '
                    'with him also that is contrite and humble in spirit, to revive the spirit of the humble, '
@@ -498,7 +498,7 @@ READINGS = {'535': {'heading': 'לְמוֹצָאֵי שַׁבָּת',
                   ['yehi_hashem',
                    'May the Lord our God be with us as he was with our fathers; may he never leave us nor '
                    'forsake us.'],
-                  ['veatem', 'You who cling to the Lord your God are all alive this day.'],
+                  ['veattem', 'You who cling to the Lord your God are all alive this day.'],
                   ['ki_niham',
                    'Truly the Lord shall comfort Zion, he shall comfort all her ruins; he shall make her '
                    'wilderness like Eden, her desert like the garden of the Lord; joy and gladness shall be '

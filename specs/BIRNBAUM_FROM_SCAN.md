@@ -775,7 +775,7 @@ Next, in the order the evidence suggests:
 
 The next reviewed installment is Psalm 30, Mourners’ Kaddish, Hareni mezamen, and
 Barukh sheamar. **It stops before Hodu**, even though Hodu begins on the same opening.
-The unit is `chol_shacharit_pesukei_dezimra.xml`; its name is the full unit's name,
+The unit is `chol_shacharit_pesuqei_dezimrah.xml`; its name is the full unit's name,
 but its present contents and bibliography cover only this reviewed opening. Extend
 that unit as subsequent pages are read, rather than creating a unit per scan batch.
 
@@ -838,7 +838,7 @@ uv run python -m opensiddur.importer.birnbaum_scan.build.build_he --project-dire
 uv run python -m opensiddur.importer.birnbaum_scan.build.build_en --project-directory "$W"
 uv run python -m opensiddur.exporter.refdb --project-directory "$W"
 uv run python -m opensiddur.exporter.compiler -p hasiddur_hashalem-birnbaum-1949-he \
-  -f chol_shacharit_pesukei_dezimra.xml -s specs/birnbaum_scan/settings_undecided.yaml \
+  -f chol_shacharit_pesuqei_dezimrah.xml -s specs/birnbaum_scan/settings_undecided.yaml \
   --project-directory "$W" -o "$O/parallel.xml"
 uv run python -m opensiddur.exporter.pdf.pdf "$O/parallel.xml" "$O/parallel.pdf" \
   -s specs/birnbaum_scan/settings_undecided.yaml --project-directory "$W"
@@ -855,7 +855,7 @@ so the final Reader lines need not sit at the same vertical position as their En
 ## Hodu through Yehi khevod: printed 51–58, IA n75–n82
 
 This installment ends **before Ashrei**, including neither its opening verses nor its
-commentary. `chol_shacharit_pesukei_dezimra.xml` now starts at **Hareni mezamen**,
+commentary. `chol_shacharit_pesuqei_dezimrah.xml` now starts at **Hareni mezamen**,
 then Barukh sheamar, Hodu, Romemu, Vehu rahum, Hoshia et amekha, Psalm 100, and
 Yehi khevod. Psalm 30 and Mourners’ Kaddish move to `chol_shacharit_opening.xml`,
 which the index places immediately before this wrapper. Their text is unchanged.
@@ -863,7 +863,7 @@ The wrapper remains partial and can grow through the rest of Pesukei dezimrah.
 
 ### Biblical identity and composite paragraphs
 
-The ordered paragraphs use `siddur:chol/shacharit/pesukei_dezimra/{incipit}` URNs,
+The ordered paragraphs use `siddur:chol/shacharit/pesuqei_dezimrah/{incipit}` URNs,
 as requested for this installment. Individual verses use `bible:` URNs. Hodu's
 verses are I Chronicles 16:8–36; Psalm 100 has the chapter URN and five verse URNs.
 The other paragraphs collect verses from different psalms; Yehi khevod also uses
@@ -922,7 +922,7 @@ uv run python -m opensiddur.importer.birnbaum_scan.build.build_he --project-dire
 uv run python -m opensiddur.importer.birnbaum_scan.build.build_en --project-directory "$W"
 uv run python -m opensiddur.exporter.refdb --project-directory "$W"
 uv run python -m opensiddur.exporter.compiler -p hasiddur_hashalem-birnbaum-1949-he \
-  -f chol_shacharit_pesukei_dezimra.xml -s specs/birnbaum_scan/settings_undecided.yaml \
+  -f chol_shacharit_pesuqei_dezimrah.xml -s specs/birnbaum_scan/settings_undecided.yaml \
   --project-directory "$W" -o "$O/parallel.xml"
 uv run python -m opensiddur.exporter.pdf.pdf "$O/parallel.xml" "$O/parallel.pdf" \
   -s specs/birnbaum_scan/settings_undecided.yaml --project-directory "$W"

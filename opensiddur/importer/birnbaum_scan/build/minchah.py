@@ -23,7 +23,7 @@ TISHA = holiday('tisha-bav')
 FAST_DAY = '<j:any>' + FAST + TISHA + '</j:any>'
 REPETITION = feature(RECITATION, 'repetition')
 MINYAN = feature(QUORUM, 'minyan')
-NACHEM = PRAYER + 'amidah/nachaym_hashem_elohaynu'
+NACHEM = PRAYER + 'amidah/nachem_hashem_eloheinu'
 SHALOM = PRAYER + 'amidah/shalom_rav_al'
 
 
@@ -41,12 +41,12 @@ def shared(lang, prayers):
          'בָּרוּךְ אַתָּה' if lang == 'he' else 'Blessed art thou'),
         ('amidah_tefillah', PRAYER + 'amidah/tefillah',
          'כִּי אַתָּה שׁוֹמֵֽעַ' if lang == 'he' else 'for thou hearest in mercy'),
-        ('amidah_geulah', PRAYER + 'amidah/aneinu',
+        ('amidah_geullah', PRAYER + 'amidah/aneinu',
          'בָּרוּךְ אַתָּה' if lang == 'he' else 'Blessed art thou'),
     ):
         by_name[name]['body'] = split_paragraph(by_name[name]['body'], urn, boundary)
     for parent, urn, name in (
-        ('amidah_geulah', PRAYER+'amidah/aneinu', 'amidah_aneinu'),
+        ('amidah_geullah', PRAYER+'amidah/aneinu', 'amidah_aneinu'),
         ('amidah_shalom', PRAYER+'amidah/shalom/hamevarekh', 'amidah_shalom_hamevarekh'),
         ('amidah_shalom', PRAYER+'amidah/shalom/besefer_chayyim', 'amidah_shalom_besefer_chayyim'),
     ):
@@ -105,8 +105,8 @@ def amidah(lang, by_name):
              instruction('The Reader repeats the Shemoneh Esreh aloud when a minyan holds service.'),
              transclude(BIBLE+'deuteronomy/32/3')]
     for name in ORDER:
-        if name == 'amidah_geulah':
-            parts += [passage('geulah/reeh_na'), conditional('reader_aneinu', 'On fast days the Reader adds here:',
+        if name == 'amidah_geullah':
+            parts += [passage('geullah/reeh_na'), conditional('reader_aneinu', 'On fast days the Reader adds here:',
                 '<j:all>'+FAST_DAY+REPETITION+MINYAN+'</j:all>', passage('aneinu'))]
         elif name == 'amidah_yerushalayim':
             parts += [passage('yerushalayim/opening'),
@@ -174,17 +174,17 @@ def kaddish(parts, cid, *, full=False, mourner=False, lang='he'):
         return ('<tei:div>'+marked(ROOT+'/conclusion/kaddish/'+key,
                                   transclude(target), unit='kaddish-part')+'</tei:div>')
     if mourner:
-        text += [transclude(PRAYER+'kaddish/yitgadal'),
-                 occurrence('response', PRAYER+'kaddish/yehe_shmeh'),
+        text += [transclude(PRAYER+'kaddish/yitgaddal'),
+                 occurrence('response', PRAYER+'kaddish/yehe_shemeh'),
                  pb(187+int(lang=='en'),sigil=SIGIL+'/conclusion'),
                  occurrence('praise', PRAYER+'kaddish/yitbarakh')]
     else:
         text += [instruction('Reader:')]
-        text += [transclude(PRAYER+'kaddish/'+p) for p in ('yitgadal','yehe_shmeh','yitbarakh')]
+        text += [transclude(PRAYER+'kaddish/'+p) for p in ('yitgaddal','yehe_shemeh','yitbarakh')]
     if full:
-        text.append(transclude(PRAYER+'kaddish/titkabal'))
+        text.append(transclude(PRAYER+'kaddish/titqabbal'))
     if full or mourner:
-        text.append(transclude(PRAYER+'kaddish/yatom/yehe_shlama'))
+        text.append(transclude(PRAYER+'kaddish/yatom/yehe_shelama'))
         text.append(occurrence('peace', PRAYER+'kaddish/yatom/oseh_shalom') if mourner
                     else transclude(PRAYER+'kaddish/yatom/oseh_shalom'))
     parts.append(conditional(cid, 'When a minyan holds service:', MINYAN, '\n'.join(text)))

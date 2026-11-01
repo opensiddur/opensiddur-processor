@@ -146,7 +146,7 @@ PASSAGES = {'hodu': [('chronicles_1/16/8',
                 ('psalms/20/10',
                  'יְיָ, הוֹשִֽׁיעָה; הַמֶּלֶךְ יַעֲנֵֽנוּ בְיוֹם קָרְאֵֽנוּ.',
                  'O Lord, save us; may the King answer us when we call.')],
- 'hoshia_et_ammekha': [('psalms/28/9',
+ 'hoshiah_et_ammekha': [('psalms/28/9',
                        'הוֹשִֽׁיעָה אֶת עַמֶּֽךָ, וּבָרֵךְ אֶת נַחֲלָתֶֽךָ, וּרְעֵם וְנַשְּׂאֵם עַד '
                        'הָעוֹלָם.',
                        'Save thy people and bless thy heritage; tend them and sustain them forever.'),

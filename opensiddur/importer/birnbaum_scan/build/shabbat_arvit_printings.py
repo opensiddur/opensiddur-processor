@@ -10,7 +10,7 @@ RANGES = {
  'al_hanissim_chanukah':(269,271),'amidah_shalom_rav':(271,271),
  'amidah_shalom_hamevarekh':(271,271),'amidah_shalom_besefer_chayyim':(271,271),
  'amidah_elohai_netzor':(271,273),'amidah_yehi_ratzon':(273,273),
- 'conclusion_titkabal':(275,275),'conclusion_aleinu':(277,279),
+ 'conclusion_titqabbal':(275,275),'conclusion_aleinu':(277,279),
  'conclusion_al_tira':(279,279),'conclusion_psalm_27':(281,281),'poem_adon_olam':(281,283),
 }
 
@@ -19,7 +19,7 @@ def apply(lang,prayers):
     side=int(lang=='en'); by_name={p['name']:p for p in prayers}
     for name,(first,last) in RANGES.items():
         p=by_name[name];p['printings']=(*p.get('printings',()),(first+side,last+side))
-    for name in ('kaddish_derabbanan_yitgadal','kaddish_derabbanan_yehe_shmeh','kaddish_derabbanan_yitbarakh','kaddish_yatom'):
+    for name in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh','kaddish_yatom'):
         p=by_name[name]
         pages=(275,279) if name=='kaddish_yatom' else (263,275,279)
         p['printings']=(*p.get('printings',()),*((n+side,n+side) for n in pages))

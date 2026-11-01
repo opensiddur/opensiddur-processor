@@ -13,13 +13,13 @@ ROOT = SIDDUR+'lifecycle'
 JOURNEY = SIDDUR+'tefillat_haderekh'
 SICK = SIDDUR+'tefillah_lecholeh'
 BURIAL = SIDDUR+'burial'
-TZIDDUK = PRAYER+'tzidduk_hadin'
+TZIDDUK = PRAYER+'tzidduq_hadin'
 KADDISH = PRAYER+'kaddish/deitchadata'
 CHAPEL = BURIAL+'/chapel'
-MILAH = SIDDUR+'brit_milah'
+MILAH = SIDDUR+'berit_milah'
 GRACE = MILAH+'/grace'
 RESHUT = POEM+'birshut_el_ayom'
-HARACHAMAN = POEM+'harachaman_brit_milah'
+HARACHAMAN = POEM+'harachaman_berit_milah'
 PIDYON = SIDDUR+'pidyon_haben'
 SIGIL = '1949 lifecycle'
 # Date-only Tachanun calendar. A funeral itself must not suppress Tzidduk
@@ -30,26 +30,26 @@ TZIDDUK_OCCASION = ('<j:none>'+COMMON_OMISSIONS+date(1,1,30)+holiday('lag-baomer
 URNS={r['key']:ROOT+'/text/'+r['key'] for r in ROWS}
 URNS.update({'haderekh':PRAYER+'tefillat_haderekh',
  'sick_psalm23':BIBLE+'psalms/23','sick_refaenu':PRAYER+'amidah/refuah',
- 'haderekh_exodus':BIBLE+'exodus/23/20', 'tzidduk_1':BIBLE+'deuteronomy/32/4',
- 'tzidduk_jeremiah':BIBLE+'jeremiah/32/19','burial_leaving':BIBLE+'isaiah/25/8',
- 'milah_wine':PRAYER+'borei_pri_hagafen','pidyon_shehecheyanu':PRAYER+'shehecheyanu',
- 'milah_blessing':PRAYER+'al_hamilah','milah_father_blessing':PRAYER+'lehachniso_bivrito',
- 'milah_covenant':PRAYER+'asher_kiddesh_yedid','pidyon_blessing':PRAYER+'al_pidyon_haben',
+ 'haderekh_exodus':BIBLE+'exodus/23/20', 'tzidduq_1':BIBLE+'deuteronomy/32/4',
+ 'tzidduq_jeremiah':BIBLE+'jeremiah/32/19','burial_leaving':BIBLE+'isaiah/25/8',
+ 'milah_wine':PRAYER+'borei_peri_hagafen','pidyon_shehecheyanu':PRAYER+'shehecheyanu',
+ 'milah_blessing':PRAYER+'al_hamilah','milah_father_blessing':PRAYER+'lehakhniso_bivrito',
+ 'milah_covenant':PRAYER+'asher_qiddesh_yedid','pidyon_blessing':PRAYER+'al_pidyon_haben',
  'burial_kaddish_open':KADDISH+'/opening',
- **{'tzidduk_'+str(i):TZIDDUK+'/'+str(i) for i in range(1,11)},
+ **{'tzidduq_'+str(i):TZIDDUK+'/'+str(i) for i in range(1,11)},
  **{'milah_poem_'+str(i):RESHUT+'/'+str(i) for i in range(1,5)},
  'milah_poem_refrain':RESHUT+'/refrain',
  **{'milah_harachaman_'+str(i):HARACHAMAN+'/'+str(i) for i in range(1,7)}})
-URNS['tzidduk_1']=BIBLE+'deuteronomy/32/4'
+URNS['tzidduq_1']=BIBLE+'deuteronomy/32/4'
 # The chapel repeats the eight Yizkor verses verbatim, including its translation.
 for key in [r['key'] for r in ROWS if r['key'].startswith('chapel_')]:
  suffix=key.removeprefix('chapel_')
  URNS[key]=SIDDUR+'yizkor/text/opening_'+('ecclesiastes_12_7' if suffix=='ecclesiastes' else suffix)
 REUSED={'sick_refaenu','milah_wine','pidyon_shehecheyanu'}|{k for k in URNS if k.startswith('chapel_')}
 BIBLICAL={
- 'haderekh_exodus':'exodus/23/20','tzidduk_1':'deuteronomy/32/4',
- 'tzidduk_jeremiah':'jeremiah/32/19','tzidduk_psalm92':'psalms/92/16',
- 'tzidduk_job':'job/1/21','tzidduk_psalm78':'psalms/78/38','burial_leaving':'isaiah/25/8',
+ 'haderekh_exodus':'exodus/23/20','tzidduq_1':'deuteronomy/32/4',
+ 'tzidduq_jeremiah':'jeremiah/32/19','tzidduq_psalm92':'psalms/92/16',
+ 'tzidduq_job':'job/1/21','tzidduq_psalm78':'psalms/78/38','burial_leaving':'isaiah/25/8',
  'milah_grace_response':'psalms/113/2','milah_all':'psalms/65/5',
 }
 # Starts identify verse boundaries independently of sentence and paragraph breaks.
@@ -132,7 +132,7 @@ def quoted_text(key, raw, lang):
         b=raw.index(unicodedata.normalize('NFC',end),a+len(start)) if end else len(raw)
         quoted=xml(raw[a:b])
         if key=='pidyon_present' and source=='numbers/18/16':
-            quoted=marked(URNS[key]+'/shekel_hakodesh',quoted,unit='quotation')
+            quoted=marked(URNS[key]+'/shekel_haqodesh',quoted,unit='quotation')
         result+=xml(raw[offset:a])+f'<tei:seg source="{BIBLE+source}">'+quoted+'</tei:seg>'
         offset=b
     return (result+xml(raw[offset:])).replace('\n','</tei:p><tei:p>')
@@ -180,13 +180,13 @@ def units(project):
     add('tefillah_lecholeh_psalm23',SICK+'/psalm23','תהלים כג','Psalm 23',733,733,p('sick_psalm23'))
     add('tefillah_lecholeh',SICK,'תְּפִלָּה לְחוֹלֶה','PRAYER FOR THE SICK',733,733,
         p('sick_psalm6')+transclude(SICK+'/psalm23')+p('sick_refaenu'))
-    add('tzidduk_hadin',TZIDDUK,'צִדּוּק הַדִּין','ACKNOWLEDGMENT OF DIVINE JUSTICE',735,737,
-        ''.join(p(r['key']) for r in ROWS if r['key'].startswith('tzidduk_')))
+    add('tzidduq_hadin',TZIDDUK,'צִדּוּק הַדִּין','ACKNOWLEDGMENT OF DIVINE JUSTICE',735,737,
+        ''.join(p(r['key']) for r in ROWS if r['key'].startswith('tzidduq_')))
     add('burial_kaddish',KADDISH,'MOURNERS’ KADDISH','MOURNERS’ KADDISH',737,739,
         rubric('burial_kaddish')+''.join(p(r['key']) for r in ROWS if r['key'].startswith('burial_kaddish_')))
     add('burial_chapel',CHAPEL,'FUNERAL SERVICE AT THE CHAPEL','FUNERAL SERVICE AT THE CHAPEL',739,739,
         ''.join(p(r['key']) for r in ROWS if r['key'].startswith('chapel_'))+rubric('chapel')+p('sick_psalm23'))
-    burial=conditional('tzidduk_calendar',RUBRICS['tzidduk_'+lang],TZIDDUK_OCCASION,transclude(TZIDDUK))
+    burial=conditional('tzidduq_calendar',RUBRICS['tzidduq_'+lang],TZIDDUK_OCCASION,transclude(TZIDDUK))
     # User-supplied editorial rule, not an instruction printed in Birnbaum:
     # the expanded burial Kaddish accompanies Tzidduk Hadin; otherwise Yatom.
     minyan=feature('opensiddur:quorum','minyan')
@@ -201,7 +201,7 @@ def units(project):
     add('milah_reshut',RESHUT,'ברשות אל איום','Birshut El Ayom',745,747,poem,False)
     add('milah_harachaman',HARACHAMAN,'הרחמן לברית מילה','Harachaman for Brit Milah',747,749,
         ''.join(p('milah_harachaman_'+str(i)) for i in range(1,7)),False)
-    add('brit_milah_grace',GRACE,'בִּרְכַּת הַמָּזוֹן לִבְרִית מִילָה','GRACE AFTER THE BRITH MILAH',745,749,
+    add('berit_milah_grace',GRACE,'בִּרְכַּת הַמָּזוֹן לִבְרִית מִילָה','GRACE AFTER THE BRITH MILAH',745,749,
         rubric('leader')+p('milah_grace_invitation')+rubric('company')+p('milah_grace_response')
         +transclude(RESHUT)+rubric('grace')
         +transclude(PRAYER+'birkat_hamazon/zimmun/nevarekh')
@@ -217,7 +217,7 @@ def units(project):
         ('mohel_before',['milah_blessing']),('father_after',['milah_father_blessing']),
         ('all',['milah_response']),('mohel',['milah_wine','milah_covenant','milah_name'])]:
         body+=rubric(label)+''.join(p(k) for k in keys)
-    add('brit_milah',MILAH,'בְּרִית מִילָה','BRITH MILAH',741,749,body+transclude(GRACE))
+    add('berit_milah',MILAH,'בְּרִית מִילָה','BRITH MILAH',741,749,body+transclude(GRACE))
     body=rubric('pidyon')+rubric('present')+p('pidyon_present')+rubric('kohen')+p('pidyon_question')
     body+=rubric('father')+p('pidyon_answer')+p('pidyon_blessing')+p('pidyon_shehecheyanu')
     body+=rubric('exchange')+p('pidyon_exchange')+rubric('hand')+p('pidyon_child_blessing')+p('pidyon_closing')

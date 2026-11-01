@@ -8,11 +8,11 @@ from .arvit import AFTER_FESTIVAL
 from .kabbalat_shabbat_data import (HE, EN, EN_JOIN, PAGES, READER, REFRAIN,
     DODI_HE, DODI_EN, CONDOLENCE, CONDOLENCE_RUBRIC, STANZAS_RUBRIC, RISE_RUBRIC)
 
-ROOT = SIDDUR+'shabbat/kabbalat_shabbat'
-SIGIL = '1949 shabbat/kabbalat_shabbat'
-DODI = POEM+'lecha_dodi'
+ROOT = SIDDUR+'shabbat/qabbalat_shabbat'
+SIGIL = '1949 shabbat/qabbalat_shabbat'
+DODI = POEM+'lekhah_dodi'
 ANA = POEM+'anna_bekhoach'
-WELCOME = PRAYER+'nichum_avelim/hamakom_yenachem'
+WELCOME = PRAYER+'nichum_avelim/hamaqom_yenachem'
 FESTIVAL = feature(AGG, 'yom-tov')
 # The caller names the incoming Shabbat. AFTER_FESTIVAL uses that night's Hebrew
 # date, so under the Shabbat scope it means a festival on the preceding Friday.
@@ -29,7 +29,7 @@ OLD_REFERENCES = {
 
 
 def conditional(cid, rubric, fs, body, *, negate=False):
-    return cond('kabbalat_'+cid,note=rubric,fs=fs,negate=negate)+body+endcond('kabbalat_'+cid)
+    return cond('qabbalat_'+cid,note=rubric,fs=fs,negate=negate)+body+endcond('qabbalat_'+cid)
 
 
 def shared(lang, prayers):
@@ -55,7 +55,7 @@ def shared(lang, prayers):
             p['body']=re.sub(r'<tei:l>(.*?)</tei:l>',line,p['body'],flags=re.S)
             if count!=7: raise ValueError('Expected seven Ana Bekoach lines')
         page={'poem_anna_bekhoach':243, 'conclusion_psalm_93':249,
-              'kaddish_derabbanan_yitgadal':249, 'kaddish_derabbanan_yehe_shmeh':249,
+              'kaddish_derabbanan_yitgaddal':249, 'kaddish_derabbanan_yehe_shemeh':249,
               'kaddish_derabbanan_yitbarakh':249, 'kaddish_yatom':249}.get(p['name'])
         if page:
             page+=int(lang=='en')
@@ -113,9 +113,9 @@ def dodi_body(lang):
 
 def prayers(lang):
     side=int(lang=='en')
-    result=[dict(name=f'kabbalat_psalm_{n}',urn=BIBLE+f'psalms/{n}',title=f'Psalm {n}',
+    result=[dict(name=f'qabbalat_psalm_{n}',urn=BIBLE+f'psalms/{n}',title=f'Psalm {n}',
                  first=PAGES[n][0]+side,last=PAGES[n][1]+side,body=psalm_body(n,lang)) for n in HE]
-    result.append(dict(name='lecha_dodi',urn=DODI,title='לכה דודי' if not side else 'Lecha Dodi',
+    result.append(dict(name='lekhah_dodi',urn=DODI,title='לכה דודי' if not side else 'Lecha Dodi',
                        first=243+side,last=247+side,body=dodi_body(lang)))
     result.append(dict(name='nichum_avelim',urn=WELCOME,title='המקום ינחם' if not side else 'Consoling the mourners',
         first=247+side,last=247+side,body='<tei:p>'+marked(WELCOME,text_xml(CONDOLENCE[side],SIGIL))+'</tei:p>'))
@@ -131,13 +131,13 @@ def units(project):
             body=f'<tei:div corresp="{urn}">'+(editorial_head(lang,he,en) if head else '')+body+'</tei:div>'))
     ana=(pb(243+side,sigil=SIGIL)+transclude(ANA)
          +transclude(PRAYER+'shema/barukh_shem'))
-    add('kabbalat_anna_bekhoach',ROOT+'/anna_bekhoach','אנא בכח','Ana Bekoach',243,243,ana)
+    add('qabbalat_anna_bekhoach',ROOT+'/anna_bekhoach','אנא בכח','Ana Bekoach',243,243,ana)
     # Psalm 93 is already encoded in the psalm-of-the-day sequence.
-    add('kabbalat_psalm_93',ROOT+'/psalm_93','תהלים צג','Psalm 93',249,249,
+    add('qabbalat_psalm_93',ROOT+'/psalm_93','תהלים צג','Psalm 93',249,249,
         pb(249+side,sigil=SIGIL)+transclude(BIBLE+'psalms/93'),head=False)
     kad=''.join(transclude(PRAYER+'kaddish/'+s) for s in
-                ('yitgadal','yehe_shmeh','yitbarakh','yatom/yehe_shlama','yatom/oseh_shalom'))
-    add('kabbalat_kaddish',ROOT+'/kaddish','קדיש יתום','MOURNERS’ KADDISH',249,249,
+                ('yitgaddal','yehe_shemeh','yitbarakh','yatom/yehe_shelama','yatom/oseh_shalom'))
+    add('qabbalat_kaddish',ROOT+'/kaddish','קדיש יתום','MOURNERS’ KADDISH',249,249,
         pb(249+side,sigil=SIGIL)+conditional('minyan','When a minyan holds service:',MINYAN,kad))
     before=''.join(transclude(BIBLE+f'psalms/{n}') for n in (95,96,97,98,99,29))
     before+=transclude(ROOT+'/anna_bekhoach')+transclude(DODI)
@@ -146,10 +146,10 @@ def units(project):
     content+=instruction('If a festival occurs on Friday, the evening service begins here.')
     content+=transclude(BIBLE+'psalms/92')+transclude(ROOT+'/psalm_93')+transclude(ROOT+'/kaddish')
     content+=transclude(ROOT+'/study')
-    add('kabbalat_shabbat',ROOT,'קַבָּלַת שַׁבָּת','WELCOMING THE SABBATH',237,255,content)
+    add('qabbalat_shabbat',ROOT,'קַבָּלַת שַׁבָּת','WELCOMING THE SABBATH',237,255,content)
     # Whole-service omission is outside the reusable Kabbalat Shabbat file.
     body='<j:declare xml:id="shabbat_opening_day">'+feature(AGG,'shabbat')+'</j:declare>'
     body+=conditional('festival',RUBRIC.format(page=257+side),FESTIVAL,transclude(ROOT),negate=True)
     body+='<j:endDeclare target="#shabbat_opening_day"/>'
-    add('shabbat_kabbalat_service',SIDDUR+'shabbat/kabbalat_service','קבלת שבת','Welcoming the Sabbath',237,255,body,head=False)
+    add('shabbat_qabbalat_service',SIDDUR+'shabbat/qabbalat_service','קבלת שבת','Welcoming the Sabbath',237,255,body,head=False)
     return tuple(result)

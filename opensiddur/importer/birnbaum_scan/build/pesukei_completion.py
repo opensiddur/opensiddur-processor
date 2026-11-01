@@ -9,12 +9,12 @@ from .milestones import Correspondences
 
 ORDER = ('ashrei', 'psalm_146', 'psalm_147', 'psalm_148', 'psalm_149',
          'psalm_150', 'barukh_adonai', 'vayevarekh_david', 'attah_hu',
-         'vayosha', 'az_yashir', 'ki_ladonai', 'yishtabach', 'kaddish_chatzi')
+         'vayyosha', 'az_yashir', 'ki_ladonai', 'yishtabbach', 'kaddish_chatzi')
 PAGES = {'ashrei': (57, 59), 'psalm_146': (59, 61), 'psalm_147': (61, 61),
          'psalm_148': (61, 63), 'psalm_149': (63, 63), 'psalm_150': (63, 65),
          'barukh_adonai': (65, 65), 'vayevarekh_david': (65, 65),
-         'attah_hu': (65, 67), 'vayosha': (67, 67), 'az_yashir': (67, 69),
-         'ki_ladonai': (69, 69), 'yishtabach': (69, 69), 'kaddish_chatzi': (69, 69)}
+         'attah_hu': (65, 67), 'vayyosha': (67, 67), 'az_yashir': (67, 69),
+         'ki_ladonai': (69, 69), 'yishtabbach': (69, 69), 'kaddish_chatzi': (69, 69)}
 CITATIONS = {'psalm_145': ('תהלים קמה', 'Psalm 145'),
              'psalm_146': ('תהלים קמו', 'Psalm 146'),
              'psalm_147': ('תהלים קמז', 'Psalm 147'),
@@ -23,11 +23,11 @@ CITATIONS = {'psalm_145': ('תהלים קמה', 'Psalm 145'),
              'psalm_150': ('תהלים קנ', 'Psalm 150'),
              'vayevarekh_david': ('דברי הימים א כט, י–יג', 'I Chronicles 29:10–13'),
              'attah_hu': ('נחמיה ט, ו–יא', 'Nehemiah 9:6–11'),
-             'vayosha': ('שמות יד, ל–לא', 'Exodus 14:30–31'),
+             'vayyosha': ('שמות יד, ל–לא', 'Exodus 14:30–31'),
              'az_yashir': ('שמות טו, א–יח', 'Exodus 15:1–18')}
 TITLES = {'ashrei': ('אַשְׁרֵי', 'Ashrei'), 'barukh_adonai': ('בָּרוּךְ יְיָ לְעוֹלָם', 'Blessed be the Lord'),
           'ki_ladonai': ('כִּי לַייָ הַמְּלוּכָה', 'For sovereignty is the Lord’s'),
-          'yishtabach': ('יִשְׁתַּבַּח', 'Yishtabach'),
+          'yishtabbach': ('יִשְׁתַּבַּח', 'Yishtabach'),
           'kaddish_chatzi': ('חֲצִי קַדִּישׁ', 'Half Kaddish'), **CITATIONS}
 
 
@@ -68,7 +68,7 @@ def prayers(lang):
 
     result = []
     for name in ORDER:
-        if name in ('ashrei', 'yishtabach'):
+        if name in ('ashrei', 'yishtabbach'):
             urn = PRAYER + name
         elif name == 'kaddish_chatzi':
             urn = PRAYER + 'kaddish/chatzi'
@@ -86,7 +86,7 @@ def prayers(lang):
         elif name == 'kaddish_chatzi':
             body += ['<tei:note type="instruction" xml:lang="en">Reader:</tei:note>']
             body += [f'<j:transclude type="external" target="{PRAYER}kaddish/{part}"/>'
-                     for part in ('yitgadal', 'yehe_shmeh', 'yitbarakh')]
+                     for part in ('yitgaddal', 'yehe_shemeh', 'yitbarakh')]
         else:
             if name in CITATIONS:
                 body.append(citation(name))

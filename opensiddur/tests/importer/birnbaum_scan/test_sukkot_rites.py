@@ -31,7 +31,7 @@ class TestSukkotRites(unittest.TestCase):
             if row['group']=='hoshanot':self.assertEqual(row['en'],'')
     def test_biblical_anthologies_are_bounded(self):
         prayers={p['urn']:fragment(p['body']) for p in r.prayers('he')}
-        for key,count in [('hoshanot_lekha',3),('hoshanot_hoshia_et_ammekha',3),('hoshanot_hoshia_et_ammekha_repeat',3),('hoshanot_hoshia_et_ammekha_rabbah',3),('lulav_lulav_intent',3)]:
+        for key,count in [('hoshanot_lekha',3),('hoshanot_hoshiah_et_ammekha',3),('hoshanot_hoshiah_et_ammekha_repeat',3),('hoshanot_hoshiah_et_ammekha_rabbah',3),('lulav_lulav_intent',3)]:
             doc=prayers[r.URNS[key]]
             self.assertEqual(len(doc.xpath('.//tei:milestone[@unit="verse"][@corresp]',namespaces=NS)),count)
             self.assertEqual(len(doc.xpath('.//tei:milestone[@unit="verse"][not(@corresp)]',namespaces=NS)),count)

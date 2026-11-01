@@ -74,7 +74,7 @@ SHABBAT_SECTIONS = (
     # The Hebrew Friday, which is also what an electronic book's reader sets as the day.
     ("shabbat/preparations", SHABBAT_EVENING),
     # Often said before nightfall, while it is still the Hebrew Friday.
-    ("shabbat/kabbalat_service", SHABBAT_EVENING),
+    ("shabbat/qabbalat_service", SHABBAT_EVENING),
     ("shabbat/arvit", all_of(SHABBAT_OR_FESTIVAL, service("maariv"))),
     ("shabbat/leil_shabbat", all_of(SHABBAT, service("maariv"))),
     ("shabbat/shacharit", all_of(SHABBAT_OR_FESTIVAL, service("shaharit"))),
@@ -105,7 +105,7 @@ OCCASIONS = (
     ("regalim/musaf", all_of(any_of(FESTIVAL, aggregate("chol-hamoed")), DAYTIME)),
     ("regalim/morning_meal", all_of(FESTIVAL, DAYTIME)),
     ("sefirat_haomer", all_of(holiday("omer", 1, 49), service("maariv"))),
-    ("regalim/akdamut", holiday("shavuot", 1)),
+    ("regalim/aqdamut", holiday("shavuot", 1)),
     # Rosh Hashanah, and Kapparoth on the eve of Yom Kippur: the Ten Days.
     ("rosh_hashanah/minchah_maariv_and_rites", aggregate("aseret-ymei-tshuva")),
     ("sukkot/rites", any_of(holiday("sukkot", 1, 7), holiday("shmini-atzeret", 1, 2))),

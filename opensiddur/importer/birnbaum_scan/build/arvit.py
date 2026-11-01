@@ -56,7 +56,7 @@ def prayers(lang, earlier):
             target = source if source and source not in seen else urn+'/'+ref.replace('/','_')
             if source and source in seen:
                 value=f'<tei:seg source="{source}">{value}</tei:seg>'
-            quotes={'mi_khamokha':'exodus/15/11','yimlokh':'exodus/15/18'} if key=='emet' else {}
+            quotes={'mi_khamokhah':'exodus/15/11','yimlokh':'exodus/15/18'} if key=='emet' else {}
             if ref in quotes:
                 value=f'<tei:seg source="{BIBLE+quotes[ref]}">{value}</tei:seg>'
             parts.append(marked(target,value,unit='verse' if source else 'prayer-part')+' ')
@@ -103,15 +103,15 @@ def shared(lang, prayers):
 
 def kaddish(cid, *, full=False, mourner=False, lang='he'):
     text=[] if mourner else [instruction('Reader:')]
-    text.extend(transclude(PRAYER+'kaddish/'+key) for key in ('yitgadal','yehe_shmeh','yitbarakh'))
+    text.extend(transclude(PRAYER+'kaddish/'+key) for key in ('yitgaddal','yehe_shemeh','yitbarakh'))
     if full:
         # The printed Saturday-night instruction redirects after Half Kaddish.
         rest=(pb(213+int(lang=='en'),sigil=SIGIL+'/kaddish')
-              +transclude(PRAYER+'kaddish/titkabal')
-              +''.join(transclude(PRAYER+'kaddish/yatom/'+key) for key in ('yehe_shlama','oseh_shalom')))
+              +transclude(PRAYER+'kaddish/titqabbal')
+              +''.join(transclude(PRAYER+'kaddish/yatom/'+key) for key in ('yehe_shelama','oseh_shalom')))
         text.append(conditional(cid+'_completion','Except on Saturday night:',SATURDAY_NIGHT,rest,negate=True))
     elif mourner:
-        text.extend(transclude(PRAYER+'kaddish/yatom/'+key) for key in ('yehe_shlama','oseh_shalom'))
+        text.extend(transclude(PRAYER+'kaddish/yatom/'+key) for key in ('yehe_shelama','oseh_shalom'))
     return conditional(cid,'When a minyan holds service:',MINYAN,'\n'.join(text))
 
 
@@ -125,8 +125,8 @@ def amidah(lang, by_name):
             parts += [transclude(PRAYER+'amidah/binah/opening'),
                 conditional('chonantanu','On the night following the Sabbath or any other holy day, add:',HAVDALAH,transclude(URNS['chonantanu']))]
             parts.append(transclude(PRAYER+'amidah/binah/conclusion'))
-        elif name=='amidah_geulah':
-            parts.append(transclude(PRAYER+'amidah/geulah/reeh_na'))
+        elif name=='amidah_geullah':
+            parts.append(transclude(PRAYER+'amidah/geullah/reeh_na'))
         elif name=='amidah_shalom':
             parts += [transclude(PRAYER+'amidah/shalom_rav_al'),
                 conditional('peace_seal','Except during the Ten Days of Repentance:',TEN_DAYS,transclude(PRAYER+'amidah/shalom/hamevarekh'),negate=True),

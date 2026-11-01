@@ -142,6 +142,10 @@ And:
   `chayyim`, `kammah`. The dagesh a prefix brings to the next letter does not: `hasiddur`,
   `hamasorah`, `birkat_hamazon`, `mikol`, `bameh`. A letter written with two characters (`sh`,
   `ch`, `kh`, `tz`) is never doubled: `mitratzeh`, not `mitratztzeh`.
+- **A shva is sounded** (`e`) under a word's first letter, under a doubled letter, as the
+  second of two, and after a long vowel (qamatz, tsere, holam, shuruq, hiriq + yod): `berit`,
+  `peri`, `malkhutekha`, `yotzerenu`, `virtzonekha`. After a short vowel it is silent:
+  `lemaankha`, `miqdash`; so it is after a qamatz qatan, which is short: `zokhrenu`, `qorbanot`.
 - **The yod of the suffix ֶיךָ is not written**: segol + yod is `ei` (`vetechezeinah`), but
   before this suffix it is `e`, as it is said: `lefanekha`, `rachamekha`, `elekha`. Tsere + yod
   is always `ei`: `eloheinu`, `aleinu`.
@@ -2008,7 +2012,7 @@ section's own conditions on it are decided even when the date is not. For exampl
       <tei:f name="shavuot"><tei:numeric value="1"/></tei:f>
    </tei:fs>
 </j:declare>
-<j:transclude type="external" target="urn:x-opensiddur:text:siddur:regalim/akdamut"/>
+<j:transclude type="external" target="urn:x-opensiddur:text:siddur:regalim/aqdamut"/>
 <j:endDeclare target="#gate_akdamut_declare"/>
 <j:endConditional target="#gate_akdamut"/>
 ```

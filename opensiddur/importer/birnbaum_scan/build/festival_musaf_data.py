@@ -43,7 +43,7 @@ ROWS = [{'page': 609,
   'he': 'וְנֶאֱמָן אַתָּה לְהַחֲיוֹת מֵתִים. בָּרוּךְ אַתָּה, יְיָ, מְחַיֵּה הַמֵּתִים.',
   'en': 'Thou art faithful to revive the dead. Blessed art thou, O Lord, who revivest the dead.'},
  {'page': 609,
-  'key': 'naaritzkha',
+  'key': 'naaritzekha',
   'he': 'נַעֲרִיצְךָ וְנַקְדִישְׁךָ כְּסוֹד שִֽׂיחַ שַׂרְפֵי קֹֽדֶשׁ, הַמַּקְדִּישִׁים שִׁמְךָ בַּקֹּֽדֶשׁ, '
         'כַּכָּתוּב עַל יַד נְבִיאֶֽךָ: וְקָרָא זֶה אֶל זֶה וְאָמַר:',
   'en': 'We revere and sanctify thee in the words of the assembly of holy seraphim who hallow thy name in '
@@ -63,7 +63,7 @@ ROWS = [{'page': 609,
   'he': 'בָּרוּךְ כְּבוֹד יְיָ מִמְּקוֹמוֹ.',
   'en': 'Blessed be the glory of the Lord from his abode.”'},
  {'page': 611,
-  'key': 'mimkomo',
+  'key': 'mimeqomo',
   'he': 'מִמְּקוֹמוֹ הוּא יִֽפֶן בְּרַחֲמִים, וְיָחֹן עַם הַמְיַחֲדִים שְׁמוֹ עֶֽרֶב וָבֹֽקֶר, בְּכָל יוֹם '
         'תָּמִיד, פַּעֲמַֽיִם בְּאַהֲבָה שְׁמַע אוֹמְרִים:',
   'en': 'From his abode may he turn with compassion and be gracious to the people who acclaim his Oneness '
@@ -73,14 +73,14 @@ ROWS = [{'page': 609,
   'he': 'שְׁמַע יִשְׂרָאֵל, יְיָ אֱלֹהֵֽינוּ, יְיָ אֶחָד.',
   'en': '“Hear, O Israel, the Lord is our God, the Lord is One.”'},
  {'page': 611,
-  'key': 'hu_elohenu',
+  'key': 'hu_eloheinu',
   'he': 'הוּא אֱלֹהֵֽינוּ, הוּא אָבִֽינוּ, הוּא מַלְכֵּֽנוּ, הוּא מוֹשִׁיעֵֽנוּ, וְהוּא יַשְׁמִיעֵֽנוּ '
         'בְּרַחֲמָיו שֵׁנִית לְעֵינֵי כָּל חָי: לִהְיוֹת לָכֶם לֵאלֹהִים—',
   'en': 'He is our God; he is our Father; he is our King; he is our Deliverer. He will again in his mercy '
         'proclaim to us in the presence of all the living: “. . . to be your God—'},
  {'page': 611, 'key': 'ani', 'he': 'אֲנִי יְיָ אֱלֹהֵיכֶם.', 'en': 'I am the Lord your God.”'},
  {'page': 611,
-  'key': 'adir',
+  'key': 'addir',
   'he': 'אַדִּיר אַדִּירֵֽנוּ, יְיָ אֲדֹנֵֽינוּ, מָה אַדִּיר שִׁמְךָ בְּכָל הָאָֽרֶץ. וְהָיָה יְיָ לְמֶֽלֶךְ '
         'עַל כָּל הָאָֽרֶץ, בַּיּוֹם הַהוּא יִהְיֶה יְיָ אֶחָד וּשְׁמוֹ אֶחָד.',
   'en': 'Our God Almighty, our Lord Eternal, how glorious is thy name over all the world! The Lord shall be '
@@ -104,7 +104,7 @@ ROWS = [{'page': 609,
   'he': 'קָדוֹשׁ, קָדוֹשׁ, קָדוֹשׁ יְיָ צְבָאוֹת; מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ.',
   'en': 'Holy, holy, holy is the Lord of hosts;\nThe whole earth is full of his glory.”'},
  {'page': 611,
-  'key': 'leumatam',
+  'key': 'leummatam',
   'he': 'לְעֻמָּתָם בָּרוּךְ יֹאמֵֽרוּ—',
   'en': 'Those opposite them say: Blessed—'},
  {'page': 613,
@@ -142,7 +142,7 @@ ROWS = [{'page': 609,
         'above all tongues and sanctify us with thy commandments. Thou, our King, didst draw us near to thy '
         'service and call us by thy great and holy name.'},
  {'page': 613,
-  'key': 'vatiten',
+  'key': 'vattitten',
   'he': 'וַתִּתֶּן לָֽנוּ, יְיָ אֱלֹהֵֽינוּ, בְּאַהֲבָה, (שַׁבָּתוֹת לִמְנוּחָה וּ)מוֹעֲדִים לְשִׂמְחָה, '
         'חַגִּים וּזְמַנִּים לְשָׂשׂוֹן, אֶת יוֹם (הַשַּׁבָּת הַזֶּה וְאֶת יוֹם)',
   'en': 'Thou, Lord our God, hast graciously given us (Sabbaths for rest,) holidays for gladness and festive '
@@ -164,11 +164,11 @@ ROWS = [{'page': 609,
   'he': 'הַשְּׁמִינִי, חַג הָעֲצֶֽרֶת הַזֶּה, זְמַן שִׂמְחָתֵֽנוּ,',
   'en': 'Eighth Day Feast, our Festival of Rejoicing,'},
  {'page': 613,
-  'key': 'mikra',
+  'key': 'miqra',
   'he': '(בְּאַהֲבָה) מִקְרָא קֹֽדֶשׁ, זֵֽכֶר לִיצִיאַת מִצְרָֽיִם.',
   'en': 'a holy convocation in remembrance of the exodus from Egypt.'},
  {'page': 613,
-  'key': 'umipnei',
+  'key': 'umippenei',
   'he': 'וּמִפְּנֵי חֲטָאֵֽינוּ גָּלִֽינוּ מֵאַרְצֵֽנוּ וְנִתְרַחַֽקְנוּ מֵעַל אַדְמָתֵֽנוּ, וְאֵין '
         'אֲנַֽחְנוּ יְכוֹלִים לַעֲלוֹת וְלֵרָאוֹת וּלְהִשְׁתַּחֲוֹת לְפָנֶֽיךָ, וְלַעֲשׂוֹת חוֹבוֹתֵֽינוּ '
         'בְּבֵית בְּחִירָתֶֽךָ, בַּבַּֽיִת הַגָּדוֹל וְהַקָּדוֹשׁ שֶׁנִּקְרָא שִׁמְךָ עָלָיו, מִפְּנֵי '
@@ -413,7 +413,7 @@ ROWS = [{'page': 609,
         'gather our exiles to thy holy courts to observe thy laws, to do thy will, and to serve thee with a '
         'perfect heart. For this we thank thee. Blessed be God to whom all thanks are due.)'},
  {'page': 623,
-  'key': 'veal_kulam',
+  'key': 'veal_kullam',
   'he': 'וְעַל כֻּלָּם יִתְבָּרַךְ וְיִתְרוֹמַם שִׁמְךָ, מַלְכֵּֽנוּ, תָּמִיד לְעוֹלָם וָעֶד.',
   'en': 'For all these acts may thy name, our King, be blessed and exalted forever and ever.'},
  {'page': 623,
@@ -508,7 +508,7 @@ ROWS = [{'page': 609,
   'en': 'Blessed art thou, Lord our God, King of the universe, who hast sanctified us with the holiness of '
         'Aaron, and commanded us to bless thy people Israel with love.'},
  {'page': 631,
-  'key': 'adir_bamarom',
+  'key': 'addir_bamarom',
   'he': 'אַדִּיר בַּמָּרוֹם, שׁוֹכֵן בִּגְבוּרָה, אַתָּה שָׁלוֹם וְשִׁמְךָ שָׁלוֹם; יְהִי רָצוֹן שֶׁתָּשִׂים '
         'עָלֵֽינוּ וְעַל כָּל עַמְּךָ בֵּית יִשְׂרָאֵל חַיִּים וּבְרָכָה לְמִשְׁמֶֽרֶת שָׁלוֹם.',
   'en': 'Supreme and mighty art thou on high; thou art peace and thy name is Peace. May it be thy will to '
@@ -535,7 +535,7 @@ ROWS = [{'page': 609,
         'rested.\n'
         'Therefore the Lord blessed the Sabbath day and hallowed it.)'},
  {'page': 631,
-  'key': 'eleh_moadei',
+  'key': 'elleh_moadei',
   'he': 'אֵלֶּה מוֹעֲדֵי יְיָ, מִקְרָֽאֵי קֹֽדֶשׁ, אֲשֶׁר תִּקְרְאוּ אֹתָם בְּמוֹעֲדָם.',
   'en': 'These are the Lord’s festivals, holy convocations, which you shall proclaim in their proper '
         'season.'},

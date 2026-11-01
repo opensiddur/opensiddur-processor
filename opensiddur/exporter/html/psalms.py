@@ -9,7 +9,7 @@ LANG='{http://www.w3.org/XML/1998/namespace}lang'
 FULL=re.compile(r'urn:x-opensiddur:text:bible:psalms/([1-9]\d{0,2})$')
 ALIASES={
     'urn:x-opensiddur:text:prayer:mizmor_shir_chanukat_habayit':30,
-    'urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/psalm_150':150,
+    'urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/psalm_150':150,
 }
 
 

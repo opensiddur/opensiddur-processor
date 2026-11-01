@@ -17,7 +17,7 @@ Run from the repository root:
 then check it with `reverse`, which is the thing that actually proves it:
 
     uv run python -m opensiddur.importer.birnbaum_scan.reverse 27 29 31 33 35 37 39 \\
-        --readings <sourcetexts>/.../scan_reading/hebrew --module he_korbanot
+        --readings <sourcetexts>/.../scan_reading/hebrew --module he_qorbanot
 """
 import pathlib, textwrap
 
@@ -134,56 +134,56 @@ def verses(urn, ls, *, indent=8):
 #: kind is "p" (one paragraph), "s" (a paragraph spanning a page turn), "v" (verse lines)
 #: or a callable emitting its own code.
 ORDER = [
-    ("p", "korbanot_kiyor", "פָּרָשַׁת הַכִּיּוֹר", "korbanot/kiyor", (27, 0), None),
-    ("p", "korbanot_yehi_ratzon_miqdash", "יְהִי רָצוֹן שֶׁתְּרַחֵם עָלֵֽינוּ",
-     "korbanot/yehi_ratzon_miqdash", (27, 1), None),
-    ("s", "korbanot_tamid", "פָּרָשַׁת הַתָּמִיד", "korbanot/tamid", [(27, 2), (29, 0)],
+    ("p", "qorbanot_kiyyor", "פָּרָשַׁת הַכִּיּוֹר", "qorbanot/kiyyor", (27, 0), None),
+    ("p", "qorbanot_yehi_ratzon_miqdash", "יְהִי רָצוֹן שֶׁתְּרַחֵם עָלֵֽינוּ",
+     "qorbanot/yehi_ratzon_miqdash", (27, 1), None),
+    ("s", "qorbanot_tamid", "פָּרָשַׁת הַתָּמִיד", "qorbanot/tamid", [(27, 2), (29, 0)],
      "#: Runs across the page turn at `נֶֽסֶךְ שֵׁכָר לַייָ. | וְאֵת הַכֶּֽבֶשׂ`."),
-    ("p", "korbanot_ushchat", "וְשָׁחַט אֹתוֹ", "korbanot/ushchat", (29, 1), None),
-    ("p", "korbanot_yehi_ratzon_amirah", "יְהִי רָצוֹן שֶׁתְּהֵא אֲמִירָה זוֹ",
-     "korbanot/yehi_ratzon_amirah", (29, 2), None),
-    ("p", "korbanot_atah_hu", "אַתָּה הוּא יְיָ אֱלֹהֵֽינוּ שֶׁהִקְטִֽירוּ",
-     "korbanot/atah_hu", (29, 3), None),
-    ("p", "korbanot_ketoret", "פָּרָשַׁת הַקְּטֹֽרֶת", "korbanot/ketoret", (29, 4), None),
-    ("s", "korbanot_pittum", "פִּטּוּם הַקְּטֹֽרֶת", "korbanot/pittum_haketoret",
+    ("p", "qorbanot_ushchat", "וְשָׁחַט אֹתוֹ", "qorbanot/ushchat", (29, 1), None),
+    ("p", "qorbanot_yehi_ratzon_amirah", "יְהִי רָצוֹן שֶׁתְּהֵא אֲמִירָה זוֹ",
+     "qorbanot/yehi_ratzon_amirah", (29, 2), None),
+    ("p", "qorbanot_atah_hu", "אַתָּה הוּא יְיָ אֱלֹהֵֽינוּ שֶׁהִקְטִֽירוּ",
+     "qorbanot/atah_hu", (29, 3), None),
+    ("p", "qorbanot_qetoret", "פָּרָשַׁת הַקְּטֹֽרֶת", "qorbanot/qetoret", (29, 4), None),
+    ("s", "qorbanot_pittum", "פִּטּוּם הַקְּטֹֽרֶת", "qorbanot/pittum_haqetoret",
      [(29, 5), (31, 0)],
      "#: Runs across the page turn at `וְשׁוֹחֲקָן | יָפֶה יָפֶה`, which falls inside a\n"
      "#: phrase rather than between sentences."),
-    ("p", "korbanot_rashbag", "רַבָּן שִׁמְעוֹן בֶּן גַּמְלִיאֵל",
-     "korbanot/pittum_haketoret/rashbag", (31, 1), None),
-    ("p", "korbanot_rabbi_natan", "תַּנְיָא, רַבִּי נָתָן אוֹמֵר",
-     "korbanot/pittum_haketoret/rabbi_natan", (31, 2), None),
-    ("s", "korbanot_bar_kappara", "תַּנְיָא, בַּר קַפָּרָא אוֹמֵר",
-     "korbanot/pittum_haketoret/bar_kappara", [(31, 3), (33, 0)],
+    ("p", "qorbanot_rashbag", "רַבָּן שִׁמְעוֹן בֶּן גַּמְלִיאֵל",
+     "qorbanot/pittum_haqetoret/rashbag", (31, 1), None),
+    ("p", "qorbanot_rabbi_natan", "תַּנְיָא, רַבִּי נָתָן אוֹמֵר",
+     "qorbanot/pittum_haqetoret/rabbi_natan", (31, 2), None),
+    ("s", "qorbanot_bar_kappara", "תַּנְיָא, בַּר קַפָּרָא אוֹמֵר",
+     "qorbanot/pittum_haqetoret/bar_kappara", [(31, 3), (33, 0)],
      "#: Runs across the page turn at `לַעֲמֹד מִפְּנֵי | רֵיחָהּ`."),
-    ("v", "korbanot_pesukim", "יְיָ צְבָאוֹת עִמָּֽנוּ", "korbanot/pesukim", (33, 1),
+    ("v", "qorbanot_pesukim", "יְיָ צְבָאוֹת עִמָּֽנוּ", "qorbanot/pesukim", (33, 1),
      "#: Three verses, each on its own centred line in the print. The English page sets\n"
      "#: them as indented lines instead -- see `readings/english_28_48.md`."),
-    ("p", "korbanot_atah_seter", "אַתָּה סֵֽתֶר לִי", "korbanot/atah_seter", (33, 2), None),
-    ("p", "korbanot_vearvah", "וְעָרְבָה לַייָ", "korbanot/vearvah", (33, 3), None),
-    ("p", "korbanot_abaye", "סֵֽדֶר הַמַּעֲרָכָה", "korbanot/seder_hamaarakhah",
+    ("p", "qorbanot_atah_seter", "אַתָּה סֵֽתֶר לִי", "qorbanot/atah_seter", (33, 2), None),
+    ("p", "qorbanot_vearvah", "וְעָרְבָה לַייָ", "qorbanot/vearvah", (33, 3), None),
+    ("p", "qorbanot_abaye", "סֵֽדֶר הַמַּעֲרָכָה", "qorbanot/seder_hamaarakhah",
      (33, 4), None),
     ("ana", None, None, None, None, None),
-    ("p", "korbanot_ribbon_haolamim", "רִבּוֹן הָעוֹלָמִים", "korbanot/ribbon_haolamim",
+    ("p", "qorbanot_ribbon_haolamim", "רִבּוֹן הָעוֹלָמִים", "qorbanot/ribbon_haolamim",
      (35, 1), None),
-    ("p", "korbanot_musaf_shabbat", "מוּסַף שֶׁל שַׁבָּת", "korbanot/musaf/shabbat",
+    ("p", "qorbanot_musaf_shabbat", "מוּסַף שֶׁל שַׁבָּת", "qorbanot/musaf/shabbat",
      (35, 2),
      "#: Said only on the day its rubric names, and nothing is negated when it is not:\n"
      "#: on an ordinary weekday the page simply has less on it. A plain conditional, and\n"
      "#: not the negated pair the Amidah's inserts need."),
-    ("s", "korbanot_musaf_rosh_chodesh", "מוּסַף שֶׁל רֹאשׁ חֹֽדֶשׁ",
-     "korbanot/musaf/rosh_chodesh", [(35, 3), (37, 0)], None),
-    ("p", "eizehu_mekoman_1", "אֵיזֶֽהוּ מְקוֹמָן א", "eizehu_mekoman/1", (37, 1),
+    ("s", "qorbanot_musaf_rosh_chodesh", "מוּסַף שֶׁל רֹאשׁ חֹֽדֶשׁ",
+     "qorbanot/musaf/rosh_chodesh", [(35, 3), (37, 0)], None),
+    ("p", "eizehu_meqoman_1", "אֵיזֶֽהוּ מְקוֹמָן א", "eizehu_meqoman/1", (37, 1),
      "#: Eizehu Mekoman. Each mishnah opens with its Hebrew numeral and a full stop, set\n"
      "#: inline with the words -- the numeral is text and not a heading, and the English\n"
      "#: side sets `1.` where this sets `א.`."),
-    ("p", "eizehu_mekoman_2", "אֵיזֶֽהוּ מְקוֹמָן ב", "eizehu_mekoman/2", (37, 2), None),
-    ("p", "eizehu_mekoman_3", "אֵיזֶֽהוּ מְקוֹמָן ג", "eizehu_mekoman/3", (37, 3), None),
-    ("p", "eizehu_mekoman_4", "אֵיזֶֽהוּ מְקוֹמָן ד", "eizehu_mekoman/4", (39, 0), None),
-    ("p", "eizehu_mekoman_5", "אֵיזֶֽהוּ מְקוֹמָן ה", "eizehu_mekoman/5", (39, 1), None),
-    ("p", "eizehu_mekoman_6", "אֵיזֶֽהוּ מְקוֹמָן ו", "eizehu_mekoman/6", (39, 2), None),
-    ("p", "eizehu_mekoman_7", "אֵיזֶֽהוּ מְקוֹמָן ז", "eizehu_mekoman/7", (39, 3), None),
-    ("s", "eizehu_mekoman_8", "אֵיזֶֽהוּ מְקוֹמָן ח", "eizehu_mekoman/8",
+    ("p", "eizehu_meqoman_2", "אֵיזֶֽהוּ מְקוֹמָן ב", "eizehu_meqoman/2", (37, 2), None),
+    ("p", "eizehu_meqoman_3", "אֵיזֶֽהוּ מְקוֹמָן ג", "eizehu_meqoman/3", (37, 3), None),
+    ("p", "eizehu_meqoman_4", "אֵיזֶֽהוּ מְקוֹמָן ד", "eizehu_meqoman/4", (39, 0), None),
+    ("p", "eizehu_meqoman_5", "אֵיזֶֽהוּ מְקוֹמָן ה", "eizehu_meqoman/5", (39, 1), None),
+    ("p", "eizehu_meqoman_6", "אֵיזֶֽהוּ מְקוֹמָן ו", "eizehu_meqoman/6", (39, 2), None),
+    ("p", "eizehu_meqoman_7", "אֵיזֶֽהוּ מְקוֹמָן ז", "eizehu_meqoman/7", (39, 3), None),
+    ("s", "eizehu_meqoman_8", "אֵיזֶֽהוּ מְקוֹמָן ח", "eizehu_meqoman/8",
      [(39, 4), (41, 0)],
      "#: The eighth runs onto printed 41, where Rabbi Ishmael's rules begin."),
 ]

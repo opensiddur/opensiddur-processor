@@ -50,23 +50,23 @@ prayer("tallith_barkhi_nafshi", "Bless the Lord, O my soul", "tallith/barkhi_naf
          "glory and majesty. Thou wrappest thyself in light as in a garment; thou "
          "spreadest the heavens like a curtain."))
 
-prayer("tallith_hineni_mitatef", "I am enwrapping myself", "tallith/hineni_mitatef",
+prayer("tallith_hineni_mitattef", "I am enwrapping myself", "tallith/hineni_mitattef",
        4, 4,
-       d(U + "tallith/hineni_mitatef",
+       d(U + "tallith/hineni_mitattef",
          "I am enwrapping myself in the fringed garment in order to fulfill the command "
          "of my Creator, as it is written in the Torah: “They shall make fringes for "
          "themselves on the corners of their garments throughout their generations.” "
          "Even as I cover myself with the tallith in this world, so may my soul deserve "
          "to be robed in a beautiful garment in the world to come, in Paradise. Amen."))
 
-prayer("tallith_lehitatef", "Blessing over the tallith", "tallith/lehitatef", 6, 6,
-       d(U + "tallith/lehitatef",
+prayer("tallith_lehitattef", "Blessing over the tallith", "tallith/lehitattef", 6, 6,
+       d(U + "tallith/lehitattef",
          f"{pb(6)}Blessed art thou, Lord our God, King of the universe, who hast "
          "sanctified us with thy commandments, and commanded us to enwrap ourselves in "
          "the fringed garment."))
 
-prayer("tallith_mah_yakar", "How precious is thy kindness", "tallith/mah_yakar", 6, 6,
-       d(U + "tallith/mah_yakar",
+prayer("tallith_mah_yaqar", "How precious is thy kindness", "tallith/mah_yaqar", 6, 6,
+       d(U + "tallith/mah_yaqar",
          "How precious is thy kindness, O God! The children of men take refuge in the "
          "shadow of thy wings. They have their fill of the choice food of thy house, and "
          "thou givest them drink of thy stream of delights. For with thee is the "

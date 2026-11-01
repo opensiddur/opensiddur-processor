@@ -34,10 +34,13 @@ variants:
   ehad: echad
   eshkeha: ashkechah
   ezrahi: ezrachi
+  hadash: chadash
+  hahayim: hachayyim
   hahesed: hachesed
   hahomer: hachomer
   hamudot: chamudot
   haqarta: chaqarta
+  harvonah: charvonah
   hashuvah: chashuvah
   hasin: chasin
   hataenu: chataeinu
@@ -89,6 +92,7 @@ variants:
   terahamenu: terachamenu
   tivhar: tivchar
   tohelet: tochelet
+  ufetah: ufetach
   umahati: umachati
   umeholeli: umecholeli
   vaanahnu: vaanachnu
@@ -98,21 +102,76 @@ variants:
   vehashakh: vechashakh
   veleharishah: velacharishah
   venithazzaqah: venitchazzeqah
+  yatriah: yatriach
   yehabbienu: yachbienu
+  yohanan: yochanan
   # Khaf is kh, not ch
+  aleichem: aleikhem
   barech: barekh
   baruch: barukh
   bechol: bekhol
+  bekoach: bekhoach
   birchot: birkhot
+  kohanecha: kohanekha
+  lehachniso: lehakhniso
   melech: melekh
+  zochreinu: zokhrenu
   # Qof is q, not k
+  akdamut: aqdamut
+  akedah: aqedah
+  hadlakat: hadlaqat
+  hakafot: haqqafot
+  haketoret: haqetoret
+  hakodesh: haqodesh
+  hamakom: hamaqom
+  kabbalat: qabbalat
   kadosh: qadosh
+  kaveh: qavveh
   kedem: qedem
   kedoshekha: qedoshekha
   kedushah: qedushah
   kedushat: qedushat
+  kesher: qesher
+  ketoret: qetoret
+  kiddesh: qiddesh
+  kiddeshanu: qiddeshanu
+  kodesh: qodesh
   kolenu: qolenu
+  korbanot: qorbanot
+  kriat: qeriat
+  kuma: qumah
+  laasok: laasoq
+  lekach: leqach
+  lekodesh: leqodesh
+  leyaakov: leyaaqov
+  likboa: liqboa
+  mekadesh: meqaddesh
+  mekoman: meqoman
+  mekudeshet: mequddeshet
+  mikra: miqra
+  mimkomekha: mimeqomekha
+  mimkomo: mimeqomo
+  pesukei: pesuqei
   pesukim: pesuqim
+  pirkei: pirqei
+  pokeach: poqeach
+  purkan: purqan
+  roka: roqa
+  shechalak: shechalaq
+  tikar: tiqar
+  tikra: tiqra
+  tiku: tiqu
+  titkabal: titqabbal
+  tzidduk: tzidduq
+  tzidkatkha: tzidqatekha
+  uvmakhalot: uvmaqhalot
+  vekara: veqara
+  venikketi: veniqqeiti
+  yaakov: yaaqov
+  yakar: yaqar
+  yekum: yequm
+  ziknah: ziqnah
+  zokef: zoqef
   # Tzadi is tz, not ts
   atsmi: atzmi
   behimamtseo: behimmatzeo
@@ -126,6 +185,7 @@ variants:
   meerets: meeretz
   mitratseh: mitratzeh
   mitsvah: mitzvah
+  netsurah: netzurah
   omets: ometz
   ratson: ratzon
   tiqtsof: tiqtzof
@@ -142,9 +202,10 @@ variants:
   tsur: tzur
   tsurenu: tzurenu
   tsuri: tzuri
+  tzvaot: tzevaot
   vetsinnati: vetzinnati
   vetsur: vetzur
-  virtsonkha: virtzonkha
+  virtsonkha: virtzonekha
   yertseh: yirtzeh
   yitsdaq: yitzdaq
   yotser: yotzer
@@ -152,48 +213,106 @@ variants:
   yotseri: yotzeri
   yotsri: yotzeri
   # Dagesh hazak doubles within a word
+  adir: addir
   amekha: ammekha
   amkha: ammekha
   apayim: appayim
+  asaperah: asapperah
   atah: attah
   ayeh: ayyeh
   bematei: bemattei
+  bematenat: bemattenat
   biqshanukha: biqqashnukha
+  chadesh: chaddesh
   chayim: chayyim
+  chisar: chissar
+  dayan: dayyan
+  dimu: dimmu
   eiyyeh: ayyeh
+  eleh: elleh
+  elu: ellu
+  gadelu: gaddelu
+  gedulatekha: gedullatekha
+  geulah: geullah
+  gibor: gibbor
+  haberiyot: haberiyyot
   habet: habbet
   hakahal: haqahal
+  hamapil: hamappil
+  hamitah: hamittah
   hateh: hatteh
+  ilu: illu
   imanu: immanu
   imekha: immekha
   kama: kammah
   kamah: kammah
   kemidat: kemiddat
   kiviti: qivviti
+  kiyor: kiyyor
+  kulam: kullam
+  lehitatef: lehitattef
+  letzion: letziyyon
+  leumatam: leummatam
   limed: limmed
   magenni: maginni
   makot: makkot
+  matir: mattir
+  mechayeh: mechayyeh
+  mekhaven: mekhavven
+  mekhubad: mekhubbad
+  meshaneh: meshanneh
+  mevaser: mevasser
+  mezamen: mezammen
   midotekha: middotekha
+  mishelo: mishello
+  mitatef: mitattef
+  mitzion: mitziyyon
   nekadesh: neqaddesh
   neqadesh: neqaddesh
+  netato: netatto
+  nisi: nissi
   qidamti: qiddamti
   qivitikha: qivvitikha
   rabu: rabbu
   ranen: rannen
   ribono: ribbono
+  samechenu: sammechenu
+  segulato: segullato
+  shetechadesh: shetechaddesh
+  shoshanat: shoshannat
   tefilah: tefillah
   tefilat: tefillat
+  tefilati: tefillati
   tehila: tehillah
+  tesamach: tesammach
   tikanta: tiqqanta
+  tikatev: tikkatev
   tiqanta: tiqqanta
+  titnenu: tittenenu
   titnu: tittenu
   tsadiq: tzaddiq
   tzaddikim: tzaddiqim
   tzadiqim: tzaddiqim
+  tziva: tzivvah
+  ulenu: ullenu
   umasi: umassei
+  umipnei: umippenei
   uneshalmah: uneshallemah
   vaamitkha: vaamittekha
+  vatiten: vattitten
+  vatodienu: vattodienu
+  vayarem: vayyarem
+  vayechezu: vayyechezu
+  vayosha: vayyosha
   veatah: veattah
+  veatem: veattem
+  vechadesh: vechaddesh
+  vehaofanim: vehaofannim
+  yechadshehu: yechaddeshehu
+  yezakenu: yezakkenu
+  yishtabach: yishtabbach
+  yitgadal: yitgaddal
+  zekhuyot: zekhuyyot
   # but not after a prefix
   bammeh: bameh
   hannahar: hanahar
@@ -202,21 +321,70 @@ variants:
   mikkol: mikol
   miqqedem: miqedem
   # Tsere or segol + yod is ei, except before the suffix -kha (lefanekha)
+  achenu: acheinu
   amarenu: amareinu
+  asamenu: asameinu
+  ashrenu: ashreinu
+  baey: baei
+  chayenu: chayyeinu
   eleikha: elekha
+  elohaynu: eloheinu
+  elohenu: eloheinu
+  hareni: hareini
+  heytivah: heitivah
+  kelohenu: keloheinu
   leenenu: leeineinu
+  lemayayn: lemeein
   lule: lulei
+  magayn: magen
   makhnise: makhnisei
+  malkaynu: malkenu
+  nachaym: nachem
+  retzay: retzeh
+  uvdivrey: uvdivrei
+  vehasiaynu: vehassienu
+  veniskehem: veniskeihem
   vetechezenah: vetechezeinah
   vetehezena: vetechezeinah
+  vimnuchataynu: vimnuchatenu
+  # A shva is sounded at a word's start and after a long vowel (malkhutekha), not after a
+  # short one (lemaankha)
+  ahavatkha: ahavatekha
+  bfi: befi
+  bri: beri
+  brit: berit
+  btaatzumot: betaatzumot
+  lemaanekha: lemaankha
+  lishuatkha: lishuatekha
+  malkhutkha: malkhutekha
+  mituvkha: mituvekha
+  naaritzkha: naaritzekha
+  pri: peri
+  qinatkha: qinatekha
+  shlama: shelama
+  shmeh: shemeh
+  shofteinu: shofeteinu
+  umechokhmatkha: umechokhmatekha
+  uvishuatkha: uvishuatekha
+  vemalkhutkha: vemalkhutekha
+  virtzonkha: virtzonekha
+  yotzrekh: yotzerekh
   # A final heh is written
   avoda: avodah
+  dezimra: dezimrah
   hashana: hashanah
+  hatzlicha: hatzlichah
   menucha: menuchah
+  morasha: morashah
   moshe: mosheh
   retze: retzeh
   shuva: shuvah
+  vehaya: vehayah
+  vesimcha: vesimchah
   yehuda: yehudah
   # Other
+  haeil: hael
   neessar: neesar
+  roshei: rashei
   vehasqat: vehasket
+  vetein: veten

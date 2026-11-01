@@ -275,7 +275,7 @@ class FirstDayTest(unittest.TestCase):
             targets = [node.get('target') for node in body.findall('.//{http://jewishliturgy.org/ns/jlptei/2}transclude')]
             self.assertEqual(6, len(targets))
             self.assertTrue(all(target.endswith('@hasiddur_hashalem-birnbaum-1949-'+lang) for target in targets))
-            self.assertIn('/titkabal@', targets[3])
+            self.assertIn('/titqabbal@', targets[3])
             self.assertIn('/oseh_shalom@', targets[-1])
 
     def test_first_day_kaddish_overrides_ten_days_and_restores_caller_context(self):

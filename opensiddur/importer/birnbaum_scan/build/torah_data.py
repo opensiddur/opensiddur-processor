@@ -12,15 +12,15 @@ def passage(key, first, last, rows):
 
 passage('vayehi_binsoa', 119, 119, [
 ('vayehi', 'numbers/10/35', 'וַיְהִי בִּנְסֹֽעַ הָאָרֹן וַיֹּֽאמֶר מֹשֶׁה: קוּמָה יְיָ, וְיָפֻֽצוּ אֹיְבֶֽיךָ, וְיָנֻֽסוּ מְשַׂנְאֶֽיךָ מִפָּנֶֽיךָ.', 'And it came to pass, whenever the ark started, Moses would say: “Arise, O Lord, and let thy enemies be scattered; let those who hate thee flee before thee.”'),
-('ki_mitzion', 'isaiah/2/3', 'כִּי מִצִּיּוֹן תֵּצֵא תוֹרָה, וּדְבַר יְיָ מִירוּשָׁלָֽיִם.', 'Truly, out of Zion shall come forth Torah, and the word of the Lord out of Jerusalem.'),
+('ki_mitziyyon', 'isaiah/2/3', 'כִּי מִצִּיּוֹן תֵּצֵא תוֹרָה, וּדְבַר יְיָ מִירוּשָׁלָֽיִם.', 'Truly, out of Zion shall come forth Torah, and the word of the Lord out of Jerusalem.'),
 ('barukh', None, 'בָּרוּךְ שֶׁנָּתַן תּוֹרָה לְעַמּוֹ יִשְׂרָאֵל בִּקְדֻשָּׁתוֹ.', 'Blessed be he who in his holiness gave the Torah to his people Israel.'),
 ])
 passage('berikh_shemeh', 119, 121, [
 ('berikh', None, 'בְּרִיךְ שְׁמֵהּ דְּמָרֵא עָלְמָא, בְּרִיךְ כִּתְרָךְ וְאַתְרָךְ. יְהֵא רְעוּתָךְ עִם עַמָּךְ יִשְׂרָאֵל לְעָלַם, וּפֻרְקַן יְמִינָךְ אַחֲזֵי לְעַמָּךְ בְּבֵית מַקְדְּשָׁךְ: וּלְאַמְטוּיֵי לָֽנָא מִטּוּב נְהוֹרָךְ, וּלְקַבֵּל צְלוֹתָֽנָא בְּרַחֲמִין. יְהֵא רַעֲוָא קֳדָמָךְ, דְּתוֹרִיךְ לָן חַיִּין בְּטִיבוּתָא.', 'Blessed be the name of the Lord of the universe! Blessed be thy crown and thy dominion. May thy good will ever abide with thy people Israel. Reveal thy saving power to thy people in thy sanctuary; bestow on us the good gift of thy light, and accept our prayer in mercy. May it be thy will to prolong our life in happiness.'),
 ('velehevei', None, 'וְלֶהֱוֵא אֲנָא פְקִידָא בְּגוֹ צַדִּיקַיָּא, לְמִרְחַם עֲלַי וּלְמִנְטַר יָתִי וְיָת כָּל דִּי לִי וְדִי לְעַמָּךְ יִשְׂרָאֵל. אַנְתְּ הוּא זָן לְכֹֽלָּא וּמְפַרְנֵס לְכֹֽלָּא. אַנְתְּ הוּא שַׁלִּיט עַל כֹּֽלָּא: אַנְתְּ הוּא דְּשַׁלִּיט עַל מַלְכַיָּא, וּמַלְכוּתָא דִילָךְ הִיא. אֲנָא עַבְדָּא דְקֻדְשָׁא בְּרִיךְ הוּא, דְּסָגִֽידְנָא קַמֵּהּ וּמִקַּמֵּי דִּיקַר אוֹרַיְתֵהּ בְּכָל עִדָּן וְעִדָּן. לָא עַל אֱנָשׁ רָחִֽיצְנָא, וְלָא עַל בַּר אֱלָהִין סָמִֽיכְנָא, אֶלָּא בֵּאלָהָא דִשְׁמַיָּא, דְּהוּא אֱלָהָא קְשׁוֹט, וְאוֹרַיְתֵהּ קְשׁוֹט, וּנְבִיאֽוֹהִי קְשׁוֹט, וּמַסְגֵּא לְמֶעְבַּד טָבְוָן וּקְשׁוֹט. בֵּהּ אֲנָא רָחִיץ, וְלִשְׁמֵהּ קַדִּישָׁא יַקִּירָא אֲנָא אֵמַר תֻּשְׁבְּחָן. יְהֵא רַעֲוָא קֳדָמָךְ, דְּתִפְתַּח לִבָּאִי {pb:121}בְּאוֹרַיְתָא, {reader}וְתַשְׁלִים מִשְׁאֲלִין דְּלִבָּאִי וְלִבָּא דְכָל עַמָּךְ יִשְׂרָאֵל לְטַב וּלְחַיִּין וְלִשְׁלָם.', 'Let me also be counted among the righteous, so that thou mayest have compassion on me and shelter me and mine and all that belong to thy people Israel. Thou art he who nourishes and sustains all; thou art he who rules over all; thou art he who rules over kings, for dominion is thine. I am the servant of the Holy One, blessed be he, before whom and before whose glorious Torah I bow at all times. Not in man do I put my trust, nor do I rely on any angel, but only in the God of heaven who is the God of truth, whose Torah is truth and whose Prophets are truth, and who performs many deeds of goodness and truth. In him I put my trust, and to his holy and glorious name I utter praises. May it be thy will to {pb:122}open my heart to thy Torah, and to fulfill the wishes of my heart and of the heart of all thy people Israel for happiness, life and peace.'),
 ])
-passage('gadelu', 121, 121, [
-('gadelu', 'psalms/34/4', 'גַּדְּלוּ לַיְיָ אִתִּי, וּנְרוֹמְמָה שְׁמוֹ יַחְדָּו.', 'Exalt the Lord with me, and let us extol his name together.'),
+passage('gaddelu', 121, 121, [
+('gaddelu', 'psalms/34/4', 'גַּדְּלוּ לַיְיָ אִתִּי, וּנְרוֹמְמָה שְׁמוֹ יַחְדָּו.', 'Exalt the Lord with me, and let us extol his name together.'),
 ])
 passage('lekha_adonai', 121, 121, [
 ('lekha', 'chronicles_1/29/11', 'לְךָ יְיָ הַגְּדֻלָּה וְהַגְּבוּרָה, וְהַתִּפְאֶֽרֶת וְהַנֵּֽצַח וְהַהוֹד, כִּי כֹל בַּשָּׁמַֽיִם וּבָאָֽרֶץ. לְךָ יְיָ הַמַּמְלָכָה וְהַמִּתְנַשֵּׂא לְכֹל לְרֹאשׁ.', 'Thine, O Lord, is the greatness and the power, the glory and the victory and the majesty; for all that is in heaven and on earth is thine; thine, O Lord, is the kingdom, and thou art supreme over all.'),
@@ -38,8 +38,8 @@ passage('vetiggaleh', 121, 121, [
 ('oz', 'psalms/29/11', 'יְיָ עֹז לְעַמּוֹ יִתֵּן: יְיָ יְבָרֵךְ אֶת עַמּוֹ בַשָּׁלוֹם.', 'The Lord will give strength to his people; the Lord will bless his people with peace.'),
 ('hael', 'psalms/18/31', 'הָאֵל תָּמִים דַּרְכּוֹ; אִמְרַת יְיָ צְרוּפָה, מָגֵן הוּא לְכֹל הַחֹסִים בּוֹ.', 'The way of God is perfect; the word of the Lord is pure; he is a shield to all who trust in him.'),
 ])
-passage('veatem', 121, 121, [
-('veatem', 'deuteronomy/4/4', 'וְאַתֶּם הַדְּבֵקִים בַּיְיָ אֱלֹהֵיכֶם, חַיִּים כֻּלְּכֶם הַיּוֹם.', 'And you who cling to the Lord your God are all alive today.'),
+passage('veattem', 121, 121, [
+('veattem', 'deuteronomy/4/4', 'וְאַתֶּם הַדְּבֵקִים בַּיְיָ אֱלֹהֵיכֶם, חַיִּים כֻּלְּכֶם הַיּוֹם.', 'And you who cling to the Lord your God are all alive today.'),
 ])
 passage('barekhu', 123, 123, [
 ('call', None, 'בָּרְכוּ אֶת יְיָ הַמְּבֹרָךְ.', 'Bless the Lord who is blessed.'),
@@ -64,16 +64,16 @@ passage('vezot_hatorah', 125, 125, [
 ('adonai_chafetz', 'isaiah/42/21', 'יְיָ חָפֵץ לְמַֽעַן צִדְקוֹ, יַגְדִּיל תּוֹרָה וְיַאְדִּיר.', 'The Lord was pleased, because of his righteousness, to render the Torah great and glorious.'),
 ])
 passage('yehi_ratzon', 125, 125, [
-('beit_chayenu', None, 'יְהִי רָצוֹן מִלִּפְנֵי אָבִֽינוּ שֶׁבַּשָּׁמַֽיִם לְכוֹנֵן אֶת בֵּית חַיֵּֽינוּ, וּלְהָשִׁיב אֶת שְׁכִינָתוֹ בְּתוֹכֵֽנוּ בִּמְהֵרָה בְיָמֵֽינוּ, וְנֹאמַר אָמֵן.', 'May it be the will of our Father who is in heaven to establish our Temple, and to restore his divine presence in our midst, speedily in our days; and let us say, Amen.'),
+('beit_chayyeinu', None, 'יְהִי רָצוֹן מִלִּפְנֵי אָבִֽינוּ שֶׁבַּשָּׁמַֽיִם לְכוֹנֵן אֶת בֵּית חַיֵּֽינוּ, וּלְהָשִׁיב אֶת שְׁכִינָתוֹ בְּתוֹכֵֽנוּ בִּמְהֵרָה בְיָמֵֽינוּ, וְנֹאמַר אָמֵן.', 'May it be the will of our Father who is in heaven to establish our Temple, and to restore his divine presence in our midst, speedily in our days; and let us say, Amen.'),
 ('lerachem', None, 'יְהִי רָצוֹן מִלִּפְנֵי אָבִֽינוּ שֶׁבַּשָּׁמַֽיִם לְרַחֵם עָלֵֽינוּ וְעַל פְּלֵטָתֵֽנוּ, וְלִמְנֹֽעַ מַשְׁחִית וּמַגֵּפָה מֵעָלֵֽינוּ וּמֵעַל כָּל עַמּוֹ בֵּית יִשְׂרָאֵל, וְנֹאמַר אָמֵן.', 'May it be the will of our Father who is in heaven to have mercy on us and on our remnant, and to ward off destruction and pestilence from us and from all his people, the house of Israel; and let us say, Amen.'),
 ('chakhmei', None, 'יְהִי רָצוֹן מִלִּפְנֵי אָבִֽינוּ שֶׁבַּשָּׁמַֽיִם לְקַיֵּם בָּֽנוּ חַכְמֵי יִשְׂרָאֵל, הֵם וּנְשֵׁיהֶם וּבְנֵיהֶם וּבְנוֹתֵיהֶם, וְתַלְמִידֵיהֶם וְתַלְמִידֵי תַלְמִידֵיהֶם, בְּכָל מְקוֹמוֹת מוֹשְׁבוֹתֵיהֶם, וְנֹאמַר אָמֵן.', 'May it be the will of our Father who is in heaven to preserve everywhere among us the wise men of Israel and their wives, their sons and daughters, their disciples and the disciples of their disciples; and let us say, Amen.'),
 ('besorot', None, 'יְהִי רָצוֹן מִלִּפְנֵי אָבִֽינוּ שֶׁבַּשָּׁמַֽיִם שֶׁנִּשְׁמַע וְנִתְבַּשֵּׂר בְּשׂוֹרוֹת טוֹבוֹת, יְשׁוּעוֹת וְנֶחָמוֹת; וִיקַבֵּץ נִדָּחֵֽינוּ מֵאַרְבַּע כַּנְפוֹת הָאָֽרֶץ, וְנֹאמַר אָמֵן.', 'May it be the will of our Father who is in heaven that we receive good tidings of deliverance and comfort; may he gather our dispersed from the four corners of the earth; and let us say, Amen.'),
-('achenu', None, 'אַחֵֽינוּ כָּל בֵּית יִשְׂרָאֵל, הַנְּתוּנִים בְּצָרָה וּבַשִּׁבְיָה, הָעוֹמְדִים בֵּין בַּיָּם וּבֵין בַּיַּבָּשָׁה, הַמָּקוֹם יְרַחֵם עֲלֵיהֶם וְיוֹצִיאֵם מִצָּרָה לִרְוָחָה, וּמֵאֲפֵלָה לְאוֹרָה, וּמִשִּׁעְבּוּד לִגְאֻלָּה, הַשְׁתָּא בַּעֲגָלָא וּבִזְמַן קָרִיב, וְנֹאמַר אָמֵן.', 'As for our brethren, the whole house of Israel, who are handed over to distress and captivity, on sea or on land, may God have mercy on them and grant them relief, bringing them from darkness to light, from servitude to liberty, speedily and very soon; and let us say, Amen.'),
+('acheinu', None, 'אַחֵֽינוּ כָּל בֵּית יִשְׂרָאֵל, הַנְּתוּנִים בְּצָרָה וּבַשִּׁבְיָה, הָעוֹמְדִים בֵּין בַּיָּם וּבֵין בַּיַּבָּשָׁה, הַמָּקוֹם יְרַחֵם עֲלֵיהֶם וְיוֹצִיאֵם מִצָּרָה לִרְוָחָה, וּמֵאֲפֵלָה לְאוֹרָה, וּמִשִּׁעְבּוּד לִגְאֻלָּה, הַשְׁתָּא בַּעֲגָלָא וּבִזְמַן קָרִיב, וְנֹאמַר אָמֵן.', 'As for our brethren, the whole house of Israel, who are handed over to distress and captivity, on sea or on land, may God have mercy on them and grant them relief, bringing them from darkness to light, from servitude to liberty, speedily and very soon; and let us say, Amen.'),
 ])
 passage('yehalelu', 125, 127, [
 ('reader', 'psalms/148/13', 'יְהַלְלוּ אֶת שֵׁם יְיָ, כִּי נִשְׂגָּב שְׁמוֹ לְבַדּוֹ—', 'Let them praise the name of the Lord, for his name alone is exalted—'),
 ('congregation', 'psalms/148/13', '{pb:127}הוֹדוֹ עַל אֶֽרֶץ וְשָׁמָֽיִם.', '{pb:128}His majesty is above earth and heaven.'),
-('vayarem', 'psalms/148/14', 'וַיָּֽרֶם קֶֽרֶן לְעַמּוֹ, תְּהִלָּה לְכָל חֲסִידָיו, לִבְנֵי יִשְׂרָאֵל עַם קְרֹבוֹ; הַלְלוּיָהּ.', 'He has raised the honor of his people, the glory of his faithful followers, the children of Israel, the people near to him. Praise the Lord!'),
+('vayyarem', 'psalms/148/14', 'וַיָּֽרֶם קֶֽרֶן לְעַמּוֹ, תְּהִלָּה לְכָל חֲסִידָיו, לִבְנֵי יִשְׂרָאֵל עַם קְרֹבוֹ; הַלְלוּיָהּ.', 'He has raised the honor of his people, the glory of his faithful followers, the children of Israel, the people near to him. Praise the Lord!'),
 ])
 passage('psalm24', 127, 127, [
 ('1', 'psalms/24/1', 'לְדָוִד מִזְמוֹר. לַיְיָ הָאָֽרֶץ וּמְלוֹאָהּ, תֵּבֵל וְיֹֽשְׁבֵי בָהּ.', 'A psalm of David. The earth and its entire contents belong to the Lord, the world and its inhabitants.'),
@@ -90,9 +90,9 @@ passage('psalm24', 127, 127, [
 passage('uvnucho', 127, 127, [
 ('uvnucho', 'numbers/10/36', 'וּבְנֻחֹה יֹאמַר: שׁוּבָה, יְיָ, רִבְבוֹת אַלְפֵי יִשְׂרָאֵל.', 'When the ark rested, Moses would say: “Return, O Lord, to the myriads of Israel’s families.”'),
 ('kumah', 'psalms/132/8', 'קוּמָה יְיָ לִמְנוּחָתֶֽךָ, אַתָּה וַאֲרוֹן עֻזֶּֽךָ.', 'Arise, O Lord, for thy resting place, thou and thy glorious ark.'),
-('kohanecha', 'psalms/132/9', 'כֹּהֲנֶֽיךָ יִלְבְּשׁוּ צֶֽדֶק, וַחֲסִידֶֽיךָ יְרַנֵּֽנוּ.', 'May thy priests be clothed with righteousness; may thy faithful followers shout for joy.'),
+('kohanekha', 'psalms/132/9', 'כֹּהֲנֶֽיךָ יִלְבְּשׁוּ צֶֽדֶק, וַחֲסִידֶֽיךָ יְרַנֵּֽנוּ.', 'May thy priests be clothed with righteousness; may thy faithful followers shout for joy.'),
 ('baavur', 'psalms/132/10', 'בַּעֲבוּר דָּוִד עַבְדֶּֽךָ אַל תָּשֵׁב פְּנֵי מְשִׁיחֶֽךָ.', 'For the sake of thy servant David, reject not thy anointed.'),
-('ki_lekach', 'proverbs/4/2', 'כִּי לֶֽקַח טוֹב נָתַֽתִּי לָכֶם, תּוֹרָתִי אַל תַּעֲזֹֽבוּ.', 'I give you good instruction: forsake not my Torah.'),
+('ki_leqach', 'proverbs/4/2', 'כִּי לֶֽקַח טוֹב נָתַֽתִּי לָכֶם, תּוֹרָתִי אַל תַּעֲזֹֽבוּ.', 'I give you good instruction: forsake not my Torah.'),
 ('etz', 'proverbs/3/18', 'עֵץ חַיִּים הִיא לַמַּחֲזִיקִים בָּהּ, וְתֹמְכֶֽיהָ מְאֻשָּׁר.', 'It is a tree of life to those who take hold of it, and happy are those who support it.'),
 ('derakheha', 'proverbs/3/17', 'דְּרָכֶֽיהָ דַרְכֵי נֹֽעַם, וְכָל נְתִיבוֹתֶֽיהָ שָׁלוֹם.', 'Its ways are ways of pleasantness, and all its paths are peace.'),
 ('hashivenu', 'lamentations/5/21', 'הֲשִׁיבֵֽנוּ יְיָ אֵלֶֽיךָ וְנָשֽׁוּבָה: חַדֵּשׁ יָמֵֽינוּ כְּקֶֽדֶם.', 'Turn us to thee, O Lord, and let us return; renew our days as of old.'),

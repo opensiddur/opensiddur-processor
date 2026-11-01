@@ -10,7 +10,7 @@ from .test_tachanun_conditions import evaluate, fragment, settings, NS
 
 
 class TestLifecycle(unittest.TestCase):
-    def test_burial_does_not_cancel_its_own_tzidduk_hadin(self):
+    def test_burial_does_not_cancel_its_own_tzidduq_hadin(self):
         values=settings(**{'house-of-mourning':True,'brit-milah':True,'omit-tahanun':True})
         self.assertEqual(evaluate(r.TZIDDUK_OCCASION,values),TriState.TRUE)
         self.assertEqual(evaluate(r.TZIDDUK_OCCASION,settings(month=1)),TriState.FALSE)
@@ -19,11 +19,11 @@ class TestLifecycle(unittest.TestCase):
         for israel,day,want in ((True,24,TriState.TRUE),(False,24,TriState.FALSE),(False,25,TriState.TRUE)):
             self.assertEqual(evaluate(r.TZIDDUK_OCCASION,settings(month=7,day=day,israel=israel)),want)
 
-    def test_calendar_selects_tzidduk_and_its_kaddish_with_regular_fallback(self):
+    def test_calendar_selects_tzidduq_and_its_kaddish_with_regular_fallback(self):
         units={u['urn']:fragment(u['body']) for u in r.units(r.PROJECT_HE)}
         self.assertFalse(units[r.TZIDDUK].xpath('.//j:conditional',namespaces=NS))
         burial=units[r.BURIAL]
-        condition=burial.xpath('.//j:conditional[contains(@xml:id,"tzidduk_calendar")]',namespaces=NS)[0]
+        condition=burial.xpath('.//j:conditional[contains(@xml:id,"tzidduq_calendar")]',namespaces=NS)[0]
         siblings=list(condition.getparent());start=siblings.index(condition)
         end=next(i for i in range(start+1,len(siblings)) if siblings[i].tag=='{'+NS['j']+'}endConditional')
         gated=[x.get('target') for x in siblings[start:end] if x.tag=='{'+NS['j']+'}transclude']

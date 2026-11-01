@@ -13,7 +13,7 @@ NOTES = [
  note(MISHNAH+'/7', ', which renders permissible the carrying of objects on the Sabbath from one household to another, consists of food placed in a room accessible to all inhabitants of a court or a town. Since each of the householders contributes his share to it, the <tei:hi rend="italic">eruv</tei:hi> (“mixture”) symbolically turns all of them into one household.', lemma='עירוב'),
  note(MISHNAH+'/7', ', the act of purifying utensils from their defilement, renders them fit for use; hence it is forbidden work on Friday at twilight.', lemma='טבילת כלים'),
  note(MISHNAH+'/7', ', produce concerning which there is a doubt as to whether the rules relating to the priestly and Levitical dues were strictly observed, may be tithed at twilight, because the probability is that the tithes have already been set apart, so that this tithing does not really make it fit for use.', lemma='דמאי'),
- note(TALMUD+'/al_tikra', 'is not intended to indicate a variant in the text. <tei:foreign xml:lang="he">בניך–בוניך</tei:foreign> is a mere play on words, designed to attract the attention to the great significance of peace.', lemma='אל תקרא'),
+ note(TALMUD+'/al_tiqra', 'is not intended to indicate a variant in the text. <tei:foreign xml:lang="he">בניך–בוניך</tei:foreign> is a mere play on words, designed to attract the attention to the great significance of peace.', lemma='אל תקרא'),
  note(TALMUD+'/isaiah_54_13', '<tei:hi rend="italic">Isaiah</tei:hi> 54:13.', kind='source', n='1'),
  note(TALMUD+'/psalms_29_11', '<tei:hi rend="italic">Psalms</tei:hi> 119:165; 122:7–9; 29:11.', kind='source', n='1'),
 ]

@@ -10,7 +10,7 @@ RANGES = {
     'amidah_avot': (159,161), 'amidah_gevurot': (161,161),
     'amidah_qedushah': (161,163), 'amidah_qedushat_hashem': (163,163),
     'amidah_binah': (163,163), 'amidah_teshuvah': (163,163),
-    'amidah_selichah': (163,163), 'amidah_geulah': (163,163),
+    'amidah_selichah': (163,163), 'amidah_geullah': (163,163),
     'amidah_aneinu': (163,169),
     'amidah_shalom_hamevarekh': (173,173), 'amidah_shalom_besefer_chayyim': (173,173),
     'amidah_refuah': (163,165), 'amidah_shanim': (165,165),
@@ -26,7 +26,7 @@ RANGES = {
     'tachanun_psalm6': (181,181), 'tachanun_shomer_yisrael': (181,181),
     'tachanun_shomer_goy_echad': (181,181), 'tachanun_shomer_goy_qadosh': (181,181),
     'tachanun_mitratzeh': (183,183), 'tachanun_vaanachnu': (183,183),
-    'conclusion_titkabal': (183,183), 'conclusion_aleinu': (185,185),
+    'conclusion_titqabbal': (183,183), 'conclusion_aleinu': (185,185),
     'conclusion_al_tira': (187,187),
 }
 

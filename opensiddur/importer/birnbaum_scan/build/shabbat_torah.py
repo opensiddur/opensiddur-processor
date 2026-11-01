@@ -12,7 +12,7 @@ from .torah import URNS as WEEKDAY, BIBLE, GOMEL_RUBRIC
 from .shabbat_amidah import SERVICE
 from .shabbat_torah_data import PASSAGES
 
-BIBLICAL_ANCHORS = {('ein_kamokha','ein'), ('al_hakol','shiru')} | {('av_memorial', n) for n in ('harninu','venikketi','lamah','doresh','yadin','minachal')}
+BIBLICAL_ANCHORS = {('ein_kamokha','ein'), ('al_hakol','shiru')} | {('av_memorial', n) for n in ('harninu','veniqqeiti','lammah','doresh','yadin','minachal')}
 
 def anchor(key,name,source):
     return BIBLE+source if (key,name) in BIBLICAL_ANCHORS else URNS[key]+'/'+name
@@ -34,12 +34,12 @@ AV_OMISSIONS = ('shabbat-rosh-hodesh','shabbat-shkalim','shabbat-zachor',
 AV_HARACHAMIM = '<j:all>'+SHABBAT+'<j:none>'+YOM_TOV+feature(AGG,'chol-hamoed')+''.join(feature(TORAH,n) for n in AV_OMISSIONS)+'</j:none></j:all>'
 URNS = {key:PRAYER+p['urn'] for key,p in PASSAGES.items()}
 RANGES = {'torah_vayehi_binsoa':(363,363),'torah_berikh_shemeh':(365,365),
- 'torah_gadelu':(365,365),'torah_lekha_adonai':(365,367),
- 'torah_av_harachamim':(367,367),'torah_veatem':(369,369),
+ 'torah_gaddelu':(365,365),'torah_lekha_adonai':(365,367),
+ 'torah_av_harachamim':(367,367),'torah_veattem':(369,369),
  'torah_barekhu':(369,369),'torah_asher_bachar':(369,369),'torah_asher_natan':(369,369),
  'torah_hagomel':(369,369),'torah_vezot_hatorah':(373,373),
  'torah_yehalelu':(387,387),'torah_psalm24':(387,389),'torah_uvnucho':(389,389),
- 'kabbalat_psalm_29':(387,387),'ashrei':(383,387)}
+ 'qabbalat_psalm_29':(387,387),'ashrei':(383,387)}
 
 
 def conditional(cid,rubric,condition,body,*,negate=False):
@@ -53,7 +53,7 @@ def shared(lang,prayers):
         if p['name'] in RANGES:
             first,last=RANGES[p['name']]
             p['printings']=(*p.get('printings',()),(first+side,last+side))
-        if p['name'] in ('kaddish_derabbanan_yitgadal','kaddish_derabbanan_yehe_shmeh','kaddish_derabbanan_yitbarakh'):
+        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh'):
             p['printings']=(*p.get('printings',()),(373+side,373+side),(389+side,389+side))
         turns=[]
         if p['name']=='ashrei':
@@ -96,12 +96,12 @@ def expand(value,lang,key,row):
 def prayers(lang,earlier):
     side=int(lang=='en');result=[]
     for key,p in PASSAGES.items():
-        if key == 'yekum_opening':
+        if key == 'yequm_opening':
             continue
         urn=URNS[key];marks=Correspondences();parts=['<tei:p>']
         rows=p['rows']
-        if key in ('yekum_scholars','yekum_congregation'):
-            rows=[('opening',None,*PASSAGES['yekum_opening']['rows'][0][2:]),*rows]
+        if key in ('yequm_scholars','yequm_congregation'):
+            rows=[('opening',None,*PASSAGES['yequm_opening']['rows'][0][2:]),*rows]
         for name,source,he,en in rows:
             value=expand((he,en)[side],lang,key,name)
             ref=anchor(key,name,source)
@@ -128,14 +128,14 @@ def units(project,by_name):
         urn=urn or ROOT+'/'+key
         result.append(dict(name='shabbat_torah_'+key,urn=urn,title_he=he,title_en=en,pages=(first+side,last+side),
           body=f'<tei:div corresp="{urn}">'+editorial_head(lang,he,en)+pb(first+side,sigil=SIGIL)+body+'</tei:div>'))
-    opening=instruction('Congregation and Reader:')+new('ein_kamokha')+new('heytivah')
+    opening=instruction('Congregation and Reader:')+new('ein_kamokha')+new('heitivah')
     opening+=instruction('The ark is opened. Reader and Congregation:')+local('opening/vayehi',old('vayehi_binsoa'))
     opening+=conditional('festival_opening','On festivals occurring on weekdays add:',WEEKDAY_FESTIVAL,new('attributes')+new('ribbono'))
-    opening+=old('berikh_shemeh')+instruction('The Reader takes the Torah and says:')+new('shema')+new('echad')+old('gadelu')
+    opening+=old('berikh_shemeh')+instruction('The Reader takes the Torah and says:')+new('shema')+new('echad')+old('gaddelu')
     opening+=instruction('Congregation:')+local('opening/lekha',old('lekha_adonai'))+new('al_hakol')+instruction('Reader:')+old('av_harachamim')
     opening+=instruction('The Torah is placed on the desk. The Reader unrolls it and says:')+new('vayaazor')
     add('opening','הוצאת ספר תורה','Taking out the Torah',361,367,conditional('public_opening','When a minyan holds service:',MINYAN,opening))
-    reading=instruction('Congregation and Reader:')+local('reading/veatem',old('veatem'))+instruction('The person called to the Torah recites:')+old('barekhu')
+    reading=instruction('Congregation and Reader:')+local('reading/veattem',old('veattem'))+instruction('The person called to the Torah recites:')+old('barekhu')
     reading+=instruction('He repeats the response and continues:')+local('reading/blessings',old('asher_bachar'))+instruction('The Torah is read. Then he recites:')+old('asher_natan')
     reading+=conditional('hagomel',GOMEL_RUBRIC,feature(PERSON,'birkat-hagomel'),f'<tei:div>'+editorial_head(lang,'בִּרְכַת הַגּוֹמֵל','THANKSGIVING')+local('reading/hagomel',old('hagomel'))+'</tei:div>')
     reading+=conditional('bar_mitzvah','The father of a Bar-Mitzvah pronounces the following blessing:',feature(PERSON,'bar-mitzvah-father'),new('bar_mitzvah'))
@@ -150,11 +150,11 @@ def units(project,by_name):
     haftarah+=conditional('haftarah_shabbat','On Sabbaths, including Ḥol ha-Mo‘ed Passover:',FESTIVAL_HAFTARAH,new('haftarah_shabbat'),negate=True)
     haftarah+=conditional('haftarah_festival','On festivals, including Ḥol ha-Mo‘ed Sukkoth:',FESTIVAL_HAFTARAH,new('haftarah_festival'))
     add('haftarah','ברכות ההפטרה','Haftarah blessings',373,377,conditional('public_haftarah','When a minyan holds service:',MINYAN,haftarah))
-    yekum=new('yekum_scholars')
-    yekum+=conditional('yekum_public','When praying in private, omit the following two paragraphs:',MINYAN,new('yekum_congregation')+new('mi_community'))
-    add('yekum_purkan','יקום פורקן','Yekum Purkan',377,379,conditional('yekum_shabbat','The following three paragraphs are recited on Sabbaths only.',SHABBAT,yekum))
+    yekum=new('yequm_scholars')
+    yekum+=conditional('yequm_public','When praying in private, omit the following two paragraphs:',MINYAN,new('yequm_congregation')+new('mi_community'))
+    add('yequm_purqan','יקום פורקן','Yekum Purkan',377,379,conditional('yequm_shabbat','The following three paragraphs are recited on Sabbaths only.',SHABBAT,yekum))
     add('government','תפילה בשלומה של מלכות','Prayer for the Government',379,379,instruction('The Reader takes the Torah and recites:')+new('government'))
-    month=new('month_yehi')+instruction('The Reader takes the Torah and recites:')+new('month_mi')+instruction('Announcing the day of Rosh Ḥodesh:')+new('month_announce')+instruction('Congregation and Reader:')+new('month_yechadshehu')
+    month=new('month_yehi')+instruction('The Reader takes the Torah and recites:')+new('month_mi')+instruction('Announcing the day of Rosh Ḥodesh:')+new('month_announce')+instruction('Congregation and Reader:')+new('month_yechaddeshehu')
     add('month','ברכת החודש','Blessing of the New Month',381,381,conditional('month','Recited on the Sabbath preceding Rosh Ḥodesh:',MEVARCHIM,month))
     add('memorial','הזכרת נשמות הקדושים','Commemoration of Martyrs',383,383,conditional('memorial','Omitted on festivals, on Sabbaths occurring on Rosh Ḥodesh, and on all distinguished Sabbaths such as Parashath Shekalim.',AV_HARACHAMIM,new('av_memorial')))
     add('ashrei','אשרי','Ashrei',383,387,transclude(PRAYER+'ashrei'))
@@ -163,7 +163,7 @@ def units(project,by_name):
     returning+=conditional('psalm24','On festivals occurring on weekdays:',WEEKDAY_FESTIVAL,f'<tei:div corresp="{ROOT}/return/psalm24">'+old('psalm24')+'</tei:div>')
     returning+=instruction('While the Torah is being placed in the ark:')+local('return/uvnucho',old('uvnucho'))
     add('return','הכנסת ספר תורה','Returning the Torah',387,389,conditional('public_return','When a minyan holds service:',MINYAN,returning))
-    add('service','קריאת התורה','READING OF THE TORAH',361,389,''.join(transclude(ROOT+'/'+key) for key in ('opening','reading','haftarah','yekum_purkan','government','month','memorial','ashrei','return')),urn=ROOT)
+    add('service','קריאת התורה','READING OF THE TORAH',361,389,''.join(transclude(ROOT+'/'+key) for key in ('opening','reading','haftarah','yequm_purqan','government','month','memorial','ashrei','return')),urn=ROOT)
     add('kaddish','חצי קדיש','Half Kaddish',389,389,conditional('final_kaddish','Reader, when a minyan holds service:',MINYAN,transclude(PRAYER+'kaddish/chatzi')),urn=KADDISH)
     return tuple(result)
 

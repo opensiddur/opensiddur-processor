@@ -296,7 +296,7 @@ Each post's URN decision is made once. It is recorded in
 
 ```json
 {"post_id": 12322, "kind": "existing", "urn": "urn:x-opensiddur:text:poem:maoz_tzur", "rows": {"1": "urn:x-opensiddur:text:poem:maoz_tzur/1", "...": "..."}}
-{"post_id": 41025, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:the_blessings_over_kindling_the_light_of_chanukah", "rows": {"1": "urn:x-opensiddur:text:prayer:hadlakat_ner_chanukah/blessing"}}
+{"post_id": 41025, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:the_blessings_over_kindling_the_light_of_chanukah", "rows": {"1": "urn:x-opensiddur:text:prayer:hadlaqat_ner_chanukah/blessing"}}
 {"post_id": 22916, "kind": "new", "urn": "urn:x-opensiddur:text:poem:banu_choshekh_lqadesh_seidenberg"}
 ```
 
@@ -351,7 +351,7 @@ How `match` handles each post:
   and Ladino (in Hebrew and Cyrillic letters), with seven transliterations.
 - **URNs:** 13 proposals accepted (one with corrections) and one replaced by a new URN.
   - Six versions of Maoz Tsur use its stanzas.
-  - The candle-lighting posts share `hadlakat_ner_chanukah/blessing`, `sheasah_nissim` and
+  - The candle-lighting posts share `hadlaqat_ner_chanukah/blessing`, `sheasah_nissim` and
     `shehecheyanu`.
   - A qerovah for the Ḥanukkah Amidah shares the Amidah's blessings.
 - **Contributors:** 13 registered.

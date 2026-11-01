@@ -93,13 +93,13 @@ HEADER_ANCHORS: dict[str, list[str]] = {
     "echad_mi_yodea": ["אחדמייודע"],
     "chad_gadya": ["חדגדיא"],
     "sefirat_haomer": ["ספירתהעומר"],
-    "elu_eser_makkot": ["אלועשרמכות"],
+    "ellu_eser_makkot": ["אלועשרמכות"],
     "rabbi_yehudah_makkot": ["יהודההיהנותן"],
     "psalm_113": ["הללויה"],
     "lefikach": ["לפיכך"],
     "you_shall_say_pesach": ["ואמרתם"],
     "ki_lo_na_eh": ["כילונאה"],
-    "adir_hu": ["אדירהוא"],
+    "addir_hu": ["אדירהוא"],
     "psalm_114": ["בצאתישראל"],
 }
 

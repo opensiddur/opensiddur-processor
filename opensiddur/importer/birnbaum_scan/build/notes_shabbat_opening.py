@@ -8,7 +8,7 @@ def song(ref, lemma, text):
     return note(SONG+'/'+ref, text, lemma=lemma)
 
 NOTES = [
- note(PRAYER+'hadlakat_ner_shabbat',
+ note(PRAYER+'hadlaqat_ner_shabbat',
     'the blessing pronounced at the lighting of the Sabbath light, is not cited in the Talmud but is found in the ninth century <tei:hi rend="italic">Siddur</tei:hi> of Amram Gaon. The custom of lighting two lights is in keeping with the two terms “Remember” and “Observe” which introduce the Sabbath Commandment in Exodus 20:8 and Deuteronomy 5:12, respectively. The lights are symbolical of the cheerfulness and serenity which distinguish the holy days.', lemma='ברכת הנר'),
  note(PRAYER+'birkat_horim',
     'the blessing of children by their parents on all important occasions, notably on the eve of Sabbaths and festivals, is one of the most beautiful customs. The <tei:hi rend="italic">Brantspiegel</tei:hi>, a treatise on morals published in 1602, mentions this in the following terms: “Before the children can walk they should be carried on Sabbaths and festivals to the father and mother to be blessed; after they are able to walk they shall go of their own accord with bowed body and shall incline their heads and receive the blessing.” This custom has linked the generations together in mutual loyalty and affection.', lemma='ברכת הורים'),

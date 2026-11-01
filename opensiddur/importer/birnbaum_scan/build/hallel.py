@@ -49,7 +49,7 @@ def prayers(lang):
             if row['page']!=previous:body+=pb(row['page']+side,sigil=SIGIL);previous=row['page']
             if key.endswith('25a'):
                 other=next(r for r in rows if r['key']=='118/25b')
-                value=marked(ROOT+'/anna/hoshia',value)+ ' '+marked(ROOT+'/anna/hatzlicha',xml(other[lang]))
+                value=marked(ROOT+'/anna/hoshiah',value)+ ' '+marked(ROOT+'/anna/hatzlichah',xml(other[lang]))
                 key='118/25'
             verse=int(key.split('/')[-1])
             separate=chapter==118 and (verse<=4 or verse>=21)
@@ -87,7 +87,7 @@ def units(project):
         elif chapter==118:
             body=(instruction('Psalm 118:1-4') if side else '')+instruction('Responsively')+verses(118,1,4)+(instruction('Psalm 118:5-29') if side else '')+verses(118,5,20)
             body+=instruction('Each verse is chanted twice:')+verses(118,21,24)+instruction('Responsively')
-            body+=''.join(transclude(ROOT+'/anna/'+part) for part in ['hoshia','hoshia','hatzlicha','hatzlicha'])
+            body+=''.join(transclude(ROOT+'/anna/'+part) for part in ['hoshiah','hoshiah','hatzlichah','hatzlichah'])
             body+=instruction('Each verse is chanted twice:')+verses(118,26,29)
         else:body=transclude(BIBLE+'psalms/'+str(chapter))
         add('hallel_psalm_'+str(chapter),ROOT+'/psalm_'+str(chapter),'תהלים '+str(chapter),'Psalm '+str(chapter),first,last,body,printed=bool(side and chapter in (113,114,117)))

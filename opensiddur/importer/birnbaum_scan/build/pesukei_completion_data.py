@@ -361,7 +361,7 @@ PASSAGES = {'ashrei_prefix': [('psalms/84/5',
               'The sea thou didst divide before them, so that they went through the middle of the '
               'sea on dry ground; and their pursuers thou didst cast into the depths, like a stone '
               'into the mighty waters.')],
- 'vayosha': [('exodus/14/30',
+ 'vayyosha': [('exodus/14/30',
               'וַיּֽוֹשַׁע יְיָ בַּיּוֹם הַהוּא אֶת יִשְׂרָאֵל מִיַּד מִצְרָֽיִם; וַיַּרְא '
               'יִשְׂרָאֵל אֶת מִצְרַֽיִם מֵת עַל שְׂפַת הַיָּם.',
               'Thus did the Lord save Israel that day from the power of the Egyptians; and Israel '
@@ -469,7 +469,7 @@ PASSAGES = {'ashrei_prefix': [('psalms/84/5',
                  'וּשְׁמוֹ אֶחָד.',
                  'The Lord shall be King over all the earth; on that day shall the Lord be One and '
                  'his name One.')],
- 'yishtabach': [('prayer:yishtabach',
+ 'yishtabbach': [('prayer:yishtabbach',
                  'יִשְׁתַּבַּח שִׁמְךָ לָעַד, מַלְכֵּֽנוּ, הָאֵל הַמֶּֽלֶךְ הַגָּדוֹל '
                  'וְהַקָּדוֹשׁ, בַּשָּׁמַֽיִם וּבָאָֽרֶץ. כִּי לְךָ נָאֶה, יְיָ אֱלֹהֵֽינוּ '
                  'וֵאלֹהֵי אֲבוֹתֵֽינוּ, שִׁיר וּשְׁבָחָה, הַלֵּל וְזִמְרָה, עֹז וּמֶמְשָׁלָה, '

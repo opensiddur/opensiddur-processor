@@ -125,18 +125,18 @@ prayer("ishmael_yehi_ratzon", "May it be thy will, that the Temple be rebuilt", 
          "There we will serve thee with reverence, as in the days of old and as in "
          "former years."))
 
-prayer("kaddish_derabbanan_yitgadal", "Glorified and sanctified", "kaddish/derabbanan/yitgadal", 46, 46,
-       d(U + "kaddish/derabbanan/yitgadal",
-         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yitgadal"/>'
+prayer("kaddish_derabbanan_yitgaddal", "Glorified and sanctified", "kaddish/derabbanan/yitgaddal", 46, 46,
+       d(U + "kaddish/derabbanan/yitgaddal",
+         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yitgaddal"/>'
          "Glorified and sanctified be God’s great name throughout the world which he "
          "has created according to his will. May he establish his kingdom in your "
          "lifetime and during your days, and within the life of the entire house of "
          "Israel, speedily and soon; and say, Amen."
          '<tei:milestone unit="prayer-part"/>'))
 
-prayer("kaddish_derabbanan_yehe_shmeh", "May his great name be blessed", "kaddish/derabbanan/yehe_shmeh", 46, 46,
-       d(U + "kaddish/derabbanan/yehe_shmeh",
-         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yehe_shmeh"/>'
+prayer("kaddish_derabbanan_yehe_shemeh", "May his great name be blessed", "kaddish/derabbanan/yehe_shemeh", 46, 46,
+       d(U + "kaddish/derabbanan/yehe_shemeh",
+         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yehe_shemeh"/>'
          "May his great name be blessed forever and to all eternity."
          '<tei:milestone unit="prayer-part"/>'))
 
@@ -156,8 +156,8 @@ prayer("kaddish_derabbanan_al_yisrael", "We pray for Israel", "kaddish/derabbana
          "everywhere. May they have abundant peace, lovingkindness, ample sustenance "
          "and salvation from their Father who is in heaven; and say, Amen."))
 
-prayer("kaddish_derabbanan_yehe_shlama", "May there be abundant peace", "kaddish/derabbanan/yehe_shlama", 48, 48,
-       d(U + "kaddish/derabbanan/yehe_shlama",
+prayer("kaddish_derabbanan_yehe_shelama", "May there be abundant peace", "kaddish/derabbanan/yehe_shelama", 48, 48,
+       d(U + "kaddish/derabbanan/yehe_shelama",
          "May there be abundant peace from heaven, and life, for us and for all "
          "Israel; and say, Amen."))
 

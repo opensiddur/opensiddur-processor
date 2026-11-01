@@ -1,5 +1,5 @@
 {"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar", "status": "canonical", "label_en": "Rabbi Elazar said: scholars increase peace"}
-{"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/al_tikra", "status": "canonical", "label_en": "Rabbi Elazar passage — al tikra", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
+{"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/al_tiqra", "status": "canonical", "label_en": "Rabbi Elazar passage — al tikra", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
 {"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/isaiah_54_13", "status": "canonical", "label_en": "Rabbi Elazar passage — isaiah 54 13", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
 {"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/opening", "status": "canonical", "label_en": "Rabbi Elazar passage — opening", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
 {"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/psalms_119_165", "status": "canonical", "label_en": "Rabbi Elazar passage — psalms 119 165", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
@@ -8,4 +8,4 @@
 {"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/psalms_122_9", "status": "canonical", "label_en": "Rabbi Elazar passage — psalms 122 9", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
 {"urn": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar/psalms_29_11", "status": "canonical", "label_en": "Rabbi Elazar passage — psalms 29 11", "parent": "urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar"}
 {"urn": "urn:x-opensiddur:text:talmud:megillah/28b/tana_devei_eliyahu", "status": "canonical", "label_en": "Megillah 28b — Tana Devei Eliyahu"}
-{"urn": "urn:x-opensiddur:text:talmud:megillah/31a/amar_rabbi_yohanan", "status": "canonical", "label_en": "megillah — 31a — amar rabbi yohanan"}
+{"urn": "urn:x-opensiddur:text:talmud:megillah/31a/amar_rabbi_yochanan", "status": "canonical", "label_en": "megillah — 31a — amar rabbi yohanan"}

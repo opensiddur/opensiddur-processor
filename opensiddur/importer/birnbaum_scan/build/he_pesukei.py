@@ -37,20 +37,20 @@ prayer('mizmor_shir_chanukat_habayit', 'מִזְמוֹר שִׁיר חֲנֻכַ
 
 prayer('kaddish_yatom', 'קַדִּישׁ יָתוֹם', 'kaddish/yatom', 49, 51,
     "\n".join([f'<tei:div corresp="{U}kaddish/yatom">',
-      f'<j:transclude type="external" target="{U}kaddish/yitgadal"/>',
-      f'<j:transclude type="external" target="{U}kaddish/yehe_shmeh"/>',
+      f'<j:transclude type="external" target="{U}kaddish/yitgaddal"/>',
+      f'<j:transclude type="external" target="{U}kaddish/yehe_shemeh"/>',
       f'<j:transclude type="external" target="{U}kaddish/yitbarakh"/>',
-      d(U + "kaddish/yatom/yehe_shlama",
+      d(U + "kaddish/yatom/yehe_shelama",
       f'{pb(51)}' + 'יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא, וְחַיִּים, עָלֵֽינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן.'),
       d(U + "kaddish/yatom/oseh_shalom", 'עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו, הוּא יַעֲשֶׂה שָׁלוֹם עָלֵֽינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן.'),
       "</tei:div>"]))
 
-prayer('hareni_mezamen', 'הֲרֵינִי מְזַמֵּן', 'hareni_mezamen', 51, 51,
-    d(U + "hareni_mezamen", 'הֲרֵינִי מְזַמֵּן אֶת פִּי לְהוֹדוֹת וּלְהַלֵּל וּלְשַׁבֵּֽחַ אֶת בּוֹרְאִי.'))
+prayer('hareini_mezammen', 'הֲרֵינִי מְזַמֵּן', 'hareini_mezammen', 51, 51,
+    d(U + "hareini_mezammen", 'הֲרֵינִי מְזַמֵּן אֶת פִּי לְהוֹדוֹת וּלְהַלֵּל וּלְשַׁבֵּֽחַ אֶת בּוֹרְאִי.'))
 
-prayer('barukh_sheamar', 'בָּרוּךְ שֶׁאָמַר', 'pesukei_dezimra/barukh_sheamar', 51, 51,
-    "\n".join([f'<tei:div corresp="{U}pesukei_dezimra/barukh_sheamar">',
-        d(U + "pesukei_dezimra/barukh_sheamar/barukh", (
+prayer('barukh_sheamar', 'בָּרוּךְ שֶׁאָמַר', 'pesuqei_dezimrah/barukh_sheamar', 51, 51,
+    "\n".join([f'<tei:div corresp="{U}pesuqei_dezimrah/barukh_sheamar">',
+        d(U + "pesuqei_dezimrah/barukh_sheamar/barukh", (
             'בָּרוּךְ שֶׁאָמַר וְהָיָה הָעוֹלָם, בָּרוּךְ הוּא. בָּרוּךְ עוֹשֶׂה '
             'בְרֵאשִׁית, בָּרוּךְ אוֹמֵר וְעוֹשֶׂה, בָּרוּךְ גּוֹזֵר וּמְקַיֵּם, בָּרוּךְ'
             ' מְרַחֵם עַל הָאָֽרֶץ, בָּרוּךְ מְרַחֵם עַל הַבְּרִיּוֹת, בָּרוּךְ מְשַׁלֵּם'
@@ -62,7 +62,7 @@ prayer('barukh_sheamar', 'בָּרוּךְ שֶׁאָמַר', 'pesukei_dezimra/b
             'נְגַדֶּלְךָ וּנְשַׁבֵּחֲךָ וּנְפָאֶרְךָ, וְנַזְכִּיר שִׁמְךָ וְנַמְלִיכְךָ, '
             'מַלְכֵּֽנוּ, אֱלֹהֵֽינוּ.')),
         '<tei:note type="instruction" xml:lang="en">Reader</tei:note>',
-        d(U + "pesukei_dezimra/barukh_sheamar/yachid", 'יָחִיד, חֵי הָעוֹלָמִים, מֶֽלֶךְ, מְשֻׁבָּח וּמְפֹאָר עֲדֵי־עַד שְׁמוֹ הַגָּדוֹל. בָּרוּךְ אַתָּה, יְיָ, מֶֽלֶךְ מְהֻלָּל בַּתִּשְׁבָּחוֹת.'),
+        d(U + "pesuqei_dezimrah/barukh_sheamar/yachid", 'יָחִיד, חֵי הָעוֹלָמִים, מֶֽלֶךְ, מְשֻׁבָּח וּמְפֹאָר עֲדֵי־עַד שְׁמוֹ הַגָּדוֹל. בָּרוּךְ אַתָּה, יְיָ, מֶֽלֶךְ מְהֻלָּל בַּתִּשְׁבָּחוֹת.'),
         "</tei:div>"]))
 
 # Biblical passages before Ashrei.

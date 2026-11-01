@@ -33,6 +33,6 @@ SHEMA_NOTES = [
     note('urn:x-opensiddur:text:siddur:chol/shacharit/shema/barukh_shem', 'was regularly used in the Temple. It is attributed to Jacob.', 'ברוך שם כבוד'),
     note(PRAYER+'emet_veyatziv/emet', 'is mentioned in the Mishnah (Tamid 5:1) among the prayers used in the Temple. The fifteen synonyms, '+he('ויציב–ויפה')+', correspond to the fifteen words in the last sentence of the '+italic('Shema')+', beginning with '+he('אני')+' and ending with '+he('אמת')+'. The rule is not to interrupt the connection between '+he('ה׳ אלהיכם')+' and '+he('אמת')+', as if these three words formed one sentence, meaning: “The Lord your God is true” (Mishnah Berakhoth 2:2).', 'אמת ויציב'),
     note(PRAYER+'emet_veyatziv/emet', 'refers to the '+italic('Shema')+' as a solemn profession of the Oneness of God. The '+italic('Shema')+' is the watchword of Israel’s faith, and it is the desire of every loyal Jew to have it upon his lips when he dies.', 'הדבר הזה'),
-    note(PRAYER+'emet_veyatziv/mi_khamokha', italic('Exodus')+' 15:11.'),
+    note(PRAYER+'emet_veyatziv/mi_khamokhah', italic('Exodus')+' 15:11.'),
     note(PRAYER+'emet_veyatziv/adonai_yimlokh', italic('Exodus')+' 15:18.'),
 ]

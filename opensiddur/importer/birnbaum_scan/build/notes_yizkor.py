@@ -10,5 +10,5 @@ NOTES = [note(URNS['opening_144_3'],'commentary',PAGES['601']['notes'][0]['text'
     note(URNS['el_male_man'],'commentary',PAGES['606']['notes'][1]['text']),
     note(URNS['av_harachamim']+'/minachal','commentary',PAGES['607']['notes'][1]['text']+' '+PAGES['608']['notes'][1]['text']),
     note(URNS['av_harachamim']+'/harninu','source','Deuteronomy 32:43.'),
-    note(URNS['av_harachamim']+'/venikketi','source','Joel 4:21.'),
-    note(URNS['av_harachamim']+'/lamah','source','Psalms 79:10; 9:13; 110:6–7.')]
+    note(URNS['av_harachamim']+'/veniqqeiti','source','Joel 4:21.'),
+    note(URNS['av_harachamim']+'/lammah','source','Psalms 79:10; 9:13; 110:6–7.')]

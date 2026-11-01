@@ -54,7 +54,7 @@ ROWS = [{'page': 575,
   'he': 'קָדוֹשׁ, קָדוֹשׁ, קָדוֹשׁ יְיָ צְבָאוֹת; מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ.',
   'en': 'Holy, holy, holy is the Lord of hosts;\nThe whole earth is full of his glory.”'},
  {'page': 577,
-  'key': 'leumatam',
+  'key': 'leummatam',
   'he': 'לְעֻמָּתָם בָּרוּךְ יֹאמֵֽרוּ—',
   'en': 'Those opposite them say: Blessed—'},
  {'page': 577,
@@ -84,7 +84,7 @@ ROWS = [{'page': 575,
   'en': 'Thou art holy and thy name is holy, and holy beings praise thee daily. Blessed art thou, O Lord, '
         'holy God.'},
  {'page': 577,
-  'key': 'roshei',
+  'key': 'rashei',
   'he': 'רָאשֵׁי חֳדָשִׁים לְעַמְּךָ נָתָֽתָּ, זְמַן כַּפָּרָה לְכָל תּוֹלְדוֹתָם. בִּהְיוֹתָם מַקְרִיבִים '
         'לְפָנֶֽיךָ זִבְחֵי רָצוֹן וּשְׂעִירֵי חַטָּאת לְכַפֵּר בַּעֲדָם, זִכָּרוֹן לְכֻלָּם יִהְיוּ, '
         'וּתְשׁוּעַת נַפְשָׁם מִיַּד שׂוֹנֵא. מִזְבֵּֽחַ חָדָשׁ בְּצִיּוֹן תָּכִין, וְעוֹלַת רֹאשׁ חֹֽדֶשׁ '
@@ -123,7 +123,7 @@ ROWS = [{'page': 575,
         'requisite libations. Moreover, a he-goat was offered to make atonement, in addition to the two '
         'regular daily offerings.'},
  {'page': 579,
-  'key': 'chadesh',
+  'key': 'chaddesh',
   'he': 'אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ, חַדֵּשׁ עָלֵֽינוּ אֶת הַחֹֽדֶשׁ הַזֶּה לְטוֹבָה וְלִבְרָכָה, '
         'לְשָׂשׂוֹן וּלְשִׂמְחָה, לִישׁוּעָה וּלְנֶחָמָה, לְפַרְנָסָה וּלְכַלְכָּלָה, לְחַיִּים וּלְשָׁלוֹם, '
         'לִמְחִילַת חֵטְא וְלִסְלִיחַת עָוֹן (וּלְכַפָּרַת פָּֽשַׁע). כִּי בְעַמְּךָ יִשְׂרָאֵל בָּחַֽרְתָּ '
@@ -203,7 +203,7 @@ ROWS = [{'page': 575,
         'courts, and appointed these eight days of Ḥanukkah for giving thanks and praise to thy great '
         'name.)'},
  {'page': 581,
-  'key': 'veal_kulam',
+  'key': 'veal_kullam',
   'he': 'וְעַל כֻּלָּם יִתְבָּרַךְ וְיִתְרוֹמַם שִׁמְךָ, מַלְכֵּֽנוּ, תָּמִיד לְעוֹלָם וָעֶד.',
   'en': 'For all these acts, may thy name, our King, be blessed and exalted forever and ever.'},
  {'page': 581,

@@ -17,46 +17,46 @@ GRACE = PRAYER+'birkat_hamazon'
 MEALS = SIDDUR+'meals'
 ABRIDGED = PRAYER+'meein_shalosh'
 BLESSINGS = SIDDUR+'berakhot/various'
-BED = SIDDUR+'kriat_shema_al_hamitah'
+BED = SIDDUR+'qeriat_shema_al_hamittah'
 CHILD = BED+'/yeladim'
 ISRAEL = PRAYER+'tefillah_lishlom_medinat_yisrael'
 SIGIL='1949 concluding_prayers'
 BY_KEY={r['key']:r for r in ROWS}
 URNS={r['key']:ROOT+'/text/'+r['key'] for r in ROWS}
-URNS.update({'mi_adir':POEM+'mi_adir','erusin':PRAYER+'birkat_erusin',
- 'ring':PRAYER+'harei_at_mekudeshet','devai_haser':POEM+'devai_haser',
+URNS.update({'mi_addir':POEM+'mi_addir','erusin':PRAYER+'birkat_erusin',
+ 'ring':PRAYER+'harei_at_mequddeshet','devai_haser':POEM+'devai_haser',
  'hamotzi':PRAYER+'hamotzi','borei_nefashot':PRAYER+'borei_nefashot',
- 'hamapil':PRAYER+'hamapil','psalm137':BIBLE+'psalms/137',
+ 'hamappil':PRAYER+'hamappil','psalm137':BIBLE+'psalms/137',
  'bed_psalm3':BED+'/psalm3','hamalakh':BIBLE+'genesis/48/16',
  'bed_exodus':BIBLE+'exodus/15/26','bed_zechariah':BIBLE+'zechariah/3/2',
  'bed_rigzu':BIBLE+'psalms/4/5'})
-for k in ('shehakol_bara','yotzer_haadam','asher_yatzar_haadam','sos_tasis','sameach_tesamach','asher_bara'):URNS[k]=SEVEN+'/'+k
+for k in ('shehakol_bara','yotzer_haadam','asher_yatzar_haadam','sos_tasis','sammeach_tesammach','asher_bara'):URNS[k]=SEVEN+'/'+k
 for k,suffix in {'hazan':'hazan','nodeh':'nodeh','veal_hakol':'veal_hakol','rachem':'rachem',
  'retzeh_grace':'retzeh_vehachalitzenu','uvneh':'uvneh_yerushalayim','hatov':'hatov_vehametiv',
  'bamarom':'bamarom','barukh_hu':'zimmun/barukh_hu','zimmun_leader':'zimmun/nevarekh',
  'zimmun_response':'zimmun/barukh_she_akhalnu','harachaman_reign':'harachaman/yimlokh',
- 'harachaman_worship':'harachaman/yitbarakh','harachaman_praise':'harachaman/yishtabach',
- 'harachaman_livelihood':'harachaman/yefarnesenu','harachaman_yoke':'harachaman/yishbor_ulenu',
+ 'harachaman_worship':'harachaman/yitbarakh','harachaman_praise':'harachaman/yishtabbach',
+ 'harachaman_livelihood':'harachaman/yefarnesenu','harachaman_yoke':'harachaman/yishbor_ullenu',
  'harachaman_house':'harachaman/yishlach_berakhah','harachaman_elijah':'harachaman/yishlach_lanu',
  'harachaman_shabbat':'harachaman/yanchilenu_shabbat','harachaman_festival':'harachaman/yanchilenu_tov',
- 'harachaman_messiah':'harachaman/yezakenu'}.items():URNS[k]=GRACE+'/'+suffix
+ 'harachaman_messiah':'harachaman/yezakkenu'}.items():URNS[k]=GRACE+'/'+suffix
 for k in ('rc','rh','sukkot','self','hosts','all'):URNS['harachaman_'+k]=GRACE+'/harachaman/'+k
 for r in ROWS:
  k=r['key']
  if k.startswith('meein_'):URNS[k]=ABRIDGED+'/'+k.removeprefix('meein_')
  if k.startswith('israel_'):URNS[k]=ISRAEL+'/'+k.removeprefix('israel_')
 for k,s in {'mezonot':'borei_minei_mezonot','shehakol':'shehakol_nihyeh_bidvaro',
- 'haetz':'borei_pri_haetz','haadamah':'borei_pri_haadamah','mezuzah':'likboa_mezuzah',
+ 'haetz':'borei_peri_haetz','haadamah':'borei_peri_haadamah','mezuzah':'liqboa_mezuzah',
  'creation':'oseh_maaseh_vereshit','storm':'shekocho_ugevurato','rainbow':'zokher_haberit',
- 'ocean':'sheasah_et_hayam_hagadol','beauty':'shekakhah_lo_beolamo','blossoms':'shelo_chisar_beolamo',
- 'ruler':'shenatan_mikevodo','appearance':'meshaneh_haberiyot','torah_sage':'shechalak_mechokhmato',
- 'secular_sage':'shenatan_mechokhmato','bad_news':'dayan_haemet','good_news':'hatov_vehametiv'}.items():URNS['blessing_'+k]=PRAYER+s
-REUSE={'marriage_wine':PRAYER+'borei_pri_hagafen','meal_hands':PRAYER+'al_netilat_yadayim',
- 'blessing_wine':PRAYER+'borei_pri_hagafen','blessing_besamim':PRAYER+'borei_minei_vesamim',
+ 'ocean':'sheasah_et_hayam_hagadol','beauty':'shekakhah_lo_beolamo','blossoms':'shelo_chissar_beolamo',
+ 'ruler':'shenatan_mikevodo','appearance':'meshanneh_haberiyyot','torah_sage':'shechalaq_mechokhmato',
+ 'secular_sage':'shenatan_mechokhmato','bad_news':'dayyan_haemet','good_news':'hatov_vehametiv'}.items():URNS['blessing_'+k]=PRAYER+s
+REUSE={'marriage_wine':PRAYER+'borei_peri_hagafen','meal_hands':PRAYER+'al_netilat_yadayim',
+ 'blessing_wine':PRAYER+'borei_peri_hagafen','blessing_besamim':PRAYER+'borei_minei_vesamim',
  'blessing_shehecheyanu':PRAYER+'shehecheyanu','blessing_bread':URNS['hamotzi'],
  'zimmun_invitation':SIDDUR+'lifecycle/text/milah_grace_invitation',
  'zimmun_name':SIDDUR+'lifecycle/text/milah_grace_response',
- 'bed_el_melekh':PRAYER+'torah_tziva/el_melekh_neeman',
+ 'bed_el_melekh':PRAYER+'torah_tzivvah/el_melekh_neeman',
  'bed_shema':BIBLE+'deuteronomy/6/4','child_shema':BIBLE+'deuteronomy/6/4',
  'bed_barukh_shem':PRAYER+'shema/barukh_shem','child_barukh_shem':PRAYER+'shema/barukh_shem',
  'bed_psalm91':SIDDUR+'lifecycle/text/haderekh_psalm91'}
@@ -105,7 +105,7 @@ BIBLICAL={'bed_vihi_noam':'psalms/90/17','bed_psalm91_repeat':'psalms/91/16','be
 
 RANGES={
  'bed_veahavta':(BIBLE+'deuteronomy/6/5',BIBLE+'deuteronomy/6/9'),
- 'bed_barukh':(SIDDUR+'chol/arvit/barukh_adonai/by_day',SIDDUR+'chol/arvit/barukh_adonai/elohenu'),
+ 'bed_barukh':(SIDDUR+'chol/arvit/barukh_adonai/by_day',SIDDUR+'chol/arvit/barukh_adonai/eloheinu'),
  'child_commit':(BIBLE+'psalms/31/6',None),
  'child_salvation':(BIBLE+'genesis/49/18',None),
 }
@@ -168,7 +168,7 @@ def shared(lang,prayers):
   pages={r.get('en_page',r['page']+1) if side else r['page'] for r in ROWS if r['key'] in REUSE and ('corresp="'+REUSE[r['key']]+'"') in p['body']}
   if p['urn']==POEM+'adon_olam':
    pages.add(785+side)
-   incipits=('adon_olam','leet_naasah','veacharei','vehu_hayah','vehu_echad','beli_reshit','vehu_eli','vehu_nisi','beyado','veim_ruchi')
+   incipits=('adon_olam','leet_naasah','veacharei','vehu_hayah','vehu_echad','beli_reshit','vehu_eli','vehu_nissi','beyado','veim_ruchi')
    lines=iter(incipits)
    p['body']=re.sub(r'<tei:l>(.*?)</tei:l>',lambda m:'<tei:l>'+marked(POEM+'adon_olam/'+next(lines),m[1],unit='stanza')+'</tei:l>',p['body'],flags=re.S)
   if pages:p['printings']=(*p.get('printings',()),*((p,p) for p in sorted(pages)))
@@ -183,7 +183,7 @@ def prayers(lang):
   page=r.get('en_page',r['page']+1) if side else r['page'];raw=r[lang]
   value=raw_xml(key,raw,lang)
   if key not in VERSE_STARTS and key!='grace_verses' and '\n' not in raw:value=marked(URNS[key],value,unit='verse' if key in BIBLICAL or ':bible:' in URNS[key] else 'prayer-part')
-  poem=key in ('mi_adir','devai_haser')
+  poem=key in ('mi_addir','devai_haser')
   if poem:value=marked(URNS[key],''.join('<tei:l>'+xml(line)+'</tei:l>' for line in raw.splitlines()),unit='stanza')
   value=value.replace('___PARA___','</tei:p><tei:p>')
   body='<tei:p>'+pb(page,sigil=SIGIL)+value+'</tei:p>'
@@ -214,10 +214,10 @@ def units(project):
   head='<tei:head>'+((he,en)[side])+'</tei:head>' if printed else editorial_head(lang,he,en)
   if name in ('grace_harachaman_before','grace_harachaman_after','grace_core','grace_four_blessings'):head=''
   out.append(dict(name=name,urn=urn,title_he=he,title_en=en,pages=(first+side,last+side),body='<tei:div corresp="'+urn+'">'+head+body+'</tei:div>'))
- six=''.join(p(k) for k in ('shehakol_bara','yotzer_haadam','asher_yatzar_haadam','sos_tasis','sameach_tesamach','asher_bara'))
+ six=''.join(p(k) for k in ('shehakol_bara','yotzer_haadam','asher_yatzar_haadam','sos_tasis','sammeach_tesammach','asher_bara'))
  add('seven_wedding_blessings',SEVEN,'שבע ברכות','Seven wedding blessings',753,755,p('marriage_wine')+six,False)
  add('wedding_blessings_after_meal',SEVEN+'/after_meal','שבע ברכות אחרי הסעודה','Wedding blessings after the meal',753,755,six+p('marriage_wine'),False)
- marriage=p('mi_adir')+rubric('rabbi')+p('marriage_wine')+p('erusin')+rubric('ring')+p('ring')
+ marriage=p('mi_addir')+rubric('rabbi')+p('marriage_wine')+p('erusin')+rubric('ring')+p('ring')
  marriage+=opt('seven','With a minyan: '+RUBRICS['seven'],MINYAN,transclude(SEVEN))
  wedding_grace=rubric('leader')+p('devai_haser')+p('wedding_zimmun')+rubric('company_leader')+p('wedding_response')+transclude(GRACE+'/core')
  wedding_grace+=rubric('wedding_grace')+opt('seven_meal','With a minyan:',MINYAN,transclude(SEVEN+'/after_meal'))
@@ -269,7 +269,7 @@ def units(project):
  blessings=rubric('blessings')+''.join(rubric(r['key'])+p(r['key']) for r in ROWS if r['key'].startswith('blessing_'))
  add('various_blessings',BLESSINGS,'בְּרָכוֹת שׁוֹנוֹת','BLESSINGS',773,777,blessings)
  add('bedtime_psalm91',BED+'/psalm91','תהלים צא','PSALM 91',779,779,p('bed_psalm91'))
- body=rubric('bedtime')+p('hamapil')+p('bed_el_melekh')+p('bed_shema')+p('bed_barukh_shem')+p('bed_veahavta')+p('bed_vihi_noam')+transclude(BED+'/psalm91')
+ body=rubric('bedtime')+p('hamappil')+p('bed_el_melekh')+p('bed_shema')+p('bed_barukh_shem')+p('bed_veahavta')+p('bed_vihi_noam')+transclude(BED+'/psalm91')
  body+=p('bed_psalm91_repeat')
  body+=''.join(p(k) for k in ('bed_psalm3','bed_hashkivenu','bed_barukh','bed_yiru','hamalakh','bed_exodus','bed_zechariah','bed_solomon','bed_kohanim','bed_guardian','bed_salvation','bed_angels','bed_psalm128','bed_rigzu'))
  add('bedtime_adon_olam',BED+'/adon_olam','אֲדוֹן עוֹלָם','ADON OLAM',785,785,transclude(POEM+'adon_olam'))

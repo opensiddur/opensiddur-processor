@@ -41,7 +41,7 @@ ANCHORS = {}
 HE_NUMBERS = {20: 'כ', 24: 'כד', 27: 'כז', 48: 'מח', 49: 'מט', 81: 'פא', 82: 'פב', 93: 'צג', 94: 'צד'}
 URNS = {key: (BIBLE + 'psalms/' + key[6:] if key.startswith('psalm_') and key != 'psalm_95_opening'
               else ROOT + '/' + key) for key in PASSAGES}
-URNS['titkabal'] = PRAYER + 'kaddish/titkabal'
+URNS['titqabbal'] = PRAYER + 'kaddish/titqabbal'
 URNS['psalm_95_opening'] = PSALMS + '/wednesday/psalm_95_opening'
 
 
@@ -110,10 +110,10 @@ def prayers(lang, earlier):
             if number != 94:
                 body.append(f'<tei:head xml:lang="{lang}">{title}</tei:head>')
         else:
-            title = {'uva_letzion': ('וּבָא לְצִיּוֹן', 'Uva Letzion'),
+            title = {'uva_letziyyon': ('וּבָא לְצִיּוֹן', 'Uva Letzion'),
                      'aleinu': ('עָלֵֽינוּ', 'Alenu'),
                      'al_tira': ('אַל תִּירָא', 'Be not afraid'),
-                     'titkabal': ('תִּתְקַבֵּל', 'May the prayers be accepted'),
+                     'titqabbal': ('תִּתְקַבֵּל', 'May the prayers be accepted'),
                      'psalm_95_opening': ('לְכוּ נְרַנְּנָה', 'Come, let us sing')}[key][side]
             if key == 'aleinu' and lang == 'en':
                 body.append('<tei:head xml:lang="en">ALENU</tei:head>')
@@ -129,12 +129,12 @@ def prayers(lang, earlier):
 def kaddish(cid, *, full=False, page=None, sigil=SIGIL, note='Mourners’ Kaddish.'):
     parts = [cond(cid, fs=MINYAN, note=note)]
     if full:
-        parts.append(transclude(PRAYER + 'kaddish/yitgadal'))
+        parts.append(transclude(PRAYER + 'kaddish/yitgaddal'))
         if page:
             parts.append(pb(page, sigil=sigil))
-        parts.extend(transclude(PRAYER + 'kaddish/' + key) for key in ('yehe_shmeh', 'yitbarakh'))
-        parts.append(transclude(URNS['titkabal']))
-        parts.extend(transclude(PRAYER + 'kaddish/yatom/' + key) for key in ('yehe_shlama', 'oseh_shalom'))
+        parts.extend(transclude(PRAYER + 'kaddish/' + key) for key in ('yehe_shemeh', 'yitbarakh'))
+        parts.append(transclude(URNS['titqabbal']))
+        parts.extend(transclude(PRAYER + 'kaddish/yatom/' + key) for key in ('yehe_shelama', 'oseh_shalom'))
     else:
         parts.append(transclude(PRAYER + 'kaddish/yatom'))
     parts.append(endcond(cid))
@@ -147,7 +147,7 @@ def unit_body(project):
     parts = [f'<tei:div corresp="{ROOT}">', declaration(), pb(127 + side, sigil=SIGIL),
         transclude(PRAYER + 'ashrei'), pb(131 + side, sigil=SIGIL),
         cond('psalm20', fs=PSALM20_OCCASION, note=PSALM20_RUBRIC),
-        transclude(URNS['psalm_20']), endcond('psalm20'), transclude(URNS['uva_letzion']),
+        transclude(URNS['psalm_20']), endcond('psalm20'), transclude(URNS['uva_letziyyon']),
         instruction(f'Musaf for Rosh Ḥodesh, page {575 + side}; for Ḥol ha-Mo‘ed, page {609 + side}.'),
         kaddish('full_kaddish', full=True, page=135 + side, note='Reader:'),
         transclude(URNS['aleinu']), kaddish('kaddish_after_aleinu', note='MOURNERS’ KADDISH'),
@@ -228,8 +228,8 @@ def full_kaddish(lang):
     """Reusable complete prayer, bound to this edition rather than caller priorities."""
     project = PROJECT_HE if lang == 'he' else PROJECT_EN
     urn = PRAYER+'kaddish/shalem'
-    parts = ('yitgadal', 'yehe_shmeh', 'yitbarakh', 'titkabal',
-             'yatom/yehe_shlama', 'yatom/oseh_shalom')
+    parts = ('yitgaddal', 'yehe_shemeh', 'yitbarakh', 'titqabbal',
+             'yatom/yehe_shelama', 'yatom/oseh_shalom')
     body = f'<tei:div corresp="{urn}">' + instruction('Reader:')
     body += ''.join(transclude(PRAYER+'kaddish/'+part+'@'+project) for part in parts)
     body += '</tei:div>'

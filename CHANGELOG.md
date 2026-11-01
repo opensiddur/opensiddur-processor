@@ -50,6 +50,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **Birnbaum's names are spelled by the table** (#266), with the old URNs recorded as aliases.
+  Qof is `q` (`qodesh`, `yaaqov`, `qabbalat_shabbat`, `pirqei_avot`), khaf `kh`
+  (`shalom_aleikhem`, `lekhah_dodi`), het `ch`, dagesh hazak is doubled (`kullam`, `yitgaddal`,
+  `yishtabbach`), a final heh is written (`pesuqei_dezimrah`), tsere is `e` and tsere + yod `ei`
+  (`magen_avot`, `eloheinu`), and a sounded shva is written (`berit`, `borei_peri`). Famous names
+  follow the table too: only English words (`kaddish`, `kiddush`) are common spellings. The
+  new spellings also rename the same words in the expanded siddur, the Haggadah (`addir_hu`,
+  `barukh_hamaqom`), the opensiddur.org imports and Asher. The table now says when a shva is
+  sounded; after a long vowel it is (`malkhutekha`, `virtzonekha`), after a short one or a qamatz
+  qatan it is not (`lemaankha`, `zokhrenu`).
+  Shabbat Musaf's printing of וּבְדִבְרֵי, whose translation differs from the weekday Kedushah's,
+  has a local address (`siddur:shabbat/musaf/amidah/qedushah/uvdivrei`); the two had been told
+  apart only by their spelling.
 - **Asher's names are spelled by the table** (#266): 317 registered URNs and 160 files (80 in
   each language) in the Asher book, with the old URNs recorded as aliases. Het is `ch` and
   tzadi `tz` where Asher's reading IDs had `h` and `ts`, dagesh hazak is doubled, and tsere +

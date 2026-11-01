@@ -47,7 +47,7 @@ class TestFestival(unittest.TestCase):
                 self.assertNotIn('(', ''.join(fragment(p['body']).xpath('.//tei:seg/text()|.//tei:p/text()',namespaces=NS)))
         # This translation deliberately lacks the Hebrew second b'ahavah.
         texts={p['name']:p['body'] for p in f.prayers('en')}
-        self.assertNotIn('j:conditional',texts['festival_mikra_text'])
+        self.assertNotIn('j:conditional',texts['festival_miqra_text'])
 
     def test_shared_passages_do_not_inherit_weekday_rubrics(self):
         from opensiddur.importer.birnbaum_scan.build import build_he,build_en
