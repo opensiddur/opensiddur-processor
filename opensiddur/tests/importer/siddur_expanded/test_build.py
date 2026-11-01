@@ -41,7 +41,7 @@ class TestExpandedBuild(unittest.TestCase):
             'siddur:shabbat/minchah/torah': ''.join(transclude(TEXT+u) for u in [
                 'siddur:chol/shacharit/torah/asher_bachar',
                 'siddur:shabbat/minchah/torah/vezot_hatorah',
-                'siddur:shabbat/minchah/torah/uvnucho']),
+                'siddur:shabbat/minchah/torah/uvenuchoh']),
             'siddur:chol/shacharit/conclusion': ''.join(transclude(TEXT+u) for u in [
                 'siddur:chol/shacharit/conclusion/ashrei',
                 'siddur:chol/shacharit/conclusion/aleinu',

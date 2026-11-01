@@ -139,7 +139,7 @@ ORDER = [
      "qorbanot/yehi_ratzon_miqdash", (27, 1), None),
     ("s", "qorbanot_tamid", "פָּרָשַׁת הַתָּמִיד", "qorbanot/tamid", [(27, 2), (29, 0)],
      "#: Runs across the page turn at `נֶֽסֶךְ שֵׁכָר לַייָ. | וְאֵת הַכֶּֽבֶשׂ`."),
-    ("p", "qorbanot_ushchat", "וְשָׁחַט אֹתוֹ", "qorbanot/ushchat", (29, 1), None),
+    ("p", "qorbanot_veshachat", "וְשָׁחַט אֹתוֹ", "qorbanot/veshachat", (29, 1), None),
     ("p", "qorbanot_yehi_ratzon_amirah", "יְהִי רָצוֹן שֶׁתְּהֵא אֲמִירָה זוֹ",
      "qorbanot/yehi_ratzon_amirah", (29, 2), None),
     ("p", "qorbanot_atah_hu", "אַתָּה הוּא יְיָ אֱלֹהֵֽינוּ שֶׁהִקְטִֽירוּ",

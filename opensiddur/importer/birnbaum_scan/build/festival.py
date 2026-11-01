@@ -38,7 +38,7 @@ REUSE = {'sefatai': 'urn:x-opensiddur:text:prayer:amidah/adonai_sefatai',
  'qadosh_minchah': 'urn:x-opensiddur:text:prayer:amidah/qedushah/qadosh',
  'leummatam': 'urn:x-opensiddur:text:prayer:amidah/qedushah/leummatam',
  'barukh_minchah': 'urn:x-opensiddur:text:prayer:amidah/qedushah/barukh_kevod',
- 'uvdivrei': 'urn:x-opensiddur:text:prayer:amidah/qedushah/uvdivrei',
+ 'uvedivrei': 'urn:x-opensiddur:text:prayer:amidah/qedushah/uvedivrei',
  'vetechezeinah': 'urn:x-opensiddur:text:prayer:amidah/avodah/vetechezeinah',
  'veal_kullam': 'urn:x-opensiddur:text:prayer:amidah/hodaah/veal_kullam',
  'hatov': 'urn:x-opensiddur:text:prayer:amidah/hodaah/hatov_shimkha',
@@ -136,7 +136,7 @@ def units(project):
     add('candles','הַדְלָקַת נֵר שֶׁל יוֹם טוֹב','LIGHTING THE FESTIVAL LIGHTS',585,585,p('candles')+
         conditional('candles_shehecheyanu','On the first night add:',FIRST_NIGHTS,p('shehecheyanu')),printed=True)
     for service,keys in [('shacharit',('neqaddesh_shacharit','qadosh_shacharit','az','barukh_shacharit','mimeqomekha','yimlokh_shacharit')),
-                         ('minchah',('neqaddesh_minchah','qadosh_minchah','leummatam','barukh_minchah','uvdivrei','yimlokh_minchah'))]:
+                         ('minchah',('neqaddesh_minchah','qadosh_minchah','leummatam','barukh_minchah','uvedivrei','yimlokh_minchah'))]:
         page=587 if service=='shacharit' else 589
         add('amidah/qedushah/'+service,'קדושה',('KEDUSHAH FOR SHAḤARITH' if service=='shacharit' else 'KEDUSHAH FOR MINḤAH'),page,page,
             ''.join(p(k) for k in keys),printed=True,english_head=True)

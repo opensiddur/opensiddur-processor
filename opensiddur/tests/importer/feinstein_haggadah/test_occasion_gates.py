@@ -31,7 +31,7 @@ class TestTheGates(unittest.TestCase):
 
     def test_each_gate_governs_its_section_and_says_nothing_to_the_reader(self):
         for slug, cond_id, child in (("index", "index_seder", "seder"),
-                                     ("pre_seder", "pre_seder_bedikat_chametz", "bedikat_chametz"),
+                                     ("pre_seder", "pre_seder_bediqat_chametz", "bediqat_chametz"),
                                      ("pre_seder", "pre_seder_biur_chametz", "biur_chametz")):
             for lang in ("he", "en"):
                 with self.subTest(cond_id=cond_id, lang=lang):
@@ -69,7 +69,7 @@ class TestTheGatesAgainstTheCalendar(unittest.TestCase):
         ))
 
     def test_leaven_is_searched_for_on_the_night_of_the_fourteenth(self):
-        self._assert("pre_seder_bedikat_chametz", "pre_seder", (
+        self._assert("pre_seder_bediqat_chametz", "pre_seder", (
             # 14 Nisan 5786 is a Wednesday: searched Tuesday night.
             ("the night of the fourteenth", CalendarDay(date=(2026, 3, 31), place=NEW_YORK,
                                                        time=(20, 30)), TRUE),

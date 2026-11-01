@@ -325,7 +325,7 @@ ROWS = [{'key': 'mi_addir',
   'en': 'Remember us this day, Lord our God, for happiness; be mindful of us for blessing; save us to enjoy '
         'life. With a promise of salvation and mercy spare us and be gracious to us; have pity on us and '
         'save us, for we look to thee, for thou art a gracious and merciful God and King.)'},
- {'key': 'uvneh',
+ {'key': 'uveneh',
   'page': 765,
   'en_page': 766,
   'he': 'וּבְנֵה יְרוּשָׁלַֽיִם עִיר הַקֹּֽדֶשׁ בִּמְהֵרָה בְיָמֵֽינוּ. בָּרוּךְ אַתָּה, יְיָ, בּוֹנֶה '

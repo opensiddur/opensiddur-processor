@@ -52,7 +52,7 @@ def shared(lang,prayers):
             PRAYER+'amidah/qedushah/'+part, 'amidah_qedushah_'+part,
             first=(85 if part in ('ledor_vador','hael_haqadosh','hamelekh_haqadosh') else 83)+side,
             last=(85 if part in ('ledor_vador','hael_haqadosh','hamelekh_haqadosh') else 83)+side))
-    for part in ('modim_derabbanan','ukhtov'):
+    for part in ('modim_derabbanan','ukhetov'):
         page=91 if part=='modim_derabbanan' else 93
         result.append(detach_division(by_name['amidah_hodaah'],
             PRAYER+'amidah/hodaah/'+part, 'amidah_hodaah_'+part,first=page+side,last=page+side))
@@ -101,7 +101,7 @@ def amidah(lang,by_name):
     text+=transclude(PRAYER+'amidah/hodaah/modim')
     text+=conditional('chanukah','On Ḥanukkah add:',holiday('hanukkah',8),transclude(PRAYER+'al_hanissim/chanukah'))
     text+=transclude(PRAYER+'amidah/hodaah/veal_kullam')
-    text+=conditional('ukhtov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,transclude(PRAYER+'amidah/hodaah/ukhtov'))
+    text+=conditional('ukhetov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,transclude(PRAYER+'amidah/hodaah/ukhetov'))
     text+=transclude(PRAYER+'amidah/hodaah/hatov_shimkha')
     text+=conditional('kohanim','During the Reader’s repetition:',READER,transclude(PRAYER+'amidah/birkat_kohanim'))
     text+=transclude(PRAYER+'amidah/shalom')

@@ -97,7 +97,7 @@ declarations:
     present-not-eaten: false
   # Textual variants are selected by URN; see the URN section of schema/JLPTEI-3.md.
   opensiddur:variant:
-    urn:x-opensiddur:condition:haggadah:magid/lefikach/shira_chadasha: true
+    urn:x-opensiddur:condition:haggadah:maggid/lefikhakh/shirah_chadashah: true
   # Rite, for passages that differ by custom (most often the haftarah). Each rite is its own
   # binary, so several may be true at once and every selected variant is kept. Omitting this
   # group entirely leaves rite undefined, which keeps *all* variants along with the headings

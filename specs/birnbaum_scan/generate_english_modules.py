@@ -201,7 +201,7 @@ K.append(block("qorbanot_yehi_ratzon_miqdash", "May it be thy will, to have merc
                "qorbanot/yehi_ratzon_miqdash", 28, 28, [(28, 1)]))
 K.append(block("qorbanot_tamid", "The daily offering", "qorbanot/tamid", 28, 30,
                [(28, 2), (30, 0)]))
-K.append(block("qorbanot_ushchat", "He shall slaughter it", "qorbanot/ushchat", 30, 30,
+K.append(block("qorbanot_veshachat", "He shall slaughter it", "qorbanot/veshachat", 30, 30,
                [(30, 1)]))
 K.append(block("qorbanot_yehi_ratzon_amirah", "May it be thy will, that this recital",
                "qorbanot/yehi_ratzon_amirah", 30, 30, [(30, 2)]))

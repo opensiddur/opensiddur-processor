@@ -7,7 +7,7 @@ Open Siddur JLPTEI corpus. It supplements [JLPTEI-3.md](../schema/JLPTEI-3.md).
 
 | Content | URN prefix | Example |
 |---------|------------|---------|
-| Haggadah-specific sections | `urn:x-opensiddur:text:haggadah:` | `…/magid/ha_lachma_anya` |
+| Haggadah-specific sections | `urn:x-opensiddur:text:haggadah:` | `…/maggid/ha_lachma_anya` |
 | Shared liturgy (kiddush, birkat hamazon, etc.) | `urn:x-opensiddur:text:prayer:` | `…/kiddush/…` |
 | Biblical quotations | `urn:x-opensiddur:text:bible:` | `…/genesis/1/31` |
 
@@ -29,18 +29,18 @@ Index/outline files use the index slug as the final path component:
 ```
 urn:x-opensiddur:text:haggadah:pre_seder
 urn:x-opensiddur:text:haggadah:seder
-urn:x-opensiddur:text:haggadah:magid
+urn:x-opensiddur:text:haggadah:maggid
 ```
 
 Leaf section files use the section slug:
 
 ```
-urn:x-opensiddur:text:haggadah:bedikat_chametz
-urn:x-opensiddur:text:haggadah:magid/ha_lachma_anya
+urn:x-opensiddur:text:haggadah:bediqat_chametz
+urn:x-opensiddur:text:haggadah:maggid/ha_lachma_anya
 urn:x-opensiddur:text:haggadah:nirtzah/chasal_siddur_pesach
 ```
 
-Nested magid and nirtzah subsections use a two-level path under `haggadah:`.
+Nested maggid and nirtzah subsections use a two-level path under `haggadah:`.
 
 ### Sub-paragraph markers
 
@@ -49,13 +49,13 @@ Within a section file, each body paragraph is marked with a `tei:milestone` whos
 biblical texts:
 
 ```
-urn:x-opensiddur:text:haggadah:kadesh/1
-urn:x-opensiddur:text:haggadah:kadesh/2
-urn:x-opensiddur:text:haggadah:magid/ha_lachma_anya/1
+urn:x-opensiddur:text:haggadah:qaddesh/1
+urn:x-opensiddur:text:haggadah:qaddesh/2
+urn:x-opensiddur:text:haggadah:maggid/ha_lachma_anya/1
 ```
 
 ```xml
-<tei:milestone unit="paragraph" n="1" corresp="urn:x-opensiddur:text:haggadah:kadesh/1"/>
+<tei:milestone unit="paragraph" n="1" corresp="urn:x-opensiddur:text:haggadah:qaddesh/1"/>
 <tei:p>…</tei:p>
 ```
 
@@ -65,13 +65,13 @@ number is a poor key across editions, though, since the count is each edition's 
 URN only where it divides the passage the same way, and prefers a named subdivision where the
 passage has a name.
 
-Index files (such as `magid.xml` or `nirtzah.xml`) may contain `tei:head` and body
+Index files (such as `maggid.xml` or `nirtzah.xml`) may contain `tei:head` and body
 content for the section title and any text that belongs to the index division itself,
 followed by `j:transclude` elements for child sections.
 
 ## Prayer namespace (shared liturgy)
 
-Sections that are not haggadah-specific—such as kiddush in `kadesh.xml` or birkat
+Sections that are not haggadah-specific—such as kiddush in `qaddesh.xml` or birkat
 hamazon in `barech.xml`—use the existing `prayer` namespace per JLPTEI-3 transliteration
 rules. The containing file remains a `haggadah:` URN on its root `tei:div`; inner
 `tei:div` or `tei:milestone` elements carry `prayer:` URNs where appropriate.

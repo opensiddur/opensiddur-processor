@@ -38,7 +38,7 @@ RANGES = {'torah_vayehi_binsoa':(363,363),'torah_berikh_shemeh':(365,365),
  'torah_av_harachamim':(367,367),'torah_veattem':(369,369),
  'torah_barekhu':(369,369),'torah_asher_bachar':(369,369),'torah_asher_natan':(369,369),
  'torah_hagomel':(369,369),'torah_vezot_hatorah':(373,373),
- 'torah_yehalelu':(387,387),'torah_psalm24':(387,389),'torah_uvnucho':(389,389),
+ 'torah_yehalelu':(387,387),'torah_psalm24':(387,389),'torah_uvenuchoh':(389,389),
  'qabbalat_psalm_29':(387,387),'ashrei':(383,387)}
 
 
@@ -161,7 +161,7 @@ def units(project,by_name):
     returning=instruction('The Reader takes the Torah and recites:')+old('yehalelu')
     returning+=conditional('psalm29','On Sabbaths:',SHABBAT,transclude(BIBLE+'psalms/29'))
     returning+=conditional('psalm24','On festivals occurring on weekdays:',WEEKDAY_FESTIVAL,f'<tei:div corresp="{ROOT}/return/psalm24">'+old('psalm24')+'</tei:div>')
-    returning+=instruction('While the Torah is being placed in the ark:')+local('return/uvnucho',old('uvnucho'))
+    returning+=instruction('While the Torah is being placed in the ark:')+local('return/uvenuchoh',old('uvenuchoh'))
     add('return','הכנסת ספר תורה','Returning the Torah',387,389,conditional('public_return','When a minyan holds service:',MINYAN,returning))
     add('service','קריאת התורה','READING OF THE TORAH',361,389,''.join(transclude(ROOT+'/'+key) for key in ('opening','reading','haftarah','yequm_purqan','government','month','memorial','ashrei','return')),urn=ROOT)
     add('kaddish','חצי קדיש','Half Kaddish',389,389,conditional('final_kaddish','Reader, when a minyan holds service:',MINYAN,transclude(PRAYER+'kaddish/chatzi')),urn=KADDISH)

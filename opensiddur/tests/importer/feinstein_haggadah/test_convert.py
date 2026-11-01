@@ -127,17 +127,17 @@ class TestConvertProducesValidJlptei(unittest.TestCase):
         ]
         self.assertEqual(holders, ["index.xml"])
 
-        kadesh = (project_dir / "kadesh.xml").read_text(encoding="utf-8")
+        qaddesh = (project_dir / "qaddesh.xml").read_text(encoding="utf-8")
         self.assertIn(
             f'<tei:ptr target="/{HE_PROJECT}/index#project_source_bibl"/>',
-            kadesh,
+            qaddesh,
         )
         # The pointer replaces the bibliography; it does not sit alongside a copy of it.
-        self.assertNotIn("HebrewBooks.org #4909", kadesh)
-        self.assertNotIn("Differences from the 1822 Heidenheim original", kadesh)
+        self.assertNotIn("HebrewBooks.org #4909", qaddesh)
+        self.assertNotIn("Differences from the 1822 Heidenheim original", qaddesh)
         # Responsibility and licence stay on every document — only sourceDesc collapses.
-        self.assertIn("<tei:respStmt>", kadesh)
-        self.assertIn("<tei:licence", kadesh)
+        self.assertIn("<tei:respStmt>", qaddesh)
+        self.assertIn("<tei:licence", qaddesh)
 
     def _assert_psalms_follow_the_1822_print(self, project_dir: Path) -> None:
         """The psalms the print carries reach the project as transcribed, not as WLC."""
@@ -194,9 +194,9 @@ class TestDocumentHeaders(unittest.TestCase):
     def test_document_header_replaces_the_bibliography_with_a_pointer(self) -> None:
         header = document_header(
             PROJECT_HEADER,
-            "kadesh",
+            "qaddesh",
             project_id="p",
-            ranges={"kadesh": ("3v", "4r")},
+            ranges={"qaddesh": ("3v", "4r")},
             scripture={},
         )
         self.assertIn(
@@ -216,7 +216,7 @@ class TestDocumentHeaders(unittest.TestCase):
         """A project with no page breaks — the 2009 translation — has no ranges at all, but
         still names the specific bibl entry, just without a page scope."""
         header = document_header(
-            PROJECT_HEADER, "kadesh", project_id="p", ranges={}, scripture={}
+            PROJECT_HEADER, "qaddesh", project_id="p", ranges={}, scripture={}
         )
         self.assertIn('<tei:ptr target="/p/index#project_source_bibl"/>', header)
         self.assertNotIn("biblScope", header)
@@ -240,11 +240,11 @@ class TestDocumentHeaders(unittest.TestCase):
         """Sub-indices (pre_seder, seder, magid…) get a header of their own rather than a
         copy of the project's, and cite the bibliography the same way a leaf does."""
         header = minimal_index_header(
-            "Magid", project_id="p", urn_suffix="magid", from_page="5r", to_page="9v"
+            "Magid", project_id="p", urn_suffix="maggid", from_page="5r", to_page="9v"
         )
         self.assertIn('<tei:title type="main" xml:lang="he">Magid</tei:title>', header)
         self.assertIn(
-            '<tei:idno type="urn">urn:x-opensiddur:text:haggadah:magid@p</tei:idno>', header
+            '<tei:idno type="urn">urn:x-opensiddur:text:haggadah:maggid@p</tei:idno>', header
         )
         self.assertIn('<tei:biblScope unit="pages" from="5r" to="9v"/>', header)
         self.assertNotIn('xml:id="project_source_bibl"', header)

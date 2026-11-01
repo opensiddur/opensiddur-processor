@@ -87,7 +87,7 @@ class ParseUrnTestCase(unittest.TestCase):
         self.assertTrue(parse_urn("urn:x-opensiddur:text:mishnah:x/2").governed)
         self.assertTrue(parse_urn("urn:x-opensiddur:instruction:role/reader").governed)
         self.assertFalse(parse_urn("urn:x-opensiddur:text:bible:psalms/1").governed)
-        self.assertFalse(parse_urn("urn:x-opensiddur:text:haggadah:magid").governed)
+        self.assertFalse(parse_urn("urn:x-opensiddur:text:haggadah:maggid").governed)
 
     def test_numeric_tails_are_dropped(self):
         # A trailing number is an edition's own division, not a canonical name.

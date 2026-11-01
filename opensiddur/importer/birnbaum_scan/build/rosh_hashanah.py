@@ -45,7 +45,7 @@ SOURCES = {'ki_shem':BIBLE+'deuteronomy/32/3','adonai_sefatai':BIBLE+'psalms/51/
  'mekhalkel':PRAYER+'amidah/gevurot/mekhalkel_chayyim','mi_khamokha':PRAYER+'amidah/gevurot/mi_khamokha',
  'neeman':PRAYER+'amidah/gevurot/mechayyeh_hametim','neqaddesh':PRAYER+'amidah/qedushah/neqaddesh',
  'qadosh':BIBLE+'isaiah/6/3','barukh':BIBLE+'ezekiel/3/12','yimlokh':BIBLE+'psalms/146/10',
- 'leummatam':PRAYER+'amidah/qedushah/leummatam','uvdivrei':PRAYER+'amidah/qedushah/uvdivrei',
+ 'leummatam':PRAYER+'amidah/qedushah/leummatam','uvedivrei':PRAYER+'amidah/qedushah/uvedivrei',
  'ledor_vador':PRAYER+'amidah/qedushah/ledor_vador','attah_qadosh':PRAYER+'amidah/qedushat_hashem',
  'attah_vechartanu':PRAYER+'amidah/attah_vechartanu_mikol','vattodienu':PRAYER+'amidah/vattodienu',
  'yaaleh_veyavo':PRAYER+'yaaleh_veyavo','retzeh':PRAYER+'amidah/avodah/retzeh',
@@ -127,7 +127,7 @@ def units(project):
         add('rh_'+name,AMIDAH+'/'+name,he,en,first,last,''.join(p(k) for k in keys))
     group('avot','אבות','Patriarchs',655,655,['avot','zokhrenu','melekh_ozer'])
     group('gevurot','גבורות','Divine power',655,655,['gevurot_start','mekhalkel','mi_khamokha','neeman'])
-    kedushah=''.join(p(k) for k in ('neqaddesh','qadosh','leummatam','barukh','uvdivrei','yimlokh'))+instruction('Reader:')+p('ledor_vador')
+    kedushah=''.join(p(k) for k in ('neqaddesh','qadosh','leummatam','barukh','uvedivrei','yimlokh'))+instruction('Reader:')+p('ledor_vador')
     add('rh_qedushah',AMIDAH+'/qedushah','קדושה','Kedushah',655,657,kedushah)
     body=c('qedushah',RUBRICS['qedushah_rubric'],READER,transclude(AMIDAH+'/qedushah'))
     body+=''.join(p(k) for k in ('attah_qadosh','uvekhen_pachdekha','uvekhen_kavod','uvekhen_tzaddiqim','vetimlokh','qadosh_ata'))
@@ -136,7 +136,7 @@ def units(project):
     body+=''.join(p(k) for k in ('vattitten_lanu','yaaleh_veyavo','melokh','kadsheinu'))
     add('rh_qedushat_hayom',AMIDAH+'/qedushat_hayom','קדושת היום','Sanctification of the day',659,661,body)
     group('avodah','עבודה','Temple service',661,661,['retzeh','vetechezeinah'])
-    body=p('modim')+c('modim_derabbanan',RUBRICS['modim_derabbanan_rubric'],READER,p('modim_derabbanan'))+''.join(p(k) for k in ('veal_kullam','ukhtov','vekhol_hachayyim'))
+    body=p('modim')+c('modim_derabbanan',RUBRICS['modim_derabbanan_rubric'],READER,p('modim_derabbanan'))+''.join(p(k) for k in ('veal_kullam','ukhetov','vekhol_hachayyim'))
     add('rh_hodaah',AMIDAH+'/hodaah','הודאה','Thanksgiving',663,663,body)
     group('shalom','שלום','Peace',663,663,['shalom_rav','besefer'])
     body=instruction(RUBRICS['amidah_rubric'])+c('ki_shem','At Minḥah:',MINCHAH,p('ki_shem'))+p('adonai_sefatai')

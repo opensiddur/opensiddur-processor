@@ -122,7 +122,7 @@ def amidah(lang,by_name):
     text+=transclude(PRAYER+'amidah/hodaah/modim')
     text+=conditional('chanukah','On Ḥanukkah add:',holiday('hanukkah',8),transclude(PRAYER+'al_hanissim/chanukah'))
     text+=transclude(PRAYER+'amidah/hodaah/veal_kullam')
-    text+=conditional('ukhtov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,transclude(PRAYER+'amidah/hodaah/ukhtov'))
+    text+=conditional('ukhetov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,transclude(PRAYER+'amidah/hodaah/ukhetov'))
     # The printed English here says “O God” where the shared weekday text says
     # “O Lord”. Local realization in both languages keeps parallel alignment.
     target=PRAYER+'amidah/hodaah/hatov_shimkha'

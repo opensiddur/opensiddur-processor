@@ -50,7 +50,7 @@ def _strip_conditions(xml: str) -> str:
     return xml
 
 
-def _section(*paragraphs: str, lang: str = "he", slug: str = "kadesh") -> SectionContent:
+def _section(*paragraphs: str, lang: str = "he", slug: str = "qaddesh") -> SectionContent:
     """A section of plain numbered paragraphs, with nothing else in it."""
     field = "hebrew" if lang == "he" else "english"
     return SectionContent(
@@ -105,7 +105,7 @@ class TestConditionTable(unittest.TestCase):
     @staticmethod
     def _validates(condition: str) -> bool:
         body = f"""<tei:body>
-          <tei:div corresp="urn:x-opensiddur:text:haggadah:kadesh">
+          <tei:div corresp="urn:x-opensiddur:text:haggadah:qaddesh">
             <j:conditional xml:id="cond_test">{condition}</j:conditional>
             <tei:p>text</tei:p>
             <j:endConditional target="#cond_test"/>
@@ -115,9 +115,9 @@ class TestConditionTable(unittest.TestCase):
             '<tei:teiHeader xmlns:tei="http://www.tei-c.org/ns/1.0"><tei:fileDesc>'
             '<tei:titleStmt><tei:title type="main">t</tei:title></tei:titleStmt>'
             "<tei:publicationStmt><tei:distributor>d</tei:distributor>"
-            '<tei:idno type="urn">urn:x-opensiddur:text:haggadah:kadesh@p</tei:idno>'
+            '<tei:idno type="urn">urn:x-opensiddur:text:haggadah:qaddesh@p</tei:idno>'
             "</tei:publicationStmt><tei:sourceDesc><tei:bibl>"
-            '<tei:ptr target="urn:x-opensiddur:text:haggadah:kadesh@p"/>'
+            '<tei:ptr target="urn:x-opensiddur:text:haggadah:qaddesh@p"/>'
             "</tei:bibl></tei:sourceDesc></tei:fileDesc></tei:teiHeader>"
         )
         is_valid, _ = validate(tei_document(header, body, lang="he"))
@@ -127,27 +127,27 @@ class TestConditionTable(unittest.TestCase):
 class TestVariantUrns(unittest.TestCase):
     def test_variant_urn_mirrors_the_text_urn(self):
         self.assertEqual(
-            variant_urn("lefikach", "shira_chadasha"),
-            urn_for_section("lefikach").replace(
+            variant_urn("lefikhakh", "shirah_chadashah"),
+            urn_for_section("lefikhakh").replace(
                 "urn:x-opensiddur:text:", "urn:x-opensiddur:condition:"
             )
-            + "/shira_chadasha",
+            + "/shirah_chadashah",
         )
 
     def test_variant_urn_carries_no_project(self):
         """A variant belongs to the text, not to the edition that prints it."""
-        self.assertNotIn("@", variant_urn("korech", "pesach"))
+        self.assertNotIn("@", variant_urn("korekh", "pesach"))
 
 
 class TestRubricConditions(unittest.TestCase):
     def test_unknown_rubric_raises(self):
         with self.assertRaises(ConditionalError) as caught:
-            condition_for_rubric("on Tuesdays say:", "kadesh")
+            condition_for_rubric("on Tuesdays say:", "qaddesh")
         self.assertIn("RUBRIC_CONDITIONS", str(caught.exception))
 
     def test_variant_rubric_without_a_section_entry_raises(self):
         with self.assertRaises(ConditionalError) as caught:
-            condition_for_rubric("some add:", "kadesh")
+            condition_for_rubric("some add:", "qaddesh")
         self.assertIn("VARIANT_RUBRIC_SECTIONS", str(caught.exception))
 
     def test_variant_rubric_sections_resolve(self):
@@ -172,35 +172,35 @@ class TestEmission(unittest.TestCase):
 
     def test_inline_scope_replaces_the_brackets(self):
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל"),
         )
-        body = self._render("kadesh", _section("אָלֶף (בֵּית) גִּימֶל"), entry)
+        body = self._render("qaddesh", _section("אָלֶף (בֵּית) גִּימֶל"), entry)
         self.assertIn("[inline[בֵּית]inline]", body)
         self.assertNotIn("(בֵּית)", body)
 
     def test_inline_scope_keeps_the_text_around_it(self):
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל"),
         )
-        body = self._render("kadesh", _section("אָלֶף (בֵּית) גִּימֶל"), entry)
+        body = self._render("qaddesh", _section("אָלֶף (בֵּית) גִּימֶל"), entry)
         self.assertIn("אָלֶף", body)
         self.assertIn("גִּימֶל", body)
 
     def test_unbracketed_inline_scope_keeps_the_words_it_wraps(self):
         """Where the source never bracketed the run, no character may be swallowed."""
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל", bracketed=False),
         )
-        body = self._render("kadesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
+        body = self._render("qaddesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
         self.assertIn("[inline[בֵּית", body)
         # A bracketed scope eats the bracket on each side; with no brackets to eat, every
         # letter of the paragraph must survive.
@@ -211,69 +211,69 @@ class TestEmission(unittest.TestCase):
         """The markers stand for the source's brackets, so an edition that cannot decide the
         condition prints them as the source did."""
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל"),
         )
-        body = self._raw("kadesh", _section("אָלֶף (בֵּית) גִּימֶל"), entry)
+        body = self._raw("qaddesh", _section("אָלֶף (בֵּית) גִּימֶל"), entry)
         self.assertIn('<j:conditional xml:id="cond_inline" type="marked">', body)
 
     def test_an_unbracketed_scope_is_not_marked(self):
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל", bracketed=False),
         )
-        body = self._raw("kadesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
+        body = self._raw("qaddesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
         self.assertIn('<j:conditional xml:id="cond_inline">', body)
 
     def test_a_lost_marking_is_restored_without_swallowing_anything(self):
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל", bracketed=False, marked=True),
         )
-        body = self._raw("kadesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
+        body = self._raw("qaddesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
         self.assertIn('<j:conditional xml:id="cond_inline" type="marked">', body)
         self.assertEqual(_strip_conditions(body).count("בֵּית"), 1)
         self.assertIn("גִּימֶל", body)
 
     def test_a_bracketed_paragraph_scope_is_marked(self):
         entry = Conditional(
-            slug="kadesh", cond_id="para", condition="shabbat",
+            slug="qaddesh", cond_id="para", condition="shabbat",
             scope_he=Paragraphs(1, bracketed=True),
         )
-        body = self._raw("kadesh", _section("(אָלֶף)", "בֵּית"), entry)
+        body = self._raw("qaddesh", _section("(אָלֶף)", "בֵּית"), entry)
         self.assertIn('<j:conditional xml:id="cond_para" type="marked">', body)
 
     def test_a_transcluded_section_is_never_marked(self):
         entry = Conditional(
             slug="nirtzah", cond_id="child", condition="first_night",
-            scope_he=Transclusion("it_happened_at_midnight"),
+            scope_he=Transclusion("vayehi_bachatzi_halailah"),
         )
-        body = self._raw("nirtzah", None, entry, child_slugs=["it_happened_at_midnight"])
+        body = self._raw("nirtzah", None, entry, child_slugs=["vayehi_bachatzi_halailah"])
         self.assertIn('<j:conditional xml:id="cond_child">', body)
 
     def test_an_unbracketed_scope_closes_on_its_last_word(self):
         """The closer goes before the space after the scope, not after it, so that a bracket
         printed for it hugs the words it closes."""
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="inline",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל", bracketed=False),
         )
-        body = self._render("kadesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
+        body = self._render("qaddesh", _section("אָלֶף בֵּית גִּימֶל"), entry)
         self.assertIn("[inline[בֵּית]inline] גִּימֶל", body)
 
     def test_paragraph_scope_brackets_whole_paragraphs(self):
         entry = Conditional(
-            slug="kadesh", cond_id="para", condition="shabbat", scope_he=Paragraphs(1)
+            slug="qaddesh", cond_id="para", condition="shabbat", scope_he=Paragraphs(1)
         )
-        body = self._render("kadesh", _section("אָלֶף", "בֵּית", "גִּימֶל"), entry)
+        body = self._render("qaddesh", _section("אָלֶף", "בֵּית", "גִּימֶל"), entry)
         between = body[body.index("[para["):body.index("]para]")]
         self.assertIn('unit="paragraph" n="1"', between)
         self.assertNotIn('unit="paragraph" n="2"', between)
@@ -295,41 +295,41 @@ class TestEmission(unittest.TestCase):
             slug="nirtzah",
             cond_id="child",
             condition="first_night",
-            scope_he=Transclusion("it_happened_at_midnight"),
+            scope_he=Transclusion("vayehi_bachatzi_halailah"),
         )
         body = self._render(
             "nirtzah",
             None,
             entry,
-            child_slugs=["it_happened_at_midnight", "ki_lo_na_eh"],
+            child_slugs=["vayehi_bachatzi_halailah", "ki_lo_naeh"],
         )
         between = body[body.index("[child["):body.index("]child]")]
-        self.assertIn("it_happened_at_midnight", between)
-        self.assertNotIn("ki_lo_na_eh", between)
+        self.assertIn("vayehi_bachatzi_halailah", between)
+        self.assertNotIn("ki_lo_naeh", between)
 
     def test_a_rubric_sits_inside_the_scope(self):
         """JLPTEI-3.md: a conditional-reading instruction goes inside the text it controls."""
         entry = Conditional(
-            slug="kadesh",
+            slug="qaddesh",
             cond_id="para",
             condition="shabbat",
             scope_he=Paragraphs(1),
             rubric_he="בשבת מתחילין כאן",
         )
-        body = self._render("kadesh", _section("אָלֶף", "בֵּית"), entry)
+        body = self._render("qaddesh", _section("אָלֶף", "בֵּית"), entry)
         between = body[body.index("[para["):body.index("]para]")]
         self.assertIn('<tei:note type="instruction">בשבת מתחילין כאן</tei:note>', between)
 
     def test_a_scope_the_source_parenthesises_with_its_rubric_is_marked(self):
         """The English sets a Shabbat insertion as "(on Shabbat say: ...)": the parentheses
         set the passage off, and the rubric sits inside the scope."""
-        entry = Conditional(slug="kadesh", cond_id="src", condition="shabbat")
-        section = SectionContent(slug="kadesh", blocks=[
+        entry = Conditional(slug="qaddesh", cond_id="src", condition="shabbat")
+        section = SectionContent(slug="qaddesh", blocks=[
             TextBlock(kind="instruction", english="on Shabbat say:", starts_paragraph=True,
                       governs=True),
             TextBlock(kind="paragraph", english="Sabbaths for rest and", governed=True),
         ])
-        body = self._raw("kadesh", section, entry, lang="en")
+        body = self._raw("qaddesh", section, entry, lang="en")
         self.assertIn('<j:conditional xml:id="cond_src" type="marked">', body)
         self.assertRegex(body, r'</j:conditional>\s*<tei:note type="instruction">on Shabbat say:')
 
@@ -358,7 +358,7 @@ class TestEmission(unittest.TestCase):
         cases = {
             "paragraphs": (
                 Conditional(
-                    slug="kadesh",
+                    slug="qaddesh",
                     cond_id="p",
                     condition="shabbat",
                     scope_he=Paragraphs(1),
@@ -368,7 +368,7 @@ class TestEmission(unittest.TestCase):
             ),
             "inline": (
                 Conditional(
-                    slug="kadesh",
+                    slug="qaddesh",
                     cond_id="i",
                     condition="shabbat",
                     scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל"),
@@ -378,7 +378,7 @@ class TestEmission(unittest.TestCase):
             ),
             "transclusion": (
                 Conditional(
-                    slug="kadesh",
+                    slug="qaddesh",
                     cond_id="t",
                     condition="shabbat",
                     scope_he=Transclusion("karpas"),
@@ -395,7 +395,7 @@ class TestEmission(unittest.TestCase):
                                        lang=lang)
                     with _entries(entry):
                         body = section_body(
-                            "kadesh", section, lang=lang, **kwargs
+                            "qaddesh", section, lang=lang, **kwargs
                         )
                     opened = re.findall(r'<j:conditional xml:id="cond_([^"]+)"', body)
                     closed = re.findall(r'<j:endConditional target="#cond_([^"]+)"', body)
@@ -457,16 +457,16 @@ class TestUnmatchedAnchor(unittest.TestCase):
     def test_an_unmatched_anchor_raises(self):
         """A source rewording must fail the conversion, not go quiet."""
         entry = Conditional(
-            slug="lefikach",
-            cond_id="lefikach_shira_chadasha",
+            slug="lefikhakh",
+            cond_id="lefikhakh_shirah_chadashah",
             condition="shabbat",
             scope_he=Inline("אָלֶף", "בֵּית", "בֵּית", "גִּימֶל"),
         )
-        section = _section("אין כאן שום דבר", slug="lefikach")
+        section = _section("אין כאן שום דבר", slug="lefikhakh")
         with _entries(entry):
             with self.assertRaises(Exception) as caught:
-                section_body("lefikach", section, lang="he")
-        self.assertIn("lefikach_shira_chadasha", str(caught.exception))
+                section_body("lefikhakh", section, lang="he")
+        self.assertIn("lefikhakh_shirah_chadashah", str(caught.exception))
 
 
 class TestAgainstTheSource(unittest.TestCase):

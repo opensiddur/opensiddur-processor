@@ -112,13 +112,21 @@ variants:
   bechol: bekhol
   bekoach: bekhoach
   birchot: birkhot
+  chacham: chakham
   kohanecha: kohanekha
+  korech: korekh
+  lefikach: lefikhakh
   lehachniso: lehakhniso
   melech: melekh
+  orech: orekh
+  yachol: yakhol
   zochreinu: zokhrenu
   # Qof is q, not k
   akdamut: aqdamut
   akedah: aqedah
+  akiva: aqiva
+  bedikat: bediqat
+  chazaka: chazaqah
   hadlakat: hadlaqat
   hakafot: haqqafot
   haketoret: haqetoret
@@ -126,6 +134,7 @@ variants:
   hamakom: hamaqom
   kabbalat: qabbalat
   kadosh: qadosh
+  kasha: qashah
   kaveh: qavveh
   kedem: qedem
   kedoshekha: qedoshekha
@@ -164,7 +173,8 @@ variants:
   titkabal: titqabbal
   tzidduk: tzidduq
   tzidkatkha: tzidqatekha
-  uvmakhalot: uvmaqhalot
+  uvmakhalot: uvemaqhalot
+  vanitzak: vannitzaq
   vekara: veqara
   venikketi: veniqqeiti
   yaakov: yaaqov
@@ -184,6 +194,7 @@ variants:
   matsoq: matzoq
   meerets: meeretz
   mitratseh: mitratzeh
+  mitsraymah: mitzraimah
   mitsvah: mitzvah
   netsurah: netzurah
   omets: ometz
@@ -255,6 +266,7 @@ variants:
   leumatam: leummatam
   limed: limmed
   magenni: maginni
+  magid: maggid
   makot: makkot
   matir: mattir
   mechayeh: mechayyeh
@@ -301,9 +313,14 @@ variants:
   vaamitkha: vaamittekha
   vatiten: vattitten
   vatodienu: vattodienu
+  vayagar: vayyagor
+  vayar: vayyar
   vayarem: vayyarem
   vayechezu: vayyechezu
+  vayered: vayyered
+  vayishma: vayyishma
   vayosha: vayyosha
+  vayotzieinu: vayyotzienu
   veatah: veattah
   veatem: veattem
   vechadesh: vechaddesh
@@ -341,12 +358,13 @@ variants:
   malkaynu: malkenu
   nachaym: nachem
   retzay: retzeh
-  uvdivrey: uvdivrei
+  uvdivrey: uvedivrei
   vehasiaynu: vehassienu
   veniskehem: veniskeihem
   vetechezenah: vetechezeinah
   vetehezena: vetechezeinah
   vimnuchataynu: vimnuchatenu
+  yossi: yosei
   # A shva is sounded at a word's start and after a long vowel (malkhutekha), not after a
   # short one (lemaankha)
   ahavatkha: ahavatekha
@@ -354,6 +372,7 @@ variants:
   bri: beri
   brit: berit
   btaatzumot: betaatzumot
+  hagalili: hagelili
   lemaanekha: lemaankha
   lishuatkha: lishuatekha
   malkhutkha: malkhutekha
@@ -361,11 +380,17 @@ variants:
   naaritzkha: naaritzekha
   pri: peri
   qinatkha: qinatekha
+  sheamda: sheamedah
   shlama: shelama
   shmeh: shemeh
   shofteinu: shofeteinu
+  ukhtov: ukhetov
   umechokhmatkha: umechokhmatekha
+  uvdivrei: uvedivrei
   uvishuatkha: uvishuatekha
+  uvmaqhalot: uvemaqhalot
+  uvneh: uveneh
+  uvnucho: uvenuchoh
   vemalkhutkha: vemalkhutekha
   virtzonkha: virtzonekha
   yotzrekh: yotzerekh
@@ -377,14 +402,19 @@ variants:
   menucha: menuchah
   morasha: morashah
   moshe: mosheh
+  netuya: netuyah
   retze: retzeh
   shuva: shuvah
   vehaya: vehayah
   vesimcha: vesimchah
   yehuda: yehudah
   # Other
+  azariah: azaryah
   haeil: hael
+  meros: merosh
   neessar: neesar
+  rashaa: rasha
   roshei: rashei
+  ushchat: veshachat
   vehasqat: vehasket
   vetein: veten

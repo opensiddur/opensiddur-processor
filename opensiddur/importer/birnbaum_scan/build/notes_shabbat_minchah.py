@@ -39,5 +39,5 @@ NOTES += [note(ROOT+'/vaani_tefillati','Psalm 69:14.',kind='citation',n='1'),
 NOTES += [
  note(ROOT+'/torah/vezot_hatorah','Deuteronomy 4:44; Numbers 9:23.',kind='citation',n='1'),
  note(ROOT+'/torah/vezot_hatorah/adonai_chafetz','Proverbs 3:18, 17, 16; Isaiah 42:21.',kind='citation',n='2'),
- note(ROOT+'/torah/uvnucho','Numbers 10:36; Psalm 132:8–10; Proverbs 4:2; 3:18, 17; Lamentations 5:21.',kind='citation',n='1'),
+ note(ROOT+'/torah/uvenuchoh','Numbers 10:36; Psalm 132:8–10; Proverbs 4:2; 3:18, 17; Lamentations 5:21.',kind='citation',n='1'),
 ]

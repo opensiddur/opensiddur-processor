@@ -88,7 +88,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:amidah/hodaah/hatov_shimkha", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/hodaah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/hodaah/modim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/hodaah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/hodaah/modim_derabbanan", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/hodaah"}
-{"urn": "urn:x-opensiddur:text:prayer:amidah/hodaah/ukhtov", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/hodaah"}
+{"urn": "urn:x-opensiddur:text:prayer:amidah/hodaah/ukhetov", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/hodaah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/hodaah/veal_kullam", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/hodaah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/horaat_haqraah_lakohanim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah", "label_he": "הוראת הקראה לכהנים"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/horaat_hemshekh_chadashah_lemusaf_shel_rosh_chodesh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah", "label_he": "הוראת המשך חדשה למוסף של ראש חודש"}
@@ -125,7 +125,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:amidah/qedushah/leummatam", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/qedushah/neqaddesh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/qedushah/qadosh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushah"}
-{"urn": "urn:x-opensiddur:text:prayer:amidah/qedushah/uvdivrei", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushah", "label_en": "Amidah — qedushah — uvdivrei"}
+{"urn": "urn:x-opensiddur:text:prayer:amidah/qedushah/uvedivrei", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushah", "label_en": "Amidah — qedushah — uvdivrei"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/qedushah/yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/qedushat_hashem", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah", "kind": "berakhah", "label_en": "Sanctification of the Name"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/qedushat_hashem/attah_qadosh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah/qedushat_hashem"}
@@ -317,7 +317,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/rachem", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/retzeh_vehachalitzenu", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/shir_hamaalot", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
-{"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/uvneh_yerushalayim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
+{"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/uveneh_yerushalayim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/veal_hakol", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/yiru_et_adonai", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
 {"urn": "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:birkat_hamazon"}
@@ -356,7 +356,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:emet_veyatziv/mosheh", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:emet_veyatziv", "label_en": "emet veyatziv / moshe"}
 {"urn": "urn:x-opensiddur:text:prayer:emet_veyatziv/shirah", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:emet_veyatziv", "label_en": "emet veyatziv / shirah"}
 {"urn": "urn:x-opensiddur:text:prayer:emet_veyatziv/tzur_yisrael", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:emet_veyatziv", "label_en": "emet veyatziv / tzur yisrael"}
-{"urn": "urn:x-opensiddur:text:prayer:ha_el_betaatzumot", "status": "canonical"}
+{"urn": "urn:x-opensiddur:text:prayer:hael_betaatzumot", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/psalm_113", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/psalm_114", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
@@ -399,7 +399,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:qorbanot/ribbon_haolamim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "רִבּוֹן הָעוֹלָמִים", "label_en": "Lord of the universe, thou hast commanded us"}
 {"urn": "urn:x-opensiddur:text:prayer:qorbanot/seder_hamaarakhah", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "סֵֽדֶר הַמַּעֲרָכָה", "label_en": "Abbaye's order of the Temple service"}
 {"urn": "urn:x-opensiddur:text:prayer:qorbanot/tamid", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "פָּרָשַׁת הַתָּמִיד", "label_en": "The daily offering"}
-{"urn": "urn:x-opensiddur:text:prayer:qorbanot/ushchat", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "וְשָׁחַט אֹתוֹ", "label_en": "He shall slaughter it on the north side"}
+{"urn": "urn:x-opensiddur:text:prayer:qorbanot/veshachat", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "וְשָׁחַט אֹתוֹ", "label_en": "He shall slaughter it on the north side"}
 {"urn": "urn:x-opensiddur:text:prayer:qorbanot/vearvah", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "וְעָרְבָה לַייָ", "label_en": "The offering of Judah and Jerusalem"}
 {"urn": "urn:x-opensiddur:text:prayer:qorbanot/yehi_ratzon_amirah", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "יְהִי רָצוֹן שֶׁתְּהֵא אֲמִירָה זוֹ", "label_en": "May it be thy will, that this recital be accepted"}
 {"urn": "urn:x-opensiddur:text:prayer:qorbanot/yehi_ratzon_miqdash", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:qorbanot", "label_he": "יְהִי רָצוֹן שֶׁתְּרַחֵם עָלֵֽינוּ", "label_en": "May it be thy will, to have mercy on us"}
@@ -503,7 +503,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:torah_tzivvah/shema_beni", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:torah_tzivvah", "label_he": "שְׁמַע בְּנִי מוּסַר אָבִֽיךָ", "label_en": "Proverbs 1:8"}
 {"urn": "urn:x-opensiddur:text:prayer:torah_tzivvah/torah_tehi", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:torah_tzivvah", "label_he": "תּוֹרָה תְּהִי אֱמוּנָתִי"}
 {"urn": "urn:x-opensiddur:text:prayer:torah_tzivvah/veattem_hadveqim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:torah_tzivvah", "label_he": "וְאַתֶּם הַדְּבֵקִים", "label_en": "Deuteronomy 4:4"}
-{"urn": "urn:x-opensiddur:text:prayer:uvmaqhalot", "status": "canonical"}
+{"urn": "urn:x-opensiddur:text:prayer:uvemaqhalot", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/eloheinu_velohei", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:yaaleh_veyavo"}
 {"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/pesach", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:yaaleh_veyavo"}

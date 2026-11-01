@@ -47,8 +47,8 @@ BIBLICAL_ANCHORS = {
     ('vezot_hatorah', 'vezot'), ('vezot_hatorah', 'etz'),
     ('vezot_hatorah', 'derakheha'), ('vezot_hatorah', 'orekh'),
     ('vezot_hatorah', 'adonai_chafetz'),
-    ('uvnucho', 'uvnucho'), ('uvnucho', 'kumah'), ('uvnucho', 'kohanekha'),
-    ('uvnucho', 'baavur'), ('uvnucho', 'ki_leqach'), ('uvnucho', 'hashivenu'),
+    ('uvenuchoh', 'uvenuchoh'), ('uvenuchoh', 'kumah'), ('uvenuchoh', 'kohanekha'),
+    ('uvenuchoh', 'baavur'), ('uvenuchoh', 'ki_leqach'), ('uvenuchoh', 'hashivenu'),
 }
 
 
@@ -150,6 +150,6 @@ def unit_body(project):
         transclude('yehi_ratzon'), endcond('torah_supplications'),
         instruction('The Reader takes the Torah and says:'), transclude('yehalelu'),
         transclude('psalm24'), instruction('While the Torah is being placed in the ark:'),
-        transclude('uvnucho'), instruction('The ark is closed. The morning service continues.'),
+        transclude('uvenuchoh'), instruction('The ark is closed. The morning service continues.'),
         endcond('torah_reading_day'), '<j:endDeclare target="#unit_service"/>', '</tei:div>']
     return '\n'.join(parts)

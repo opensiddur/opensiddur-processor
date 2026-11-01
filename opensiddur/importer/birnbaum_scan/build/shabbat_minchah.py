@@ -32,14 +32,14 @@ def shared(lang,prayers):
     side=int(lang=='en');result=[dict(p) for p in prayers];by_name={p['name']:p for p in result}
     # The weekday Kedushah owns a weekday gate. Detach the remaining common
     # sentences so Mincha can reuse them without inheriting that gate.
-    for part in ('neqaddesh','leummatam','uvdivrei'):
+    for part in ('neqaddesh','leummatam','uvedivrei'):
         result.append(detach_division(by_name['amidah_qedushah'],PRAYER+'amidah/qedushah/'+part,
             'amidah_qedushah_'+part,first=83+side,last=83+side))
     ranges={'ashrei':(437,439),'conclusion_uva_letziyyon':(439,441),
       'minchah_ki_shem':(449,449),'amidah_adonai_sefatai':(449,449),'amidah_avot':(449,451),
       'amidah_gevurot':(451,451),'amidah_qedushat_hashem':(453,453),'shabbat_arvit_retzeh_text':(453,453),
       'amidah_avodah':(453,455),'yaaleh_veyavo':(453,455),'amidah_hodaah':(455,457),
-      'amidah_hodaah_modim_derabbanan':(455,455),'amidah_hodaah_ukhtov':(457,457),
+      'amidah_hodaah_modim_derabbanan':(455,455),'amidah_hodaah_ukhetov':(457,457),
       'al_hanissim_chanukah':(457,457),'amidah_shalom_rav':(457,457),
       'amidah_shalom_hamevarekh':(457,457),'amidah_shalom_besefer_chayyim':(459,459),
       'amidah_elohai_netzor':(459,459),'amidah_yehi_ratzon':(459,459),
@@ -47,7 +47,7 @@ def shared(lang,prayers):
     for k in ('vayehi_binsoa','berikh_shemeh'):ranges['torah_'+k]=(443,443)
     for k in ('gaddelu','lekha_adonai','av_harachamim','vetiggaleh','veattem','barekhu','asher_bachar'):ranges['torah_'+k]=(445,445)
     for k in ('asher_natan','vezot_hatorah','yehalelu','psalm24'):ranges['torah_'+k]=(447,447)
-    ranges['torah_uvnucho']=(449,449)
+    ranges['torah_uvenuchoh']=(449,449)
     for p in result:
         if p['name'] in ranges:
             a,b=ranges[p['name']];p['printings']=(*p.get('printings',()),(a+side,b+side))
@@ -128,7 +128,7 @@ def amidah(lang):
     text+=transclude(ATAH)+transclude(ARVIT['retzeh'])+tr('avodah')
     text+=conditional('modim','When the Reader repeats the Amidah, the Congregation responds here by saying:',READER,transclude(ROOT+'/amidah/modim_derabbanan'))+transclude(ROOT+'/amidah/modim')
     text+=conditional('chanukah','On Ḥanukkah add:',holiday('hanukkah',8),transclude(ROOT+'/amidah/chanukah'))+tr('hodaah/veal_kullam')
-    text+=conditional('ukhtov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,tr('hodaah/ukhtov'))+tr('hodaah/hatov_shimkha')
+    text+=conditional('ukhetov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,tr('hodaah/ukhetov'))+tr('hodaah/hatov_shimkha')
     text+=transclude(SHALOM)
     text+=conditional('peace_seal','Except during the Ten Days of Repentance:',TEN_DAYS,tr('shalom/hamevarekh'),negate=True)
     text+=conditional('peace_ten_days','Between Rosh Hashanah and Yom Kippur say:',TEN_DAYS,tr('shalom/besefer_chayyim'))
@@ -168,7 +168,7 @@ def units(project,by_name):
     text+=pb(447+side,sigil=SIGIL)+instruction('The Torah is read; then he recites:')+transclude(TORAH['asher_natan'])
     text+=instruction('When the Torah is raised, the Congregation recites:')+transclude(ROOT+'/torah/vezot_hatorah')
     text+=instruction('The Reader takes the Torah and says:')+transclude(TORAH['yehalelu'])+transclude(TORAH['psalm24'])
-    text+=pb(449+side,sigil=SIGIL)+instruction('While the Torah is being placed in the ark:')+transclude(ROOT+'/torah/uvnucho')
+    text+=pb(449+side,sigil=SIGIL)+instruction('While the Torah is being placed in the ark:')+transclude(ROOT+'/torah/uvenuchoh')
     add('torah','קְרִיאַת הַתּוֹרָה','READING OF THE TORAH',443,449,text,True)
     # The Mincha call has no Psalm 19 / 29 / Deuteronomy 32 verses after Veatem.
     # Added below without a heading.
@@ -187,12 +187,12 @@ def units(project,by_name):
     unheaded('torah/vetiggaleh',passage_range(TORAH['vetiggaleh']+'/vetiggaleh',TORAH['vetiggaleh']+'/barukh'),445,445)
     unheaded('torah/vezot_hatorah',passage_range(BIBLE+'deuteronomy/4/44',BIBLE+'proverbs/3/16')+
         variant('vezot_hatorah','adonai_chafetz','The Lord is pleased, for the sake of his righteousness, to render the Torah great and glorious.'),447,447)
-    unheaded('torah/uvnucho',passage_range(BIBLE+'numbers/10/36',BIBLE+'psalms/132/8')+
-        variant('uvnucho','kohanekha','May thy priests be clothed in righteousness; may thy faithful followers shout for joy.')+
+    unheaded('torah/uvenuchoh',passage_range(BIBLE+'numbers/10/36',BIBLE+'psalms/132/8')+
+        variant('uvenuchoh','kohanekha','May thy priests be clothed in righteousness; may thy faithful followers shout for joy.')+
         transclude(BIBLE+'psalms/132/10')+
-        variant('uvnucho','ki_leqach','I give you good instruction; forsake not my Torah.')+
-        passage_range(TORAH['uvnucho']+'/etz',BIBLE+'lamentations/5/21'),449,449)
-    ked=''.join(transclude(PRAYER+'amidah/qedushah/'+k) for k in ('neqaddesh','qadosh','leummatam','barukh_kevod','uvdivrei','yimlokh','ledor_vador'))
+        variant('uvenuchoh','ki_leqach','I give you good instruction; forsake not my Torah.')+
+        passage_range(TORAH['uvenuchoh']+'/etz',BIBLE+'lamentations/5/21'),449,449)
+    ked=''.join(transclude(PRAYER+'amidah/qedushah/'+k) for k in ('neqaddesh','qadosh','leummatam','barukh_kevod','uvedivrei','yimlokh','ledor_vador'))
     for key,negate,rubric in [('hael_haqadosh',True,'Except during the Ten Days of Repentance:'),('hamelekh_haqadosh',False,'Between Rosh Hashanah and Yom Kippur say:')]:
         ked+=conditional('qedushah_'+key,rubric,TEN_DAYS,transclude(PRAYER+'amidah/qedushah/'+key),negate=negate)
     add('amidah/qedushah','קדושה','KEDUSHAH',451,453,ked)

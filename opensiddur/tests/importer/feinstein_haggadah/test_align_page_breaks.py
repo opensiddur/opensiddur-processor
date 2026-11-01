@@ -73,12 +73,12 @@ class TestAlignPageBreaksIntegration(unittest.TestCase):
             # The opening sections are the ones the header anchors match cleanly, so the
             # draft should agree with the curated table there. Later sections drift, which
             # is why this is a first pass for hand verification and not the source of truth.
-            self.assertEqual(folio_at_facsimile_page(mapping["bedikat_chametz"]), "2r")
+            self.assertEqual(folio_at_facsimile_page(mapping["bediqat_chametz"]), "2r")
             self.assertEqual(folio_at_facsimile_page(mapping["eruv_tavshilin"]), "3r")
 
             out = write_page_breaks(mapping, root)
             data = json.loads(out.read_text(encoding="utf-8"))
-            self.assertIn("bedikat_chametz", data)
+            self.assertIn("bediqat_chametz", data)
             self.assertNotIn("_only", data)
 
 

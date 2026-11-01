@@ -36,7 +36,7 @@ SCOPED_SUBSECTION_PREFIXES: dict[str, list[tuple[str, str]]] = {
 #: cell, and scanning a whole prefix table line by line would slice rows that merely quote a verse
 #: another subsection also opens with.
 ROW_SPLIT_PREFIXES: list[tuple[str, str]] = [
-    ("לְשָּׁנָה הַבָּאָה בִּירוּשָׁלָיִם", "lshana_haba_ah"),
+    ("לְשָּׁנָה הַבָּאָה בִּירוּשָׁלָיִם", "leshanah_habaah"),
 ]
 
 
@@ -349,10 +349,10 @@ def _resolve_slug(
             if slug and (not nirtzah_only or nirtzah_mode or slug in ("echad_mi_yodea", "chad_gadya")):
                 if nirtzah_only:
                     return slug, True
-                if h3_parent == "magid":
+                if h3_parent == "maggid":
                     return slug, nirtzah_mode
 
-    if h3_parent == "magid":
+    if h3_parent == "maggid":
         return None, nirtzah_mode
     if h3_parent == "nirtzah" or nirtzah_mode:
         return None, True
@@ -372,7 +372,7 @@ def _scoped_prefixes(h3_parent: str | None, nirtzah_mode: bool) -> list[tuple[st
         return NIRTZAH_SUBSECTION_PREFIXES
     if h3_parent in SCOPED_SUBSECTION_PREFIXES:
         return SCOPED_SUBSECTION_PREFIXES[h3_parent]
-    if h3_parent == "magid":
+    if h3_parent == "maggid":
         return MAGID_SUBSECTION_PREFIXES
     return []
 

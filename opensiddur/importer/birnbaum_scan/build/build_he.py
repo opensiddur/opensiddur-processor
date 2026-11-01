@@ -374,7 +374,7 @@ KORBANOT_ORDER = (
     ("citation", "במדבר כח, א–ח", "Numbers 28:1\u20138"),
     "qorbanot_tamid",
     ("citation", "ויקרא א, יא", "Leviticus 1:11"),
-    "qorbanot_ushchat",
+    "qorbanot_veshachat",
     "qorbanot_yehi_ratzon_amirah",
     "qorbanot_attah_hu",
     ("citation", "שמות ל, לד–לו; ל ז–ח", "Exodus 30:34\u201336; 30:7\u20138"),

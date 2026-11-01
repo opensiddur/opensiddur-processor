@@ -72,7 +72,7 @@ The path mirrors the text URN of the passage that varies, with the variant's nam
 carries **no** project identifier, because a variant belongs to the text rather than to any one
 edition of it:
 ```urn
-urn:x-opensiddur:condition:haggadah:magid/lefikach/shira_chadasha
+urn:x-opensiddur:condition:haggadah:maggid/lefikhakh/shirah_chadashah
 ```
 
 An example complete Biblical URN is:
@@ -144,8 +144,10 @@ And:
   `ch`, `kh`, `tz`) is never doubled: `mitratzeh`, not `mitratztzeh`.
 - **A shva is sounded** (`e`) under a word's first letter, under a doubled letter, as the
   second of two, and after a long vowel (qamatz, tsere, holam, shuruq, hiriq + yod): `berit`,
-  `peri`, `malkhutekha`, `yotzerenu`, `virtzonekha`. After a short vowel it is silent:
-  `lemaankha`, `miqdash`; so it is after a qamatz qatan, which is short: `zokhrenu`, `qorbanot`.
+  `peri`, `malkhutekha`, `yotzerenu`, `virtzonekha`, and after the conjunction וּ: `uvemaqhalot`,
+  `ukhetov`. After a short vowel it is silent: `lemaankha`, `miqdash`; so it is after a qamatz
+  qatan, which is short (`zokhrenu`, `qorbanot`), and before a letter that takes a light dagesh
+  (`ushpizin`).
 - **The yod of the suffix ֶיךָ is not written**: segol + yod is `ei` (`vetechezeinah`), but
   before this suffix it is `e`, as it is said: `lefanekha`, `rachamekha`, `elekha`. Tsere + yod
   is always `ei`: `eloheinu`, `aleinu`.
@@ -1733,7 +1735,7 @@ than to the edition printing it, so two sources offering the same variant name t
 and one setting selects it in both.
 ```xml
 <tei:fs type="opensiddur:variant">
-   <tei:f name="urn:x-opensiddur:condition:haggadah:magid/lefikach/shira_chadasha">
+   <tei:f name="urn:x-opensiddur:condition:haggadah:maggid/lefikhakh/shirah_chadashah">
       <tei:binary value="true"/>
    </tei:f>
 </tei:fs>

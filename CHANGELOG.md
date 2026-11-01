@@ -50,6 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **The Haggadah's names are spelled by the table** (#266), with the old URNs recorded as
+  aliases. The seder steps are `qaddesh`, `maggid`, `rachatz`, `korekh` and `shulchan_orekh`; a
+  word is no longer split by `_` (`asher_ge_alanu` is `asher_gealanu`, `u_v_moftim` is
+  `uvemofetim`); and names that were English or glosses are the printed words
+  (`it_happened_at_midnight` is `vayehi_bachatzi_halailah`, `pesach_mitzvah` is `pesach_shehayu`,
+  `mitzrim_ra` is `vayyareu_otanu_hamitzrim`). The table now says a shva after the conjunction
+  וּ is sounded, which also renames a few Birnbaum names (`uvemaqhalot`, `uvedivrei`, `ukhetov`,
+  `uveneh`, `uvenuchoh`); `ha_el_betaatzumot` is `hael_betaatzumot` wherever it is said; and
+  Birnbaum's `qorbanot/ushchat` is `qorbanot/veshachat`, as printed (וְשָׁחַט). The Haggadah's
+  variant conditions are renamed with their sections, so a settings file that chose one needs
+  the new name (`condition:haggadah:maggid/lefikhakh/shirah_chadashah`).
 - **Birnbaum's names are spelled by the table** (#266), with the old URNs recorded as aliases.
   Qof is `q` (`qodesh`, `yaaqov`, `qabbalat_shabbat`, `pirqei_avot`), khaf `kh`
   (`shalom_aleikhem`, `lekhah_dodi`), het `ch`, dagesh hazak is doubled (`kullam`, `yitgaddal`,

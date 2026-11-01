@@ -80,8 +80,8 @@ prayer("qorbanot_tamid", "The daily offering", "qorbanot/tamid", 28, 30,
          "evening, with the same meal-offering and the same oblation as in the "
          "morning, to be a burnt-offering of sweet savor to the Lord."))
 
-prayer("qorbanot_ushchat", "He shall slaughter it", "qorbanot/ushchat", 30, 30,
-       d(U + "qorbanot/ushchat",
+prayer("qorbanot_veshachat", "He shall slaughter it", "qorbanot/veshachat", 30, 30,
+       d(U + "qorbanot/veshachat",
          "He shall slaughter it on the north side of the altar before the Lord; and "
          "Aaron’s sons, the priests, shall sprinkle its blood all around the altar."))
 

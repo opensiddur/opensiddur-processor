@@ -14,10 +14,10 @@ ROOT = SIDDUR+'shabbat/shacharit'
 PESUKEI = ROOT+'/pesuqei_dezimrah'
 SIGIL = '1949 shabbat/shacharit/pesuqei_dezimrah'
 NISHMAT = PRAYER+'nishmat'
-HAEL = PRAYER+'ha_el_betaatzumot'
+HAEL = PRAYER+'hael_betaatzumot'
 SHOKHEN = PRAYER+'shokhen_ad'
 BEFI = PRAYER+'befi_yesharim'
-BEMAKHALOT = PRAYER+'uvmaqhalot'
+BEMAKHALOT = PRAYER+'uvemaqhalot'
 REPEAT91 = PESUKEI+'/psalm_91_repeat'
 OLD_REFERENCES = {
  'torah_vetiggaleh': ('psalms/19/8','psalms/19/9'),
@@ -113,7 +113,7 @@ def prayers(lang):
             start=value.index(('רַנְּנוּ','Rejoice')[side]);end=len(value)-(1 if side else 0)
             quotation=f'<tei:seg source="{BIBLE}psalms/33/1">'+value[start:end]+'</tei:seg>'
             value=value[:start]+marked(SHOKHEN+'/psalms_33_1',quotation)+value[end:]
-        add(key,urn,he.split(',')[0],title,333,335 if key=='bemakhalot' else 333,'<tei:p>'+value+'</tei:p>')
+        add(key,urn,he.split(',')[0],title,333,335 if key=='uvemaqhalot' else 333,'<tei:p>'+value+'</tei:p>')
     return result
 
 
