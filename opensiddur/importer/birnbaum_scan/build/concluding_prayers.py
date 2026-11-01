@@ -34,7 +34,7 @@ for k in ('shehakol_bara','yotzer_haadam','asher_yatzar_haadam','sos_tasis','sam
 for k,suffix in {'hazan':'hazan','nodeh':'nodeh','veal_hakol':'veal_hakol','rachem':'rachem',
  'retzeh_grace':'retzeh_vehachalitzenu','uveneh':'uveneh_yerushalayim','hatov':'hatov_vehametiv',
  'bamarom':'bamarom','barukh_hu':'zimmun/barukh_hu','zimmun_leader':'zimmun/nevarekh',
- 'zimmun_response':'zimmun/barukh_she_akhalnu','harachaman_reign':'harachaman/yimlokh',
+ 'zimmun_response':'zimmun/barukh_sheakhalnu','harachaman_reign':'harachaman/yimlokh',
  'harachaman_worship':'harachaman/yitbarakh','harachaman_praise':'harachaman/yishtabbach',
  'harachaman_livelihood':'harachaman/yefarnesenu','harachaman_yoke':'harachaman/yishbor_ullenu',
  'harachaman_house':'harachaman/yishlach_berakhah','harachaman_elijah':'harachaman/yishlach_lanu',

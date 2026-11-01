@@ -266,17 +266,17 @@ class TestFestivalReadingsMaftir(unittest.TestCase):
 
     def test_sukkot_chol_hamoed_day_maftirs_are_recognized_as_maftir(self):
         for day in (1, 2, 5):
-            span = self._span("sukkot_shabbat_chol_ha_moed", f"maftir_day{day}")
+            span = self._span("sukkot_shabbat_chol_hamoed", f"maftir_day{day}")
             self.assertEqual(span.unit, UNIT_MAFTIR)
 
     def test_sukkot_chol_hamoed_day_maftirs_are_not_left_as_raw_source_keys(self):
-        labels = {span.label for span in self.festivals["sukkot_shabbat_chol_ha_moed"]["aliyot"]}
+        labels = {span.label for span in self.festivals["sukkot_shabbat_chol_hamoed"]["aliyot"]}
         self.assertNotIn("M-day1", labels)
         self.assertNotIn("M-day2", labels)
         self.assertNotIn("M-day5", labels)
 
     def test_sukkot_chol_hamoed_non_maftir_aliyah_is_unaffected(self):
-        span = self._span("sukkot_shabbat_chol_ha_moed", "1")
+        span = self._span("sukkot_shabbat_chol_hamoed", "1")
         self.assertEqual(span.unit, UNIT_ALIYAH)
 
 

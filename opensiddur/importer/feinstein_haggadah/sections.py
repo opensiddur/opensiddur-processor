@@ -267,7 +267,7 @@ SHARED_PARAGRAPHS = {
     ("barekh", 1): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/hav_lan",
     ("barekh", 2): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/yehi_shem",
     ("barekh", 3): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/nevarekh",
-    ("barekh", 4): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_she_akhalnu",
+    ("barekh", 4): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_sheakhalnu",
     ("barekh", 5): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_umevorakh",
     ("barekh", 6): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_hu",
     ("barekh", 7): "urn:x-opensiddur:text:prayer:birkat_hamazon/hazan",
