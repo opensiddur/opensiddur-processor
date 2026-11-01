@@ -12,7 +12,10 @@ from opensiddur.importer.opensiddur_org.naming import (
     date_field,
     fold,
     imported_projects,
+    join_prefixes,
     name_field,
+    respelled,
+    text_name,
     title_field,
 )
 from opensiddur.importer.opensiddur_org.parse_post import Column, parse_post
@@ -39,6 +42,9 @@ class FoldTestCase(unittest.TestCase):
     def test_other_diacritics_are_stripped_and_alephs_dropped(self):
         self.assertEqual(fold("Ṭevet Moïse Anzünden l’Garesh Y'qar"),
                          ["tevet", "moise", "anzunden", "lgaresh", "yqar"])
+
+    def test_a_schwa_is_e_and_an_ayin_is_dropped(self):
+        self.assertEqual(fold("Qədushah Shəvat Maʕalot"), ["qedushah", "shevat", "maalot"])
 
     def test_decomposed_text_folds_the_same(self):
         self.assertEqual(fold(unicodedata.normalize("NFKD", "Ḥanukkah Ẓion")), ["chanukkah", "tzion"])
@@ -80,6 +86,54 @@ class TitleTestCase(unittest.TestCase):
 
     def test_a_hebrew_only_title_is_named_from_the_slug(self):
         self.assertEqual(title_field(post("בָּאנוּ חֹשֶׁךְ לְגָרֵשׁ", slug="banu-hoshekh-by-sara")), "banu_hoshekh")
+
+
+class TextNameTestCase(unittest.TestCase):
+    """A text's name follows the table; a project's title keeps the post's romanization."""
+
+    #: A spelling list of the tests' own, so these do not change with the real one.
+    VARIANTS = {"tsur": "tzur", "shnei": "shenei"}
+
+    def test_an_elided_shva_is_written(self):
+        for title, expected in (("Banu Ḥoshekh l’Garesh", "Banu Ḥoshekh leGaresh"),
+                                ("Avnei Y’qar", "Avnei Yeqar"),
+                                ("Ashira l-Tsur Nora", "Ashira leTsur Nora"),
+                                ("Yevanim Tsur b-Af", "Yevanim Tsur beAf")):
+            with self.subTest(title=title):
+                self.assertEqual(join_prefixes(title), expected)
+
+    def test_a_hyphened_prefix_joins_its_word(self):
+        self.assertEqual(join_prefixes("Hakhrazah li-Ymei ha-Hodayah"), "Hakhrazah liYmei haHodayah")
+        self.assertEqual(join_prefixes("u-N’taneh Toqef"), "uNetaneh Toqef")
+
+    def test_a_dotted_consonant_takes_its_shva(self):
+        self.assertEqual(join_prefixes("Imrot ha-El Ṭ’horot"), "Imrot haEl Ṭehorot")
+
+    def test_english_apostrophes_and_hyphens_are_left_alone(self):
+        for title in ("Children's Prayer", "R' Joseph", "X-ray", "D-Day", "Schmiedl-Neuda", "Ma'oz Tsur"):
+            with self.subTest(title=title):
+                self.assertEqual(join_prefixes(title), title)
+
+    def test_a_word_after_a_joined_prefix_is_respelled(self):
+        self.assertEqual(respelled("letsur", self.VARIANTS), "letzur")
+        self.assertEqual(respelled("tsur", self.VARIANTS), "tzur")
+        self.assertEqual(respelled("leotef", self.VARIANTS), "leotef")
+
+    def test_a_variant_that_only_doubles_is_not_found_after_a_prefix(self):
+        # `sheelu` is שְׁאֵלוּ, not she + אֵלּוּ.
+        self.assertEqual(respelled("sheelu", {"elu": "ellu"}), "sheelu")
+        self.assertEqual(respelled("elu", {"elu": "ellu"}), "ellu")
+
+    def test_a_french_title_is_not_joined(self):
+        data = make_post(title="Prière avant l’instruction")
+        data["custom_fields"]["languages_meta"] = ['[{"name":"French","code":"fra"}]']
+        p = parse_post(data)
+        self.assertEqual(text_name(p, self.VARIANTS).split("_")[:3], ["priere", "avant", "linstruction"])
+
+    def test_the_text_name_joins_and_respells_but_the_project_title_does_not(self):
+        p = post("אָשִׁירָה | Ashira l-Tsur Nora, a piyyuṭ")
+        self.assertEqual(text_name(p, self.VARIANTS).split("_")[:3], ["ashira", "letzur", "nora"])
+        self.assertEqual(title_field(p), "ashira_l_tsur_nora")
 
 
 class NameTestCase(unittest.TestCase):

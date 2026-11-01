@@ -49,10 +49,10 @@ _LETTERS = {
     "ḥ": "ch", "Ḥ": "ch", "ẓ": "tz", "Ẓ": "tz", "ƙ": "kh", "Ƙ": "kh", "š": "sh", "Š": "sh",
     "ḳ": "q", "Ḳ": "q", "ḇ": "v", "þ": "t", "Þ": "t", "ʝ": "j", "Ʝ": "j", "ß": "ss",
     "æ": "ae", "Æ": "ae", "ø": "o", "Ø": "o", "ł": "l", "Ł": "l", "Ḇ": "v", "œ": "oe", "Œ": "oe",
-    "ð": "d", "Ð": "d", "đ": "d", "Đ": "d", "ı": "i",
+    "ð": "d", "Ð": "d", "đ": "d", "Đ": "d", "ı": "i", "ə": "e", "Ə": "e",
 }
 #: Marks for an aleph or an ayin, and apostrophes, which the table does not write.
-_DROPPED = "ʼʾʿ'’‘`ʻȝȜŋŊ"
+_DROPPED = "ʼʾʿʕ'’‘`ʻȝȜŋŊ"
 
 _BRACKETED = re.compile(r"\([^()]*\)|\[[^\[\]]*\]")
 #: Where a title's name ends and its attribution begins: a comma, "by", a dash, or a colon
@@ -126,12 +126,57 @@ def latin_title(post: Post) -> str | None:
     return next((title for lang, title in titles_by_language(post) if lang == "en"), None)
 
 
-def title_words(post: Post) -> list[str]:
-    """The words that name the post: its Latin title up to the attribution, folded."""
+#: A first letter whose shva the romanization elides, then an apostrophe: "l’Garesh", "Y’qar",
+#: "Ṭ’horot"; or a prefix letter, then a hyphen: "l-Tsur", "b-Af". The table writes the shva
+#: (`legaresh`, `yeqar`, `tehorot`, `letzur`, `beaf`). French elides the same way ("l’instruction"),
+#: so a French post's title is not joined (:func:`title_words`).
+_CONSONANT = "BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyzḤḥḲḳṬṭẒẓŠš"
+_ELIDED_SHVA = re.compile(rf"\b([{_CONSONANT}]|[SsCcKk]h|[Tt]z)['’ʼ‘](?=[^\W\d_])"
+                          r"|\b([BbKkLlMm])-(?=[^\W\d_])")
+#: A prefix written with a hyphen, "ha-Hodayah", "u-Netaneh", which the table joins to its word.
+_HYPHENED_PREFIX = re.compile(r"\b([Hh]a|[Ll][ai]|[Bb][ai]|[Mm]i|[Uu])-(?=[^\W\d_])")
+#: The prefixes a joined word may begin with, whose word is respelled by the list after them.
+_PREFIXES = ("she", "be", "de", "ke", "le", "me", "ve", "ha")
+
+
+def join_prefixes(text: str) -> str:
+    """``text`` with its Hebrew prefixes joined to their words as the table writes them:
+    "Banu Ḥoshekh l’Garesh" is "Banu Ḥoshekh leGaresh", "li-Ymei ha-Hodayah" is
+    "li-Ymei haHodayah"."""
+    text = _ELIDED_SHVA.sub(lambda m: (m.group(1) or m.group(2)) + "e", text)
+    return _HYPHENED_PREFIX.sub(r"\1", text)
+
+
+def respelled(word: str, variants: Mapping[str, str]) -> str:
+    """``word`` spelled by the list, or a prefix and its word so spelled (`letsur` is `letzur`)."""
+    if word in variants:
+        return variants[word]
+    for prefix in _PREFIXES:
+        rest = word[len(prefix):]
+        # A variant that only doubles a letter may, after a prefix, be another word: `sheelu`
+        # is שְׁאֵלוּ, not she + אֵלּוּ.
+        if word.startswith(prefix) and rest in variants and re.sub(r"(.)\1", r"\1", variants[rest]) != rest:
+            return prefix + variants[rest]
+    return word
+
+
+def _french(post: Post) -> bool:
+    """Whether the post is in French, by its languages (ISO 639-3) or its columns."""
+    return (any(code in ("fra", "fre") for code in post.languages)
+            or any(column.lang == "fr" for column in post.columns))
+
+
+def title_words(post: Post, *, prefixes_joined: bool = False) -> list[str]:
+    """The words that name the post: its Latin title up to the attribution, folded. A text's
+    name joins the title's Hebrew prefixes to their words (:func:`join_prefixes`), unless the
+    post is in French, whose elisions look the same; a project's title keeps the post's own
+    romanization."""
     title = latin_title(post)
     if title is not None:
         name = _BRACKETED.sub(" ", title)
         name = _TITLE_END.split(name, 1)[0]
+        if prefixes_joined and not _french(post):
+            name = join_prefixes(name)
         words = fold(name) or fold(title)
     else:
         words = []
@@ -151,7 +196,8 @@ def text_name(post: Post, variants: Mapping[str, str]) -> str:
     the spelling list (``specs/naming/spellings.yaml``), since a URN follows the table where a
     project title keeps the post's own romanization; then its author's name, since a new text
     on the site is someone's (``chanukah_wise``, not ``chanukah``)."""
-    name = _joined([variants.get(word, word) for word in title_words(post)], TITLE_LENGTH)
+    name = _joined([respelled(word, variants) for word in title_words(post, prefixes_joined=True)],
+                   TITLE_LENGTH)
     # The author is respelled too: a URN is spelled by the table throughout, and the person's
     # own spelling stays in the registry's label and the credits (ibn Tsur -> `tzur`).
     author = "_".join(variants.get(word, word) for word in original_author(post).split("_") if word)

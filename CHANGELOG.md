@@ -50,6 +50,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **The opensiddur.org imports' names are spelled by the table** (#266): the Hebrew words of
+  the post titles that name their texts, with the old URNs recorded as aliases. A shva the
+  title elides is written (`avnei_yeqar`, `banu_choshekh_legaresh`, `shenei_zeitim`), a prefix
+  is joined to its word (`ashirah_letzur_nora`, `hakhrazah_limei_hahodayah`), and doubling and
+  a final heh follow the table (`al_hanissim`, `chanukkiyyah`). The importer now joins the
+  prefixes itself when it names a new post's text; a project's title keeps the post's own
+  romanization. English, German, French, Yiddish, Ladino and Judeo-Arabic words are left as
+  the titles give them, and a French post's title is not joined, since French elides the same
+  way ("l’instruction").
 - **The Haggadah's names are spelled by the table** (#266), with the old URNs recorded as
   aliases. The seder steps are `qaddesh`, `maggid`, `rachatz`, `korekh` and `shulchan_orekh`; a
   word is no longer split by `_` (`asher_ge_alanu` is `asher_gealanu`, `u_v_moftim` is

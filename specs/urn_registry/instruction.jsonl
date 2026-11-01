@@ -4,7 +4,7 @@
 {"urn": "urn:x-opensiddur:instruction:amidah/addir_adiraynu_horaah_leshatz", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "אדיר אדירנו הוראה לש\"ץ"}
 {"urn": "urn:x-opensiddur:instruction:amidah/addir_bamarom", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "אדיר במרום"}
 {"urn": "urn:x-opensiddur:instruction:amidah/al_halel_acharay_tefillat_haamidah_shel_shacharit_bekhol_veshabat", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "על הלל אחרי תפילת העמידה של שחרית בחול ושבת"}
-{"urn": "urn:x-opensiddur:instruction:amidah/al_hanisim_leshushan_purim", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "על הניסים לשושן פורים"}
+{"urn": "urn:x-opensiddur:instruction:amidah/al_hanissim_leshushan_purim", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "על הניסים לשושן פורים"}
 {"urn": "urn:x-opensiddur:instruction:amidah/al_qedushat_hashem_leyachid_bitfilat_halachash", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "על ברכת קדושה ליחיד בתפילת הלחש"}
 {"urn": "urn:x-opensiddur:instruction:amidah/am_qedoshekha_kaamur", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "עַם קְדוֹשֶֽׁךָ, כָּאָמוּר."}
 {"urn": "urn:x-opensiddur:instruction:amidah/anaynu_bevirkat_hageulah", "status": "canonical", "parent": "urn:x-opensiddur:instruction:amidah", "label_he": "עננו בברכת הגאולה"}

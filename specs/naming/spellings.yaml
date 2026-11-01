@@ -235,6 +235,7 @@ variants:
   bematenat: bemattenat
   biqshanukha: biqqashnukha
   chadesh: chaddesh
+  chanukkiah: chanukkiyyah
   chayim: chayyim
   chisar: chissar
   dayan: dayyan
@@ -251,6 +252,7 @@ variants:
   hakahal: haqahal
   hamapil: hamappil
   hamitah: hamittah
+  hanisim: hanissim
   hateh: hatteh
   ilu: illu
   imanu: immanu
@@ -374,7 +376,9 @@ variants:
   btaatzumot: betaatzumot
   hagalili: hagelili
   lemaanekha: lemaankha
+  lgaresh: legaresh
   lishuatkha: lishuatekha
+  lshabbat: leshabbat
   malkhutkha: malkhutekha
   mituvkha: mituvekha
   naaritzkha: naaritzekha
@@ -382,7 +386,10 @@ variants:
   qinatkha: qinatekha
   sheamda: sheamedah
   shlama: shelama
+  shlomoh: shelomoh
   shmeh: shemeh
+  shmona: shemonah
+  shmuel: shemuel
   shofteinu: shofeteinu
   ukhtov: ukhetov
   umechokhmatkha: umechokhmatekha
@@ -394,7 +401,9 @@ variants:
   vemalkhutkha: vemalkhutekha
   virtzonkha: virtzonekha
   yotzrekh: yotzerekh
+  yqar: yeqar
   # A final heh is written
+  ashira: ashirah
   avoda: avodah
   dezimra: dezimrah
   hashana: hashanah

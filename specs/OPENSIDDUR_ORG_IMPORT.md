@@ -297,7 +297,7 @@ Each post's URN decision is made once. It is recorded in
 ```json
 {"post_id": 12322, "kind": "existing", "urn": "urn:x-opensiddur:text:poem:maoz_tzur", "rows": {"1": "urn:x-opensiddur:text:poem:maoz_tzur/1", "...": "..."}}
 {"post_id": 41025, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:the_blessings_over_kindling_the_light_of_chanukah", "rows": {"1": "urn:x-opensiddur:text:prayer:hadlaqat_ner_chanukah/blessing"}}
-{"post_id": 22916, "kind": "new", "urn": "urn:x-opensiddur:text:poem:banu_choshekh_lqadesh_seidenberg"}
+{"post_id": 22916, "kind": "new", "urn": "urn:x-opensiddur:text:poem:banu_choshekh_leqaddesh_seidenberg"}
 ```
 
 - An `existing` post is a version of a text in the collection, and names each row's URN.
@@ -329,15 +329,21 @@ How `match` handles each post:
 - A post with no candidate at all is given a new URN at once, `text:poem:<name>` for a post
   tagged as a piyyut or poem and `text:prayer:<name>` otherwise.
   - `<name>` is the post's title, as `specs/NAMING_SCHEME.md` names a project's: its Latin
-    part up to the attribution, folded to ASCII. Each word is then respelled by
-    `specs/naming/spellings.yaml`, since a URN follows the transliteration table where a
-    project title keeps the post's own romanization (`maoz_tzur_…`, not `maoz_tsur_…`). A
+    part up to the attribution, folded to ASCII. Its Hebrew prefixes are first joined to
+    their words as the table writes them: a letter whose shva the romanization elides with an
+    apostrophe, or a prefix letter with a hyphen, takes its `e` ("l’Garesh" is `legaresh`,
+    "Y’qar" `yeqar`, "l-Tsur" `letzur`), and the article "ha-" joins its word. Each word is
+    then respelled by `specs/naming/spellings.yaml`, a prefixed word by its word, since a URN
+    follows the transliteration table where a project title keeps the post's own romanization
+    (`maoz_tzur_…`, not `maoz_tsur_…`). A
     name cut at 60 characters does not end on a word like "of" or "the". The original
     author's name follows, as the project's author field gives it, or as the title's "by"
     gives it when no one else is credited (`chanukah_wise`, `rock_of_ages_gottheil`), since a
     new text on the site is someone's. It is respelled by the list like the rest (Yaaqov ibn
-    Tsur gives `_tzur`); the person's own spelling stays in the label and the credits. The slug is not used: the bibliography's link still
-    leads to the post on the site.
+    Tsur gives `_tzur`); the person's own spelling stays in the label and the credits. The
+    slug is not used: the bibliography's link still leads to the post on the site. A name is
+    kept once given (`specs/opensiddur_org/post_urns.jsonl`), so a rule changed later renames
+    an older post's text only when that file is respelled with it.
   - If that name is taken, `_<post_id>` is appended.
 - Every other post gets a proposal in `output/opensiddur_org_urn_proposals.jsonl`. The
   proposal is reviewed, and may be edited, then recorded with `match --accept <id>`, or
