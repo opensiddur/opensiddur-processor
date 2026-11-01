@@ -44,6 +44,55 @@ def _span(unit: str, label: str, start, end, owner=None) -> ReadingSpan:
     )
 
 
+class TestDivisionPath(unittest.TestCase):
+    """A division's URN path below its parshah: legal URN components, the triennial cycle a path."""
+
+    def path(self, unit, label, parsha="chukat"):
+        return build._division_path(_span(unit, label, (1, 1), (1, 2)), parsha)
+
+    def test_a_triennial_division_is_a_path_of_cycle_year_and_aliyah(self):
+        self.assertEqual(self.path("aliyah.triennial.1", "1.1"), "triennial/1/1")
+        self.assertEqual(self.path("aliyah.triennial.chukat.C.2", "c.2.1"), "triennial/c/2/1")
+        self.assertEqual(self.path("aliyah.triennial.behar.IL1.1", "il1.1.1", "behar"),
+                         "triennial/il1/1/1")
+        self.assertEqual(self.path("aliyah.triennial.combined.1", "combined.1.3", "a_b"),
+                         "triennial/combined/1/3")
+
+    def test_the_parshah_a_pair_file_repeats_is_not_repeated(self):
+        self.assertEqual(self.path("aliyah.triennial.nitzavim.1", "1.2", "nitzavim"),
+                         "triennial/1/2")
+
+    def test_a_maftir_is_named_maftir(self):
+        self.assertEqual(self.path("maftir.triennial.chukat.G.1", "g.1.maftir"), "triennial/g/1/maftir")
+        self.assertEqual(self.path("maftir.annual", "מפטיר"), "maftir_annual/maftir")
+
+    def test_other_divisions_keep_their_unit_and_number(self):
+        self.assertEqual(self.path("aliyah.annual", "3"), "aliyah_annual/3")
+
+    def test_a_label_with_no_ascii_name_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.path("maftir.annual", "שביעי")
+
+
+class TestMilestoneUrn(unittest.TestCase):
+    """A division's URN is under its owner's parshah when it has one, else under the file's."""
+
+    def corresp(self, span, urn_base):
+        return etree.fromstring(
+            build._milestone(span, urn_base).replace("tei:", "")
+        ).get("corresp")
+
+    def test_a_division_without_an_owner_is_under_the_file(self):
+        span = _span("aliyah.triennial.behar.IL3.2", "il3.2.7", (1, 1), (1, 2))
+        self.assertEqual(self.corresp(span, f"{build.URN_PREFIX}:parsha/behar"),
+                         f"{build.URN_PREFIX}:parsha/behar/triennial/il3/2/7")
+
+    def test_a_division_with_an_owner_is_under_its_owner(self):
+        span = _span("aliyah.triennial.behar.IL3.2", "il3.2.7", (1, 1), (1, 2), owner="behar")
+        self.assertEqual(self.corresp(span, f"{build.URN_PREFIX}:parsha/behar_bechukotai"),
+                         f"{build.URN_PREFIX}:parsha/behar/triennial/il3/2/7")
+
+
 class TestPairFile(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -524,6 +573,12 @@ class TestIndexFile(unittest.TestCase):
         alt = doc_title.find(f'{TEI}titlePart[@type="alt"]')
         self.assertEqual(alt.get(f"{XML}lang"), "en")
         self.assertEqual(alt.text, "Humash")
+
+    def test_the_source_points_at_the_tanakh_of_miqra(self):
+        _, document = build.index_file({})
+        root = etree.fromstring(document.encode("utf-8"))
+        ptr = root.find(f'.//{TEI}bibl[@{XML}id="source_mam"]/{TEI}ptr')
+        self.assertEqual(ptr.get("target"), f"{build.URN_PREFIX}:tanakh@{build.MIQRA_PROJECT}")
 
     def _body(self, sections: dict) -> object:
         _, document = build.index_file(sections)

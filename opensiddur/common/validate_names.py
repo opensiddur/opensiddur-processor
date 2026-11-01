@@ -131,6 +131,18 @@ def project_language(project_path: Path) -> str | None:
     return root.get(_XML_LANG) or None
 
 
+def _strip_prose_punctuation(urn: str) -> str:
+    """``urn`` without the punctuation of the prose it is cited in: a full stop or comma after
+    it, or the closing parenthesis of a parenthesis it ends."""
+    while True:
+        stripped = urn.rstrip(_TRAILING_PUNCTUATION)
+        if stripped.endswith(")") and stripped.count(")") > stripped.count("("):
+            stripped = stripped[:-1]
+        if stripped == urn:
+            return urn
+        urn = stripped
+
+
 def urn_paths(text: str) -> Iterator[str]:
     """The path of each text, instruction and notes URN in ``text``.
 
@@ -142,7 +154,7 @@ def urn_paths(text: str) -> Iterator[str]:
     for match in _URN_IN_TEXT.finditer(text):
         urn = match.group(0)
         if text[match.end():match.end() + 1].isspace() or match.end() == len(text):
-            urn = urn.rstrip(_TRAILING_PUNCTUATION)
+            urn = _strip_prose_punctuation(urn)
         urn, _ = split_project(urn.split("#", 1)[0])
         try:
             ends = split_range(urn)

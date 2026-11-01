@@ -314,6 +314,20 @@ class TestMiqraConvertTsv(unittest.TestCase):
         self.assertEqual(_chapter_from_page_key(""), "")
 
 
+class TestIndexUrnName(unittest.TestCase):
+    def test_the_canon_is_tanakh_and_other_indexes_their_file(self):
+        from opensiddur.importer.miqra_al_pi_hamasorah.convert_tsv import index_urn_name
+        self.assertEqual(index_urn_name("index"), "tanakh")
+        self.assertEqual(index_urn_name("the_prophets"), "the_prophets")
+
+
+class TestHeaderUrn(unittest.TestCase):
+    def test_the_header_names_its_entrypoint(self):
+        from opensiddur.importer.miqra_al_pi_hamasorah.convert_tsv import MIQRA_PROJECT, header
+        self.assertIn(f">urn:x-opensiddur:text:bible:amos@{MIQRA_PROJECT}<",
+                      header(None, "Amos", entrypoint="amos"))
+        self.assertIn(f">urn:x-opensiddur:text:bible:tanakh@{MIQRA_PROJECT}<",
+                      header(None, "Tanakh"))
+
 if __name__ == "__main__":
     unittest.main()
-

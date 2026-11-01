@@ -615,6 +615,40 @@ class TestTransformBookXSLT(unittest.TestCase):
             self.assertIn('xml:id="note-ref-genesis-1-1-1"', result)
             # Note: standOff is only created when there's a <notes> section with actual note content
     
+    def test_a_note_is_named_by_its_lowercased_code(self):
+        """The note's URN path is a legal component: the code, lowercased"""
+        input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<Tanach>
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title level="a" type="main">Genesis</title>
+            </titleStmt>
+            <publicationStmt/>
+            <sourceDesc/>
+        </fileDesc>
+    </teiHeader>
+    <tanach>
+        <book>
+            <names><name>Genesis</name></names>
+            <c n="1">
+                <v n="1"><w>test<x>X</x></w></v>
+            </c>
+        </book>
+    </tanach>
+    <notes>
+        <note><code>X</code><note>A synthetic note.</note></note>
+    </notes>
+</Tanach>'''
+
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+            f.write(self.xslt_content)
+            f.flush()
+
+            result = xslt_transform_string(Path(f.name), input_xml, xslt_params=PARAMS)
+
+            self.assertIn('corresp="urn:x-opensiddur:notes:wlc/x"', result)
+
     def test_special_formatting_creates_hi(self):
         """Test that s element creates tei:hi with rend attribute"""
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>

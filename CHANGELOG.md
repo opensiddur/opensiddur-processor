@@ -50,6 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- **URNs that broke the URN grammar are fixed** (#266), so that every name in the corpus now
+  passes `validate_names`, and the projects check's gate runs it in full:
+  - The Humash's triennial divisions are a path below the parshah:
+    `parsha/chukat/aliyah_triennial_chukat_C_2/c.2.1` is `parsha/chukat/triennial/c/2/1`, and
+    `parsha/miketz/maftir_triennial_1/1.maftir` is `parsha/miketz/triennial/1/maftir`.
+  - Its annual maftir is `maftir_annual/maftir`, not the Hebrew `מפטיר`.
+  - Its readings drop hebcal's punctuation: `reading/chanukah_day_1_(on_shabbat)` is
+    `reading/chanukah_day_1_on_shabbat`, and the files are named the same way.
+  - Miqra al pi ha-Masorah's headers name each file as its body does (`bible:amos`, was
+    `bible:tanakh:amos`), and its index is `bible:tanakh`, as in the other Tanakh projects.
+  - The WLC's notes are `notes:wlc/` followed by the lowercased note code, was `notes:tanakh.wlc.<code>`.
 - **URNs and file names are respelled** by the spelling list, `specs/naming/spellings.yaml` (#266):
   386 URNs and 383 file names, in every project at once, since many URNs are shared between
   books (Birnbaum's are transcluded by the expanded siddur, Asher and the opensiddur.org posts).

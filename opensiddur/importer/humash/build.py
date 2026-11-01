@@ -324,10 +324,31 @@ def _milestone(span: ReadingSpan, urn_base: str, qualifier: str | None = None) -
             return f'<tei:milestone unit="{span.unit}" n="{_escape(title)}"/>'
     else:
         base = f"{URN_PREFIX}:parsha/{span.owner}" if span.owner else urn_base
-        urn = f"{base}/{span.unit.replace('.', '_')}/{slugify_reading_name(span.label)}"
+        urn = f"{base}/{_division_path(span, base.rsplit('/', 1)[-1])}"
     return (
         f'<tei:milestone unit="{span.unit}" n="{_escape(title)}" corresp="{urn}"/>'
     )
+
+
+def _division_path(span, parsha: str) -> str:
+    """The path that names a division below its parshah or reading.
+
+    A triennial division is named by its cycle, year and aliyah: ``triennial/2/1``,
+    ``triennial/c/2/1`` (a cycle of a pair), ``triennial/combined/1/maftir``. The unit names the
+    parshah again where a pair's file holds a single's divisions, and the path need not. Any
+    other division is named by its unit and its number, ``aliyah_annual/1``; a maftir by
+    ``maftir``, not the label it is printed with.
+    """
+    parts = span.unit.split(".")
+    if parts[1:2] == ["triennial"]:
+        rest = parts[2:]
+        if len(rest) > 1 and rest[0] == parsha:
+            rest = rest[1:]
+        return "/".join(["triennial", *(p.lower() for p in rest), span.label.split(".")[-1]])
+    label = "maftir" if span.label == "מפטיר" else slugify_reading_name(span.label)
+    if not label:
+        raise ValueError(f"the label {span.label!r} of {span.unit} has no name to put in a URN")
+    return f"{span.unit.replace('.', '_')}/{label}"
 
 
 def _transclude(target: str) -> str:
@@ -954,7 +975,7 @@ def index_file(sections: dict[str, list[str]]) -> tuple[str, str]:
     <tei:sourceDesc>
       <tei:bibl xml:id="source_mam">
         <tei:title>Miqra al pi ha-Masorah</tei:title>
-        <tei:ptr target="{URN_PREFIX}:index@{MIQRA_PROJECT}"/>
+        <tei:ptr target="{URN_PREFIX}:tanakh@{MIQRA_PROJECT}"/>
         <tei:note>Source of the weekly parshah, aliyah and maftir divisions.</tei:note>
       </tei:bibl>
       <tei:bibl xml:id="source_hebcal">
