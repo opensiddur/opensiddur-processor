@@ -1640,7 +1640,7 @@ class TestMilestoneScoping(unittest.TestCase):
         """Behar read alone in one cycle runs into Bechukotai, so the pair is what ends it."""
         variation, _second_parsha, _pair = self._document(
             ("aliyah.triennial.behar.IL3.2", "IL3.2.7",
-             "urn:x-opensiddur:text:bible:parsha/behar/aliyah_triennial_behar_IL3_2/il3.2.7"),
+             "urn:x-opensiddur:text:bible:parsha/behar/triennial/il3/2/7"),
             ("parsha.annual", "bechukotai", "urn:x-opensiddur:text:bible:parsha/bechukotai"),
             ("parsha.combined", "behar_bechukotai",
              "urn:x-opensiddur:text:bible:parsha/behar_bechukotai"),

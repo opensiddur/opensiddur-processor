@@ -124,6 +124,10 @@ class TestSlugifyReadingName(unittest.TestCase):
         self.assertEqual("rosh_hashanah_i", slugify_reading_name("Rosh Hashana I"))
         self.assertEqual("shabbat_chol_hamoed", slugify_reading_name("Shabbat Chol Hamoed"))
 
+    def test_punctuation_is_dropped(self):
+        self.assertEqual("fast_day_afternoon", slugify_reading_name("Fast Day (Afternoon)"))
+        self.assertEqual("purim_on_shabbat", slugify_reading_name("Purim (on Shabbat),"))
+
     def test_apostrophes_are_dropped_not_replaced(self):
         self.assertEqual("sukkot_shabbat_chol_hamoed", slugify_reading_name(
             "Sukkot Shabbat Chol Hamoed"))

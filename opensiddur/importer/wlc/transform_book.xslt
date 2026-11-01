@@ -239,7 +239,7 @@
         <xsl:if test="exists($note-targets)">        
             <tei:note>
                 <xsl:attribute name="xml:id" select="concat('note-', $note-id)"/>
-                <xsl:attribute name="corresp" select="concat('urn:x-opensiddur:notes:tanakh.wlc.', $note-id)"/>
+                <xsl:attribute name="corresp" select="concat('urn:x-opensiddur:notes:wlc/', lower-case($note-id))"/>
                 <xsl:attribute name="target" select="string-join($note-targets, ' ')"/>
                 <xsl:apply-templates select="note/node()"/>
             </tei:note>

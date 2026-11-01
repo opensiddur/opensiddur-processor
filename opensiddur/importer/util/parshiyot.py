@@ -139,10 +139,10 @@ def hebcal_for_hebrew(hebrew: str) -> str:
 
 def slugify_reading_name(name: str) -> str:
     """Slug for a reading hebcal names but the parshah table does not, e.g. a festival, its
-    words respelled by the spelling list (specs/NAMING_SCHEME.md): hebcal's "Rosh Hashana"
-    is ``rosh_hashanah``."""
+    words respelled by the spelling list and its punctuation dropped (specs/NAMING_SCHEME.md):
+    hebcal's "Yom Kippur (Mincha, Traditional)" is ``yom_kippur_mincha_traditional``."""
     folded = name.replace("'", "").replace("’", "")
-    return respell(re.sub(r"[\s\-/]+", "_", folded.lower()).strip("_"), _spellings())
+    return respell(re.sub(r"[^a-z0-9]+", "_", folded.lower()).strip("_"), _spellings())
 
 
 @lru_cache(maxsize=1)

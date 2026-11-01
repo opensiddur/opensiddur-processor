@@ -182,7 +182,6 @@ def header(
     project_id: str = MIQRA_PROJECT,
     namespace: str = "bible",
     entrypoint: str = "tanakh",
-    qualifier: str = "",
     license_url: str = "https://creativecommons.org/licenses/by-sa/4.0/",
     license_name: str = "Creative Commons Attribution-ShareAlike 4.0 International",
 ) -> str:
@@ -199,7 +198,7 @@ def header(
       <tei:distributor>
         <tei:ref target="http://opensiddur.org">Open Siddur Project</tei:ref>
       </tei:distributor>
-      <tei:idno type="urn">urn:x-opensiddur:text:{namespace}:{entrypoint}{qualifier}@{project_id}</tei:idno>
+      <tei:idno type="urn">urn:x-opensiddur:text:{namespace}:{entrypoint}@{project_id}</tei:idno>
       <tei:availability status="free">
         <tei:licence target="{license_url}">{license_name}</tei:licence>
       </tei:availability>
@@ -527,7 +526,7 @@ def book_file(book: Book, *, sourcetexts_root: Path | None, project_dir: Path | 
     intermediate = miqra_rows_to_intermediate(book, sheets_dir)
     intermediate = annotate_canonical_verses(intermediate, book.file_name)
     xml_dict = intermediate_to_tei(intermediate)
-    header_xml = header(book.book_name_he, book.book_name_en, qualifier=f":{book.file_name}")
+    header_xml = header(book.book_name_he, book.book_name_en, entrypoint=book.file_name)
     tei_content = tei_file(header_xml, **xml_dict)
     make_project_directory(project_dir)
     validate_and_write_tei_file(tei_content, book.file_name, project_dir, add_subverse=True)
@@ -548,6 +547,12 @@ def _readme_front_matter(sourcetexts_root: Path | None) -> str:
     return f"<tei:front xmlns:tei=\"http://www.tei-c.org/ns/1.0\">{paras}</tei:front>"
 
 
+def index_urn_name(file_name: str) -> str:
+    """The name an index file's URN has: the whole canon is ``tanakh``, as in every Tanakh
+    project; any other index (``the_prophets``) is named by its file."""
+    return "tanakh" if file_name == "index" else file_name
+
+
 def index_file(idx: Index, *, sourcetexts_root: Path | None, project_dir: Path | None) -> None:
     transclusion_str = "\n".join(
         [
@@ -556,14 +561,14 @@ def index_file(idx: Index, *, sourcetexts_root: Path | None, project_dir: Path |
         ]
     )
     index_body = f"""<tei:body xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">
-  <tei:div corresp="urn:x-opensiddur:text:bible:{idx.file_name}">
+  <tei:div corresp="urn:x-opensiddur:text:bible:{index_urn_name(idx.file_name)}">
     <tei:head xml:lang="en">{_xml_escape(idx.index_title_en)}</tei:head>
     {transclusion_str}
   </tei:div>
 </tei:body>
 """
     front = _readme_front_matter(sourcetexts_root) if idx.file_name == "index" else ""
-    header_xml = header(idx.index_title_he, idx.index_title_en, qualifier=f":{idx.file_name}")
+    header_xml = header(idx.index_title_he, idx.index_title_en, entrypoint=index_urn_name(idx.file_name))
     tei_content = tei_file(header_xml, front=front, body=index_body)
     make_project_directory(project_dir)
     validate_and_write_tei_file(tei_content, idx.file_name, project_dir)

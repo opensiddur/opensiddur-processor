@@ -162,6 +162,8 @@ An importer that names something from a source's own words -- hebcal's reading n
 reading IDs of a transcription -- respells those words by the list as it names it
 (`opensiddur.common.validate_names.respell` and `respell_urns`), and keeps the source's own
 spelling in the source. A word added to the list is then respelled everywhere by regenerating.
+Until then the projects that use the old spelling fail the check, so a change to the list comes
+with an opensiddur-projects PR of the same branch name that regenerates them.
 
 The variant list catches known misspellings, not every one. A word is only a variant if it
 cannot be another word: `selah` (סֶלָה) and `selach` (סְלַח) are both correct, so neither is

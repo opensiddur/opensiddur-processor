@@ -147,6 +147,10 @@ class WordsTestCase(unittest.TestCase):
         self.assertEqual(list(urn_paths(f"see {TEXT}prayer:amidah/avot. And {TEXT}prayer:aleinu")),
                          ["amidah/avot", "aleinu"])
 
+    def test_a_urn_cited_in_a_parenthesis_leaves_its_closing_parenthesis(self):
+        self.assertEqual(list(urn_paths(f"(see {TEXT}bible:genesis/1/1). And ({TEXT}prayer:aleinu)")),
+                         ["genesis/1/1", "aleinu"])
+
     def test_a_malformed_component_is_read_whole(self):
         self.assertEqual(list(urn_paths(f'"{TEXT}bible:reading/yom_kippur_(mincha,_x)"')),
                          ["reading/yom_kippur_(mincha,_x)"])

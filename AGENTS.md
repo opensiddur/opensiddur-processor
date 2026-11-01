@@ -251,9 +251,9 @@ and Hebrew/English alignment after regeneration.
   spelling listed in `specs/naming/spellings.yaml`. A file and a URN for the same text spell
   its words the same way.
 - When you settle a spelling the table did not decide, add it to `spellings.yaml`. Check with
-  `uv run python -m opensiddur.common.validate_names [project ...]`. Pull requests to
-  opensiddur-projects must pass its `--names-only` check (project names and settings places);
-  the full check, of file names, URNs and their spelling, is advisory until they are respelled.
+  `uv run python -m opensiddur.common.validate_names [project ...]`; pull requests to
+  opensiddur-projects must pass it. A new variant in `spellings.yaml` makes the projects that
+  still use the old spelling fail, so regenerate them in a paired PR with the same branch name.
 
 ### Testing Conventions
 
