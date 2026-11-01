@@ -227,9 +227,9 @@ class TestSectionOrder(unittest.TestCase):
         for _, slug in HALLEL_SUBSECTION_PREFIXES:
             self.assertIn(slug, placed)
 
-    def test_sefirat_haomer_sits_between_adir_hu_and_echad_mi_yodea(self) -> None:
+    def test_sefirat_haomer_sits_between_addir_hu_and_echad_mi_yodea(self) -> None:
         order = INDEX_CHILDREN["nirtzah"]
-        self.assertEqual(order.index("sefirat_haomer"), order.index("adir_hu") + 1)
+        self.assertEqual(order.index("sefirat_haomer"), order.index("addir_hu") + 1)
         self.assertEqual(
             order.index("echad_mi_yodea"), order.index("sefirat_haomer") + 1
         )

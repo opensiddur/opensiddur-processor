@@ -40,23 +40,23 @@ prayer('mizmor_shir_chanukat_habayit', 'A psalm, a song', 'mizmor_shir_chanukat_
 
 prayer('kaddish_yatom', 'Mourners’ Kaddish', 'kaddish/yatom', 50, 52,
     "\n".join([f'<tei:div corresp="{U}kaddish/yatom">',
-      f'<j:transclude type="external" target="{U}kaddish/yitgadal"/>',
-      f'<j:transclude type="external" target="{U}kaddish/yehe_shmeh"/>',
+      f'<j:transclude type="external" target="{U}kaddish/yitgaddal"/>',
+      f'<j:transclude type="external" target="{U}kaddish/yehe_shemeh"/>',
       f'<j:transclude type="external" target="{U}kaddish/yitbarakh"/>',
-      d(U + "kaddish/yatom/yehe_shlama",
+      d(U + "kaddish/yatom/yehe_shelama",
       f'{pb(52)}' + 'May there be abundant peace from heaven, and life, for us and for all Israel; and say, Amen.'),
       d(U + "kaddish/yatom/oseh_shalom", 'He who creates peace in his celestial heights, may he create peace for us and for all Israel; and say, Amen.'),
       "</tei:div>"]))
 
 # An explicit empty corresponding position, not an invented English translation.
 # Without it the sequence alignment pairs the next English prayer with Hareni.
-prayer('hareni_mezamen', 'Hareni mezamen (not translated in the print)',
-       'hareni_mezamen', 52, 52,
-       f'<tei:div corresp="{U}hareni_mezamen"><!-- No English text printed. --></tei:div>')
+prayer('hareini_mezammen', 'Hareni mezamen (not translated in the print)',
+       'hareini_mezammen', 52, 52,
+       f'<tei:div corresp="{U}hareini_mezammen"><!-- No English text printed. --></tei:div>')
 
-prayer('barukh_sheamar', 'Blessed be he who spoke', 'pesukei_dezimra/barukh_sheamar', 52, 52,
-    "\n".join([f'<tei:div corresp="{U}pesukei_dezimra/barukh_sheamar">',
-        d(U + "pesukei_dezimra/barukh_sheamar/barukh", (
+prayer('barukh_sheamar', 'Blessed be he who spoke', 'pesuqei_dezimrah/barukh_sheamar', 52, 52,
+    "\n".join([f'<tei:div corresp="{U}pesuqei_dezimrah/barukh_sheamar">',
+        d(U + "pesuqei_dezimrah/barukh_sheamar/barukh", (
             'Blessed be he who spoke, and the world came into being; blessed be he. '
             'Blessed be he who created the universe. Blessed be he who says and performs.'
             ' Blessed be he who decrees and fulfills. Blessed be he who has mercy on the '
@@ -69,7 +69,7 @@ prayer('barukh_sheamar', 'Blessed be he who spoke', 'pesukei_dezimra/barukh_shea
             'servant David will we praise thee, Lord our God; with his hymns and psalms '
             'will we exalt, extol and glorify thee. We will call upon thy name and '
             'proclaim thee King, our King, our God.')),
-        d(U + "pesukei_dezimra/barukh_sheamar/yachid", (
+        d(U + "pesuqei_dezimrah/barukh_sheamar/yachid", (
             'Thou who art One, the life of the universe, O King, praised and glorified be'
             ' thy great name forever and ever. Blessed art thou, O Lord, King extolled '
             'with hymns of praise.')),

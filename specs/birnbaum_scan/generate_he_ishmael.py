@@ -107,16 +107,16 @@ emit("#: Kaddish d'Rabbanan. `יִתְבָּרַךְ` runs across the page turn 
      "#: `וּלְעָלְמֵי עָלְמַיָּא. | יִתְבָּרַךְ`, which is a paragraph boundary, so the\n"
      "#: break opens the next passage rather than sitting inside this one.")
 KADDISH = [
-    ("kaddish_derabbanan_yitgadal", "יִתְגַּדַּל וְיִתְקַדַּשׁ", "kaddish/derabbanan/yitgadal",
+    ("kaddish_derabbanan_yitgaddal", "יִתְגַּדַּל וְיִתְקַדַּשׁ", "kaddish/derabbanan/yitgaddal",
      45, 45, para(45, 2), ""),
-    ("kaddish_derabbanan_yehe_shmeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ",
-     "kaddish/derabbanan/yehe_shmeh", 45, 45, para(45, 3), ""),
+    ("kaddish_derabbanan_yehe_shemeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ",
+     "kaddish/derabbanan/yehe_shemeh", 45, 45, para(45, 3), ""),
     ("kaddish_derabbanan_yitbarakh", "יִתְבָּרַךְ וְיִשְׁתַּבַּח",
      "kaddish/derabbanan/yitbarakh", 47, 47, para(47, 0), "{pb(47)}"),
     ("kaddish_derabbanan_al_yisrael", "עַל יִשְׂרָאֵל וְעַל רַבָּנָן",
      "kaddish/derabbanan/al_yisrael", 47, 47, para(47, 1), ""),
-    ("kaddish_derabbanan_yehe_shlama", "יְהֵא שְׁלָמָא רַבָּא",
-     "kaddish/derabbanan/yehe_shlama", 47, 47, para(47, 2), ""),
+    ("kaddish_derabbanan_yehe_shelama", "יְהֵא שְׁלָמָא רַבָּא",
+     "kaddish/derabbanan/yehe_shelama", 47, 47, para(47, 2), ""),
     ("kaddish_derabbanan_oseh_shalom", "עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו",
      "kaddish/derabbanan/oseh_shalom", 47, 47, para(47, 3), ""),
 ]

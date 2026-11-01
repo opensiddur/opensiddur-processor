@@ -59,7 +59,7 @@ def prayers(lang):
                 parts.append(marks.start(BIBLE + ref[6:]) + text_xml(text) + ' ')
             elif ref.startswith('bible:'):
                 # These Exodus verses already occur in the Song at the Sea.
-                key = 'mi_khamokha' if ref.endswith('/11') else 'adonai_yimlokh'
+                key = 'mi_khamokhah' if ref.endswith('/11') else 'adonai_yimlokh'
                 parts.append(f'<tei:div corresp="{PRAYER}{name}/{key}"><tei:p><tei:seg source="{BIBLE}{ref[6:]}">{text_xml(text)}</tei:seg></tei:p></tei:div>')
             elif ref == 'shema/barukh_shem':
                 parts.append(f'<tei:div corresp="{SIDDUR}chol/shacharit/shema/barukh_shem"><j:transclude type="external" target="{PRAYER}{ref}"/></tei:div>')

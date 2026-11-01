@@ -47,8 +47,8 @@ def d(urn, *paras, indent=8):
 #: Genesis 22:1-19, printed under its own citation and running across the page turn at
 #: `וְנָשֽׁוּבָה | אֲלֵיכֶם`. One paragraph in the print, so one `tei:p` with the break
 #: inside it -- `tei:pb` is valid there and the sentence is not broken to accommodate it.
-prayer("akedah", "פָּרָשַׁת הָעֲקֵדָה", "akedah", 19, 21,
-       d(U + "akedah",
+prayer("aqedah", "פָּרָשַׁת הָעֲקֵדָה", "aqedah", 19, 21,
+       d(U + "aqedah",
          "וַיְהִי אַחַר הַדְּבָרִים הָאֵֽלֶּה, וְהָאֱלֹהִים נִסָּה אֶת אַבְרָהָם, "
          "וַיֹּֽאמֶר אֵלָיו: אַבְרָהָם, וַיֹּֽאמֶר הִנֵּֽנִי. וַיֹּֽאמֶר: קַח נָא אֶת "
          "בִּנְךָ, אֶת יְחִידְךָ, אֲשֶׁר אָהַֽבְתָּ, אֶת יִצְחָק, וְלֶךְ לְךָ אֶל אֶֽרֶץ "
@@ -88,8 +88,8 @@ prayer("akedah", "פָּרָשַׁת הָעֲקֵדָה", "akedah", 19, 21,
 #: Runs across the page turn at `וֵאלֹהֵי | אֲבוֹתֵֽינוּ` -- the nine words that were
 #: missing from the reading *and* from the transcription until the slice was rebuilt from
 #: the printed page's own transclusions. See `readings/21.md`.
-prayer("akedah_ribbono", "רִבּוֹנוֹ שֶׁל עוֹלָם", "akedah/ribbono_shel_olam", 21, 23,
-       d(U + "akedah/ribbono_shel_olam",
+prayer("aqedah_ribbono", "רִבּוֹנוֹ שֶׁל עוֹלָם", "aqedah/ribbono_shel_olam", 21, 23,
+       d(U + "aqedah/ribbono_shel_olam",
          "רִבּוֹנוֹ שֶׁל עוֹלָם, יְהִי רָצוֹן מִלְּפָנֶֽיךָ, יְיָ אֱלֹהֵֽינוּ וֵאלֹהֵי "
          f"{pb(23)}אֲבוֹתֵֽינוּ, שֶׁתִּזְכָּר־לָֽנוּ בְּרִית אֲבוֹתֵֽינוּ. כְּמוֹ שֶׁכָּבַשׁ אַבְרָהָם "
          "אָבִֽינוּ אֶת רַחֲמָיו מִבֶּן־יְחִידוֹ, וְרָצָה לִשְׁחֹט אוֹתוֹ כְּדֵי "
@@ -139,8 +139,8 @@ prayer("lefikhakh", "לְפִיכָךְ אֲנַֽחְנוּ חַיָּבִים"
          "אַשְׁרֵֽינוּ, מַה טּוֹב חֶלְקֵֽנוּ וּמַה נָּעִים גּוֹרָלֵֽנוּ וּמַה יָּפָה "
          "יְרֻשָּׁתֵֽנוּ."))
 
-prayer("ashrenu", "אַשְׁרֵֽינוּ שֶׁאֲנַֽחְנוּ מַשְׁכִּימִים", "lefikhakh/ashrenu", 25, 25,
-       d(U + "lefikhakh/ashrenu",
+prayer("ashreinu", "אַשְׁרֵֽינוּ שֶׁאֲנַֽחְנוּ מַשְׁכִּימִים", "lefikhakh/ashreinu", 25, 25,
+       d(U + "lefikhakh/ashreinu",
          "אַשְׁרֵֽינוּ, שֶׁאֲנַֽחְנוּ מַשְׁכִּימִים וּמַעֲרִיבִים, עֶֽרֶב וָבֹֽקֶר, "
          "וְאוֹמְרִים פַּעֲמַֽיִם בְּכָל יוֹם:"))
 
@@ -151,8 +151,8 @@ prayer("attah_hu_ad", "אַתָּה הוּא עַד שֶׁלֹּא נִבְרָ�
          "אַתָּה הוּא בָּעוֹלָם הַזֶּה וְאַתָּה הוּא לָעוֹלָם הַבָּא. קַדֵּשׁ אֶת שִׁמְךָ "
          "עַל מַקְדִּישֵׁי שְׁמֶֽךָ, וְקַדֵּשׁ אֶת שִׁמְךָ בְּעוֹלָמֶֽךָ,"))
 
-prayer("attah_hu_uvishuatkha", "וּבִישׁוּעָתְךָ תָּרוּם", "attah_hu/uvishuatkha", 25, 25,
-       d(U + "attah_hu/uvishuatkha",
+prayer("attah_hu_uvishuatekha", "וּבִישׁוּעָתְךָ תָּרוּם", "attah_hu/uvishuatekha", 25, 25,
+       d(U + "attah_hu/uvishuatekha",
          "וּבִישׁוּעָתְךָ תָּרוּם וְתִגְבַּהּ קַרְנֵֽנוּ. בָּרוּךְ אַתָּה, יְיָ, "
          "מְקַדֵּשׁ אֶת שִׁמְךָ בָּרַבִּים."))
 

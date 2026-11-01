@@ -116,18 +116,18 @@ prayer("ishmael_yehi_ratzon", "יְהִי רָצוֹן שֶׁיִּבָּנֶה 
 #: Kaddish d'Rabbanan. `יִתְבָּרַךְ` runs across the page turn at
 #: `וּלְעָלְמֵי עָלְמַיָּא. | יִתְבָּרַךְ`, which is a paragraph boundary, so the
 #: break opens the next passage rather than sitting inside this one.
-prayer("kaddish_derabbanan_yitgadal", "יִתְגַּדַּל וְיִתְקַדַּשׁ", "kaddish/derabbanan/yitgadal", 45, 45,
-       d(U + "kaddish/derabbanan/yitgadal",
-         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yitgadal"/>'
+prayer("kaddish_derabbanan_yitgaddal", "יִתְגַּדַּל וְיִתְקַדַּשׁ", "kaddish/derabbanan/yitgaddal", 45, 45,
+       d(U + "kaddish/derabbanan/yitgaddal",
+         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yitgaddal"/>'
          "יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא בְּעָלְמָא דִּי בְרָא "
          "כִרְעוּתֵהּ; וְיַמְלִיךְ מַלְכוּתֵהּ בְּחַיֵּיכוֹן וּבְיוֹמֵיכוֹן, "
          "וּבְחַיֵּי דְכָל בֵּית יִשְׂרָאֵל, בַּעֲגָלָא וּבִזְמַן קָרִיב, "
          "וְאִמְרוּ אָמֵן."
          '<tei:milestone unit="prayer-part"/>'))
 
-prayer("kaddish_derabbanan_yehe_shmeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ", "kaddish/derabbanan/yehe_shmeh", 45, 45,
-       d(U + "kaddish/derabbanan/yehe_shmeh",
-         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yehe_shmeh"/>'
+prayer("kaddish_derabbanan_yehe_shemeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ", "kaddish/derabbanan/yehe_shemeh", 45, 45,
+       d(U + "kaddish/derabbanan/yehe_shemeh",
+         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yehe_shemeh"/>'
          "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא."
          '<tei:milestone unit="prayer-part"/>'))
 
@@ -153,8 +153,8 @@ prayer("kaddish_derabbanan_al_yisrael", "עַל יִשְׂרָאֵל וְעַל 
          "וּמְזוֹנֵי רְוִיחֵי, וּפֻרְקָנָא מִן קֳדָם אֲבוּהוֹן דְּבִשְׁמַיָּא "
          "וְאַרְעָא, וְאִמְרוּ אָמֵן."))
 
-prayer("kaddish_derabbanan_yehe_shlama", "יְהֵא שְׁלָמָא רַבָּא", "kaddish/derabbanan/yehe_shlama", 47, 47,
-       d(U + "kaddish/derabbanan/yehe_shlama",
+prayer("kaddish_derabbanan_yehe_shelama", "יְהֵא שְׁלָמָא רַבָּא", "kaddish/derabbanan/yehe_shelama", 47, 47,
+       d(U + "kaddish/derabbanan/yehe_shelama",
          "יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא, וְחַיִּים טוֹבִים, עָלֵֽינוּ וְעַל "
          "כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן."))
 

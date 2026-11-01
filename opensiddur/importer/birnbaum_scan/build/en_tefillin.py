@@ -36,9 +36,9 @@ def d(urn, *paras, indent=8):
 TEFILLIN = '<tei:foreign xml:lang="he-Latn">tefillin</tei:foreign>'
 MENORAH = '<tei:foreign xml:lang="he-Latn">Menorah</tei:foreign>'
 
-prayer("tefillin_hineni_mekhaven", "Meditation before putting on the tefillin",
-       "tefillin/hineni_mekhaven", 6, 8,
-       d(U + "tefillin/hineni_mekhaven",
+prayer("tefillin_hineni_mekhavven", "Meditation before putting on the tefillin",
+       "tefillin/hineni_mekhavven", 6, 8,
+       d(U + "tefillin/hineni_mekhavven",
          f"By putting on the {TEFILLIN} I intend to fulfill the command of my Creator, "
          f"who has commanded us to wear {TEFILLIN}, as it is written in the Torah: You "
          "shall bind them as a sign on your hand, and they shall be as frontlets between "
@@ -56,9 +56,9 @@ prayer("tefillin_hineni_mekhaven", "Meditation before putting on the tefillin",
          "and free me from any sinful reflection whatever. May the evil impulse never "
          "tempt us, but leave us to serve the Lord as our heart desires."))
 
-prayer("tefillin_lehaniach", "Blessing over binding the tefillin", "tefillin/lehaniach",
+prayer("tefillin_lehanniach", "Blessing over binding the tefillin", "tefillin/lehanniach",
        8, 8,
-       d(U + "tefillin/lehaniach",
+       d(U + "tefillin/lehanniach",
          "Blessed art thou, Lord our God, King of the universe, who hast sanctified us "
          f"with thy commandments, and commanded us to wear {TEFILLIN}."))
 
@@ -69,8 +69,8 @@ prayer("tefillin_al_mitzvat", "Blessing over the precept of tefillin",
          "with thy commandments, and commanded us concerning the precept of "
          f"{TEFILLIN}."))
 
-prayer("tefillin_umechokhmatkha", "Supreme God", "tefillin/umechokhmatkha", 8, 8,
-       d(U + "tefillin/umechokhmatkha",
+prayer("tefillin_umechokhmatekha", "Supreme God", "tefillin/umechokhmatekha", 8, 8,
+       d(U + "tefillin/umechokhmatekha",
          "Supreme God, thou wilt imbue me with thy wisdom and thy intelligence; in thy "
          "grace thou wilt do great things for me; by thy might thou wilt cut off my foes "
          f"and my adversaries. Thou wilt pour the good oil into the seven branches of the "

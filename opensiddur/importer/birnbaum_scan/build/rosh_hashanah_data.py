@@ -59,7 +59,7 @@ ROWS = [{'key': 'ki_shem',
   'page': 657,
   'he': 'קָדוֹשׁ, קָדוֹשׁ, קָדוֹשׁ יְיָ צְבָאוֹת; מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ.',
   'en': 'Holy, holy, holy is the Lord of hosts;\nThe whole earth is full of his glory.”'},
- {'key': 'leumatam',
+ {'key': 'leummatam',
   'page': 657,
   'he': 'לְעֻמָּתָם בָּרוּךְ יֹאמֵֽרוּ—',
   'en': 'Those opposite them say: Blessed—'},
@@ -82,7 +82,7 @@ ROWS = [{'key': 'ki_shem',
   'en': 'Through all generations we will declare thy greatness; to all eternity we will proclaim thy '
         'holiness; thy praise, our God, shall never depart from our mouth, for thou art a great and holy God '
         'and King.'},
- {'key': 'ata_qadosh',
+ {'key': 'attah_qadosh',
   'page': 657,
   'he': 'אַתָּה קָדוֹשׁ וְשִׁמְךָ קָדוֹשׁ, וּקְדוֹשִׁים בְּכָל יוֹם יְהַלְלֽוּךָ סֶּֽלָה.',
   'en': 'Thou art holy and thy name is holy, and holy beings praise thee daily.'},
@@ -130,7 +130,7 @@ ROWS = [{'key': 'ki_shem',
   'en': 'Holy art thou, awe-inspiring is thy name, and there is no God but thee, as it is written: “The Lord '
         'of hosts is exalted through justice, the holy God is sanctified through righteousness.” Blessed art '
         'thou, O Lord, holy King.'},
- {'key': 'ata_vechartanu',
+ {'key': 'attah_vechartanu',
   'page': 659,
   'he': 'אַתָּה בְחַרְתָּֽנוּ מִכָּל הָעַמִּים, אָהַֽבְתָּ אוֹתָֽנוּ וְרָצִֽיתָ בָּֽנוּ, וְרוֹמַמְתָּֽנוּ '
         'מִכָּל הַלְּשׁוֹנוֹת, וְקִדַּשְׁתָּֽנוּ בְּמִצְוֺתֶֽיךָ, וְקֵרַבְתָּֽנוּ מַלְכֵּֽנוּ '
@@ -138,7 +138,7 @@ ROWS = [{'key': 'ki_shem',
   'en': 'Thou didst choose us from among all peoples; thou didst love and favor us; thou didst exalt us '
         'above all tongues and sanctify us with thy commandments. Thou, our King, didst draw us near to thy '
         'service and call us by thy great and holy name.'},
- {'key': 'vatodienu',
+ {'key': 'vattodienu',
   'page': 659,
   'he': '(וַתּוֹדִיעֵֽנוּ, יְיָ אֱלֹהֵֽינוּ, אֶת מִשְׁפְּטֵי צִדְקֶֽךָ, וַתְּלַמְּדֵֽנוּ לַעֲשׂוֹת חֻקֵּי '
         'רְצוֹנֶֽךָ; וַתִּתֶּן לָֽנוּ, יְיָ אֱלֹהֵֽינוּ, מִשְׁפָּטִים יְשָׁרִים וְתוֹרוֹת אֱמֶת, חֻקִּים '
@@ -157,7 +157,7 @@ ROWS = [{'key': 'ki_shem',
         'working days. Thou hast made a distinction between the holiness of the Sabbath and the holiness of '
         'the festival, and hast hallowed the seventh day above the six working days; thou hast distinguished '
         'and sanctified thy people Israel with thy holiness.)'},
- {'key': 'vatiten_lanu',
+ {'key': 'vattitten_lanu',
   'page': 659,
   'he': 'וַתִּתֶּן לָֽנוּ, יְיָ אֱלֹהֵֽינוּ, בְּאַהֲבָה אֶת יוֹם (הַשַּׁבָּת הַזֶּה וְאֶת יוֹם) הַזִּכָּרוֹן '
         'הַזֶּה, יוֹם (זִכְרוֹן) תְּרוּעָה (בְּאַהֲבָה) מִקְרָא קֹֽדֶשׁ, זֵֽכֶר לִיצִיאַת מִצְרָֽיִם.',
@@ -244,7 +244,7 @@ ROWS = [{'key': 'ki_shem',
         'because thou hast kept us alive and sustained us; mayest thou ever grant us life and sustenance. O '
         'gather our exiles to thy holy courts to observe thy laws, to do thy will, and to serve thee with a '
         'perfect heart. For this we thank thee. Blessed be God to whom all thanks are due.)'},
- {'key': 'veal_kulam',
+ {'key': 'veal_kullam',
   'page': 663,
   'he': 'וְעַל כֻּלָּם יִתְבָּרַךְ וְיִתְרוֹמַם שִׁמְךָ, מַלְכֵּֽנוּ, תָּמִיד לְעוֹלָם וָעֶד.',
   'en': 'For all these acts may thy name, our King, be blessed and exalted forever and ever.'},
@@ -252,7 +252,7 @@ ROWS = [{'key': 'ki_shem',
   'page': 663,
   'he': 'וּכְתוֹב לְחַיִּים טוֹבִים כָּל בְּנֵי בְרִיתֶֽךָ.',
   'en': 'Inscribe all thy people of the covenant for a happy life.'},
- {'key': 'vekhol_hahayim',
+ {'key': 'vekhol_hachayyim',
   'page': 663,
   'he': 'וְכֹל הַחַיִּים יוֹדֽוּךָ סֶּֽלָה, וִיהַלְלוּ אֶת שִׁמְךָ בֶּאֱמֶת, הָאֵל, יְשׁוּעָתֵֽנוּ '
         'וְעֶזְרָתֵֽנוּ סֶֽלָה. בָּרוּךְ אַתָּה, יְיָ, הַטּוֹב שִׁמְךָ, וּלְךָ נָאֶה לְהוֹדוֹת.',
@@ -760,7 +760,7 @@ NOTES = [{'page': 655,
 RUBRICS = {'amidah_rubric': 'The Amidah is recited in silent devotion while standing, facing east.',
  'qedushah_rubric': 'When the Reader repeats the Amidah, the following Kedushah is said:',
  'reader': 'Reader:',
- 'vatodienu_rubric': 'On Saturday night add:',
+ 'vattodienu_rubric': 'On Saturday night add:',
  'modim_derabbanan_rubric': 'When the Reader repeats the Amidah, the Congregation responds here by saying:',
  'elohai_netzor_rubric': 'After the Amidah add the following meditation:',
  'greeting_rubric': 'Rosh Hashanah Greeting:',

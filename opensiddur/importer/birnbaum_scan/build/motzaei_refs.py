@@ -67,7 +67,7 @@ VEYITTEN = [('urn:x-opensiddur:text:bible:genesis/27/28', 'וְיִתֶּן־ל�
   'The spirit came upon Amasai'),
  ('urn:x-opensiddur:text:bible:samuel_1/25/6', 'וַאֲמַרְתֶּם כֹּה לֶחָי', 'And thus shall you say'),
  ('urn:x-opensiddur:text:bible:psalms/29/11', 'יְיָ עֹז', 'The Lord will give strength'),
- ('urn:x-opensiddur:text:talmud:megillah/31a/amar_rabbi_yohanan',
+ ('urn:x-opensiddur:text:talmud:megillah/31a/amar_rabbi_yochanan',
   'אָמַר רַבִּי יוֹחָנָן',
   'Rabbi Yoḥanan said:'),
  ('urn:x-opensiddur:text:bible:kings_1/8/57',

@@ -18,12 +18,12 @@ NOTES = [
 # reference at the opening, even though only verse 35 occurs there.
 for key, row, number, citation in (
     ('vayehi_binsoa', 'vayehi', '1', 'Numbers 10:35–36.'),
-    ('vayehi_binsoa', 'ki_mitzion', '2', 'Isaiah 2:3.'),
-    ('gadelu', 'gadelu', '1', 'Psalm 34:4.'),
+    ('vayehi_binsoa', 'ki_mitziyyon', '2', 'Isaiah 2:3.'),
+    ('gaddelu', 'gaddelu', '1', 'Psalm 34:4.'),
     ('lekha_adonai', 'lekha', '2', 'I Chronicles 29:11.'),
     ('lekha_adonai', 'romemu_hadom', '3', 'Psalm 99:5, 9.'),
     ('vetiggaleh', 'torat', '4', 'Psalms 19:8–9; 29:11; 18:31.'),
-    ('veatem', 'veatem', '5', 'Deuteronomy 4:4.'),
+    ('veattem', 'veattem', '5', 'Deuteronomy 4:4.'),
     ('vezot_hatorah', 'vezot', '1', 'Deuteronomy 4:44; Numbers 9:23.'),
     ('vezot_hatorah', 'etz', '2', 'Proverbs 3:18, 17, 16; Isaiah 42:21.'),
     ('yehalelu', 'reader', '1', 'Psalm 148:13–14.'),

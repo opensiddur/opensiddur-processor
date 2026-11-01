@@ -8,7 +8,7 @@ NOTES = [
  note(URNS['vehu'],'The verse <tei:foreign xml:lang="he">והוא רחום</tei:foreign>, consisting of thirteen words, was held by some to recall the thirteen attributes of divine mercy (Exodus 34:6–7). “As the evening approaches, man is conscious of having sinned during the day, and thus begins his prayer with this appeal to the divine mercy” (Maḥzor Vitry, page 77).'),
  note(URNS['vehu'],'Psalms 78:38; 20:10.',kind='citation',n='1'),
  note(URNS['emet']+'/opening','Job 9:10; Psalm 66:9.',kind='citation',n='1'),
- note(URNS['emet']+'/mi_khamokha','Exodus 15:11.',kind='citation',n='2'),
+ note(URNS['emet']+'/mi_khamokhah','Exodus 15:11.',kind='citation',n='2'),
  note(URNS['emet']+'/yimlokh','Exodus 15:18.',kind='citation',n='3'),
  note(URNS['emet']+'/seal','Jeremiah 31:10.',kind='citation',n='4'),
  note(ANCHORS['barukh','psalms/79/13'],'Psalms 89:53; 135:21; 72:18–19; 104:31; 113:2; I Samuel 12:22; I Kings 18:39; Zechariah 14:9; Psalms 33:22; 106:47; 86:9–10; 79:13.',kind='citation',n='1'),

@@ -118,7 +118,7 @@ PASSAGES = {'vayomer': {'he': 'וַיֹּֽאמֶר דָּוִד אֶל גָּד
                             'עָלֵֽינוּ. ',
                       'en': 'Deal not with us according to our sins; requite us not according to our '
                             'iniquities. '},
-                     {'anchor': 'im_avonenu',
+                     {'anchor': 'im_avoneinu',
                       'source': 'jeremiah/14/7',
                       'he': 'אִם עֲוֹנֵֽינוּ {pb:107}עָֽנוּ בָֽנוּ, יְיָ, עֲשֵׂה לְמַֽעַן שְׁמֶֽךָ. ',
                       'en': 'If our sins, O Lord, testify against us, act for {pb:108}thy name’s sake. '},

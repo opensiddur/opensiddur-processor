@@ -9,14 +9,14 @@ def note(key,kind,text):
 
 # Citation and commentary anchors are deliberately separate when the scan's
 # superscript and catchword fall on different phrases.
-ANCHORS={609:['avot'],610:['ki_shem','ki_shem','sefatai'],611:['hu_elohenu'],
- 612:['qadosh_major','barukh_major','shema','ani','adir','yimlokh_major'],
+ANCHORS={609:['avot'],610:['ki_shem','ki_shem','sefatai'],611:['hu_eloheinu'],
+ 612:['qadosh_major','barukh_major','shema','ani','addir','yimlokh_major'],
  616:['shabbat_offering','pesach_offering'],617:['sukkot_opening'],
  618:['sukkot_day2','shavuot_offering','sukkot_opening'],619:['uminchatam'],
  620:['shemini_offering'],622:['shalosh_peamim'],624:['kohanim_reader'],
  625:['veteerav'],626:[None,'elohai_netzor','yehi_ratzon'],627:['dream'],
  628:['kohanim_response_1_3'],630:['kohanim_response_2_5','kohanim_response_3_4','kohanim_response_3_7'],
- 631:['adir_bamarom'],632:['kohanim_ribbon','kiddush_shabbat','vayedaber'],633:['tal_bereshuto'],634:[None]}
+ 631:['addir_bamarom'],632:['kohanim_ribbon','kiddush_shabbat','vayedaber'],633:['tal_bereshuto'],634:[None]}
 NOTES=[]
 for page,keys in ANCHORS.items():
     notes=PAGES[str(page)]['notes']

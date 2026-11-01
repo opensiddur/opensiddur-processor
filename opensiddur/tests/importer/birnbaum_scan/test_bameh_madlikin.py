@@ -33,11 +33,11 @@ class TestBamehMadlikin(unittest.TestCase):
                 ({**date_values(3,7,False),(AGG,'yom-tov'):True},TriState.FALSE)]:
             self.assertEqual(evaluate(expr,vals),expected)
         xml=etree.tostring(study,encoding='unicode')
-        self.assertLess(xml.index('target="#kabbalat_bameh_festival"'),xml.index('target="'+TALMUD+'"'))
+        self.assertLess(xml.index('target="#qabbalat_bameh_festival"'),xml.index('target="'+TALMUD+'"'))
         self.assertIn('target="'+ROOT+'/study_kaddish"',xml)
 
     def test_shared_metadata_does_not_mutate_old_text_or_claim_variant_printing(self):
-        sample=[dict(name='kaddish_derabbanan_yehe_shlama',body='Earlier wording.',printings=((48,48),)),
+        sample=[dict(name='kaddish_derabbanan_yehe_shelama',body='Earlier wording.',printings=((48,48),)),
                 dict(name='kaddish_derabbanan_al_yisrael',body='Shared wording.')]
         result=shared('en',sample)
         self.assertEqual(result[0],sample[0])

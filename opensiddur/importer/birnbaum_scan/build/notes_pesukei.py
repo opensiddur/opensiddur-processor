@@ -9,7 +9,7 @@ PESUKEI_NOTES = [
              "independent of God’s aid. In his distress he pleaded that his life might "
              "be spared, and his prayer was answered. He is determined to spend the "
              "rest of his life in thanksgiving."))]),
-    dict(kind="commentary", target=PRAYER + "pesukei_dezimra/barukh_sheamar/barukh",
+    dict(kind="commentary", target=PRAYER + "pesuqei_dezimrah/barukh_sheamar/barukh",
          lemma="ברוך שאמר", paras=[dict(text=(
              "is composed of eighty-seven words, a number suggesting the numerical "
              'value of <tei:foreign xml:lang="he">פז</tei:foreign> (“refined gold”). '
@@ -29,7 +29,7 @@ PESUKEI_NOTES += [
     dict(kind="commentary", target=ROOT + "romemu", paras=[dict(text=(
         'The passage beginning with <tei:foreign xml:lang="he">רוממו</tei:foreign> '
         'is composed of a variety of biblical verses.'))]),
-    dict(kind="commentary", target=ROOT + "hoshia_et_ammekha", paras=[dict(text=(
+    dict(kind="commentary", target=ROOT + "hoshiah_et_ammekha", paras=[dict(text=(
         '<tei:hi rend="italic">Psalms</tei:hi> 99:5, 9; 78:38; 40:12; 25:6; 68:35–36; '
         '94:1–2; 3:9; 46:8; 84:13; 20:10; 28:9; 33:20–22; 85:8; 44:27; 81:11; 144:15; 13:6.'))]),
     dict(kind="commentary", target=BIBLE + "psalms/100", lemma="מזמור לתודה", paras=[dict(text=(
@@ -100,7 +100,7 @@ PESUKEI_NOTES += [
     dict(kind='commentary', target=ROOT+'ki_ladonai', paras=[dict(text=(
         '<tei:hi rend="italic">Psalm</tei:hi> 22:29; <tei:hi rend="italic">Obadiah</tei:hi> 1:21; '
         '<tei:hi rend="italic">Zechariah</tei:hi> 14:9.'))]),
-    dict(kind='commentary', target=PRAYER+'yishtabach', lemma='ישתבח', paras=[dict(text=(
+    dict(kind='commentary', target=PRAYER+'yishtabbach', lemma='ישתבח', paras=[dict(text=(
         'and <tei:foreign xml:lang="he">ברוך שאמר</tei:foreign> form the prologue and the epilogue '
         'to <tei:hi rend="italic">Pesuke d’Zimrah</tei:hi>. It has been suggested that the name of '
         'the author of <tei:hi rend="italic">Yishtabaḥ</tei:hi> was Solomon, since the initial letters '

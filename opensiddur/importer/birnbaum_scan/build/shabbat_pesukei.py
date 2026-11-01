@@ -11,30 +11,30 @@ from .shacharit_end import editorial_head
 from . import shabbat_pesukei_data as data
 
 ROOT = SIDDUR+'shabbat/shacharit'
-PESUKEI = ROOT+'/pesukei_dezimra'
-SIGIL = '1949 shabbat/shacharit/pesukei_dezimra'
+PESUKEI = ROOT+'/pesuqei_dezimrah'
+SIGIL = '1949 shabbat/shacharit/pesuqei_dezimrah'
 NISHMAT = PRAYER+'nishmat'
-HAEL = PRAYER+'ha_el_btaatzumot'
+HAEL = PRAYER+'ha_el_betaatzumot'
 SHOKHEN = PRAYER+'shokhen_ad'
-BEFI = PRAYER+'bfi_yesharim'
-BEMAKHALOT = PRAYER+'uvmakhalot'
+BEFI = PRAYER+'befi_yesharim'
+BEMAKHALOT = PRAYER+'uvmaqhalot'
 REPEAT91 = PESUKEI+'/psalm_91_repeat'
 OLD_REFERENCES = {
  'torah_vetiggaleh': ('psalms/19/8','psalms/19/9'),
  'leil_shabbat_guard_text': ('psalms/91/11',),
- 'hoshia_et_ammekha': ('psalms/33/20','psalms/33/21','psalms/33/22'),
+ 'hoshiah_et_ammekha': ('psalms/33/20','psalms/33/21','psalms/33/22'),
  'yehi_khevod': ('psalms/135/13','psalms/33/10','psalms/33/11','psalms/33/9','psalms/135/4'),
  'barukh_adonai': ('psalms/135/21',),
 }
 RANGES = {
  'mizmor_shir_chanukat_habayit':(299,299), 'kaddish_yatom':(299,301),
- 'hareni_mezamen':(301,301),'barukh_sheamar':(301,301),'hodu':(301,303),
- 'romemu':(303,303),'vehu_rachum':(303,305),'hoshia_et_ammekha':(305,305),
- 'kabbalat_psalm_92':(317,317),'conclusion_psalm_93':(317,317),
+ 'hareini_mezammen':(301,301),'barukh_sheamar':(301,301),'hodu':(301,303),
+ 'romemu':(303,303),'vehu_rachum':(303,305),'hoshiah_et_ammekha':(305,305),
+ 'qabbalat_psalm_92':(317,317),'conclusion_psalm_93':(317,317),
  'yehi_khevod':(319,319),'ashrei':(319,321),'psalm_146':(321,323),
  'psalm_147':(323,323),'psalm_148':(323,325),'psalm_149':(325,325),'psalm_150':(325,325),
  'barukh_adonai':(327,327),'vayevarekh_david':(327,327),'attah_hu':(327,327),
- 'vayosha':(329,329),'az_yashir':(329,329),'ki_ladonai':(331,331),'yishtabach':(335,335),
+ 'vayyosha':(329,329),'az_yashir':(329,329),'ki_ladonai':(331,331),'yishtabbach':(335,335),
  'kaddish_chatzi':(335,335),
 }
 
@@ -57,7 +57,7 @@ def shared(lang,prayers):
             if count!=1:raise ValueError(f'Expected one earlier {source} in {p["name"]}')
         if p['name'] in RANGES:
             a,b=RANGES[p['name']];p['printings']=(*p.get('printings',()),(a+side,b+side))
-        if p['name'] in ('kaddish_derabbanan_yitgadal','kaddish_derabbanan_yehe_shmeh','kaddish_derabbanan_yitbarakh'):
+        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh'):
             p['printings']=(*p.get('printings',()),(299+side,299+side),(335+side,335+side))
     by_name={p['name']:p for p in result}
     def before(name,he,en,page):
@@ -84,9 +84,9 @@ def prayers(lang):
             if not side and n==data.READER.get(number):body.append(marks.close()+instruction('Reader'))
             body += [marks.start(urn+'/'+str(n)),xml(text),' ']
         body += [marks.close(),'</tei:p></tei:div>']
-        result.append(dict(name='shabbat_pesukei_psalm_'+str(number),urn=urn,title=title,first=first+side,last=last+side,body=''.join(body)))
+        result.append(dict(name='shabbat_pesuqei_psalm_'+str(number),urn=urn,title=title,first=first+side,last=last+side,body=''.join(body)))
     def add(key,urn,he,en,first,last,body):
-        result.append(dict(name='shabbat_pesukei_'+key+'_text',urn=urn,title=(he,en)[side],first=first+side,last=last+side,body=f'<tei:div corresp="{urn}">'+body+'</tei:div>'))
+        result.append(dict(name='shabbat_pesuqei_'+key+'_text',urn=urn,title=(he,en)[side],first=first+side,last=last+side,body=f'<tei:div corresp="{urn}">'+body+'</tei:div>'))
     # The English does not translate the repeated final verse of Psalm 91.
     repeat='' if side else '<tei:p>'+marked(REPEAT91+'/text',f'<tei:seg source="{BIBLE}psalms/91/16">'+xml(data.HE[91].splitlines()[-1])+'</tei:seg>',unit='verse')+'</tei:p>'
     add('psalm_91_repeat',REPEAT91,'ארך ימים','Repeated final verse of Psalm 91',311,311,repeat)
@@ -127,7 +127,7 @@ def units(project,by_name):
     lang='he' if project==PROJECT_HE else 'en';side=int(lang=='en');result=[]
     def tr(name):return transclude(by_name[name]['urn'])
     def gate(cid,body):
-        cid='shabbat_pesukei_'+cid
+        cid='shabbat_pesuqei_'+cid
         return cond(cid,note='With a minyan:',fs=MINYAN)+body+endcond(cid)
     def add(key,he,en,first,last,body,*,printed=False):
         urn=ROOT+('/'+key if key else '')
@@ -135,19 +135,19 @@ def units(project,by_name):
         result.append(dict(name='shabbat_shacharit'+('_'+key.replace('/','_') if key else ''),urn=urn,title_he=he,title_en=en,pages=(first+side,last+side),body=f'<tei:div corresp="{urn}">'+heading+pb(first+side,sigil=SIGIL)+body+'</tei:div>'))
     add('opening/kaddish','קדיש יתום','MOURNERS’ KADDISH',299,301,gate('yatom',tr('kaddish_yatom')),printed=True)
     add('opening','פתיחת שחרית','Morning service opening',299,301,tr('mizmor_shir_chanukat_habayit')+transclude(ROOT+'/opening/kaddish'))
-    add('pesukei_dezimra/nishmat','נשמת','NISHMATH',331,335,
+    add('pesuqei_dezimrah/nishmat','נשמת','NISHMATH',331,335,
         transclude(NISHMAT)+cond('nishmat_reader_festival', fs=feature(AGG, 'yom-tov'))
         +instruction('On festivals the Reader begins here:')+endcond('nishmat_reader_festival')+transclude(HAEL)
         +cond('nishmat_reader_shabbat', fs='<j:all>'+feature(AGG, 'shabbat')+'<j:none>'+feature(AGG, 'yom-tov')+'</j:none></j:all>')
-        +instruction('On Sabbaths the Reader begins here:')+endcond('nishmat_reader_shabbat')+transclude(SHOKHEN)+transclude(BEFI)+transclude(BEMAKHALOT)+tr('yishtabach'),printed=True)
-    add('pesukei_dezimra/kaddish','חצי קדיש','Half Kaddish',335,335,gate('chatzi',tr('kaddish_chatzi')))
-    body=''.join(tr(k) for k in ('hareni_mezamen','barukh_sheamar','hodu','romemu','vehu_rachum','hoshia_et_ammekha'))
+        +instruction('On Sabbaths the Reader begins here:')+endcond('nishmat_reader_shabbat')+transclude(SHOKHEN)+transclude(BEFI)+transclude(BEMAKHALOT)+tr('yishtabbach'),printed=True)
+    add('pesuqei_dezimrah/kaddish','חצי קדיש','Half Kaddish',335,335,gate('chatzi',tr('kaddish_chatzi')))
+    body=''.join(tr(k) for k in ('hareini_mezammen','barukh_sheamar','hodu','romemu','vehu_rachum','hoshiah_et_ammekha'))
     for n in (19,34,90,91,135,136,33,92,93):
         body+=transclude(BIBLE+f'psalms/{n}')
         if n==91:body+=transclude(REPEAT91)
-    body+=''.join(tr(k) for k in ('yehi_khevod','ashrei','psalm_146','psalm_147','psalm_148','psalm_149','psalm_150','barukh_adonai','vayevarekh_david','attah_hu','vayosha','az_yashir','ki_ladonai'))
+    body+=''.join(tr(k) for k in ('yehi_khevod','ashrei','psalm_146','psalm_147','psalm_148','psalm_149','psalm_150','barukh_adonai','vayevarekh_david','attah_hu','vayyosha','az_yashir','ki_ladonai'))
     body+=transclude(PESUKEI+'/nishmat')+transclude(PESUKEI+'/kaddish')
-    add('pesukei_dezimra','פסוקי דזמרה','Pesukei Dezimrah',301,335,body)
+    add('pesuqei_dezimrah','פסוקי דזמרה','Pesukei Dezimrah',301,335,body)
     add('','שַׁחֲרִית לְשַׁבָּת וְיוֹם טוֹב','MORNING SERVICE FOR SABBATHS AND FESTIVALS',299,335,
         declaration()+instruction('The Preliminary Morning Service (pages 11–48) is read as on weekdays.')
         +transclude(SIDDUR+'all/shacharit/birkhot_hashachar')+transclude(ROOT+'/opening')+transclude(PESUKEI)

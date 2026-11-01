@@ -33,7 +33,7 @@ def notes():
                 target=ROOT+'/psalm128'
             if page==551:text+=' '+READINGS['552']['notes'][0]
             if (page,i)==(550,1):target=ROOT+'/psalm128'
-            if (page,i)==(559,1):target=PRAYER+'ufetah_lanu'
+            if (page,i)==(559,1):target=PRAYER+'ufetach_lanu'
             if (page,i)==(563,1):target=LEVANAH+'/greetings'
             if page==566:target=LEVANAH+('/mi_zot' if i==0 else '/yehi_ratzon')
             source=bool(re.match(r'\d ',text)) or page==566

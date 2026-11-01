@@ -48,8 +48,8 @@ def verses(urn, ls, *, indent=8):
 
 #: Four paragraphs here against one in Hebrew; the page turn falls
 #: inside the second, at `we will worship and | come back to you.`
-prayer("akedah", "The binding of Isaac", "akedah", 20, 22,
-       d(U + "akedah",
+prayer("aqedah", "The binding of Isaac", "aqedah", 20, 22,
+       d(U + "aqedah",
          "And it came to pass after these things that God put Abraham to the test, "
          "and said to him: “Abraham”; and he answered: “Here I am.” Then he said: "
          "“Take your son, your only son, Isaac, whom you love; go to the land of "
@@ -89,8 +89,8 @@ prayer("akedah", "The binding of Isaac", "akedah", 20, 22,
          "then returned to his servants, and they started together for Beersheba, "
          "for Abraham dwelt in Beersheba."))
 
-prayer("akedah_ribbono", "Master of the world", "akedah/ribbono_shel_olam", 22, 24,
-       d(U + "akedah/ribbono_shel_olam",
+prayer("aqedah_ribbono", "Master of the world", "aqedah/ribbono_shel_olam", 22, 24,
+       d(U + "aqedah/ribbono_shel_olam",
          "Master of the world! May it be thy will, Lord our God and",
          f"{pb(24)}God of our fathers, to remember in our favor the covenant of our fathers. "
          "Even as Abraham our father held back his compassion from his only son and "
@@ -139,8 +139,8 @@ prayer("lefikhakh", "Therefore it is our duty", "lefikhakh", 26, 26,
          "thee. Happy are we! How good is our destiny, how pleasant our lot, how "
          "beautiful our heritage!"))
 
-prayer("ashrenu", "Happy are we who, early and late", "lefikhakh/ashrenu", 26, 26,
-       d(U + "lefikhakh/ashrenu",
+prayer("ashreinu", "Happy are we who, early and late", "lefikhakh/ashreinu", 26, 26,
+       d(U + "lefikhakh/ashreinu",
          "Happy are we who, early and late, morning and evening, twice every day, "
          "proclaim:"))
 
@@ -151,8 +151,8 @@ prayer("attah_hu_ad", "Thou wast the same before the world was created", "attah_
          "thou wilt be the same in the world to come. Reveal thy holiness to those "
          "who sanctify thy name; manifest thy holiness throughout thy world."))
 
-prayer("attah_hu_uvishuatkha", "May our strength rise", "attah_hu/uvishuatkha", 26, 26,
-       d(U + "attah_hu/uvishuatkha",
+prayer("attah_hu_uvishuatekha", "May our strength rise", "attah_hu/uvishuatekha", 26, 26,
+       d(U + "attah_hu/uvishuatekha",
          "May our strength rise and be exalted through thy deliverance. Blessed art "
          "thou, O Lord, who sanctifiest thy name in the presence of all men."))
 

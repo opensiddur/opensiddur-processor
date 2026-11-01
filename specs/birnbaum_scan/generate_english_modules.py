@@ -167,13 +167,13 @@ the tail of Zevaḥim to its citation. It is in the unit body, not here.
 The rules are numbered `1.` here and `א)` there; the closing rubric names **page 300** here
 and page 299 there, each side pointing at its own half of the target opening."""
 
-# ---------------------------------------------------------------- en_akedah
+# ---------------------------------------------------------------- en_aqedah
 A = []
-A.append(block("akedah", "The binding of Isaac", "akedah", 20, 22,
+A.append(block("aqedah", "The binding of Isaac", "aqedah", 20, 22,
                [(20, 3), (20, 4), (22, 0), (22, 1), (22, 2)],
                comment="#: Four paragraphs here against one in Hebrew; the page turn falls\n"
                        "#: inside the second, at `we will worship and | come back to you.`"))
-A.append(block("akedah_ribbono", "Master of the world", "akedah/ribbono_shel_olam", 22, 24,
+A.append(block("aqedah_ribbono", "Master of the world", "aqedah/ribbono_shel_olam", 22, 24,
                [(22, 3), (24, 0)]))
 A.append(block("leolam_yehe_adam", "Man should ever be God-fearing", "leolam_yehe_adam",
                24, 24, [(24, 1)]))
@@ -185,64 +185,64 @@ A.append(block("lefikhakh", "Therefore it is our duty", "lefikhakh", 26, 26,
                [(26, 0, 0)],
                comment="#: Parted from what follows because printed 25 parts it: the\n"
                        "#: `Reader` label falls between them on the Hebrew page."))
-A.append(block("ashrenu", "Happy are we who, early and late", "lefikhakh/ashrenu", 26, 26,
+A.append(block("ashreinu", "Happy are we who, early and late", "lefikhakh/ashreinu", 26, 26,
                [(26, 0, 1)]))
 A.append(block("atah_hu_ad", "Thou wast the same before the world was created",
                "atah_hu/ad_shelo", 26, 26, [(26, 3, 0)]))
-A.append(block("atah_hu_uvishuatkha", "May our strength rise", "atah_hu/uvishuatkha",
+A.append(block("atah_hu_uvishuatekha", "May our strength rise", "atah_hu/uvishuatekha",
                26, 26, [(26, 3, 1)]))
 A.append(block("atah_hu_bashamayim", "Thou, Lord our God, art in heaven",
                "atah_hu/bashamayim", 26, 26, [(26, 4)]))
 
-# ---------------------------------------------------------------- en_korbanot
+# ---------------------------------------------------------------- en_qorbanot
 K = []
-K.append(block("korbanot_kiyor", "The laver", "korbanot/kiyor", 28, 28, [(28, 0)]))
-K.append(block("korbanot_yehi_ratzon_miqdash", "May it be thy will, to have mercy on us",
-               "korbanot/yehi_ratzon_miqdash", 28, 28, [(28, 1)]))
-K.append(block("korbanot_tamid", "The daily offering", "korbanot/tamid", 28, 30,
+K.append(block("qorbanot_kiyyor", "The laver", "qorbanot/kiyyor", 28, 28, [(28, 0)]))
+K.append(block("qorbanot_yehi_ratzon_miqdash", "May it be thy will, to have mercy on us",
+               "qorbanot/yehi_ratzon_miqdash", 28, 28, [(28, 1)]))
+K.append(block("qorbanot_tamid", "The daily offering", "qorbanot/tamid", 28, 30,
                [(28, 2), (30, 0)]))
-K.append(block("korbanot_ushchat", "He shall slaughter it", "korbanot/ushchat", 30, 30,
+K.append(block("qorbanot_ushchat", "He shall slaughter it", "qorbanot/ushchat", 30, 30,
                [(30, 1)]))
-K.append(block("korbanot_yehi_ratzon_amirah", "May it be thy will, that this recital",
-               "korbanot/yehi_ratzon_amirah", 30, 30, [(30, 2)]))
-K.append(block("korbanot_atah_hu", "Thou art the Lord our God before whom",
-               "korbanot/atah_hu", 30, 30, [(30, 3)]))
-K.append(block("korbanot_ketoret", "The incense", "korbanot/ketoret", 30, 30, [(30, 4)]))
-K.append(block("korbanot_pittum", "The compounding of the incense",
-               "korbanot/pittum_haketoret", 30, 32, [(30, 5), (32, 0), (32, 1)],
+K.append(block("qorbanot_yehi_ratzon_amirah", "May it be thy will, that this recital",
+               "qorbanot/yehi_ratzon_amirah", 30, 30, [(30, 2)]))
+K.append(block("qorbanot_atah_hu", "Thou art the Lord our God before whom",
+               "qorbanot/atah_hu", 30, 30, [(30, 3)]))
+K.append(block("qorbanot_qetoret", "The incense", "qorbanot/qetoret", 30, 30, [(30, 4)]))
+K.append(block("qorbanot_pittum", "The compounding of the incense",
+               "qorbanot/pittum_haqetoret", 30, 32, [(30, 5), (32, 0), (32, 1)],
                comment="#: One paragraph in Hebrew, three here."))
-K.append(block("korbanot_rashbag", "Rabbi Simeon ben Gamaliel says",
-               "korbanot/pittum_haketoret/rashbag", 32, 32, [(32, 2)]))
-K.append(block("korbanot_rabbi_natan", "Rabbi Nathan says",
-               "korbanot/pittum_haketoret/rabbi_natan", 32, 32, [(32, 3)]))
-K.append(block("korbanot_bar_kappara", "Bar Kappara says",
-               "korbanot/pittum_haketoret/bar_kappara", 32, 34, [(32, 4), (34, 0)]))
-K.append(verse_block("korbanot_pesukim", "The Lord of hosts is with us",
-                     "korbanot/pesukim", 34, 34, [(34, 1), (34, 2), (34, 3)],
+K.append(block("qorbanot_rashbag", "Rabbi Simeon ben Gamaliel says",
+               "qorbanot/pittum_haqetoret/rashbag", 32, 32, [(32, 2)]))
+K.append(block("qorbanot_rabbi_natan", "Rabbi Nathan says",
+               "qorbanot/pittum_haqetoret/rabbi_natan", 32, 32, [(32, 3)]))
+K.append(block("qorbanot_bar_kappara", "Bar Kappara says",
+               "qorbanot/pittum_haqetoret/bar_kappara", 32, 34, [(32, 4), (34, 0)]))
+K.append(verse_block("qorbanot_pesukim", "The Lord of hosts is with us",
+                     "qorbanot/pesukim", 34, 34, [(34, 1), (34, 2), (34, 3)],
                      comment="#: Centred lines on the Hebrew page, indented lines here."))
-K.append(block("korbanot_atah_seter", "Thou art my shelter", "korbanot/atah_seter",
+K.append(block("qorbanot_atah_seter", "Thou art my shelter", "qorbanot/atah_seter",
                34, 34, [(34, 4)]))
-K.append(block("korbanot_vearvah", "The offering of Judah and Jerusalem",
-               "korbanot/vearvah", 34, 34, [(34, 5)]))
-K.append(block("korbanot_abaye", "Abbaye recounted the daily order",
-               "korbanot/seder_hamaarakhah", 34, 34, [(34, 6)]))
+K.append(block("qorbanot_vearvah", "The offering of Judah and Jerusalem",
+               "qorbanot/vearvah", 34, 34, [(34, 5)]))
+K.append(block("qorbanot_abaye", "Abbaye recounted the daily order",
+               "qorbanot/seder_hamaarakhah", 34, 34, [(34, 6)]))
 K.append(verse_block("poem_anna_bekhoach", "By the great power", "anna_bekhoach", 34, 36,
                      [(34, 7), (34, 8), (36, 0), (36, 1), (36, 2), (36, 3), (36, 4)],
                      base=True,
                      comment="#: Seven lines, as the Hebrew has -- Birnbaum's footnote says\n"
                              "#: six words to each of seven lines and describes the Hebrew."))
-K.append(block("korbanot_ribbon_haolamim", "Lord of the universe",
-               "korbanot/ribbon_haolamim", 36, 36, [(36, 6)]))
-K.append(block("korbanot_musaf_shabbat", "On the Sabbath day", "korbanot/musaf/shabbat",
+K.append(block("qorbanot_ribbon_haolamim", "Lord of the universe",
+               "qorbanot/ribbon_haolamim", 36, 36, [(36, 6)]))
+K.append(block("qorbanot_musaf_shabbat", "On the Sabbath day", "qorbanot/musaf/shabbat",
                36, 36, [(36, 7)]))
-K.append(block("korbanot_musaf_rosh_chodesh", "And on your new moon festivals",
-               "korbanot/musaf/rosh_chodesh", 36, 38, [(36, 8), (38, 0)]))
+K.append(block("qorbanot_musaf_rosh_chodesh", "And on your new moon festivals",
+               "qorbanot/musaf/rosh_chodesh", 36, 38, [(36, 8), (38, 0)]))
 for n, (page, index) in enumerate(
         [(38, 1), (38, 2), (38, 3), (40, 0), (40, 1), (40, 2), (40, 3)], start=1):
-    K.append(block(f"eizehu_mekoman_{n}", f"Which were the places of sacrifice {n}",
-                   f"eizehu_mekoman/{n}", page, page, [(page, index)]))
-K.append(block("eizehu_mekoman_8", "Which were the places of sacrifice 8",
-               "eizehu_mekoman/8", 40, 42, [(40, 4), (42, 0)]))
+    K.append(block(f"eizehu_meqoman_{n}", f"Which were the places of sacrifice {n}",
+                   f"eizehu_meqoman/{n}", page, page, [(page, index)]))
+K.append(block("eizehu_meqoman_8", "Which were the places of sacrifice 8",
+               "eizehu_meqoman/8", 40, 42, [(40, 4), (42, 0)]))
 
 # ---------------------------------------------------------------- en_ishmael
 I = []
@@ -253,23 +253,23 @@ for n, (page, index) in enumerate(RULES, start=1):
 I.append(block("ishmael_yehi_ratzon", "May it be thy will, that the Temple be rebuilt",
                "middot/yehi_ratzon", 46, 46, [(46, 1)]))
 for name, title, slug, page, index in [
-    ("kaddish_derabbanan_yitgadal", "Glorified and sanctified",
-     "kaddish/derabbanan/yitgadal", 46, 2),
-    ("kaddish_derabbanan_yehe_shmeh", "May his great name be blessed",
-     "kaddish/derabbanan/yehe_shmeh", 46, 3),
+    ("kaddish_derabbanan_yitgaddal", "Glorified and sanctified",
+     "kaddish/derabbanan/yitgaddal", 46, 2),
+    ("kaddish_derabbanan_yehe_shemeh", "May his great name be blessed",
+     "kaddish/derabbanan/yehe_shemeh", 46, 3),
     ("kaddish_derabbanan_yitbarakh", "Blessed and praised",
      "kaddish/derabbanan/yitbarakh", 48, 0),
     ("kaddish_derabbanan_al_yisrael", "We pray for Israel",
      "kaddish/derabbanan/al_yisrael", 48, 1),
-    ("kaddish_derabbanan_yehe_shlama", "May there be abundant peace",
-     "kaddish/derabbanan/yehe_shlama", 48, 2),
+    ("kaddish_derabbanan_yehe_shelama", "May there be abundant peace",
+     "kaddish/derabbanan/yehe_shelama", 48, 2),
     ("kaddish_derabbanan_oseh_shalom", "He who creates peace",
      "kaddish/derabbanan/oseh_shalom", 48, 3),
 ]:
     I.append(block(name, title, slug, page, page, [(page, index)]))
 
-for module, doc, blocks in (("en_akedah", AKEDAH_DOC, A),
-                            ("en_korbanot", KORBANOT_DOC, K),
+for module, doc, blocks in (("en_aqedah", AKEDAH_DOC, A),
+                            ("en_qorbanot", KORBANOT_DOC, K),
                             ("en_ishmael", ISHMAEL_DOC, I)):
     out = pathlib.Path(f"opensiddur/importer/birnbaum_scan/build/{module}.py")
     out.write_text((HEAD % doc) + "\n" + "\n".join(blocks), encoding="utf-8")

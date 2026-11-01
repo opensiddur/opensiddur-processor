@@ -108,21 +108,21 @@ ROWS = [{'key': 'haderekh',
   'en': 'Heal us, O Lord, and we shall be healed; save us and we shall be saved; for thou art our praise. '
         'Grant a perfect healing to all our wounds; for thou art a faithful and merciful God, King and '
         'Healer. Blessed art thou, O Lord, who healest the sick among thy people Israel.'},
- {'key': 'tzidduk_1',
+ {'key': 'tzidduq_1',
   'page': 735,
   'en_page': 736,
   'he': 'הַצּוּר תָּמִים פָּעֳלוֹ, כִּי כָל דְּרָכָיו מִשְׁפָּט; אֵל אֱמוּנָה וְאֵין עָֽוֶל, צַדִּיק '
         'וְיָשָׁר הוּא.',
   'en': 'He is God; what he does is right, for all his ways are just; God of faithfulness and without wrong, '
         'just and right is he.'},
- {'key': 'tzidduk_2',
+ {'key': 'tzidduq_2',
   'page': 735,
   'en_page': 736,
   'he': 'הַצּוּר תָּמִים בְּכָל פֹּֽעַל, מִי יֹאמַר לוֹ מַה תִּפְעָל; הַשַּׁלִּיט בְּמַֽטָּה וּבְמַֽעַל, '
         'מֵמִית וּמְחַיֶּה, מוֹרִיד שְׁאוֹל וַיָּֽעַל.',
   'en': 'He is God, perfect in every deed; who can say to him: “What art thou doing?” He rules below and '
         'above; he causes death and life; he brings down to the grave and raises up.'},
- {'key': 'tzidduk_3',
+ {'key': 'tzidduq_3',
   'page': 735,
   'en_page': 736,
   'he': 'הַצּוּר תָּמִים בְּכָל מַעֲשֶׂה, מִי יֹאמַר אֵלָיו מַה תַּעֲשֶׂה; הָאוֹמֵר וְעֹשֶׂה, חֶֽסֶד חִנָּם '
@@ -130,7 +130,7 @@ ROWS = [{'key': 'haderekh',
   'en': 'He is God, perfect in every deed; who can say to him: “What art thou doing?” O thou who decreest '
         'and performest, show us unmerited kindness; for the sake of Isaac who was bound like a lamb, listen '
         'and take action.'},
- {'key': 'tzidduk_4',
+ {'key': 'tzidduq_4',
   'page': 735,
   'en_page': 736,
   'he': 'צַדִּיק בְּכָל דְּרָכָיו, הַצּוּר תָּמִים, אֶֽרֶךְ אַפַּֽיִם וּמָלֵא רַחֲמִים, חֲמָל־נָא וְחוּס נָא '
@@ -138,7 +138,7 @@ ROWS = [{'key': 'haderekh',
   'en': 'O thou who art righteous in all thy ways, thou who art the perfect God, slow to anger and full of '
         'mercy, have compassion, have pity on parents and children; for thine, O Lord, is forgiveness and '
         'mercy.'},
- {'key': 'tzidduk_5',
+ {'key': 'tzidduq_5',
   'page': 735,
   'en_page': 736,
   'he': 'צַדִּיק אַתָּה, יְיָ, לְהָמִית וּלְהַחֲיוֹת; אֲשֶׁר בְּיָדְךָ פִּקְדוֹן כָּל רוּחוֹת, חָלִֽילָה '
@@ -147,21 +147,21 @@ ROWS = [{'key': 'haderekh',
   'en': 'Just art thou, O Lord, in causing death and life; thou in whose hand all living beings are kept, '
         'far be it from thee to blot out our remembrance; let thy eyes be open to us in mercy; for thine, O '
         'Lord, is mercy and forgiveness.'},
- {'key': 'tzidduk_6',
+ {'key': 'tzidduq_6',
   'page': 735,
   'en_page': 736,
   'he': 'אָדָם אִם בֶּן־שָׁנָה יִחְיֶה, אוֹ אֶֽלֶף שָׁנִים יִחְיֶה, מַה יִתְרוֹן לוֹ; כְּלֹא הָיָה יִהְיֶה; '
         'בָּרוּךְ דַּיַּן הָאֱמֶת, מֵמִית וּמְחַיֶּה.',
   'en': 'Whether one lives a year or a thousand years—what does he gain? He is as though he were '
         'non-existent. Blessed be the true Judge, who causes death and life.'},
- {'key': 'tzidduk_7',
+ {'key': 'tzidduq_7',
   'page': 735,
   'en_page': 736,
   'he': 'בָּרוּךְ הוּא, כִּי אֱמֶת דִּינוֹ, וּמְשׁוֹטֵט הַכֹּל בְּעֵינוֹ, וּמְשַׁלֵּם לְאָדָם חֶשְׁבּוֹנוֹ '
         'וְדִינוֹ, וְהַכֹּל לִשְׁמוֹ הוֹדָיָה יִתֵּֽנוּ.',
   'en': 'Blessed be he, for his judgment is true; his eye ranges over all, and he punishes and rewards man '
         'according to strict account; all must render acknowledgment to him.'},
- {'key': 'tzidduk_8',
+ {'key': 'tzidduq_8',
   'page': 737,
   'en_page': 738,
   'he': 'יָדַעְנוּ, יְיָ, כִּי צֶֽדֶק מִשְׁפָּטֶֽךָ, תִּצְדַּק בְּדָבְרֶֽךָ, וְתִזְכֶּה בְּשָׁפְטֶֽךָ, '
@@ -169,37 +169,37 @@ ROWS = [{'key': 'haderekh',
   'en': 'We know, O Lord, that thy judgment is just; thou art right when thou speakest, and justified when '
         'thou givest sentence; one must not find fault with thy manner of judging. Thou art righteous, O '
         'Lord, and thy judgment is right.'},
- {'key': 'tzidduk_9',
+ {'key': 'tzidduq_9',
   'page': 737,
   'en_page': 738,
   'he': 'דַּיַּן אֱמֶת, שׁוֹפֵט צֶֽדֶק וֶאֱמֶת; בָּרוּךְ דַּיַּן הָאֱמֶת, שֶׁכָּל מִשְׁפָּטָיו צֶֽדֶק '
         'וֶאֱמֶת.',
   'en': 'True and righteous Judge, blessed art thou, all whose judgments are righteous and true.'},
- {'key': 'tzidduk_10',
+ {'key': 'tzidduq_10',
   'page': 737,
   'en_page': 738,
   'he': 'נֶֽפֶשׁ כָּל חַי בְּיָדֶֽךָ, צֶֽדֶק מָלְאָה יְמִינְךָ וְיָדֶֽךָ, רַחֵם עַל פְּלֵיטַת צֹאן יָדֶֽךָ, '
         'וְתֹאמַר לַמַּלְאָךְ הֶֽרֶף יָדֶֽךָ.',
   'en': 'The life of every living being is in thy hand; thy right hand is full of righteousness. Have mercy '
         'on the remnant of thy own flock, and say to the angel: “Stay your hand.”'},
- {'key': 'tzidduk_jeremiah',
+ {'key': 'tzidduq_jeremiah',
   'page': 737,
   'en_page': 738,
   'he': 'גְּדֹל הָעֵצָה וְרַב הָעֲלִילִיָּה, אֲשֶׁר עֵינֶֽיךָ פְקֻחוֹת עַל כָּל דַּרְכֵי בְּנֵי אָדָם, לָתֵת '
         'לְאִישׁ כִּדְרָכָיו וְכִפְרִי מַעֲלָלָיו.',
   'en': 'Thou art great in counsel and mighty in action; thy eyes are open to all the ways of men, to give '
         'to every one according to his conduct and according to the results of his doings.'},
- {'key': 'tzidduk_psalm92',
+ {'key': 'tzidduq_psalm92',
   'page': 737,
   'en_page': 738,
   'he': 'לְהַגִּיד כִּי יָשָׁר יְיָ; צוּרִי, וְלֹא עַוְלָֽתָה בּוֹ.',
   'en': 'We proclaim that the Lord is just. He is my stronghold, and there is no wrong in him.'},
- {'key': 'tzidduk_job',
+ {'key': 'tzidduq_job',
   'page': 737,
   'en_page': 738,
   'he': 'יְיָ נָתַן, וַיְיָ לָקָח; יְהִי שֵׁם יְיָ מְבֹרָךְ.',
   'en': 'The Lord gave and the Lord has taken away; blessed be the name of the Lord.'},
- {'key': 'tzidduk_psalm78',
+ {'key': 'tzidduq_psalm78',
   'page': 737,
   'en_page': 738,
   'he': 'וְהוּא רַחוּם, יְכַפֵּר עָוֹן וְלֹא יַשְׁחִית; וְהִרְבָּה לְהָשִׁיב אַפּוֹ, וְלֹא יָעִיר כָּל '
@@ -575,8 +575,8 @@ ROWS = [{'key': 'haderekh',
   'en': 'The Lord guards you; the Lord at your right hand is your shelter. A long and happy life will be '
         'given you. The Lord will guard you from all evil; he will guard your life. Amen.'}]
 
-RUBRICS = {'tzidduk_he': 'Burial service held on days when Taḥanan (page 103) is recited',
- 'tzidduk_en': 'Burial service held on days when Taḥanan (page 104) is recited',
+RUBRICS = {'tzidduq_he': 'Burial service held on days when Taḥanan (page 103) is recited',
+ 'tzidduq_en': 'Burial service held on days when Taḥanan (page 104) is recited',
  'burial_kaddish': 'Recited after the burial',
  'leaving': 'On leaving the burial ground all wash their hands and say:',
  'chapel_he': 'Add Psalm 23 (page 733).',
@@ -613,7 +613,7 @@ NOTES = [{'key': 'haderekh',
   'text': 'Genesis 32:2–3; Exodus 23:20; Numbers 6:24–26.',
   'kind': 'source'},
  {'key': 'sick_psalm6', 'page': 734, 'text': 'Psalm 6.', 'kind': 'source'},
- {'key': 'tzidduk',
+ {'key': 'tzidduq',
   'page': 735,
   'text': 'צדוק הדין, the submission to the justice of the divine judgment, is mentioned in the Talmud '
           '(Abodah Zarah 18a) in connection with the martyrdom of Rabbi Ḥanina ben Teradyon and his family. '
@@ -622,17 +622,17 @@ NOTES = [{'key': 'haderekh',
           '32:4); and the daughter quoted: גדול העצה ורב העליליה... (Jeremiah 32:19). These passages were '
           'later embodied in the rhymed verses of tsidduk ha-din, the burial service.',
   'kind': 'commentary'},
- {'key': 'tzidduk_1', 'page': 736, 'text': 'Deuteronomy 32:4.', 'kind': 'source'},
+ {'key': 'tzidduq_1', 'page': 736, 'text': 'Deuteronomy 32:4.', 'kind': 'source'},
  {'key': 'burial_kaddish',
   'page': 737,
   'text': 'קדיש ל(את)חדתא refers to the restoration of the Holy Land. The Sephardic Jews recite this Kaddish '
           'on the fast of Tish‘ah b’Av. Maimonides quotes it as the Kaddish d’Rabbanan, to be recited at the '
           'conclusion of a talmudic discourse; compare Sofrim 19:12.',
   'kind': 'commentary'},
- {'key': 'tzidduk_jeremiah', 'page': 738, 'text': 'Jeremiah 32:19.', 'kind': 'source'},
- {'key': 'tzidduk_psalm92', 'page': 738, 'text': 'Psalm 92:16.', 'kind': 'source'},
- {'key': 'tzidduk_job', 'page': 738, 'text': 'Job 1:21.', 'kind': 'source'},
- {'key': 'tzidduk_psalm78', 'page': 738, 'text': 'Psalm 78:38.', 'kind': 'source'},
+ {'key': 'tzidduq_jeremiah', 'page': 738, 'text': 'Jeremiah 32:19.', 'kind': 'source'},
+ {'key': 'tzidduq_psalm92', 'page': 738, 'text': 'Psalm 92:16.', 'kind': 'source'},
+ {'key': 'tzidduq_job', 'page': 738, 'text': 'Job 1:21.', 'kind': 'source'},
+ {'key': 'tzidduq_psalm78', 'page': 738, 'text': 'Psalm 78:38.', 'kind': 'source'},
  {'key': 'burial_leaving', 'page': 740, 'text': 'Isaiah 25:8.', 'kind': 'source'},
  {'key': 'chapel',
   'page': 740,

@@ -17,10 +17,10 @@ SHABBAT_AMIDAH = '<j:all>'+SHABBAT+'<j:none>'+FESTIVAL+'</j:none></j:all>'
 REGALIM = '<j:all>'+FESTIVAL+'<j:any>'+holiday('pesah',8)+holiday('shavuot',2)+holiday('sukkot',7)+holiday('shmini-atzeret',2)+'</j:any></j:all>'
 URNS = {'hashkivenu': PRAYER+'hashkivenu/hapores_sukkat_shalom',
         'veshamru':ROOT+'/verses/veshamru', 'vaydaber':BIBLE+'leviticus/23/44',
-        'tiku':ROOT+'/verses/tiku', 'attah':PRAYER+'amidah/attah_qidashta_et',
-        'vaykhulu':ROOT+'/vaykhulu', 'retzeh':PRAYER+'amidah/retzay_vimnuchataynu',
-        'mein':PRAYER+'me_ein_sheva', 'kiddush':PRAYER+'kiddush/asher_kiddeshanu',
-        'wine':PRAYER+'borei_pri_hagafen'}
+        'tiqu':ROOT+'/verses/tiqu', 'attah':PRAYER+'amidah/attah_qidashta_et',
+        'vaykhulu':ROOT+'/vaykhulu', 'retzeh':PRAYER+'amidah/retzeh_vimnuchatenu',
+        'mein':PRAYER+'me_ein_sheva', 'kiddush':PRAYER+'kiddush/asher_qiddeshanu',
+        'wine':PRAYER+'borei_peri_hagafen'}
 
 
 def conditional(cid,rubric,fs,content,*,negate=False,marked=False):
@@ -55,7 +55,7 @@ def prayers(lang,earlier):
     add('hashkivenu','הפורש סכת שלום','Who spreadest the shelter of peace',263,263,para('hashkivenu',data.HASHKIVENU_SEAL[side]))
     add('veshamru','ושמרו','The children of Israel shall keep the Sabbath',263,263,verses('veshamru',data.VESHAMRU))
     add('vaydaber','וידבר משה','Moses announced the festivals',263,263,verses('vaydaber',data.VAYDABER))
-    add('tiku','תקעו בחדש שופר','Sound the Shofar',263,263,verses('tiku',data.TIKU))
+    add('tiqu','תקעו בחדש שופר','Sound the Shofar',263,263,verses('tiqu',data.TIKU))
     add('attah','אתה קדשת','Thou hast sanctified',267,267,para('attah',data.ATAH_KIDASHTA[side]))
     add('vaykhulu','ויכלו','Thus the heavens and the earth were finished',267,267,verses('vaykhulu',data.VAYKHULU))
     result[-1]['printings']=((273+side,273+side),)
@@ -73,8 +73,8 @@ def prayers(lang,earlier):
     congregation = ('<tei:note type="instruction" xml:lang="en">Congregation: '
                     'Between Rosh Hashanah and Yom Kippur substitute '
                     + substitution + '</tei:note>')
-    mein=(instruction('Reader:')+'<tei:p>'+marked(PRAYER+'amidah/birkat_petichah_lemayayn_sheva',xml(data.MEIN_OPENING[side]))+'</tei:p>'
-          +congregation+'<tei:p>'+marked(PRAYER+'amidah/magayn_avot',magen)+'</tei:p>'
+    mein=(instruction('Reader:')+'<tei:p>'+marked(PRAYER+'amidah/birkat_petichah_lemeein_sheva',xml(data.MEIN_OPENING[side]))+'</tei:p>'
+          +congregation+'<tei:p>'+marked(PRAYER+'amidah/magen_avot',magen)+'</tei:p>'
           +instruction('Reader:')+'<tei:p>'+marked(URNS['mein']+'/retzeh',xml((data.RETZEH_HE,data.MEIN_RETZEH_EN)[side]))+'</tei:p>')
     add('mein','ברכה מעין שבע','Blessing embodying the seven blessings',273,275,mein)
     add('wine','בורא פרי הגפן','Who createst the fruit of the vine',277,277,para('wine',data.WINE[side]))
@@ -105,9 +105,9 @@ def declaration():
 
 def kaddish(cid,*,full=False,mourner=False):
     text='' if mourner else '<tei:p>'+instruction('Reader:')+'</tei:p>'
-    text+=''.join(transclude(PRAYER+'kaddish/'+k) for k in ('yitgadal','yehe_shmeh','yitbarakh'))
-    if full:text+=transclude(PRAYER+'kaddish/titkabal')
-    if full or mourner:text+=''.join(transclude(PRAYER+'kaddish/yatom/'+k) for k in ('yehe_shlama','oseh_shalom'))
+    text+=''.join(transclude(PRAYER+'kaddish/'+k) for k in ('yitgaddal','yehe_shemeh','yitbarakh'))
+    if full:text+=transclude(PRAYER+'kaddish/titqabbal')
+    if full or mourner:text+=''.join(transclude(PRAYER+'kaddish/yatom/'+k) for k in ('yehe_shelama','oseh_shalom'))
     return conditional(cid,'When a minyan holds service:',MINYAN,text)
 
 
@@ -121,7 +121,7 @@ def amidah(lang,by_name):
     # insert; assemble its thanksgiving from the shared parts accordingly.
     text+=transclude(PRAYER+'amidah/hodaah/modim')
     text+=conditional('chanukah','On Ḥanukkah add:',holiday('hanukkah',8),transclude(PRAYER+'al_hanissim/chanukah'))
-    text+=transclude(PRAYER+'amidah/hodaah/veal_kulam')
+    text+=transclude(PRAYER+'amidah/hodaah/veal_kullam')
     text+=conditional('ukhtov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,transclude(PRAYER+'amidah/hodaah/ukhtov'))
     # The printed English here says “O God” where the shared weekday text says
     # “O Lord”. Local realization in both languages keeps parallel alignment.
@@ -150,7 +150,7 @@ def units(project,by_name):
     unit('blessings_before_shema','ברכות לפני קריאת שמע','Blessings before Shema',257,257,
          conditional('barekhu','When a minyan holds service:',MINYAN,transclude(PRAYER+'barekhu'))+transclude(ARVIT['maariv'])+transclude(ARVIT['ahavat']))
     unit('shema','קריאת שמע','Shema',257,261,transclude(PRAYER+'shema'))
-    after=''.join(transclude(ARVIT['emet']+'/'+part) for part in ('opening','mosheh','mi_khamokha','malkhutkha','yimlokh'))
+    after=''.join(transclude(ARVIT['emet']+'/'+part) for part in ('opening','mosheh','mi_khamokhah','malkhutekha','yimlokh'))
     # This printing corrects the numbered Jeremiah citation to 31:11. Isolate
     # its occurrence so the earlier 31:10 apparatus does not follow it here.
     seal_urn=ARVIT['emet']+'/seal'
@@ -159,7 +159,7 @@ def units(project,by_name):
     after+=transclude(ARVIT['hashkivenu']+'/opening')+transclude(URNS['hashkivenu'])
     after+=conditional('veshamru','On the Sabbath, Congregation and Reader:',SHABBAT,transclude(URNS['veshamru']))
     after+=conditional('regalim','On Pesaḥ, Shavuoth and Sukkoth:',REGALIM,transclude(URNS['vaydaber']))
-    after+=conditional('rosh_hashanah','On Rosh Hashanah:',holiday('rosh-hashana',2),transclude(URNS['tiku']))
+    after+=conditional('rosh_hashanah','On Rosh Hashanah:',holiday('rosh-hashana',2),transclude(URNS['tiqu']))
     unit('blessings_after_shema','ברכות לאחר קריאת שמע','Blessings after Shema',261,263,after+kaddish('half_kaddish'))
     unit('amidah','תפילת העמידה לשבת','Amidah for the Sabbath',265,273,amidah(lang,by_name))
     unit('after_amidah','ויכלו וברכה מעין שבע','Vaykhullu and Me‘ein Sheva',273,275,

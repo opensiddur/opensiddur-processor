@@ -9,7 +9,7 @@ from . import leil_shabbat_data as data
 
 ROOT = SIDDUR+'shabbat/leil_shabbat'
 SIGIL = '1949 shabbat/leil_shabbat'
-URNS = {key: POEM+key for key in ('shalom_aleichem','kol_mekadesh','menuchah_vesimcha','yah_ribbon','tzur_mishelo')}
+URNS = {key: POEM+key for key in ('shalom_aleikhem','kol_meqaddesh','menuchah_vesimchah','yah_ribbon','tzur_mishello')}
 # This is a different prayer from the morning Ribbon kol ha‘olamim.
 URNS['ribbon'] = PRAYER+'ribbon_kol_haolamim_adon_kol_haneshamot'
 URNS['eshet'] = ROOT+'/eshet_chayil'
@@ -45,7 +45,7 @@ def prayers(lang,earlier):
         body=''
         for i,row in enumerate(rows,1):
             value=xml(row[side])
-            if key=='kol_mekadesh':
+            if key=='kol_meqaddesh':
                 # Each final line is a biblical quotation, not a new Bible text.
                 refs=('numbers/1/52','kings_1/8/56','psalms/118/24','genesis/2/2','exodus/12/47','psalms/36/9','samuel_1/14/41')
                 he_starts=('אִישׁ עַל','בָּרוּךְ יְיָ','זֶה הַיּוֹם','וַיְכַל אֱלֹהִים','כָּל עֲדַת','יִרְוְיֻן','יְיָ אֱלֹהֵי')
@@ -55,7 +55,7 @@ def prayers(lang,earlier):
             if refrain:
                 body+=paragraph(URNS[key]+'/refrain/'+str(i),refrain[side],unit='stanza')
         return body
-    add('shalom_aleichem','שלום עליכם','Shalom Aleichem',283,283,stanzas('shalom_aleichem',data.SHALOM))
+    add('shalom_aleikhem','שלום עליכם','Shalom Aleichem',283,283,stanzas('shalom_aleikhem',data.SHALOM))
     guard='<tei:p>'
     for ref,he,en in data.GUARD:
         source=BIBLE+ref; value=xml((he,en)[side])
@@ -69,12 +69,12 @@ def prayers(lang,earlier):
            '<tei:note type="instruction" xml:lang="he">משלי לא, י–לא</tei:note>')
     eshet+=''.join(paragraph(BIBLE+'proverbs/31/'+str(i),row[side],unit='verse') for i,row in enumerate(data.ESHET,10))
     add('eshet','אשת חיל','Eshet Ḥayil',287,289,eshet)
-    add('kol_mekadesh','כל מקדש','Kol Mekadesh',291,293,stanzas('kol_mekadesh',data.KOL))
-    add('menuchah_vesimcha','מנוחה ושמחה','Menuḥah Vesimḥah',293,293,stanzas('menuchah_vesimcha',data.MENUCHA))
+    add('kol_meqaddesh','כל מקדש','Kol Mekadesh',291,293,stanzas('kol_meqaddesh',data.KOL))
+    add('menuchah_vesimchah','מנוחה ושמחה','Menuḥah Vesimḥah',293,293,stanzas('menuchah_vesimchah',data.MENUCHA))
     add('yah_ribbon','יה רבון','Yah Ribbon',295,295,stanzas('yah_ribbon',data.YAH,refrain=data.YAH_REFRAIN))
-    add('tzur_mishelo','צור משלו','Tzur Mishelo',297,297,
-        paragraph(URNS['tzur_mishelo']+'/refrain',data.TZUR_REFRAIN[side],unit='stanza')
-        +stanzas('tzur_mishelo',data.TZUR,refrain=data.TZUR_SHORT))
+    add('tzur_mishello','צור משלו','Tzur Mishelo',297,297,
+        paragraph(URNS['tzur_mishello']+'/refrain',data.TZUR_REFRAIN[side],unit='stanza')
+        +stanzas('tzur_mishello',data.TZUR,refrain=data.TZUR_SHORT))
     return result
 
 
@@ -93,9 +93,9 @@ def units(project):
     kiddush+=transclude(ARVIT['wine'])+transclude(ARVIT['kiddush'])
     add('kiddush','קִדּוּשׁ','KIDDUSH',289,289,kiddush)
     add('zemirot','זְמִירוֹת לְלֵיל שַׁבָּת','SABBATH EVE HYMNS',291,297,
-        instruction('Chanted at the table')+''.join(transclude(URNS[k]) for k in ('kol_mekadesh','menuchah_vesimcha','yah_ribbon','tzur_mishelo')))
+        instruction('Chanted at the table')+''.join(transclude(URNS[k]) for k in ('kol_meqaddesh','menuchah_vesimchah','yah_ribbon','tzur_mishello')))
     add('','לליל שבת','FOR SABBATH EVE',283,297,
         instruction('Upon returning from synagogue:')
-        +''.join(transclude(URNS[k]) for k in ('shalom_aleichem','guard','ribbon','eshet'))
+        +''.join(transclude(URNS[k]) for k in ('shalom_aleikhem','guard','ribbon','eshet'))
         +cond('night_meal_shabbat_kiddush', fs='<j:none>'+feature(AGG, 'yom-tov')+'</j:none>')+transclude(ROOT+'/kiddush')+endcond('night_meal_shabbat_kiddush')+transclude(ROOT+'/zemirot'))
     return tuple(result)

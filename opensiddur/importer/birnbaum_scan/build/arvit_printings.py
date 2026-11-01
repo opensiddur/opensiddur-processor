@@ -5,7 +5,7 @@ RANGES = {
  'barekhu':(191,191), 'shema':(193,195),
  'amidah_adonai_sefatai':(199,199), 'amidah_avot':(199,201),
  'amidah_gevurot':(201,201), 'amidah_qedushat_hashem':(201,201), 'amidah_binah':(201,201),
- 'amidah_teshuvah':(203,203), 'amidah_selichah':(203,203), 'amidah_geulah':(203,203),
+ 'amidah_teshuvah':(203,203), 'amidah_selichah':(203,203), 'amidah_geullah':(203,203),
  'amidah_refuah':(203,203), 'amidah_shanim':(203,203), 'amidah_qibbutz_galuyot':(203,203),
  'amidah_mishpat':(203,203), 'amidah_minim':(205,205), 'amidah_tzaddiqim':(205,205),
  'amidah_yerushalayim':(205,205), 'amidah_david':(205,205), 'amidah_tefillah':(205,205),
@@ -13,7 +13,7 @@ RANGES = {
  'al_hanissim_chanukah':(207,209), 'al_hanissim_purim':(209,209),
  'amidah_shalom_rav':(209,209), 'amidah_shalom_hamevarekh':(209,209),
  'amidah_shalom_besefer_chayyim':(209,211), 'amidah_elohai_netzor':(211,211),
- 'amidah_yehi_ratzon':(211,211), 'conclusion_titkabal':(213,213),
+ 'amidah_yehi_ratzon':(211,211), 'conclusion_titqabbal':(213,213),
  'conclusion_aleinu':(213,215), 'conclusion_al_tira':(215,215),
  'conclusion_psalm_27':(215,217), 'conclusion_psalm_49':(217,219),
 }
@@ -27,8 +27,8 @@ def apply(lang, prayers):
         p['printings']=(*p.get('printings',()),(first+side,last+side))
     # Kaddish has several distinct occurrences in this service.
     for name, ranges in {
-        'kaddish_derabbanan_yitgadal':((189,189),(199,199),(211,211),(215,215),(219,219)),
-        'kaddish_derabbanan_yehe_shmeh':((189,189),(199,199),(211,211),(215,215),(219,219)),
+        'kaddish_derabbanan_yitgaddal':((189,189),(199,199),(211,211),(215,215),(219,219)),
+        'kaddish_derabbanan_yehe_shemeh':((189,189),(199,199),(211,211),(215,215),(219,219)),
         'kaddish_derabbanan_yitbarakh':((189,189),(199,199),(211,211),(215,215),(219,219)),
         'kaddish_yatom':((213,213),(215,215),(217,217),(219,219)),
     }.items():

@@ -15,7 +15,7 @@ def make_notes(anchors):
                           lemma=lemma, paras=[dict(text=text)]))
 
 
-    commentary('uva_letzion', 'uva', 'ובא לציון', 'which consists of biblical passages accompanied by the paraphrase of the Targum, was designed to enable every Jew to have a daily share in the study of the Torah (Rashi, Sotah 49a). On Sabbaths and festivals, when the Torah and the Prophets are read at great length, the recitation of this collection of Scriptural passages is postponed till the afternoon service.')
+    commentary('uva_letziyyon', 'uva', 'ובא לציון', 'which consists of biblical passages accompanied by the paraphrase of the Targum, was designed to enable every Jew to have a daily share in the study of the Torah (Rashi, Sotah 49a). On Sabbaths and festivals, when the Torah and the Prophets are read at great length, the recitation of this collection of Scriptural passages is postponed till the afternoon service.')
     commentary('aleinu', 'aleinu', 'עלינו', 'is the proclamation of God as King over a united humanity. An old tradition claims Joshua as its author. Taken from the <tei:hi rend="italic">Musaf</tei:hi> service of <tei:hi rend="italic">Rosh Hashanah</tei:hi>, <tei:hi rend="italic">Alenu</tei:hi> has been used as the closing prayer of the daily services since the thirteenth century. It is reported that it was the death-song of Jewish martyrs in the Middle Ages. <tei:hi rend="italic">Alenu</tei:hi> has been the occasion of repeated attacks on account of the passage: “They bow to vanity and emptiness and pray to a god that cannot save” (<tei:foreign xml:lang="he">שהם משתחוים להבל וריק ומתפללים אל אל לא יושיע</tei:foreign>). Through fear of the official censors, the passage in question has been excluded from the prayer.')
     commentary(SHIR_SHEL_YOM, None, 'שיר של יום', 'the Psalm of the Day, was chanted by the Levites each day during the Temple service (Mishnah Tamid 7:4). According to the Talmud, the daily psalms were intended to recall the incidents of the six days of creation (Rosh Hashanah 31a).')
     commentary(PSALMS+'/sunday/psalm_24/1', None, 'מזמור', 'a poem sung to the accompaniment of musical instruments in the Temple service.')
@@ -54,22 +54,22 @@ def make_notes(anchors):
     commentary('psalm_49', '16', 'אך…יפדה נפשי', 'The psalmist is confident that God will deliver him from the premature death of the wicked and will receive him under his divine protection.')
 
     for key, row, number, citation in (
-        ('uva_letzion', 'uva', '1', 'Isaiah 59:20–21.'),
-        ('uva_letzion', 'veattah', '2', 'Psalm 22:4.'),
-        ('uva_letzion', 'vekara', '3', 'Isaiah 6:3.'),
-        ('uva_letzion', 'vatissa', '4', 'Ezekiel 3:12.'),
-        ('uva_letzion', 'targum_qadosh', '*', 'The words in italics are the Targum paraphrase of the preceding verse.'),
-        ('uva_letzion', 'yimlokh', '1', 'Exodus 15:18.'),
-        ('uva_letzion', 'avraham', '2', 'I Chronicles 29:18.'),
-        ('uva_letzion', 'vehu', '3', 'Psalms 78:38; 86:5; 119:142.'),
-        ('uva_letzion', 'titten', '4', 'Micah 7:20.'),
-        ('uva_letzion', 'barukh', '5', 'Psalms 68:20; 46:8; 84:13; 20:10.'),
-        ('uva_letzion', 'lemaan', '6', 'Psalm 30:13.'),
-        ('uva_letzion', 'barukh_hagever', '7', 'Jeremiah 17:7; Isaiah 26:4; Psalm 9:11.'),
-        ('uva_letzion', 'chafetz', '8', 'Isaiah 42:21.'),
+        ('uva_letziyyon', 'uva', '1', 'Isaiah 59:20–21.'),
+        ('uva_letziyyon', 'veattah', '2', 'Psalm 22:4.'),
+        ('uva_letziyyon', 'veqara', '3', 'Isaiah 6:3.'),
+        ('uva_letziyyon', 'vatissa', '4', 'Ezekiel 3:12.'),
+        ('uva_letziyyon', 'targum_qadosh', '*', 'The words in italics are the Targum paraphrase of the preceding verse.'),
+        ('uva_letziyyon', 'yimlokh', '1', 'Exodus 15:18.'),
+        ('uva_letziyyon', 'avraham', '2', 'I Chronicles 29:18.'),
+        ('uva_letziyyon', 'vehu', '3', 'Psalms 78:38; 86:5; 119:142.'),
+        ('uva_letziyyon', 'titten', '4', 'Micah 7:20.'),
+        ('uva_letziyyon', 'barukh', '5', 'Psalms 68:20; 46:8; 84:13; 20:10.'),
+        ('uva_letziyyon', 'lemaan', '6', 'Psalm 30:13.'),
+        ('uva_letziyyon', 'barukh_hagever', '7', 'Jeremiah 17:7; Isaiah 26:4; Psalm 9:11.'),
+        ('uva_letziyyon', 'chafetz', '8', 'Isaiah 42:21.'),
         ('aleinu', 'veyadata', '1', 'Deuteronomy 4:39.'),
         ('aleinu', 'yimlokh', '1', 'Exodus 15:18.'),
-        ('aleinu', 'vehaya', '2', 'Zechariah 14:9.'),
+        ('aleinu', 'vehayah', '2', 'Zechariah 14:9.'),
         ('al_tira', 'al_tira', '3', 'Proverbs 3:25; Isaiah 8:10; 46:4.'),
     ):
         NOTES.append(dict(kind='citation', target=anchor(key, row), n=number,

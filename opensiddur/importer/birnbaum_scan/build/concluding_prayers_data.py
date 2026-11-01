@@ -1,5 +1,5 @@
 """Direct scan readings, printed 753–790; audit in sourcetexts/scan_reading/concluding_prayers."""
-ROWS = [{'key': 'mi_adir',
+ROWS = [{'key': 'mi_addir',
   'page': 753,
   'en_page': 754,
   'he': 'מִי אַדִּיר עַל הַכֹּל,\n'
@@ -56,7 +56,7 @@ ROWS = [{'key': 'mi_adir',
         'יְיָ, מְשַׂמֵּֽחַ צִיּוֹן בְּבָנֶֽיהָ.',
   'en': 'May Zion exult at the joyful reunion of her children in Jerusalem. Blessed art thou, O Lord, who '
         'causest Zion to rejoice in her children.'},
- {'key': 'sameach_tesamach',
+ {'key': 'sammeach_tesammach',
   'page': 755,
   'en_page': 756,
   'he': 'שַׂמֵּֽחַ תְּשַׂמַּח רֵעִים הָאֲהוּבִים, כְּשַׂמֵּחֲךָ יְצִירְךָ בְּגַן עֵֽדֶן מִקֶּֽדֶם. בָּרוּךְ '
@@ -689,7 +689,7 @@ ROWS = [{'key': 'mi_adir',
   'en_page': 778,
   'he': 'בָּרוּךְ אַתָּה, יְיָ אֱלֹהֵֽינוּ, מֶֽלֶךְ הָעוֹלָם, הַטּוֹב וְהַמֵּטִיב.',
   'en': 'Blessed art thou, Lord our God, King of the universe, who art good and beneficent.'},
- {'key': 'hamapil',
+ {'key': 'hamappil',
   'page': 777,
   'en_page': 778,
   'he': 'בָּרוּךְ אַתָּה, יְיָ אֱלֹהֵֽינוּ, מֶֽלֶךְ הָעוֹלָם, הַמַּפִּיל חֶבְלֵי שֵׁנָה עַל עֵינַי, '
@@ -951,7 +951,7 @@ ROWS = [{'key': 'mi_adir',
   'en_page': 786,
   'he': 'וְעִם רוּחִי גְּוִיָּתִי\nיְיָ לִי וְלֹא אִירָא.',
   'en': 'As long as my soul is with my body\nThe Lord is with me; I am not afraid.'},
- {'key': 'child_hamapil',
+ {'key': 'child_hamappil',
   'page': 787,
   'en_page': 788,
   'he': 'בָּרוּךְ אַתָּה, יְיָ אֱלֹהֵֽינוּ, מֶֽלֶךְ הָעוֹלָם, הַמַּפִּיל חֶבְלֵי שֵׁנָה עַל עֵינַי, '
@@ -1243,12 +1243,12 @@ NOTES = [{'page': 753,
           'one ought to read the Shema before retiring at night in addition to its recital in the evening '
           'service (Berakhoth 4b).'},
  {'page': 777,
-  'key': 'hamapil',
+  'key': 'hamappil',
   'kind': 'commentary',
   'text': 'המפיל חבלי שנה... literally means “who lets down the cords, or chains, of sleep upon my eyes.” '
           'The reference is to the whole body, metaphorically represented as chained in sleep.'},
  {'page': 778,
-  'key': 'hamapil',
+  'key': 'hamappil',
   'kind': 'commentary',
   'text': 'מטתי is here used figuratively in the sense of my offspring; compare the expressions שמא חס ושלום '
           'יש במטתי פסול and שהיתה מטתו שלימה (Pesaḥim 56a). אישון and בת עין are synonyms denoting the '

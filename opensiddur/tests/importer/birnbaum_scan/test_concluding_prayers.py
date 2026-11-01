@@ -12,7 +12,7 @@ class TestConcludingPrayers(unittest.TestCase):
             units={u['urn']:fragment(u['body']) for u in r.units(project)}
             ceremony=units[r.SEVEN].xpath('.//j:transclude/@target',namespaces=NS)
             meal=units[r.SEVEN+'/after_meal'].xpath('.//j:transclude/@target',namespaces=NS)
-            self.assertEqual(ceremony[0],r.PRAYER+'borei_pri_hagafen')
+            self.assertEqual(ceremony[0],r.PRAYER+'borei_peri_hagafen')
             self.assertEqual(meal,ceremony[1:]+ceremony[:1])
             self.assertFalse(units[r.SEVEN].xpath('.//j:conditional',namespaces=NS))
 

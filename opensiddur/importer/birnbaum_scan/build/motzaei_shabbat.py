@@ -14,7 +14,7 @@ LEVANAH = SIDDUR+'berakhot/birkat_halevanah'
 SIGIL = '1949 shabbat/conclusion'
 FS = 'opensiddur:motzaei-shabbat'
 NO_FESTIVAL = '<j:none>'+feature(FS,'omit-vihi-noam')+'</j:none>'
-POEMS = ('hamavdil_bein_kodesh_lechol','bemotzaei_yom_menuchah','bemotzaei_yom_gilah','amar_adonai_leyaakov')
+POEMS = ('hamavdil_bein_qodesh_lechol','bemotzaei_yom_menuchah','bemotzaei_yom_gilah','amar_adonai_leyaaqov')
 
 
 def reading(page,key):
@@ -48,7 +48,7 @@ def psalm(number,value,lang,urn,seen):
 
 def shared(lang,prayers):
     result=[dict(p) for p in prayers];page=541+int(lang=='en')
-    references={PRAYER+'kaddish/'+k for k in ('yitgadal','yehe_shmeh','yatom/yehe_shlama','yatom/oseh_shalom')}
+    references={PRAYER+'kaddish/'+k for k in ('yitgaddal','yehe_shemeh','yatom/yehe_shelama','yatom/oseh_shalom')}
     for p in result:
         if p['urn'] in references:p['printings']=(*p.get('printings',()),(page,page))
     return result
@@ -86,14 +86,14 @@ def prayers(lang,earlier):
     # The prayers continue across an even page; their page sigils stay Hebrew.
     for key,he,en,value in [
         ('ribbon_haolamim','רבון העולמים','Master of the universe',reading(559,6)),
-        ('ufetah_lanu','ופתח לנו','Open for us',reading(559,7)+' {pb:560}'+READINGS['560']['text_he'][0]+' {pb:561}'+READINGS['561']['continuation'])]:
+        ('ufetach_lanu','ופתח לנו','Open for us',reading(559,7)+' {pb:560}'+READINGS['560']['text_he'][0]+' {pb:561}'+READINGS['561']['continuation'])]:
         urn=PRAYER+key
         add(key,urn,559,561,paragraph(urn+'/text',value) if not side else '',he,en)
     # Distinct blessings have their own reusable prayer addresses.
     for key,idx,he,en in [
         ('borei_minei_vesamim',3,'בורא מיני בשמים','Blessing over spices'),
         ('borei_meorei_haesh',4,'בורא מאורי האש','Blessing over fire'),
-        ('hamavdil_bein_kodesh_lechol',5,'המבדיל בין קדש לחול','Blessing of separation')]:
+        ('hamavdil_bein_qodesh_lechol',5,'המבדיל בין קדש לחול','Blessing of separation')]:
         urn=PRAYER+key
         add(key,urn,551,551,'<tei:p>'+xml(reading(551+side,idx-side))+'</tei:p>',he,en)
     return result
@@ -128,15 +128,15 @@ def units(project,by_name):
     from .conclusion_data import PASSAGES
     from .conclusion import URNS as CONCLUSION
     bounds=[]
-    for key,ref,he,en in PASSAGES['uva_letzion']['rows'][2:]:
+    for key,ref,he,en in PASSAGES['uva_letziyyon']['rows'][2:]:
         he=re.sub(r'\{[^}]+\}', '', he);en=re.sub(r'\{[^}]+\}', '', en)
         he=' '.join(he.split()[:2]);en=' '.join(en.split()[:4])
         if key=='lemaan':en='May my soul sing'
         if key=='targum_qadosh':he='וּמְקַבְּלִין'
         bounds.append((key,he,en))
     body=''
-    for (key,value),(_,ref,_,_) in zip(split(value,bounds,lang),PASSAGES['uva_letzion']['rows'][2:]):
-        source=(BIBLE+ref) if ref and not key.startswith('targum') else CONCLUSION['uva_letzion']+'/'+key
+    for (key,value),(_,ref,_,_) in zip(split(value,bounds,lang),PASSAGES['uva_letziyyon']['rows'][2:]):
+        source=(BIBLE+ref) if ref and not key.startswith('targum') else CONCLUSION['uva_letziyyon']+'/'+key
         value=value.replace('*','')
         encoded=xml(value)
         if key.startswith('targum'):
@@ -150,7 +150,7 @@ def units(project,by_name):
     # This printing has its own punctuation and Titkabal vowel/translation.
     from .avinu_malkenu import TEN_DAYS
     printed_kaddish = kaddish(full=True)
-    for part, index in [('yitbarakh', 2), ('titkabal', 3)]:
+    for part, index in [('yitbarakh', 2), ('titqabbal', 3)]:
         value = reading(542, 'kaddish'+str(index+1)) if side else reading(541, 'kaddish').splitlines()[index]
         variant = passage('kaddish/'+part, value, PRAYER+'kaddish/'+part)
         if not side and part == 'yitbarakh':
@@ -189,12 +189,12 @@ def units(project,by_name):
     havdalah+=conditional('havdalah_private','Outside the synagogue:',feature('opensiddur:observance','synagogue-havdalah'),transclude(ROOT+'/havdalah_intro'),negate=True)
     havdalah+=instruction('In the synagogue, the Reader begins here:')
     if not side:havdalah+=passage('havdalah/savri',reading(551,1))
-    havdalah+=passage('havdalah/wine',reading(551+side,2-side),PRAYER+'borei_pri_hagafen')
+    havdalah+=passage('havdalah/wine',reading(551+side,2-side),PRAYER+'borei_peri_hagafen')
     havdalah+=conditional('havdalah_spices','Except when a festival immediately follows the Sabbath:',feature(AGG,'yom-tov'),transclude(PRAYER+'borei_minei_vesamim'),negate=True)
-    havdalah+=transclude(PRAYER+'borei_meorei_haesh')+transclude(PRAYER+'hamavdil_bein_kodesh_lechol')
+    havdalah+=transclude(PRAYER+'borei_meorei_haesh')+transclude(PRAYER+'hamavdil_bein_qodesh_lechol')
     add('havdalah','הַבְדָּלָה','HAVDALAH',551,551,havdalah,printed=True)
     hymns=''.join(transclude(POEM+p) for p in POEMS)
-    hymns+=transclude(PRAYER+'ribbon_haolamim')+transclude(PRAYER+'ufetah_lanu')
+    hymns+=transclude(PRAYER+'ribbon_haolamim')+transclude(PRAYER+'ufetach_lanu')
     add('zemirot','זְמִירוֹת','HYMNS',553,561,hymns,printed=True)
     arvit=SIDDUR+'chol/arvit/'
     sequence=transclude(ROOT+'/opening')
@@ -208,8 +208,8 @@ def units(project,by_name):
     sequence=('<j:declare xml:id="motzaei_context"><tei:fs type="opensiddur:day-of-week"><tei:f name="hebrew-day"><tei:numeric value="1"/></tei:f></tei:fs></j:declare>'+sequence+'<j:endDeclare target="#motzaei_context"/>')
     add('','לְמוֹצָאֵי שַׁבָּת','FOR THE CONCLUSION OF SABBATH',535,561,sequence,printed=True)
     moon=instruction(READINGS[str(561+side)]['rubrics'][0])
-    for page,keys in [(561,['psalm148','blessing','barukh_yotzrekh','keshem','tippol']),
-                      (563,['david','greetings','siman_tov','kol_dodi','psalm121','psalm150','tana']),
+    for page,keys in [(561,['psalm148','blessing','barukh_yotzerekh','keshem','tippol']),
+                      (563,['david','greetings','simman_tov','kol_dodi','psalm121','psalm150','tana']),
                       (565,['mi_zot','yehi_ratzon','psalm67'])]:
         for idx,key in enumerate(keys):
             source={'psalm148':BIBLE+'psalms/148','psalm121':BIBLE+'psalms/121','psalm150':BIBLE+'psalms/150',

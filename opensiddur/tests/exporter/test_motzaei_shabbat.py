@@ -115,4 +115,4 @@ class TestMotzaeiEncoding(unittest.TestCase):
                 'xmlns:j="http://jewishliturgy.org/ns/jlptei/2">' + body + '</root>').encode())
             self.assertIn(expected, ''.join(root.itertext()))
             self.assertTrue(root.xpath('//tei:milestone[@corresp=$urn]',
-                namespaces=ns, urn=ROOT + '/kaddish/titkabal'))
+                namespaces=ns, urn=ROOT + '/kaddish/titqabbal'))

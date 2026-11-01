@@ -168,10 +168,10 @@ def anchors(printed: int):
 #: any passage, and a note whose `<ref>` follows the opening words of the passage it is
 #: about rather than preceding them. Both are read off the page, not guessed.
 BY_LEMMA = {
-    "ציצית": "urn:x-opensiddur:text:prayer:tallith/lehitatef",
+    "ציצית": "urn:x-opensiddur:text:prayer:tallith/lehitattef",
     "אדון עולם": "urn:x-opensiddur:text:poem:adon_olam",
     "יגדל": "urn:x-opensiddur:text:poem:yigdal",
-    "קדיש דרבנן": "urn:x-opensiddur:text:prayer:kaddish/derabbanan/yitgadal",
+    "קדיש דרבנן": "urn:x-opensiddur:text:prayer:kaddish/derabbanan/yitgaddal",
     "עושה שלום": "urn:x-opensiddur:text:prayer:kaddish/derabbanan/oseh_shalom",
     "שמונה עשרה": "urn:x-opensiddur:text:prayer:amidah/adonai_sefatai",
     "קדושה": "urn:x-opensiddur:text:prayer:amidah/qedushah",
@@ -184,7 +184,7 @@ BY_LEMMA = {
 #: heading is the key, and it takes the first text under that heading -- the nearest
 #: canonical URN, which is the rule for every note in this apparatus.
 BY_OPENING = {
-    "The <tei:foreign": "urn:x-opensiddur:text:prayer:tefillin/hineni_mekhaven",
+    "The <tei:foreign": "urn:x-opensiddur:text:prayer:tefillin/hineni_mekhavven",
 }
 
 #: The transcription sets a **hyphen** in every numeric range; the print sets an **en dash**.
@@ -360,7 +360,7 @@ def main():
 
 
 UNITS = (
-    ("YELADIM_NOTES", lambda u: u.endswith(("torah_tziva", "torah_tziva/morasha"))
+    ("YELADIM_NOTES", lambda u: u.endswith(("torah_tzivvah", "torah_tzivvah/morashah"))
      or "/yeladim" in u),
     ("AMIDAH_NOTES", lambda u: ":prayer:amidah" in u),
     ("BIRCHOT_NOTES", lambda u: True),

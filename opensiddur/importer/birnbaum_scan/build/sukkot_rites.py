@@ -16,7 +16,7 @@ USHPIZIN = PRAYER+'ushpizin'
 LULAV = PRAYER+'netilat_lulav'
 HOSHANOT = PRAYER+'hoshanot'
 GESHEM = PRAYER+'tefillat_geshem'
-HAKAFOT = PRAYER+'hakafot_simchat_torah'
+HAKAFOT = PRAYER+'haqqafot_simchat_torah'
 SIGIL = '1949 sukkot rites'
 SUKKOT = date(7,15,21)
 RABBAH = date(7,21)
@@ -28,18 +28,18 @@ BIBLICAL = {
  'hoshanot_a_add':'psalms/89/3','hoshanot_b_add':'psalms/89/14',
  'hoshanot_c_add':'micah/7/20','hoshanot_hoshia_add':'psalms/16/11',
  'hoshanot_adam_add':'psalms/8/2','hoshanot_adamah_add':'psalms/145/17',
- 'hakafot_ata_horeta':'deuteronomy/4/35','hakafot_leoseh':'psalms/136/4',
- 'hakafot_ein_kamokha':'psalms/86/8','hakafot_yehi_khevod':'psalms/104/31',
- 'hakafot_yehi_shem':'psalms/113/2','hakafot_yehi_immanu':'kings_1/8/57',
- 'hakafot_veimru':'chronicles_1/16/35','hakafot_strength':'psalms/29/11',
- 'hakafot_vayehi':'numbers/10/35','hakafot_kuma':'psalms/132/8',
- 'hakafot_kohanim':'psalms/132/9','hakafot_david':'psalms/132/10',
- 'hakafot_veamar':'isaiah/25/9','hakafot_malkhut':'psalms/145/13',
- 'hakafot_zion':'isaiah/2/3','hakafot_shema':'deuteronomy/6/4','hakafot_exalt':'psalms/34/4'}
+ 'haqqafot_attah_horeta':'deuteronomy/4/35','haqqafot_leoseh':'psalms/136/4',
+ 'haqqafot_ein_kamokha':'psalms/86/8','haqqafot_yehi_khevod':'psalms/104/31',
+ 'haqqafot_yehi_shem':'psalms/113/2','haqqafot_yehi_immanu':'kings_1/8/57',
+ 'haqqafot_veimru':'chronicles_1/16/35','haqqafot_strength':'psalms/29/11',
+ 'haqqafot_vayehi':'numbers/10/35','haqqafot_qumah':'psalms/132/8',
+ 'haqqafot_kohanim':'psalms/132/9','haqqafot_david':'psalms/132/10',
+ 'haqqafot_veamar':'isaiah/25/9','haqqafot_malkhut':'psalms/145/13',
+ 'haqqafot_zion':'isaiah/2/3','haqqafot_shema':'deuteronomy/6/4','haqqafot_exalt':'psalms/34/4'}
 SOURCES = {'lulav_shehecheyanu':PRAYER+'shehecheyanu',
  'geshem_avot':PRAYER+'amidah/avot', 'geshem_avot_close':PRAYER+'amidah/avot/magen_avraham',
- 'geshem_gevurot':PRAYER+'amidah/gevurot/attah_gibor',
- 'hakafot_father':PRAYER+'av_harachamim/heytivah/text','hakafot_one':PRAYER+'echad_elohenu/text'}
+ 'geshem_gevurot':PRAYER+'amidah/gevurot/attah_gibbor',
+ 'haqqafot_father':PRAYER+'av_harachamim/heitivah/text','haqqafot_one':PRAYER+'echad_eloheinu/text'}
 # The same verse has distinct punctuation/pointing and apparatus in these
 # printings. Occurrence addresses retain that evidence; source is canonical.
 
@@ -95,12 +95,12 @@ def prayers(lang):
         if key in ('geshem_blessing','geshem_life','geshem_plenty'):
             a,b=raw.split('\t');value=instruction('Congregation and Reader:')+xml(a)+' '+instruction('Congregation:')+xml(b)
         if key=='lulav_lulav_intent':value=lulav_quotations(raw,lang,key)
-        if key=='hoshanot_lekha' or key.startswith('hoshanot_hoshia_et_ammekha'):
+        if key=='hoshanot_lekha' or key.startswith('hoshanot_hoshiah_et_ammekha'):
             value=anthology(raw,key) if raw else ''
         # Hoshanot has no facing English translation: the English document
         # provides matching empty anchors for Birnbaum's explanatory apparatus.
         body='<tei:p>'+pb(page,sigil=SIGIL)+marked(urn,value,unit='verse' if key in BIBLICAL else 'prayer-part')+'</tei:p>'
-        if key=='hakafot_sisu':
+        if key=='haqqafot_sisu':
             # Eight Hebrew lines, with paired hemistichs, correspond to three
             # English stanzas of six, four and six lines.
             stanzas=[raw.splitlines()[:3],raw.splitlines()[3:5],raw.splitlines()[5:]] if lang=='he' else [s.splitlines() for s in raw.split('\n\n')]
@@ -155,8 +155,8 @@ def units(project):
         (4,'אדון המושיע','Adon hamoshia',680,682,hp('hoshia_start')+star('hoshia_add')+hp('adam')+star('adam_add')+hp('adamah')+star('adamah_add')+hseq('lemaan_eitan','lekha')),
         (5,'אערוך שועי','E‘erokh shu‘i',682,683,hp('eerokh_start')),
         (6,'אל למושעות','El lemosha‘ot',683,683,hp('el_lemoshaot')),
-        (7,'אני והו — לחול','Ani vaho — weekdays',683,684,hseq('ani_vaho_1','kehosha_start','ani_vaho_2','hoshia_et_ammekha')),
-        (8,'אם נצורה — לשבת','Om netzurah — Sabbath',684,686,hseq('om_netsurah_start','ani_vaho_3','kehosha_adam_start','ani_vaho_4','hoshia_et_ammekha_repeat'))]
+        (7,'אני והו — לחול','Ani vaho — weekdays',683,684,hseq('ani_vaho_1','kehosha_start','ani_vaho_2','hoshiah_et_ammekha')),
+        (8,'אם נצורה — לשבת','Om netzurah — Sabbath',684,686,hseq('om_netzurah_start','ani_vaho_3','kehosha_adam_start','ani_vaho_4','hoshiah_et_ammekha_repeat'))]
     for n,he,en,first,last,body in sections:
         letter='אבגדהוזח'[n-1]
         add('hoshana_'+str(n),HOSHANOT+'/'+str(n),letter+' — '+he,'<tei:foreign xml:lang="he">'+letter+'</tei:foreign> — '+en,first,last,body)
@@ -168,13 +168,13 @@ def units(project):
     rab_keys=[r['key'] for r in ROWS if r['group']=='hoshanot']
     rab_keys=rab_keys[rab_keys.index('hoshanot_ani_vaho_rabbah'):]
     rb=''
-    before={'ani_vaho_rabbah':('686','rabbah'),'anna_hoshia':('687','response'),'anna_el_na':('688','response'),'anna_avinu':('689','response'),'hosha_na_el_na':('692','response'),'taaneh_emunim_first':('692','willows'),'kol_mevaser_response':('694','response'),'kol_mevaser_end':('696','response'),'yehi_ratzon_aravah':('696','strike')}
+    before={'ani_vaho_rabbah':('686','rabbah'),'anna_hoshiah':('687','response'),'anna_el_na':('688','response'),'anna_avinu':('689','response'),'hosha_na_el_na':('692','response'),'taaneh_emunim_first':('692','willows'),'qol_mevasser_response':('694','response'),'qol_mevasser_end':('696','response'),'yehi_ratzon_aravah':('696','strike')}
     for k in rab_keys:
         short=k.removeprefix('hoshanot_')
         if short in before:
             page,label=before[short]
             if label!='rabbah':rb+=rubric(page,label)
-        if short=='kol_mevaser_end':rb+=rubric(696,'repeat')
+        if short=='qol_mevasser_end':rb+=rubric(696,'repeat')
         rb+=p(k)
     rb+=rubric(696,'continue')
     add('hoshana_rabbah',HOSHANOT+'/rabbah','הושענא רבה','HOSHANA RABBAH',686,696,rb,True)
@@ -190,21 +190,21 @@ def units(project):
     # The actual Musaf caller continues at Mekhalkel Chayim without a second opening.
     gs+=rubric(702 if side else 701,'continue')
     add('geshem',GESHEM,'תְּפִלַּת גֶּשֶׁם','PRAYER FOR RAIN',697,701,gs,True)
-    hak=rubric(703,'responsive')+''.join(p(r['key']) for r in ROWS if r['group']=='hakafot' and r['page']==703)+p('hakafot_father')+rubric(705,'groups')
+    hak=rubric(703,'responsive')+''.join(p(r['key']) for r in ROWS if r['group']=='haqqafot' and r['page']==703)+p('haqqafot_father')+rubric(705,'groups')
     ordinals=('First','Second','Third','Fourth','Fifth','Sixth','Seventh')
     for n in range(1,8):
-        ks=['hakafot_'+str(n)+suffix for suffix in ('a','b')] if n in (1,7) else ['hakafot_'+str(n)]
+        ks=['haqqafot_'+str(n)+suffix for suffix in ('a','b')] if n in (1,7) else ['haqqafot_'+str(n)]
         add('hakafah_'+str(n),HAKAFOT+'/'+str(n),'הקפה '+str(n),ordinals[n-1]+' Hakkafah',707 if n==7 else 705,707 if n==7 else 705,seq(*ks),True)
         hak+=transclude(HAKAFOT+'/'+str(n))
-    add('sisu',POEM+'sisu_vesimchu','שישו ושמחו','Sisu Vesimchu',707,707,p('hakafot_sisu'))
+    add('sisu',POEM+'sisu_vesimchu','שישו ושמחו','Sisu Vesimchu',707,707,p('haqqafot_sisu'))
     hak+=transclude(POEM+'sisu_vesimchu')+rubric(707,'return')
-    for k,label in [('shema','reader_congregation1'),('one','reader_congregation2'),('exalt','reader')]:hak+=rubric(707,label)+p('hakafot_'+k)
+    for k,label in [('shema','reader_congregation1'),('one','reader_congregation2'),('exalt','reader')]:hak+=rubric(707,label)+p('haqqafot_'+k)
     hak+=rubric(708 if side else 707,'continue')
-    add('hakafot',HAKAFOT,'הַקָּפוֹת לְשִׂמְחַת תּוֹרָה','HAKKAFOTH FOR SIMḤATH TORAH',703,707,hak,True)
+    add('haqqafot',HAKAFOT,'הַקָּפוֹת לְשִׂמְחַת תּוֹרָה','HAKKAFOTH FOR SIMḤATH TORAH',703,707,hak,True)
     body=c('ushpizin_occasion','During Sukkoth:',SUKKOT,transclude(USHPIZIN))
     body+=c('lulav_occasion',RUBRICS['677']['during'],'<j:all>'+SUKKOT+'<j:none>'+SHABBAT+'</j:none></j:all>',transclude(LULAV))
     body+=c('hoshanot_occasion','',SUKKOT,transclude(HOSHANOT))
     body+=c('geshem_occasion',RUBRICS['697']['occasion'],GESHEM_OCCASION,transclude(GESHEM))
-    body+=c('hakafot_occasion','On Simḥath Torah:',SIMCHAT_TORAH,transclude(HAKAFOT))
+    body+=c('haqqafot_occasion','On Simḥath Torah:',SIMCHAT_TORAH,transclude(HAKAFOT))
     add('rites',ROOT+'/rites','סוכות ושמיני עצרת','Sukkot and Shemini Atzeret',675,707,body)
     return tuple(out)

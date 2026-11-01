@@ -27,35 +27,35 @@ FIRST_NIGHTS = '<j:any>'+''.join(
 REUSE = {'sefatai': 'urn:x-opensiddur:text:prayer:amidah/adonai_sefatai',
  'avot': 'urn:x-opensiddur:text:prayer:amidah/avot/barukh_attah',
  'melekh': 'urn:x-opensiddur:text:prayer:amidah/avot/magen_avraham',
- 'gevurot': 'urn:x-opensiddur:text:prayer:amidah/gevurot/attah_gibor',
+ 'gevurot': 'urn:x-opensiddur:text:prayer:amidah/gevurot/attah_gibbor',
  'mekhalkel': 'urn:x-opensiddur:text:prayer:amidah/gevurot/mekhalkel_chayyim',
- 'veneeman': 'urn:x-opensiddur:text:prayer:amidah/gevurot/mechayeh_hametim',
+ 'veneeman': 'urn:x-opensiddur:text:prayer:amidah/gevurot/mechayyeh_hametim',
  'neqaddesh_shacharit': 'urn:x-opensiddur:text:siddur:shabbat/shacharit/amidah/qedushah/neqaddesh',
  'qadosh_shacharit': 'urn:x-opensiddur:text:prayer:amidah/qedushah/qadosh',
  'barukh_shacharit': 'urn:x-opensiddur:text:prayer:amidah/qedushah/barukh_kevod',
  'yimlokh_shacharit': 'urn:x-opensiddur:text:prayer:amidah/qedushah/yimlokh',
  'neqaddesh_minchah': 'urn:x-opensiddur:text:siddur:shabbat/shacharit/amidah/qedushah/neqaddesh',
  'qadosh_minchah': 'urn:x-opensiddur:text:prayer:amidah/qedushah/qadosh',
- 'leumatam': 'urn:x-opensiddur:text:prayer:amidah/qedushah/leumatam',
+ 'leummatam': 'urn:x-opensiddur:text:prayer:amidah/qedushah/leummatam',
  'barukh_minchah': 'urn:x-opensiddur:text:prayer:amidah/qedushah/barukh_kevod',
- 'uvdivrei': 'urn:x-opensiddur:text:prayer:amidah/qedushah/uvdivrey',
+ 'uvdivrei': 'urn:x-opensiddur:text:prayer:amidah/qedushah/uvdivrei',
  'vetechezeinah': 'urn:x-opensiddur:text:prayer:amidah/avodah/vetechezeinah',
- 'veal_kulam': 'urn:x-opensiddur:text:prayer:amidah/hodaah/veal_kulam',
+ 'veal_kullam': 'urn:x-opensiddur:text:prayer:amidah/hodaah/veal_kullam',
  'hatov': 'urn:x-opensiddur:text:prayer:amidah/hodaah/hatov_shimkha',
- 'wine': 'urn:x-opensiddur:text:prayer:borei_pri_hagafen'}
+ 'wine': 'urn:x-opensiddur:text:prayer:borei_peri_hagafen'}
 # Unique liturgical paragraphs have prayer addresses; edition-specific variants
 # retain local addresses and point to the common passage using source.
 UNIQUE = {'eruv_blessing':PRAYER+'eruv_tavshilin/blessing',
           'eruv_declaration':PRAYER+'eruv_tavshilin/declaration',
-          'candles':PRAYER+'hadlakat_ner_yom_tov',
+          'candles':PRAYER+'hadlaqat_ner_yom_tov',
           'shehecheyanu':PRAYER+'shehecheyanu',
           'attah_vechartanu':PRAYER+'amidah/attah_vechartanu_mikol',
-          'vatodienu':PRAYER+'amidah/vatodienu',
-          'vehasi':PRAYER+'amidah/vehasiaynu_hashem_elohaynu',
-          'havdalah':PRAYER+'hamavdil_bein_kodesh_lekodesh',
+          'vattodienu':PRAYER+'amidah/vattodienu',
+          'vehasi':PRAYER+'amidah/vehassienu_hashem_eloheinu',
+          'havdalah':PRAYER+'hamavdil_bein_qodesh_leqodesh',
           'sukkah':PRAYER+'leshev_basukkah'}
 SOURCES = {'ki_shem':BIBLE+'deuteronomy/32/3','rain':PRAYER+'amidah/gevurot/mashiv_haruach',
- 'az':PRAYER+'amidah/az_beqol_raash','mimkomekha':PRAYER+'amidah/mimeqomekha_malkaynu_tofia',
+ 'az':PRAYER+'amidah/az_beqol_raash','mimeqomekha':PRAYER+'amidah/mimeqomekha_malkenu_tofia',
  'yimlokh_minchah':BIBLE+'psalms/146/10','ledor':PRAYER+'amidah/qedushah/ledor_vador',
  'attah_qadosh':PRAYER+'amidah/qedushat_hashem','yaaleh':PRAYER+'yaaleh_veyavo',
  'retzeh':PRAYER+'amidah/avodah/retzeh','modim':PRAYER+'amidah/hodaah/modim',
@@ -99,11 +99,11 @@ def prayers(lang):
         key=row['key']
         if key in REUSE or key=='kiddush_shehecheyanu':continue
         raw=row[lang]
-        if key in ('ki_shem','rain','vatodienu','modim_derabbanan','vayehi','vaykhulu'):
+        if key in ('ki_shem','rain','vattodienu','modim_derabbanan','vayehi','vaykhulu'):
             raw=raw.removeprefix('(').removesuffix(')')
         value=text_xml(raw,SIGIL).replace('\n','<tei:lb/>')
         # Every remaining parenthesis in these paragraphs is a Sabbath addition.
-        if key in ('candles','vatiten','mikra','vehasi','kiddush_open','kiddush_close'):
+        if key in ('candles','vattitten','miqra','vehasi','kiddush_open','kiddush_close'):
             n=iter(range(20))
             value=re.sub(r'\(([^()]*)\)',lambda m:conditional(key+'_shabbat_'+str(next(n)),
                 'On the Sabbath:',SHABBAT,m[1]),value)
@@ -135,16 +135,16 @@ def units(project):
         instruction(PAGES['585']['items'][0]['text'])+p('eruv_blessing')+p('eruv_declaration'),printed=True)
     add('candles','הַדְלָקַת נֵר שֶׁל יוֹם טוֹב','LIGHTING THE FESTIVAL LIGHTS',585,585,p('candles')+
         conditional('candles_shehecheyanu','On the first night add:',FIRST_NIGHTS,p('shehecheyanu')),printed=True)
-    for service,keys in [('shacharit',('neqaddesh_shacharit','qadosh_shacharit','az','barukh_shacharit','mimkomekha','yimlokh_shacharit')),
-                         ('minchah',('neqaddesh_minchah','qadosh_minchah','leumatam','barukh_minchah','uvdivrei','yimlokh_minchah'))]:
+    for service,keys in [('shacharit',('neqaddesh_shacharit','qadosh_shacharit','az','barukh_shacharit','mimeqomekha','yimlokh_shacharit')),
+                         ('minchah',('neqaddesh_minchah','qadosh_minchah','leummatam','barukh_minchah','uvdivrei','yimlokh_minchah'))]:
         page=587 if service=='shacharit' else 589
         add('amidah/qedushah/'+service,'קדושה',('KEDUSHAH FOR SHAḤARITH' if service=='shacharit' else 'KEDUSHAH FOR MINḤAH'),page,page,
             ''.join(p(k) for k in keys),printed=True,english_head=True)
     def alternatives(prefix):
         return ''.join(conditional(prefix+'_'+key,label,holiday(name,last),p(prefix+'_'+key)) for key,label,name,last in HOLIDAYS)
-    middle=p('attah_vechartanu')+conditional('vatodienu','On Saturday night:',
-        '<j:all>'+MAARIV+SATURDAY_NIGHT+'</j:all>',p('vatodienu'))
-    middle+=p('vatiten')+alternatives('amidah')+p('mikra')+p('yaaleh')+alternatives('yaaleh')+p('zokhrenu')+p('vehasi')
+    middle=p('attah_vechartanu')+conditional('vattodienu','On Saturday night:',
+        '<j:all>'+MAARIV+SATURDAY_NIGHT+'</j:all>',p('vattodienu'))
+    middle+=p('vattitten')+alternatives('amidah')+p('miqra')+p('yaaleh')+alternatives('yaaleh')+p('zokhrenu')+p('vehasi')
     add('amidah/qedushat_hayom','קדושת היום','Sanctification of the festival',589,593,middle)
     body=instruction('The Amidah is recited in silent devotion while standing, facing east.')
     body+=conditional('ki_shem','At Minḥah:',MINCHAH,p('ki_shem'))+''.join(p(k) for k in ('sefatai','avot','melekh','gevurot'))
@@ -155,7 +155,7 @@ def units(project):
     body+=conditional('ledor','Reader:',READER,p('ledor'))
     body+=conditional('silent','In silent devotion:',READER,p('attah_qadosh'),negate=True)
     body+=transclude(AMIDAH+'/qedushat_hayom')+p('retzeh')+p('vetechezeinah')
-    body+=conditional('modim','When the Reader repeats the Amidah, the Congregation responds here by saying:',READER,p('modim_derabbanan'))+p('modim')+p('veal_kulam')+p('hatov')
+    body+=conditional('modim','When the Reader repeats the Amidah, the Congregation responds here by saying:',READER,p('modim_derabbanan'))+p('modim')+p('veal_kullam')+p('hatov')
     body+=conditional('kohanim','Priestly blessing recited by the Reader:', '<j:all>'+READER+SHACHARIT+'</j:all>',p('kohanim'))
     body+=conditional('sim_shalom','For Shaḥarith:',SHACHARIT,p('sim_shalom'))
     body+=conditional('shalom_rav','For Minḥah and Ma‘ariv:','<j:any>'+MINCHAH+MAARIV+'</j:any>',p('shalom_rav'))

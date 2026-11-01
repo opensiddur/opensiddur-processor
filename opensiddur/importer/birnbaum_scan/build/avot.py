@@ -5,7 +5,7 @@ from .conclusion import transclude
 from .milestones import Correspondences
 from .avot_data import READINGS
 
-ROOT = SIDDUR+'pirkei_avot'
+ROOT = SIDDUR+'pirqei_avot'
 MISHNAH = 'urn:x-opensiddur:text:mishnah:avot'
 OPENING = 'urn:x-opensiddur:text:mishnah:sanhedrin/10/1/kol_yisrael'
 CLOSING = 'urn:x-opensiddur:text:mishnah:makkot/3/16'
@@ -137,7 +137,7 @@ def units(project):
             chapter+=f'<tei:div corresp="{urn}/{key}">'+pb(row['page'],sigil=SIGIL)+content+'</tei:div>'
         chapter+='</tei:div>'
         result.append(dict(name=f'avot_chapter_{c}',urn=urn,title_he='פרקי אבות '+str(c),title_en='Pirkei Avot '+str(c),pages=(first['page'],last['page']),body=chapter))
-    result.append(dict(name='pirkei_avot',urn=ROOT,title_he='פרקי אבות',title_en='Pirkei Avot',pages=(477+side,533+side),body=body+'</tei:div>'))
+    result.append(dict(name='pirqei_avot',urn=ROOT,title_he='פרקי אבות',title_en='Pirkei Avot',pages=(477+side,533+side),body=body+'</tei:div>'))
     return tuple(result)
 
 

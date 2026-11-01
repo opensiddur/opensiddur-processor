@@ -15,7 +15,7 @@ AMIDAH = ROOT+'/minchah_maariv/amidah'
 KIDDUSH = ROOT+'/kiddush'
 TASHLIKH = PRAYER+'tashlikh'
 KAPPAROT = PRAYER+'kapparot'
-CANDLES = PRAYER+'hadlakat_ner_yom_kippur'
+CANDLES = PRAYER+'hadlaqat_ner_yom_kippur'
 SIGIL = '1949 rosh hashana and erev yom kippur'
 RH = holiday('rosh-hashana',2)
 READER = '<j:all>'+MINCHAH+AMIDAH_READER+'</j:all>'
@@ -35,25 +35,25 @@ UNIQUE = {'uvekhen_pachdekha':PRAYER+'amidah/uvekhen_ten_pachdekha',
  'qadosh_ata':PRAYER+'amidah/qadosh_attah_venora',
  'melokh':PRAYER+'amidah/melokh_al_kol_haolam',
  'kadsheinu':PRAYER+'amidah/sof_birkat_hazeman_lerosh_hashanah',
- 'greeting':PRAYER+'leshanah_tovah_tikatev',
+ 'greeting':PRAYER+'leshanah_tovah_tikkatev',
  'kiddush':PRAYER+'kiddush_rosh_hashanah',
- 'apple':PRAYER+'shetechadesh_aleinu_shanah_tovah',
+ 'apple':PRAYER+'shetechaddesh_aleinu_shanah_tovah',
  'yk_candle_blessing':CANDLES+'/blessing'}
 SOURCES = {'ki_shem':BIBLE+'deuteronomy/32/3','adonai_sefatai':BIBLE+'psalms/51/17',
  'avot':PRAYER+'amidah/avot/barukh_attah','zokhrenu':PRAYER+'amidah/avot/zokhrenu',
- 'melekh_ozer':PRAYER+'amidah/avot/magen_avraham','gevurot_start':PRAYER+'amidah/gevurot/attah_gibor',
+ 'melekh_ozer':PRAYER+'amidah/avot/magen_avraham','gevurot_start':PRAYER+'amidah/gevurot/attah_gibbor',
  'mekhalkel':PRAYER+'amidah/gevurot/mekhalkel_chayyim','mi_khamokha':PRAYER+'amidah/gevurot/mi_khamokha',
- 'neeman':PRAYER+'amidah/gevurot/mechayeh_hametim','neqaddesh':PRAYER+'amidah/qedushah/neqaddesh',
+ 'neeman':PRAYER+'amidah/gevurot/mechayyeh_hametim','neqaddesh':PRAYER+'amidah/qedushah/neqaddesh',
  'qadosh':BIBLE+'isaiah/6/3','barukh':BIBLE+'ezekiel/3/12','yimlokh':BIBLE+'psalms/146/10',
- 'leumatam':PRAYER+'amidah/qedushah/leumatam','uvdivrei':PRAYER+'amidah/qedushah/uvdivrey',
- 'ledor_vador':PRAYER+'amidah/qedushah/ledor_vador','ata_qadosh':PRAYER+'amidah/qedushat_hashem',
- 'ata_vechartanu':PRAYER+'amidah/attah_vechartanu_mikol','vatodienu':PRAYER+'amidah/vatodienu',
+ 'leummatam':PRAYER+'amidah/qedushah/leummatam','uvdivrei':PRAYER+'amidah/qedushah/uvdivrei',
+ 'ledor_vador':PRAYER+'amidah/qedushah/ledor_vador','attah_qadosh':PRAYER+'amidah/qedushat_hashem',
+ 'attah_vechartanu':PRAYER+'amidah/attah_vechartanu_mikol','vattodienu':PRAYER+'amidah/vattodienu',
  'yaaleh_veyavo':PRAYER+'yaaleh_veyavo','retzeh':PRAYER+'amidah/avodah/retzeh',
  'vetechezeinah':PRAYER+'amidah/avodah/vetechezeinah','modim':PRAYER+'amidah/hodaah/modim',
- 'modim_derabbanan':PRAYER+'amidah/hodaah/modim_derabbanan','veal_kulam':PRAYER+'amidah/hodaah/veal_kulam',
- 'vekhol_hahayim':PRAYER+'amidah/hodaah/hatov_shimkha','shalom_rav':PRAYER+'amidah/shalom_rav_al',
+ 'modim_derabbanan':PRAYER+'amidah/hodaah/modim_derabbanan','veal_kullam':PRAYER+'amidah/hodaah/veal_kullam',
+ 'vekhol_hachayyim':PRAYER+'amidah/hodaah/hatov_shimkha','shalom_rav':PRAYER+'amidah/shalom_rav_al',
  'elohai_netzor':PRAYER+'amidah/elohai_netzor/text','yehi_ratzon_temple':PRAYER+'amidah/yehi_ratzon',
- 'wine':PRAYER+'borei_pri_hagafen','havdalah':PRAYER+'hamavdil_bein_kodesh_lekodesh',
+ 'wine':PRAYER+'borei_peri_hagafen','havdalah':PRAYER+'hamavdil_bein_qodesh_leqodesh',
  'shehecheyanu':PRAYER+'shehecheyanu','yk_shehecheyanu':PRAYER+'shehecheyanu',
  'isaiah11_9':BIBLE+'isaiah/11/9'}
 URNS = {r['key']:UNIQUE.get(r['key'],ROOT+'/text/'+r['key']) for r in ROWS}
@@ -78,10 +78,10 @@ def prayers(lang):
         key=r['key'];urn=URNS[key]
         if key=='zeh_halifatenu':continue
         raw=r[lang]
-        if key in ('ki_shem','vatodienu','modim_derabbanan','vayekhulu','fire','havdalah'):
+        if key in ('ki_shem','vattodienu','modim_derabbanan','vayekhulu','fire','havdalah'):
             raw=raw.removeprefix('(').removesuffix(')')
         value=xml(raw)
-        if key in ('vatiten_lanu','kadsheinu','kiddush','yk_candle_blessing'):
+        if key in ('vattitten_lanu','kadsheinu','kiddush','yk_candle_blessing'):
             n=iter(range(20))
             value=re.sub(r'\(([^()]*)\)',lambda m:c(key+'_shabbat_'+str(next(n)),
                 'On the Sabbath:',SHABBAT,m[1]),value)
@@ -127,16 +127,16 @@ def units(project):
         add('rh_'+name,AMIDAH+'/'+name,he,en,first,last,''.join(p(k) for k in keys))
     group('avot','אבות','Patriarchs',655,655,['avot','zokhrenu','melekh_ozer'])
     group('gevurot','גבורות','Divine power',655,655,['gevurot_start','mekhalkel','mi_khamokha','neeman'])
-    kedushah=''.join(p(k) for k in ('neqaddesh','qadosh','leumatam','barukh','uvdivrei','yimlokh'))+instruction('Reader:')+p('ledor_vador')
+    kedushah=''.join(p(k) for k in ('neqaddesh','qadosh','leummatam','barukh','uvdivrei','yimlokh'))+instruction('Reader:')+p('ledor_vador')
     add('rh_qedushah',AMIDAH+'/qedushah','קדושה','Kedushah',655,657,kedushah)
     body=c('qedushah',RUBRICS['qedushah_rubric'],READER,transclude(AMIDAH+'/qedushah'))
-    body+=''.join(p(k) for k in ('ata_qadosh','uvekhen_pachdekha','uvekhen_kavod','uvekhen_tzaddiqim','vetimlokh','qadosh_ata'))
+    body+=''.join(p(k) for k in ('attah_qadosh','uvekhen_pachdekha','uvekhen_kavod','uvekhen_tzaddiqim','vetimlokh','qadosh_ata'))
     add('rh_qedushat_hashem',AMIDAH+'/qedushat_hashem','קדושת השם','Sanctification of God’s name',655,659,body)
-    body=p('ata_vechartanu')+c('vatodienu',RUBRICS['vatodienu_rubric'],'<j:all>'+MAARIV+SATURDAY_NIGHT+'</j:all>',p('vatodienu'))
-    body+=''.join(p(k) for k in ('vatiten_lanu','yaaleh_veyavo','melokh','kadsheinu'))
+    body=p('attah_vechartanu')+c('vattodienu',RUBRICS['vattodienu_rubric'],'<j:all>'+MAARIV+SATURDAY_NIGHT+'</j:all>',p('vattodienu'))
+    body+=''.join(p(k) for k in ('vattitten_lanu','yaaleh_veyavo','melokh','kadsheinu'))
     add('rh_qedushat_hayom',AMIDAH+'/qedushat_hayom','קדושת היום','Sanctification of the day',659,661,body)
     group('avodah','עבודה','Temple service',661,661,['retzeh','vetechezeinah'])
-    body=p('modim')+c('modim_derabbanan',RUBRICS['modim_derabbanan_rubric'],READER,p('modim_derabbanan'))+''.join(p(k) for k in ('veal_kulam','ukhtov','vekhol_hahayim'))
+    body=p('modim')+c('modim_derabbanan',RUBRICS['modim_derabbanan_rubric'],READER,p('modim_derabbanan'))+''.join(p(k) for k in ('veal_kullam','ukhtov','vekhol_hachayyim'))
     add('rh_hodaah',AMIDAH+'/hodaah','הודאה','Thanksgiving',663,663,body)
     group('shalom','שלום','Peace',663,663,['shalom_rav','besefer'])
     body=instruction(RUBRICS['amidah_rubric'])+c('ki_shem','At Minḥah:',MINCHAH,p('ki_shem'))+p('adonai_sefatai')

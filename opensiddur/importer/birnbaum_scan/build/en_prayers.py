@@ -85,7 +85,7 @@ prayer("amidah_avot", "Blessing of the Patriarchs", "amidah/avot", 82, 84, "\n".
 
 prayer("amidah_gevurot", "Blessing of God’s might", "amidah/gevurot", 84, 84, "\n".join([
     f'        <tei:div corresp="{U}amidah/gevurot">',
-    d(U + "amidah/gevurot/attah_gibor", "Thou, O Lord, art mighty forever; thou revivest the dead; thou art powerful to save."),
+    d(U + "amidah/gevurot/attah_gibbor", "Thou, O Lord, art mighty forever; thou revivest the dead; thou art powerful to save."),
     cond("cond_gevurot_geshem", note="Between Sukkoth and Pesaḥ add:", fs=feature(AGG, "geshem")),
     d(U + "amidah/gevurot/mashiv_haruach",
       "(Thou causest the wind to blow and the rain to fall.)"),
@@ -99,7 +99,7 @@ prayer("amidah_gevurot", "Blessing of God’s might", "amidah/gevurot", 84, 84, 
     d(U + "amidah/gevurot/mi_khamokha",
       "(Who is like thee, merciful Father? In mercy thou rememberest thy creatures to life.)"),
     endcond("cond_gevurot_aseret"),
-    d(U + "amidah/gevurot/mechayeh_hametim",
+    d(U + "amidah/gevurot/mechayyeh_hametim",
       "Thou art faithful to revive the dead. Blessed art thou, O Lord, who revivest the dead."),
     "        </tei:div>"]))
 
@@ -113,10 +113,10 @@ prayer("amidah_qedushah", "Kedushah", "amidah/qedushah", 84, 86, "\n".join([
       "as it is written by thy prophet: “They keep calling to one another:"),
     d(U + "amidah/qedushah/qadosh",
       "Holy, holy, holy is the Lord of hosts;", "The whole earth is full of his glory.”"),
-    d(U + "amidah/qedushah/leumatam", "Those opposite them say: Blessed—"),
+    d(U + "amidah/qedushah/leummatam", "Those opposite them say: Blessed—"),
     d(U + "amidah/qedushah/barukh_kevod",
       "Blessed be the glory of the Lord from his abode."),
-    d(U + "amidah/qedushah/uvdivrey", "And in thy holy Scriptures it is written:"),
+    d(U + "amidah/qedushah/uvdivrei", "And in thy holy Scriptures it is written:"),
     d(U + "amidah/qedushah/yimlokh",
       "The Lord shall reign forever,", "Your God, O Zion, for all generations.", "Praise the Lord!"),
     f'          <tei:div corresp="{U}amidah/qedushah/ledor_vador">',
@@ -126,7 +126,7 @@ prayer("amidah_qedushah", "Kedushah", "amidah/qedushah", 84, 86, "\n".join([
     "mouth, for thou art a great and holy God and King.</tei:p>",
     "          </tei:div>",
     cond("cond_qedushah_seal_ordinary", fs=AYT, negate=True, marked=True),
-    d(U + "amidah/qedushah/haeil_haqadosh", "Blessed art thou, O Lord, holy God."),
+    d(U + "amidah/qedushah/hael_haqadosh", "Blessed art thou, O Lord, holy God."),
     endcond("cond_qedushah_seal_ordinary"),
     cond("cond_qedushah_seal_aseret",
          note="Between Rosh Hashanah and Yom Kippur substitute:", fs=AYT),
@@ -139,7 +139,7 @@ prayer("amidah_qedushat_hashem", "Sanctification of God’s name", "amidah/qedus
     f'        <tei:div corresp="{U}amidah/qedushat_hashem">',
     d(U + "amidah/qedushat_hashem/attah_qadosh", "Thou art holy and thy name is holy, and holy beings praise thee daily."),
     cond("cond_qh_seal_ordinary", fs=AYT, negate=True, marked=True),
-    d(U + "amidah/qedushat_hashem/haeil_haqadosh", "Blessed art thou, O Lord, holy God."),
+    d(U + "amidah/qedushat_hashem/hael_haqadosh", "Blessed art thou, O Lord, holy God."),
     endcond("cond_qh_seal_ordinary"),
     cond("cond_qh_seal_aseret",
          note="Between Rosh Hashanah and Yom Kippur substitute:", fs=AYT),
@@ -159,11 +159,11 @@ simple("amidah_selichah", "Blessing for forgiveness", "amidah/selichah", 85,
        "transgressed; for thou dost pardon and forgive. Blessed art thou, O Lord, who art "
        "gracious and ever forgiving.")
 
-prayer("amidah_geulah", "Blessing for redemption", "amidah/geulah", 86, 86, "\n".join([
-    f'        <tei:div corresp="{U}amidah/geulah">',
-    d(U + "amidah/geulah/reeh_na", "Look upon our affliction and champion our cause; redeem us speedily for thy name’s "
+prayer("amidah_geullah", "Blessing for redemption", "amidah/geullah", 86, 86, "\n".join([
+    f'        <tei:div corresp="{U}amidah/geullah">',
+    d(U + "amidah/geullah/reeh_na", "Look upon our affliction and champion our cause; redeem us speedily for thy name’s "
             "sake, for thou art a mighty Redeemer. Blessed art thou, O Lord, Redeemer of Israel."),
-    cond("cond_geulah_aneinu",
+    cond("cond_geullah_aneinu",
          note="On fast days (except Tish‘ah b’Av) the Reader adds:",
          fs="\n".join(["          <j:all>", feature(AGG, "minor-fast"),
                        feature(RECITATION, "repetition"), feature(QUORUM, "minyan"), "          </j:all>"])),
@@ -175,7 +175,7 @@ prayer("amidah_geulah", "Blessing for redemption", "amidah/geulah", 86, 86, "\n"
       "yet speaking, I will hear.” For thou, O Lord, art he who answers in time of trouble, who "
       "redeems and delivers in all times of woe and stress. Blessed art thou, O Lord, who "
       "answerest in time of distress.)"),
-    endcond("cond_geulah_aneinu"),
+    endcond("cond_geullah_aneinu"),
     "        </tei:div>"]))
 
 simple("amidah_refuah", "Blessing for healing", "amidah/refuah", 87,
@@ -192,11 +192,11 @@ prayer("amidah_shanim", "Blessing of the years", "amidah/shanim", 88, 88, "\n".j
     d(U + "amidah/shanim/barekh_aleinu", "Bless for us, Lord our God, this year and all kinds of its produce for the best."),
     cond("cond_shanim_berakhah", note="From Pesaḥ till December 4th say:",
          fs=feature(AGG, "tal-umatar"), negate=True),
-    d(U + "amidah/shanim/vetein_berakhah", "Bestow a blessing"),
+    d(U + "amidah/shanim/veten_berakhah", "Bestow a blessing"),
     endcond("cond_shanim_berakhah"),
     cond("cond_shanim_tal_umatar", note="From December 4th till Pesaḥ say:",
          fs=feature(AGG, "tal-umatar")),
-    d(U + "amidah/shanim/vetein_tal_umatar", "Bestow dew and rain for a blessing"),
+    d(U + "amidah/shanim/veten_tal_umatar", "Bestow dew and rain for a blessing"),
     endcond("cond_shanim_tal_umatar"),
     d(U + "amidah/shanim/al_penei_haadamah", "upon the face of the earth. Satisfy us with thy goodness, and bless our year like "
             "other good years. Blessed art thou, O Lord, who blessest the years."),
@@ -209,7 +209,7 @@ simple("amidah_qibbutz_galuyot", "Blessing for the ingathering", "amidah/qibbutz
 
 prayer("amidah_mishpat", "Blessing for justice", "amidah/mishpat", 88, 88, "\n".join([
     f'        <tei:div corresp="{U}amidah/mishpat">',
-    d(U + "amidah/mishpat/hashivah_shofteinu", "Restore our judges as at first, and our counselors as at the beginning; remove from "
+    d(U + "amidah/mishpat/hashivah_shofeteinu", "Restore our judges as at first, and our counselors as at the beginning; remove from "
             "us sorrow and sighing; reign thou alone over us, O Lord, in kindness and mercy, and "
             "clear us in judgment."),
     cond("cond_mishpat_seal_ordinary", fs=AYT, negate=True, marked=True),
@@ -271,7 +271,7 @@ prayer("amidah_avodah", "Blessing for the Temple service", "amidah/avodah", 90, 
 
 prayer("yaaleh_veyavo", "Ya‘aleh v’yavo", "yaaleh_veyavo", 90, 92, "\n".join([
     f'        <tei:div corresp="{U}yaaleh_veyavo">',
-    d(U + "yaaleh_veyavo/elohenu_velohei", "(Our God and God of our fathers, may the remembrance of us, of our fathers, of "
+    d(U + "yaaleh_veyavo/eloheinu_velohei", "(Our God and God of our fathers, may the remembrance of us, of our fathers, of "
             "Messiah the son of David thy servant, of Jerusalem thy holy city, and of all thy "
             "people the house of Israel, ascend and come and be accepted before thee for "
             "deliverance and happiness, for grace, kindness and mercy, for life and peace, on "
@@ -322,7 +322,7 @@ prayer("amidah_hodaah", "Blessing of thanksgiving", "amidah/hodaah", 92, 94, "\n
          fs=feature(HOL, "purim-observed", '<tei:numeric value="1"/>')),
     f'        <j:transclude type="external" target="{U}al_hanissim/purim"/>',
     endcond("cond_hodaah_purim"),
-    d(U + "amidah/hodaah/veal_kulam", "For all these acts may thy name, our King, be blessed and exalted forever and ever."),
+    d(U + "amidah/hodaah/veal_kullam", "For all these acts may thy name, our King, be blessed and exalted forever and ever."),
     cond("cond_hodaah_aseret", note="Between Rosh Hashanah and Yom Kippur add:", fs=AYT),
     d(U + "amidah/hodaah/ukhtov",
       "(Inscribe all thy people of the covenant for a happy life.)"),

@@ -7,7 +7,7 @@ from .shacharit_end import editorial_head
 from .song_of_songs_data import HE, EN, EN_PARAGRAPHS
 
 ROOT = SIDDUR + 'shabbat/preparations'
-CANDLES = PRAYER + 'hadlakat_ner_shabbat'
+CANDLES = PRAYER + 'hadlaqat_ner_shabbat'
 PARENTAL = PRAYER + 'birkat_horim'
 SONG = BIBLE + 'song_of_songs'
 SIGIL = '1949 shabbat/preparations'

@@ -60,7 +60,7 @@ class TestMorningTorahOpening(unittest.TestCase):
 
     def test_weekday_opening_is_unchanged(self):
         self.assertEqual(self.compile_opening(self.settings()),
-                         ['weekday-opening', 'vayehi_binsoa', 'berikh_shemeh', 'gadelu',
+                         ['weekday-opening', 'vayehi_binsoa', 'berikh_shemeh', 'gaddelu',
                           'lekha_adonai', 'hu_yerachem', 'vetiggaleh'])
 
     def test_undated_output_keeps_both_major_day_alternatives(self):

@@ -15,9 +15,9 @@ SIGIL = '1949 chol/shacharit/torah'
 URNS = {key: ROOT + '/' + key for key in PASSAGES}
 URNS.update({
     'berikh_shemeh': PRAYER + 'berikh_shemeh',
-    'gadelu': ROOT + '/gadelu',
+    'gaddelu': ROOT + '/gaddelu',
     'av_harachamim': PRAYER + 'av_harachamim/hu_yerachem',
-    'veatem': BIBLE + 'deuteronomy/4/4',
+    'veattem': BIBLE + 'deuteronomy/4/4',
     'asher_natan': PRAYER + 'birkhot_hatorah/asher_natan',
     'hagomel': PRAYER + 'birkat_hagomel',
     'yehi_ratzon': PRAYER + 'yehi_ratzon_milifnei_avinu',
@@ -47,13 +47,13 @@ BIBLICAL_ANCHORS = {
     ('vezot_hatorah', 'vezot'), ('vezot_hatorah', 'etz'),
     ('vezot_hatorah', 'derakheha'), ('vezot_hatorah', 'orekh'),
     ('vezot_hatorah', 'adonai_chafetz'),
-    ('uvnucho', 'uvnucho'), ('uvnucho', 'kumah'), ('uvnucho', 'kohanecha'),
-    ('uvnucho', 'baavur'), ('uvnucho', 'ki_lekach'), ('uvnucho', 'hashivenu'),
+    ('uvnucho', 'uvnucho'), ('uvnucho', 'kumah'), ('uvnucho', 'kohanekha'),
+    ('uvnucho', 'baavur'), ('uvnucho', 'ki_leqach'), ('uvnucho', 'hashivenu'),
 }
 
 
 def anchor(key, name, source):
-    if key in ('gadelu', 'veatem'):
+    if key in ('gaddelu', 'veattem'):
         return URNS[key]
     if key == 'psalm24' or (key, name) in BIBLICAL_ANCHORS:
         return BIBLE + source
@@ -102,7 +102,7 @@ def prayers(lang):
                 original = PRAYER + ('barekhu/' + name if key == 'barekhu' else 'birkhot_hatorah/asher_bachar')
                 attributes = f' source="{original}"'
             value = text_xml((he, en)[side])
-            if key in ('gadelu', 'veatem'):
+            if key in ('gaddelu', 'veattem'):
                 parts.append(f'<tei:seg{attributes}>{value}</tei:seg>' if attributes else value)
             else:
                 if attributes:
@@ -130,10 +130,10 @@ def unit_body(project):
         f'<tei:head xml:lang="{lang}">' + ('קְרִיאַת הַתּוֹרָה' if side == 0 else 'READING OF THE TORAH') + '</tei:head>',
         instruction('The ark is opened.'), instruction('Reader and Congregation:'),
         transclude('vayehi_binsoa'), transclude('berikh_shemeh'),
-        instruction('The Reader takes the Torah and says:'), transclude('gadelu'),
+        instruction('The Reader takes the Torah and says:'), transclude('gaddelu'),
         instruction('Congregation:'), transclude('lekha_adonai'), transclude('av_harachamim'),
         instruction('The Torah is placed on the desk. The Reader unrolls it and says:'),
-        transclude('vetiggaleh'), instruction('Congregation and Reader:'), transclude('veatem'),
+        transclude('vetiggaleh'), instruction('Congregation and Reader:'), transclude('veattem'),
         pb(123 + side, sigil=SIGIL), instruction('The person called to the Torah recites:'),
         transclude('barekhu'), instruction('He repeats the response and continues:'),
         transclude('asher_bachar'), instruction('The Torah is read. Then he recites:'),

@@ -79,7 +79,7 @@ prayer("amidah_avot", "בִּרְכַּת אָבוֹת", "amidah/avot", 81, 83, 
 # ---------------------------------------------------------------- 83
 prayer("amidah_gevurot", "בִּרְכַּת גְּבוּרוֹת", "amidah/gevurot", 83, 83, "\n".join([
     f'        <tei:div corresp="{U}amidah/gevurot">',
-    d(U + "amidah/gevurot/attah_gibor", "אַתָּה גִבּוֹר לְעוֹלָם, אֲדֹנָי; מְחַיֵּה מֵתִים אַתָּה, רַב לְהוֹשִֽׁיעַ.", indent=10),
+    d(U + "amidah/gevurot/attah_gibbor", "אַתָּה גִבּוֹר לְעוֹלָם, אֲדֹנָי; מְחַיֵּה מֵתִים אַתָּה, רַב לְהוֹשִֽׁיעַ.", indent=10),
     cond("cond_gevurot_geshem", note="Between Sukkoth and Pesaḥ add:",
          fs=feature(AGG, "geshem")),
     d(U + "amidah/gevurot/mashiv_haruach",
@@ -92,7 +92,7 @@ prayer("amidah_gevurot", "בִּרְכַּת גְּבוּרוֹת", "amidah/gevu
     d(U + "amidah/gevurot/mi_khamokha",
       "(מִי כָמֽוֹךָ, אַב הָרַחֲמִים, זוֹכֵר יְצוּרָיו לְחַיִּים בְּרַחֲמִים.)", indent=10),
     endcond("cond_gevurot_aseret"),
-    d(U + "amidah/gevurot/mechayeh_hametim",
+    d(U + "amidah/gevurot/mechayyeh_hametim",
       "וְנֶאֱמָן אַתָּה לְהַחֲיוֹת מֵתִים. בָּרוּךְ אַתָּה, יְיָ, מְחַיֵּה הַמֵּתִים.", indent=10),
     "        </tei:div>"]))
 
@@ -107,12 +107,12 @@ prayer("amidah_qedushah", "קְדֻשָּׁה", "amidah/qedushah", 83, 85, "\n".
       "כַּכָּתוּב עַל יַד נְבִיאֶֽךָ: וְקָרָא זֶה אֶל זֶה וְאָמַר:", indent=10),
     d(U + "amidah/qedushah/qadosh",
       "קָדוֹשׁ, קָדוֹשׁ, קָדוֹשׁ יְיָ צְבָאוֹת; מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ.", indent=10),
-    f'        <tei:div corresp="{U}amidah/qedushah/leumatam">',
+    f'        <tei:div corresp="{U}amidah/qedushah/leummatam">',
     '          <tei:note type="instruction" xml:lang="en" corresp="urn:x-opensiddur:instruction:role/reader">Reader</tei:note>',
     "          <tei:p>לְעֻמָּתָם בָּרוּךְ יֹאמֵֽרוּ—</tei:p>",
     "        </tei:div>",
     d(U + "amidah/qedushah/barukh_kevod", "בָּרוּךְ כְּבוֹד יְיָ מִמְּקוֹמוֹ.", indent=10),
-    f'        <tei:div corresp="{U}amidah/qedushah/uvdivrey">',
+    f'        <tei:div corresp="{U}amidah/qedushah/uvdivrei">',
     '          <tei:note type="instruction" xml:lang="en" corresp="urn:x-opensiddur:instruction:role/reader">Reader</tei:note>',
     "          <tei:p>וּבְדִבְרֵי קָדְשְׁךָ כָּתוּב לֵאמֹר:</tei:p>",
     "        </tei:div>",
@@ -126,7 +126,7 @@ prayer("amidah_qedushah", "קְדֻשָּׁה", "amidah/qedushah", 83, 85, "\n".
     # The asterisk marks the seal as substitutable: on the Ten Days הָאֵל הַקָּדוֹשׁ is NOT
     # said and הַמֶּלֶךְ הַקָּדוֹשׁ stands in its place. Two exclusive readings, not an addition.
     cond("cond_qedushah_seal_ordinary", fs=AYT, negate=True, marked=True),
-    d(U + "amidah/qedushah/haeil_haqadosh",
+    d(U + "amidah/qedushah/hael_haqadosh",
       "בָּרוּךְ אַתָּה, יְיָ, הָאֵל הַקָּדוֹשׁ.", indent=10),
     endcond("cond_qedushah_seal_ordinary"),
     cond("cond_qedushah_seal_aseret",
@@ -142,7 +142,7 @@ prayer("amidah_qedushat_hashem", "קְדֻשַּׁת הַשֵּׁם", "amidah/qe
     f'        <tei:div corresp="{U}amidah/qedushat_hashem">',
     d(U + "amidah/qedushat_hashem/attah_qadosh", "אַתָּה קָדוֹשׁ וְשִׁמְךָ קָדוֹשׁ, וּקְדוֹשִׁים בְּכָל יוֹם יְהַלְלֽוּךָ סֶּֽלָה.", indent=10),
     cond("cond_qh_seal_ordinary", fs=AYT, negate=True, marked=True),
-    d(U + "amidah/qedushat_hashem/haeil_haqadosh",
+    d(U + "amidah/qedushat_hashem/hael_haqadosh",
       "בָּרוּךְ אַתָּה, יְיָ, הָאֵל הַקָּדוֹשׁ.", indent=10),
     endcond("cond_qh_seal_ordinary"),
     cond("cond_qh_seal_aseret",
@@ -165,13 +165,13 @@ for nm, ti, sl, txt in [
 ]:
     prayer(nm, ti, sl, 85, 85, wrap(U + sl, d(None, txt, indent=10)))
 
-prayer("amidah_geulah", "גְּאוּלָּה", "amidah/geulah", 85, 85, "\n".join([
-    f'        <tei:div corresp="{U}amidah/geulah">',
-    d(U + "amidah/geulah/reeh_na", "רְאֵה נָא בְעָנְיֵֽנוּ וְרִיבָה רִיבֵֽנוּ, וּגְאָלֵֽנוּ מְהֵרָה לְמַֽעַן שְׁמֶֽךָ, כִּי גוֹאֵל חָזָק אָֽתָּה. "
+prayer("amidah_geullah", "גְּאוּלָּה", "amidah/geullah", 85, 85, "\n".join([
+    f'        <tei:div corresp="{U}amidah/geullah">',
+    d(U + "amidah/geullah/reeh_na", "רְאֵה נָא בְעָנְיֵֽנוּ וְרִיבָה רִיבֵֽנוּ, וּגְאָלֵֽנוּ מְהֵרָה לְמַֽעַן שְׁמֶֽךָ, כִּי גוֹאֵל חָזָק אָֽתָּה. "
             "בָּרוּךְ אַתָּה, יְיָ, גּוֹאֵל יִשְׂרָאֵל.", indent=10),
     # Two tests, and they combine with j:all only because both carry a value: a fast day,
     # and the Reader's repetition. Tish'ah b'Av is excluded by name in the rubric.
-    cond("cond_geulah_aneinu",
+    cond("cond_geullah_aneinu",
          note="On fast days (except Tish‘ah b’Av) the Reader adds:",
          fs="\n".join(["          <j:all>", feature(AGG, "minor-fast"),
                        feature(RECITATION, "repetition"), feature(QUORUM, "minyan"), "          </j:all>"])),
@@ -181,7 +181,7 @@ prayer("amidah_geulah", "גְּאוּלָּה", "amidah/geulah", 85, 85, "\n".jo
       "חַסְדְּךָ לְנַחֲמֵֽנוּ; טֶֽרֶם נִקְרָא אֵלֶֽיךָ עֲנֵֽנוּ, כַּדָּבָר שֶׁנֶּאֱמַר: וְהָיָה טֶֽרֶם יִקְרָֽאוּ, וַאֲנִי "
       "אֶעֱנֶה; עוֹד הֵם מְדַבְּרִים, וַאֲנִי אֶשְׁמָע. כִּי אַתָּה, יְיָ, הָעוֹנֶה בְּעֵת צָרָה, פּוֹדֶה וּמַצִּיל "
       "בְּכָל עֵת צָרָה וְצוּקָה. בָּרוּךְ אַתָּה, יְיָ, הָעוֹנֶה בְּעֵת צָרָה.)", indent=10),
-    endcond("cond_geulah_aneinu"),
+    endcond("cond_geullah_aneinu"),
     "        </tei:div>"]))
 
 # ---------------------------------------------------------------- 87
@@ -199,11 +199,11 @@ prayer("amidah_shanim", "בִּרְכַּת הַשָּׁנִים", "amidah/shani
     d(U + "amidah/shanim/barekh_aleinu", "בָּרֵךְ עָלֵֽינוּ, יְיָ אֱלֹהֵֽינוּ, אֶת הַשָּׁנָה הַזֹּאת וְאֶת כָּל מִינֵי תְבוּאָתָהּ לְטוֹבָה,", indent=10),
     cond("cond_shanim_berakhah", note="From Pesaḥ till December 4th say:",
          fs=feature(AGG, "tal-umatar"), negate=True),
-    d(U + "amidah/shanim/vetein_berakhah", "וְתֵן בְּרָכָה", indent=10),
+    d(U + "amidah/shanim/veten_berakhah", "וְתֵן בְּרָכָה", indent=10),
     endcond("cond_shanim_berakhah"),
     cond("cond_shanim_tal_umatar", note="From December 4th till Pesaḥ say:",
          fs=feature(AGG, "tal-umatar")),
-    d(U + "amidah/shanim/vetein_tal_umatar", "וְתֵן טַל וּמָטָר לִבְרָכָה", indent=10),
+    d(U + "amidah/shanim/veten_tal_umatar", "וְתֵן טַל וּמָטָר לִבְרָכָה", indent=10),
     endcond("cond_shanim_tal_umatar"),
     d(U + "amidah/shanim/al_penei_haadamah", "עַל פְּנֵי הָאֲדָמָה, וְשַׂבְּעֵֽנוּ מִטּוּבָהּ, וּבָרֵךְ שְׁנָתֵֽנוּ כַּשָּׁנִים הַטּוֹבוֹת. "
             "בָּרוּךְ אַתָּה, יְיָ, מְבָרֵךְ הַשָּׁנִים.", indent=10),
@@ -216,7 +216,7 @@ prayer("amidah_qibbutz_galuyot", "קִבּוּץ גָּלֻיּוֹת", "amidah/
 
 prayer("amidah_mishpat", "בִּרְכַּת מִשְׁפָּט", "amidah/mishpat", 87, 87, "\n".join([
     f'        <tei:div corresp="{U}amidah/mishpat">',
-    d(U + "amidah/mishpat/hashivah_shofteinu", "הָשִֽׁיבָה שׁוֹפְטֵֽינוּ כְּבָרִאשׁוֹנָה, וְיוֹעֲצֵֽינוּ כְּבַתְּחִלָּה; וְהָסֵר מִמֶּֽנּוּ יָגוֹן וַאֲנָחָה; "
+    d(U + "amidah/mishpat/hashivah_shofeteinu", "הָשִֽׁיבָה שׁוֹפְטֵֽינוּ כְּבָרִאשׁוֹנָה, וְיוֹעֲצֵֽינוּ כְּבַתְּחִלָּה; וְהָסֵר מִמֶּֽנּוּ יָגוֹן וַאֲנָחָה; "
             "וּמְלוֹךְ עָלֵֽינוּ, אַתָּה יְיָ לְבַדְּךָ, בְּחֶֽסֶד וּבְרַחֲמִים, וְצַדְּקֵֽנוּ בַּמִּשְׁפָּט.", indent=10),
     cond("cond_mishpat_seal_ordinary", fs=AYT, negate=True, marked=True),
     d(U + "amidah/mishpat/melekh_ohev_tzedaqah",
@@ -288,7 +288,7 @@ prayer("amidah_avodah", "עֲבוֹדָה", "amidah/avodah", 89, 91, "\n".join([
 # "say this on Rosh Hodesh".
 prayer("yaaleh_veyavo", "יַעֲלֶה וְיָבֹא", "yaaleh_veyavo", 89, 91, "\n".join([
     f'        <tei:div corresp="{U}yaaleh_veyavo">',
-    d(U + "yaaleh_veyavo/elohenu_velohei", "(אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ, יַעֲלֶה וְיָבֹא, וְיַגִּֽיעַ וְיֵרָאֶה, וְיֵרָצֶה וְיִשָּׁמַע, "
+    d(U + "yaaleh_veyavo/eloheinu_velohei", "(אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ, יַעֲלֶה וְיָבֹא, וְיַגִּֽיעַ וְיֵרָאֶה, וְיֵרָצֶה וְיִשָּׁמַע, "
             "וְיִפָּקֵד וְיִזָּכֵר זִכְרוֹנֵֽנוּ וּפִקְדוֹנֵֽנוּ, וְזִכְרוֹן אֲבוֹתֵֽינוּ, וְזִכְרוֹן מָשִֽׁיחַ בֶּן דָּוִד "
             "עַבְדֶּֽךָ, וְזִכְרוֹן יְרוּשָׁלַֽיִם עִיר קָדְשֶֽׁךָ, וְזִכְרוֹן כָּל עַמְּךָ בֵּית יִשְׂרָאֵל לְפָנֶֽיךָ, "
             "לִפְלֵיטָה וּלְטוֹבָה, לְחֵן וּלְחֶֽסֶד וּלְרַחֲמִים, לְחַיִּים וּלְשָׁלוֹם, בְּיוֹם", indent=10),
@@ -339,7 +339,7 @@ prayer("amidah_hodaah", "הוֹדָאָה", "amidah/hodaah", 91, 93, "\n".join([
          fs=feature(HOL, "purim-observed", '<tei:numeric value="1"/>')),
     f'        <j:transclude type="external" target="{U}al_hanissim/purim"/>',
     endcond("cond_hodaah_purim"),
-    d(U + "amidah/hodaah/veal_kulam", "וְעַל כֻּלָּם יִתְבָּרַךְ וְיִתְרוֹמַם שִׁמְךָ, מַלְכֵּֽנוּ, תָּמִיד לְעוֹלָם וָעֶד.", indent=10),
+    d(U + "amidah/hodaah/veal_kullam", "וְעַל כֻּלָּם יִתְבָּרַךְ וְיִתְרוֹמַם שִׁמְךָ, מַלְכֵּֽנוּ, תָּמִיד לְעוֹלָם וָעֶד.", indent=10),
     cond("cond_hodaah_aseret", note="Between Rosh Hashanah and Yom Kippur add:", fs=AYT),
     d(U + "amidah/hodaah/ukhtov",
       "(וּכְתוֹב לְחַיִּים טוֹבִים כָּל בְּנֵי בְרִיתֶֽךָ.)", indent=10),

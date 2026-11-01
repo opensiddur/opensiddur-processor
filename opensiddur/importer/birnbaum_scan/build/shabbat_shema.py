@@ -109,7 +109,7 @@ def units(project,by_name):
     body=transclude(PRAYER+'yotzer_or/opening')
     body+=conditional('festival','On festivals occurring on weekdays say:',FESTIVAL_WEEKDAY,festival)
     body+=conditional('shabbat','On Sabbaths say:',SHABBAT,transclude(YOTZER+'/shabbat_opening')+transclude(EL_ADON)+transclude(LAEL))
-    body+=''.join(transclude(PRAYER+'yotzer_or/'+key) for key in ('titbarakh','et_shem','qadosh','vehaofanim','barukh_kevod','lael_barukh','or_hadash'))
+    body+=''.join(transclude(PRAYER+'yotzer_or/'+key) for key in ('titbarakh','et_shem','qadosh','vehaofannim','barukh_kevod','lael_barukh','or_chadash'))
     add('yotzer_or','יוצר אור','Yotzer Or',337,343,body)
     add('blessings_before','ברכות לפני קריאת שמע','Blessings before Shema',335,343,
         conditional('barekhu','When a minyan holds service:',MINYAN,transclude(PRAYER+'barekhu'))

@@ -167,7 +167,7 @@ YELADIM_RUBRICS = (
     ("When washing the hands:", ["yeladim_netilat_yadayim"]),
     ("When putting on the <tei:foreign xml:lang=\"he-Latn\">arba kanfoth</tei:foreign>:",
      ["yeladim_tzitzit"]),
-    ("When dressed:", ["yeladim_torah_tziva", "yeladim_elohai_netzor"]),
+    ("When dressed:", ["yeladim_torah_tzivvah", "yeladim_elohai_netzor"]),
 )
 
 
@@ -196,8 +196,8 @@ TALLITH = '<tei:foreign xml:lang="he-Latn">tallith</tei:foreign>'
 BIRCHOT_RUBRICS = (
     ("Upon entering the synagogue:", ["birkhot_mah_tovu"]),
     (f"Before putting on the {TALLITH}:",
-     ["tallith_barkhi_nafshi", "tallith_hineni_mitatef"]),
-    (f"When putting on the {TALLITH}:", ["tallith_lehitatef"]),
+     ["tallith_barkhi_nafshi", "tallith_hineni_mitattef"]),
+    (f"When putting on the {TALLITH}:", ["tallith_lehitattef"]),
 )
 
 #: The tefillin order's heading and rubrics, printed pages 5-11 against 6-12. Barukh Shem
@@ -207,7 +207,7 @@ TEFILLIN_HEAD = {
     PROJECT_HE: '        <tei:head xml:lang="he">סֵֽדֶר הַנָּחַת תְּפִלִּין</tei:head>',
     PROJECT_EN: '        <tei:head xml:lang="en">PUTTING ON THE TEFILLIN</tei:head>',
 }
-#: The Shema verse and Barukh Shem are `tei:seg`s inside the children's `torah_tziva`
+#: The Shema verse and Barukh Shem are `tei:seg`s inside the children's `torah_tzivvah`
 #: rather than files of their own, so they are reached by URN and not by prayer name. They
 #: are the same words wherever the book prints them, which is the whole point of giving
 #: them canonical URNs there.
@@ -215,14 +215,14 @@ SHEMA_PASUK = PRAYER + "shema/shema_yisrael"
 SHEMA_BARUKH_SHEM = PRAYER + "shema/barukh_shem"
 
 TEFILLIN_RUBRICS = (
-    ("Meditation before putting on the tefillin", ["tefillin_hineni_mekhaven"]),
-    ("When placing the tefillin on the left arm:", ["tefillin_lehaniach"]),
+    ("Meditation before putting on the tefillin", ["tefillin_hineni_mekhavven"]),
+    ("When placing the tefillin on the left arm:", ["tefillin_lehanniach"]),
     ("When placing the tefillin on the forehead:", ["tefillin_al_mitzvat"]),
     # Printed 7 sets Barukh Shem here, between the two blessings. It is realised on the
     # children's page, so the unit reaches it by URN -- which `he_tefillin`'s docstring has
     # said all along and the unit did not in fact do.
     ("", [SHEMA_BARUKH_SHEM]),
-    ("", ["tefillin_umechokhmatkha"]),
+    ("", ["tefillin_umechokhmatekha"]),
     ("When winding the retsuah three times round the middle finger:",
      ["tefillin_verastikh"]),
     ("", ["tefillin_yehi_ratzon"]),
@@ -278,8 +278,8 @@ GENDERED = (
 #: children's page is certainly not its home.
 SHARED_WITH_YELADIM = ("yeladim_netilat_yadayim",)
 
-TORAH_BLESSINGS = ("asher_yatzar", "birkhot_hatorah_laasok", "birkhot_hatorah_vehaarev",
-                   "birkhot_hatorah_asher_bachar", "birkat_kohanim", "elu_devarim",
+TORAH_BLESSINGS = ("asher_yatzar", "birkhot_hatorah_laasoq", "birkhot_hatorah_vehaarev",
+                   "birkhot_hatorah_asher_bachar", "birkat_kohanim", "ellu_devarim",
                    "elohai_neshamah")
 
 
@@ -311,7 +311,7 @@ def _transclude(lines, by_name, name):
 BLESSING_CITATIONS = {
     "yeladim_netilat_yadayim": ("מסכת ברכות יא, א; ס, ב", "Talmud Berakhoth 11a; 60b"),
     "birkat_kohanim": ("במדבר ו, כד–כו", "Numbers 6:24–26"),
-    "elu_devarim": ("פאה א, משנה א; מסכת שבת קכז, א",
+    "ellu_devarim": ("פאה א, משנה א; מסכת שבת קכז, א",
                     "Mishnah Peah 1:1; Talmud Shabbath 127a"),
     "elohai_neshamah": ("מסכת ברכות ס, ב", "Talmud Berakhoth 60b"),
 }
@@ -337,29 +337,29 @@ def _birkhot_blessings(lines, project, by_name):
                 _transclude(lines, by_name, gname)
                 lines.append(endcond(cid))
     for name in ("birkhot_shetargilenu", "birkhot_gomel_chasadim",
-                 "birkhot_shetatzileni", "birkhot_zochreinu"):
+                 "birkhot_shetatzileni", "birkhot_zokhrenu"):
         _transclude(lines, by_name, name)
 
 
 #: Printed 19 to 25, from the Akedah to the end of the Atah Hu passages.
 #:
-#: The two `Reader` labels on printed 25 are what make `lefikhakh/ashrenu` and
-#: `atah_hu/uvishuatkha` texts of their own: a label cannot stand inside a `tei:p`, and a
+#: The two `Reader` labels on printed 25 are what make `lefikhakh/ashreinu` and
+#: `attah_hu/uvishuatekha` texts of their own: a label cannot stand inside a `tei:p`, and a
 #: passage that must start level with its translation needs a URN. The English page runs
 #: straight on and is parted at the same two points so the columns join URN for URN.
 AKEDAH_ORDER = (
     ("citation", "בראשית כב, א–יט", "Genesis 22:1\u201319"),
-    "akedah",
-    "akedah_ribbono",
+    "aqedah",
+    "aqedah_ribbono",
     "leolam_yehe_adam",
     "ribbon_kol_haolamim",
     "aval_anachnu",
     "lefikhakh",
-    ("reader", "ashrenu"),
+    ("reader", "ashreinu"),
     ("transclude", SHEMA_PASUK),
     ("transclude", SHEMA_BARUKH_SHEM),
     "attah_hu_ad",
-    ("reader", "attah_hu_uvishuatkha"),
+    ("reader", "attah_hu_uvishuatekha"),
     "attah_hu_bashamayim",
 )
 
@@ -369,38 +369,38 @@ AKEDAH_ORDER = (
 #: both. A citation naming two places parts them with a semicolon.
 KORBANOT_ORDER = (
     ("citation", "שמות ל, יז–כא", "Exodus 30:17\u201321"),
-    "korbanot_kiyor",
-    "korbanot_yehi_ratzon_miqdash",
+    "qorbanot_kiyyor",
+    "qorbanot_yehi_ratzon_miqdash",
     ("citation", "במדבר כח, א–ח", "Numbers 28:1\u20138"),
-    "korbanot_tamid",
+    "qorbanot_tamid",
     ("citation", "ויקרא א, יא", "Leviticus 1:11"),
-    "korbanot_ushchat",
-    "korbanot_yehi_ratzon_amirah",
-    "korbanot_attah_hu",
+    "qorbanot_ushchat",
+    "qorbanot_yehi_ratzon_amirah",
+    "qorbanot_attah_hu",
     ("citation", "שמות ל, לד–לו; ל ז–ח", "Exodus 30:34\u201336; 30:7\u20138"),
-    "korbanot_ketoret",
+    "qorbanot_qetoret",
     ("citation", "תלמוד בבלי, כריתות ו, א; תלמוד ירושלמי, יומא ד, ה",
      "Babylonian Talmud, Kerithoth 6a; Palestinian Talmud, Yoma 4:5"),
-    "korbanot_pittum",
-    "korbanot_rashbag",
-    "korbanot_rabbi_natan",
-    "korbanot_bar_kappara",
-    "korbanot_pesuqim",
-    "korbanot_attah_seter",
-    "korbanot_vearvah",
+    "qorbanot_pittum",
+    "qorbanot_rashbag",
+    "qorbanot_rabbi_natan",
+    "qorbanot_bar_kappara",
+    "qorbanot_pesuqim",
+    "qorbanot_attah_seter",
+    "qorbanot_vearvah",
     ("citation", "מסכת יומא לג, א", "Talmud Yoma 33a"),
-    "korbanot_abaye",
+    "qorbanot_abaye",
     "poem_anna_bekhoach",
     ("transclude", SHEMA_BARUKH_SHEM),
-    "korbanot_ribbon_haolamim",
+    "qorbanot_ribbon_haolamim",
     ("conditional", "cond_musaf_shabbat", "On Sabbath say:",
      feature(AGG, "shabbat"),
-     "במדבר כח, ט–י", "Numbers 28:9\u201310", "korbanot_musaf_shabbat"),
+     "במדבר כח, ט–י", "Numbers 28:9\u201310", "qorbanot_musaf_shabbat"),
     ("conditional", "cond_musaf_rosh_chodesh", "On Rosh \u1e24odesh say:",
      feature(HOL, "rosh-hodesh", '<tei:numeric value="1" max="2"/>'),
-     "במדבר כח, יא–טו", "Numbers 28:11\u201315", "korbanot_musaf_rosh_chodesh"),
+     "במדבר כח, יא–טו", "Numbers 28:11\u201315", "qorbanot_musaf_rosh_chodesh"),
     ("citation", "משנה זבחים, פרק ה", "Mishnah Zebaḥim, Chapter 5"),
-) + tuple(f"eizehu_mekoman_{n}" for n in range(1, 9))
+) + tuple(f"eizehu_meqoman_{n}" for n in range(1, 9))
 
 #: Printed 41 to 47. The English page carries a heading this one does not, which is the
 #: sharpest asymmetry in the section and is why `head` here is a per-project value.
@@ -415,11 +415,11 @@ ISHMAEL_ORDER = (
      feature("opensiddur:quorum", "minyan")),
     ("head", "קַדִּישׁ דְּרַבָּנָן", "KADDISH D\u2019RABBANAN"),
     ("mourners", None),
-    "kaddish_derabbanan_yitgadal",
-    "kaddish_derabbanan_yehe_shmeh",
+    "kaddish_derabbanan_yitgaddal",
+    "kaddish_derabbanan_yehe_shemeh",
     "kaddish_derabbanan_yitbarakh",
     "kaddish_derabbanan_al_yisrael",
-    "kaddish_derabbanan_yehe_shlama",
+    "kaddish_derabbanan_yehe_shelama",
     "kaddish_derabbanan_oseh_shalom",
     ("end-conditional", "morning_study_kaddish"),
     ("closing", None),
@@ -489,7 +489,7 @@ def unit_body_birchot(project, by_name):
         for name in names:
             _transclude(lines, by_name, name)
     lines.append(BIRCHOT_CITATION[project])
-    for name in ("tallith_mah_yakar", "tallith_yehi_ratzon"):
+    for name in ("tallith_mah_yaqar", "tallith_yehi_ratzon"):
         _transclude(lines, by_name, name)
     tefillin = ('<j:all><j:none>'+feature(AGG, 'shabbat')+feature(AGG, 'yom-tov')
                 +feature(HOL, 'tisha-bav', '<tei:numeric value="1"/>')+'</j:none><j:any>'
@@ -552,9 +552,9 @@ def todah_condition():
 
 def unit_body_pesukei(project, by_name):
     """Hareni mezamen through the concluding Half Kaddish."""
-    lines = [f'<tei:div corresp="{S}chol/shacharit/pesukei_dezimra">', declaration()]
-    for name in ('hareni_mezamen', 'barukh_sheamar', 'hodu', 'romemu',
-                 'vehu_rachum', 'hoshia_et_ammekha'):
+    lines = [f'<tei:div corresp="{S}chol/shacharit/pesuqei_dezimrah">', declaration()]
+    for name in ('hareini_mezammen', 'barukh_sheamar', 'hodu', 'romemu',
+                 'vehu_rachum', 'hoshiah_et_ammekha'):
         _transclude(lines, by_name, name)
     lines.append(todah_condition())
     _transclude(lines, by_name, 'mizmor_letodah')
@@ -597,10 +597,10 @@ def units(project, pages, by_name, amidah_body):
              body=unit_body_opening(project, by_name),
              title_he="תְּפִלַּת שַׁחֲרִית", title_en="Morning service opening",
              urn=f"{S}chol/shacharit/opening", pages=pages["opening"]),
-        dict(name="chol_shacharit_pesukei_dezimra",
+        dict(name="chol_shacharit_pesuqei_dezimrah",
              body=unit_body_pesukei(project, by_name),
              title_he="פְּסוּקֵי דְזִמְרָה", title_en="Verses of praise",
-             urn=f"{S}chol/shacharit/pesukei_dezimra", pages=pages["pesukei"]),
+             urn=f"{S}chol/shacharit/pesuqei_dezimrah", pages=pages["pesuqei"]),
         dict(name="chol_shacharit_shema", body=shema_body(project, by_name),
              title_he="קְרִיאַת שְׁמַע וּבִרְכוֹתֶיהָ", title_en="Shema and its blessings",
              urn=f"{S}chol/shacharit/shema", pages=pages["shema"]),
@@ -639,7 +639,7 @@ def units(project, pages, by_name, amidah_body):
     # Explicit editorial section headings supply navigation where the printed
     # book relies on placement. Prayer headings remain inside their sections.
     for unit in result:
-        if unit['name'] in ('chol_shacharit_pesukei_dezimra', 'chol_shacharit_shema',
+        if unit['name'] in ('chol_shacharit_pesuqei_dezimrah', 'chol_shacharit_shema',
                             'chol_shacharit_conclusion', 'chol_shacharit_psalms'):
             start, rest = unit['body'].split('>', 1)
             unit['body'] = start + '>\n' + editorial_head(lang, unit['title_he'], unit['title_en']) + rest
@@ -685,7 +685,7 @@ YELADIM_HEAD = {
 
 ORDER = ["amidah_adonai_sefatai", "amidah_avot", "amidah_gevurot", "amidah_qedushah",
          "amidah_qedushat_hashem", "amidah_binah", "amidah_teshuvah", "amidah_selichah",
-         "amidah_geulah", "amidah_refuah", "amidah_shanim", "amidah_qibbutz_galuyot",
+         "amidah_geullah", "amidah_refuah", "amidah_shanim", "amidah_qibbutz_galuyot",
          "amidah_mishpat", "amidah_minim", "amidah_tzaddiqim", "amidah_yerushalayim",
          "amidah_david", "amidah_tefillah", "amidah_avodah", "amidah_hodaah",
          "amidah_birkat_kohanim", "amidah_shalom", "amidah_elohai_netzor",
@@ -694,7 +694,7 @@ ORDER = ["amidah_adonai_sefatai", "amidah_avot", "amidah_gevurot", "amidah_qedus
 BY_NAME = {p["name"]: p for p in PRAYERS}
 
 #: Which printed pages each unit spans, on the Hebrew side of the opening.
-HE_UNIT_PAGES = {"yeladim": (1, 1), "birkhot": (3, 47), "opening": (49, 51), "pesukei": (51, 69), "shema": (71, 81), "amidah": (81, 97), "avinu": (97, 101)}
+HE_UNIT_PAGES = {"yeladim": (1, 1), "birkhot": (3, 47), "opening": (49, 51), "pesuqei": (51, 69), "shema": (71, 81), "amidah": (81, 97), "avinu": (97, 101)}
 
 
 def unit_body():

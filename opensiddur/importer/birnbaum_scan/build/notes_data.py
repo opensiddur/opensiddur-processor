@@ -12,7 +12,7 @@ are not in these projects yet. 86 read, 84 encoded.
 YELADIM_NOTES = [
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:torah_tziva/morasha",
+        target="urn:x-opensiddur:text:prayer:torah_tzivvah/morashah",
         lemma="תורה צוה לנו",
         paras=[
             dict(text=(
@@ -110,7 +110,7 @@ AMIDAH_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:amidah/gevurot/attah_gibor",
+        target="urn:x-opensiddur:text:prayer:amidah/gevurot/attah_gibbor",
         lemma="גבורות",
         paras=[
             dict(text=(
@@ -224,7 +224,7 @@ AMIDAH_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:yaaleh_veyavo/elohenu_velohei",
+        target="urn:x-opensiddur:text:prayer:yaaleh_veyavo/eloheinu_velohei",
         lemma="יעלה ויבוא",
         paras=[
             dict(text=(
@@ -368,7 +368,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:tallith/lehitatef",
+        target="urn:x-opensiddur:text:prayer:tallith/lehitattef",
         lemma="ציצית",
         paras=[
             dict(text=(
@@ -414,7 +414,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="3",
-        target="urn:x-opensiddur:text:prayer:tallith/hineni_mitatef",
+        target="urn:x-opensiddur:text:prayer:tallith/hineni_mitattef",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Numbers</tei:hi> 15:38."
@@ -423,7 +423,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhaven",
+        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhavven",
         paras=[
             dict(text=(
                 "The <tei:foreign xml:lang=\"he\">תפילין</tei:foreign>, known as <tei:foreign "
@@ -463,7 +463,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhaven",
+        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhavven",
         lemma="הנני מכון...",
         paras=[
             dict(text=(
@@ -479,7 +479,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="1",
-        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhaven",
+        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhavven",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Deuteronomy</tei:hi> 6:8."
@@ -489,7 +489,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="2",
-        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhaven",
+        target="urn:x-opensiddur:text:prayer:tefillin/hineni_mekhavven",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Deuteronomy</tei:hi> 6:4–9; 11:13–21; <tei:hi "
@@ -499,7 +499,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:tefillin/umechokhmatkha",
+        target="urn:x-opensiddur:text:prayer:tefillin/umechokhmatekha",
         lemma="ומחכמתך אל עליון",
         paras=[
             dict(text=(
@@ -511,7 +511,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:tefillin/umechokhmatkha",
+        target="urn:x-opensiddur:text:prayer:tefillin/umechokhmatekha",
         lemma="קני המנורה",
         paras=[
             dict(text=(
@@ -522,7 +522,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="1",
-        target="urn:x-opensiddur:text:prayer:tefillin/umechokhmatkha",
+        target="urn:x-opensiddur:text:prayer:tefillin/umechokhmatekha",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Psalm</tei:hi> 145:16."
@@ -574,7 +574,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:elu_devarim",
+        target="urn:x-opensiddur:text:prayer:ellu_devarim",
         lemma="פאה",
         paras=[
             dict(text=(
@@ -586,7 +586,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:elu_devarim",
+        target="urn:x-opensiddur:text:prayer:ellu_devarim",
         lemma="בכורים",
         paras=[
             dict(text=(
@@ -596,7 +596,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:elu_devarim",
+        target="urn:x-opensiddur:text:prayer:ellu_devarim",
         lemma="ראיון",
         paras=[
             dict(text=(
@@ -607,7 +607,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:elu_devarim",
+        target="urn:x-opensiddur:text:prayer:ellu_devarim",
         lemma="גמילות חסדים",
         paras=[
             dict(text=(
@@ -618,7 +618,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:elu_devarim",
+        target="urn:x-opensiddur:text:prayer:ellu_devarim",
         lemma="תלמוד תורה",
         paras=[
             dict(text=(
@@ -707,7 +707,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:birkhot_hashachar/zochreinu",
+        target="urn:x-opensiddur:text:prayer:birkhot_hashachar/zokhrenu",
         lemma="זכרנו בזכרון טוב",
         paras=[
             dict(text=(
@@ -722,7 +722,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:akedah",
+        target="urn:x-opensiddur:text:prayer:aqedah",
         lemma="נסה את אברהם",
         paras=[
             dict(text=(
@@ -735,7 +735,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:akedah",
+        target="urn:x-opensiddur:text:prayer:aqedah",
         lemma="בהר ה' יראה",
         paras=[
             dict(text=(
@@ -747,7 +747,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="1",
-        target="urn:x-opensiddur:text:prayer:akedah/ribbono_shel_olam",
+        target="urn:x-opensiddur:text:prayer:aqedah/ribbono_shel_olam",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Leviticus</tei:hi> 26:42."
@@ -789,7 +789,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:attah_hu/uvishuatkha",
+        target="urn:x-opensiddur:text:prayer:attah_hu/uvishuatekha",
         lemma="קדש את שמך–ברבים",
         paras=[
             dict(text=(
@@ -810,7 +810,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:korbanot/kiyor",
+        target="urn:x-opensiddur:text:prayer:qorbanot/kiyyor",
         lemma="וידבר... ועשית כיור",
         paras=[
             dict(text=(
@@ -840,7 +840,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="1",
-        target="urn:x-opensiddur:text:prayer:korbanot/pittum_haketoret/bar_kappara",
+        target="urn:x-opensiddur:text:prayer:qorbanot/pittum_haqetoret/bar_kappara",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Leviticus</tei:hi> 2:11"
@@ -850,7 +850,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="2",
-        target="urn:x-opensiddur:text:prayer:korbanot/attah_seter",
+        target="urn:x-opensiddur:text:prayer:qorbanot/attah_seter",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Psalms</tei:hi> 46:8; 84:13: 20:10; 32:7."
@@ -860,7 +860,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="3",
-        target="urn:x-opensiddur:text:prayer:korbanot/vearvah",
+        target="urn:x-opensiddur:text:prayer:qorbanot/vearvah",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Malachi</tei:hi> 3:4."
@@ -870,7 +870,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="4",
-        target="urn:x-opensiddur:text:prayer:korbanot/seder_hamaarakhah",
+        target="urn:x-opensiddur:text:prayer:qorbanot/seder_hamaarakhah",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Leviticus</tei:hi> 6:5."
@@ -879,7 +879,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:korbanot/seder_hamaarakhah",
+        target="urn:x-opensiddur:text:prayer:qorbanot/seder_hamaarakhah",
         lemma="שלמים",
         paras=[
             dict(text=(
@@ -905,7 +905,7 @@ BIRCHOT_NOTES = [
     dict(
         kind="citation",
         n="1",
-        target="urn:x-opensiddur:text:prayer:korbanot/ribbon_haolamim",
+        target="urn:x-opensiddur:text:prayer:qorbanot/ribbon_haolamim",
         paras=[
             dict(text=(
                 "<tei:hi rend=\"italic\">Hosea</tei:hi> 14:3"
@@ -1136,7 +1136,7 @@ BIRCHOT_NOTES = [
     ),
     dict(
         kind="commentary",
-        target="urn:x-opensiddur:text:prayer:kaddish/derabbanan/yitgadal",
+        target="urn:x-opensiddur:text:prayer:kaddish/derabbanan/yitgaddal",
         lemma="קדיש דרבנן",
         paras=[
             dict(text=(

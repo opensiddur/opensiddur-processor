@@ -250,7 +250,7 @@ ROWS = [{'key': 'preparation',
                 'The peoples shall praise thee, O Lord; all the peoples shall praise thee!',
                 'The earth has yielded its produce; God, our own God, blesses us.',
                 'God blesses us; all the far ends of the earth shall revere him.']},
- {'key': 'anna_bekoach',
+ {'key': 'anna_bekhoach',
   'page': 645,
   'he': 'אָנָּא, בְּכֹֽחַ גְּדֻלַּת יְמִינְךָ תַּתִּיר צְרוּרָה.\n'
         'קַבֵּל רִנַּת עַמְּךָ, שַׂגְּבֵֽנוּ, טַהֲרֵֽנוּ, נוֹרָא.\n'
@@ -499,7 +499,7 @@ NOTES = [{'key': 'preparation',
           'seven weeks or forty-nine days of the Sefirah.',
   'kind': 'commentary'},
  {'key': 'ribbono/leviticus_23_16', 'page': 646, 'text': 'Leviticus 23:15–16.', 'kind': 'source'},
- {'key': 'akdamut/1',
+ {'key': 'aqdamut/1',
   'page': 647,
   'text': 'אקדמות was composed by Rabbi Meir ben Isaac of France, who lived in the eleventh century. The '
           'poem, written in Aramaic, consists of ninety verses alphabetically arranged. Its acrostic '
@@ -510,50 +510,50 @@ NOTES = [{'key': 'preparation',
           'indescribable greatness of the Creator, the excellence of the Torah and the future hope of '
           'Israel.',
   'kind': 'commentary'},
- {'key': 'akdamut/2',
+ {'key': 'aqdamut/2',
   'page': 648,
   'text': 'עדי לקששותא is taken from Isaiah 46:4 (ועד זקנה... אני אסבל).',
   'kind': 'commentary'},
- {'key': 'akdamut/6',
+ {'key': 'aqdamut/6',
   'page': 648,
   'text': 'אותא קלילא refers to the mystic idea that the creation of the world was brought about by means of '
           'the Hebrew letter ה.',
   'kind': 'commentary'},
- {'key': 'akdamut/8',
+ {'key': 'aqdamut/8',
   'page': 648,
   'text': 'חדתין נבוט... a paraphrase of the verse חדשים לבקרים, רבה אמונתך (Lamentations 3:23). According '
           'to a midrashic statement, there are countless numbers of angels who come into being daily; they '
           'praise God and vanish immediately after the performance of their task.',
   'kind': 'commentary'},
- {'key': 'akdamut/15',
+ {'key': 'aqdamut/15',
   'page': 650,
   'text': 'סיומא דלעלם that is, they are silent forever; they do not chant even after seven years. The '
           'reference is to the midrashic statement to the effect that whenever the daily angels do not chant '
           'their hymns at the exact moment, they disappear in the stream of fire known as Dinur.',
   'kind': 'commentary'},
- {'key': 'akdamut/16',
+ {'key': 'aqdamut/16',
   'page': 650,
   'text': 'עדב יקר אחסנתיה the lot of his precious heritage [Israel]. This refers to the talmudic passage '
           '(Ḥullin 91b) to the effect that Israel sings God’s praises at all times, while the angels are '
           'limited in this respect.',
   'kind': 'commentary'},
- {'key': 'akdamut/19',
+ {'key': 'aqdamut/19',
   'page': 650,
   'text': 'קטירא לחי עלמא refers to the mystic idea that God’s tefillin contain an inscription in praise of '
           'Israel.',
   'kind': 'commentary'},
- {'key': 'akdamut/22',
+ {'key': 'aqdamut/22',
   'page': 652,
   'text': 'תאין ומתכנשין alludes to the medieval public disputations on the relative merits of Judaism and '
           'other religions, with particular emphasis upon the Messianic idea.',
   'kind': 'commentary'},
- {'key': 'akdamut/22',
+ {'key': 'aqdamut/22',
   'page': 652,
   'text': 'תמהין ושיילין and onwards is based upon the Sifré, section 143: וכן היו אומות העולם שואלים את '
           'ישראל ואומרים להם: „מה דודך מדוד״ שכך אתם מומתים עליו, שכך אתם נהרגים עליו?... כולכם נאים, כולכם '
           'גבורים, בואו והתערבו עמנו. וישראל אומרים להם: נאמר לכם מקצת שבחו, ואתם מכירים אותו...',
   'kind': 'commentary'},
- {'key': 'akdamut/38',
+ {'key': 'aqdamut/38',
   'page': 654,
   'text': 'טלולה דלויתן is a description of the contest between the legendary monsters, Leviathan and '
           'Behemoth, which ends with the destruction of both. In kabbalistic literature the Leviathan is '
@@ -562,12 +562,12 @@ NOTES = [{'key': 'preparation',
           'feast, after which there will be no bodily needs. There are some who conceive the Messianic '
           'banquet in a spiritual sense.',
   'kind': 'commentary'},
- {'key': 'akdamut/40',
+ {'key': 'aqdamut/40',
   'page': 654,
   'text': 'מקרב... בריה בחרביה a paraphrase of the verse העושו יגש חרבו (Job 40:19) in a description of '
           'Behemoth.',
   'kind': 'commentary'},
- {'key': 'akdamut/10',
+ {'key': 'aqdamut/10',
   'page': 649,
   'text': 'יקר מלי… contains the essential part of the Kedushah, derived from Isaiah 6:3.',
   'kind': 'commentary'}]

@@ -453,7 +453,7 @@ class TestUnitsHoldOnlyTheirOwnTexts(unittest.TestCase):
             joined = " ".join(targets)
             for slug in ("birkhot_hashachar/shelo_asani_aved",
                          "birkhot_hashachar/hamaavir_shenah",
-                         "birkhot_hatorah/laasok", "poem:adon_olam"):
+                         "birkhot_hatorah/laasoq", "poem:adon_olam"):
                 self.assertIn(slug, joined)
 
 

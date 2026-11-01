@@ -57,12 +57,12 @@ class TestTheGates(unittest.TestCase):
 
     def test_every_occasion_s_section_is_gated(self):
         for section in ("chol/shacharit", "chol/minchah", "chol/arvit",
-                        "shabbat/preparations", "shabbat/kabbalat_service", "shabbat/arvit",
+                        "shabbat/preparations", "shabbat/qabbalat_service", "shabbat/arvit",
                         "shabbat/leil_shabbat", "shabbat/shacharit", "shabbat/musaf",
                         "shabbat/day_meal", "shabbat/minchah", "shabbat/conclusion",
                         "berakhot/birkat_halevanah", "hallel", "rosh_chodesh/musaf", "regalim",
                         "yizkor", "regalim/musaf", "regalim/morning_meal", "sefirat_haomer",
-                        "regalim/akdamut", "rosh_hashanah/minchah_maariv_and_rites",
+                        "regalim/aqdamut", "rosh_hashanah/minchah_maariv_and_rites",
                         "sukkot/rites", "chanukah", "purim"):
             with self.subTest(section):
                 self.assertIn(section, self.gates)
@@ -82,7 +82,7 @@ class TestTheGates(unittest.TestCase):
                 self.assertIsNone(gate.find("tei:note", NS))
                 self.assertIsNone(gate.get("type"))
 
-    def test_pirkei_avot_is_inside_the_sabbath_minha_gate(self):
+    def test_pirqei_avot_is_inside_the_sabbath_minha_gate(self):
         gate = self.gates["shabbat/minchah"]
         avot = self.root.xpath(".//j:conditional[@xml:id='avot_season']", namespaces=NS)[0]
         self.assertIn(avot, list(gate.itersiblings()))
@@ -97,8 +97,8 @@ class TestTheGates(unittest.TestCase):
         return {(fs.get("type"), f.get("name")): (f[0].get("value"))
                 for fs in declare.iterfind("tei:fs", NS) for f in fs.iterfind("tei:f", NS)}
 
-    def test_akdamut_declares_the_first_day_of_shavuot(self):
-        self.assertEqual(self._declared("regalim/akdamut"),
+    def test_aqdamut_declares_the_first_day_of_shavuot(self):
+        self.assertEqual(self._declared("regalim/aqdamut"),
                          {("opensiddur:holiday", "shavuot"): "1"})
 
     def test_the_weekday_services_declare_the_kind_of_day(self):
@@ -137,12 +137,12 @@ class TestTheGatesAgainstTheCalendar(unittest.TestCase):
         time given, every weekday service is left in; nothing for another day is."""
         self._assert_days(CalendarDay(date=(2026, 11, 16)), {
             "chol/shacharit": UNDEFINED, "chol/minchah": UNDEFINED, "chol/arvit": UNDEFINED,
-            "shabbat/preparations": FALSE, "shabbat/kabbalat_service": FALSE,
+            "shabbat/preparations": FALSE, "shabbat/qabbalat_service": FALSE,
             "shabbat/arvit": FALSE, "shabbat/leil_shabbat": FALSE, "shabbat/shacharit": FALSE,
             "shabbat/musaf": FALSE, "shabbat/day_meal": FALSE, "shabbat/minchah": FALSE,
             "shabbat/conclusion": FALSE, "hallel": FALSE, "rosh_chodesh/musaf": FALSE,
             "regalim": FALSE, "yizkor": FALSE, "regalim/musaf": FALSE,
-            "regalim/morning_meal": FALSE, "sefirat_haomer": FALSE, "regalim/akdamut": FALSE,
+            "regalim/morning_meal": FALSE, "sefirat_haomer": FALSE, "regalim/aqdamut": FALSE,
             "rosh_hashanah/minchah_maariv_and_rites": FALSE, "sukkot/rites": FALSE,
             "chanukah": FALSE, "purim": FALSE,
             "berakhot/birkat_halevanah": TRUE,
@@ -157,7 +157,7 @@ class TestTheGatesAgainstTheCalendar(unittest.TestCase):
         """21 November 2026, 11 Kislev. Without a time the evening sections stay undecided; Saturday night is a separate Hebrew day."""
         self._assert_days(CalendarDay(date=(2026, 11, 21)), {
             "chol/shacharit": FALSE, "chol/minchah": FALSE, "chol/arvit": FALSE,
-            "shabbat/preparations": UNDEFINED, "shabbat/kabbalat_service": UNDEFINED,
+            "shabbat/preparations": UNDEFINED, "shabbat/qabbalat_service": UNDEFINED,
             "shabbat/arvit": UNDEFINED, "shabbat/leil_shabbat": UNDEFINED,
             "shabbat/shacharit": UNDEFINED, "shabbat/musaf": UNDEFINED, "shabbat/day_meal": UNDEFINED,
             "shabbat/minchah": UNDEFINED, "shabbat/conclusion": FALSE,
@@ -168,7 +168,7 @@ class TestTheGatesAgainstTheCalendar(unittest.TestCase):
         self._assert_days(CalendarDay(date=(2023, 10, 7), time=(9, 0), place=NEW_YORK), {
             "all/shacharit/yeladim": TRUE, "shabbat/shacharit": TRUE,
             "shabbat/musaf": TRUE, "regalim/musaf": TRUE, "hallel": TRUE,
-            "shabbat/kabbalat_service": FALSE, "shabbat/preparations": FALSE,
+            "shabbat/qabbalat_service": FALSE, "shabbat/preparations": FALSE,
             "shabbat/arvit": FALSE, "shabbat/leil_shabbat": FALSE,
             "shabbat/conclusion": FALSE,
         })
@@ -176,18 +176,18 @@ class TestTheGatesAgainstTheCalendar(unittest.TestCase):
     def test_saturday_night_is_a_weekday_with_havdalah(self):
         self._assert_days(CalendarDay(date=(2026, 11, 21), time=(20, 0)), {
             "chol/arvit": TRUE, "shabbat/arvit": FALSE, "shabbat/conclusion": TRUE,
-            "shabbat/kabbalat_service": FALSE,
+            "shabbat/qabbalat_service": FALSE,
         })
 
     def test_friday_is_for_the_sabbath_s_preparations(self):
         self._assert_days(CalendarDay(date=(2026, 11, 20)), {
-            "shabbat/preparations": UNDEFINED, "shabbat/kabbalat_service": UNDEFINED,
+            "shabbat/preparations": UNDEFINED, "shabbat/qabbalat_service": UNDEFINED,
             "shabbat/arvit": FALSE, "chol/shacharit": UNDEFINED,
         })
 
     def test_friday_evening_is_the_sabbath(self):
         self._assert_days(CalendarDay(date=(2026, 11, 20), time=(20, 0)), {
-            "chol/arvit": FALSE, "shabbat/arvit": TRUE, "shabbat/kabbalat_service": TRUE,
+            "chol/arvit": FALSE, "shabbat/arvit": TRUE, "shabbat/qabbalat_service": TRUE,
             "shabbat/preparations": TRUE,
         })
 
@@ -211,7 +211,7 @@ class TestTheGatesAgainstTheCalendar(unittest.TestCase):
     def test_the_first_day_of_shavuot(self):
         """11 June 2027, a Friday: a festival, not a weekday, and Akdamut is chanted."""
         self._assert_days(CalendarDay(date=(2027, 6, 11)), {
-            "regalim/akdamut": TRUE, "regalim": TRUE, "regalim/musaf": UNDEFINED,
+            "regalim/aqdamut": TRUE, "regalim": TRUE, "regalim/musaf": UNDEFINED,
             "regalim/morning_meal": UNDEFINED, "hallel": UNDEFINED, "shabbat/shacharit": UNDEFINED,
             "chol/shacharit": FALSE, "yizkor": TRUE,
             # Its prayers after Musaf are the festival's too.
@@ -255,11 +255,11 @@ class TestTheGatesOnAReadersDevice(unittest.TestCase):
                 cls.monday.setdefault(fs, {}).update(features)
 
     def test_an_ordinary_monday_hides_the_sabbath_and_the_festivals(self):
-        for section in ("shabbat/preparations", "shabbat/kabbalat_service", "shabbat/arvit",
+        for section in ("shabbat/preparations", "shabbat/qabbalat_service", "shabbat/arvit",
                         "shabbat/leil_shabbat", "shabbat/shacharit", "shabbat/musaf",
                         "shabbat/day_meal", "shabbat/minchah", "shabbat/conclusion", "hallel",
                         "rosh_chodesh/musaf", "yizkor", "regalim/musaf", "regalim/morning_meal",
-                        "regalim/akdamut", "rosh_hashanah/minchah_maariv_and_rites",
+                        "regalim/aqdamut", "rosh_hashanah/minchah_maariv_and_rites",
                         "sukkot/rites", "chanukah", "purim"):
             with self.subTest(section):
                 self.assertEqual(

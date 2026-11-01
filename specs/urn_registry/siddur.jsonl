@@ -8,20 +8,20 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/avinu_malkenu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "label_en": "Avinu Malkenu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/kaddish_after_tachanun", "status": "canonical", "label_en": "Kaddish after tachanun", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/opening", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "status": "canonical", "label_en": "Psalm 30 and Mourners’ Kaddish before the verses of praise"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "status": "canonical", "label_en": "Weekday morning verses of praise"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/attah_hu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Nehemiah 9:6–11"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/az_yashir", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Exodus 15:1–18 with closing repetition"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/barukh_adonai", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Collected verses beginning Barukh Adonai"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hodu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Hodu: I Chronicles 16:8–36"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Collected verses beginning Hoshia et amekha"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/ki_ladonai", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Collected verses following the Song of the Sea"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/psalm_150", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Psalm 150 with its Hebrew closing repetition"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/romemu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Romemu: Psalms 99:5 and 99:9"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/vayevarekh_david", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "I Chronicles 29:10–13"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/vayosha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Exodus 14:30–31"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/vehu_rachum", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Collected verses beginning Vehu rahum"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Collected verses beginning Yehi khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/adonai_melekh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod", "status": "canonical", "label_en": "The Lord is King; the Lord was King"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "status": "canonical", "label_en": "Weekday morning verses of praise"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/attah_hu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Nehemiah 9:6–11"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/az_yashir", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Exodus 15:1–18 with closing repetition"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/barukh_adonai", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Collected verses beginning Barukh Adonai"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hodu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Hodu: I Chronicles 16:8–36"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Collected verses beginning Hoshia et amekha"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/ki_ladonai", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Collected verses following the Song of the Sea"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/psalm_150", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Psalm 150 with its Hebrew closing repetition"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/romemu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Romemu: Psalms 99:5 and 99:9"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/vayevarekh_david", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "I Chronicles 29:10–13"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/vayyosha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Exodus 14:30–31"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/vehu_rachum", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Collected verses beginning Vehu rahum"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Collected verses beginning Yehi khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/adonai_melekh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod", "status": "canonical", "label_en": "The Lord is King; the Lord was King"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/shema", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "label_en": "chol / shacharit / shema"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/shema/barukh_shem", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/shema", "label_en": "chol / shacharit / shema / barukh shem"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun", "status": "canonical", "label_en": "Tachanun", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit"}
@@ -56,7 +56,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/attah", "status": "canonical", "label_en": "Atah", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/avinu", "status": "canonical", "label_en": "Avinu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/hoshienu", "status": "canonical", "label_en": "Hoshienu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/im_avonenu", "status": "canonical", "label_en": "Im avonenu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/im_avoneinu", "status": "canonical", "label_en": "Im avonenu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/im_avonot", "status": "canonical", "label_en": "Im avonot", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/ki_immekha", "status": "canonical", "label_en": "Ki imekha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu/lo_khataenu", "status": "canonical", "label_en": "Lo khataenu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/tachanun/vehu"}
@@ -83,7 +83,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho/etz", "status": "canonical", "label_en": "Etz", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa", "status": "canonical", "label_en": "Vayehi binsoa", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa/barukh", "status": "canonical", "label_en": "Barukh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa/ki_mitzion", "status": "canonical", "label_en": "Ki mitzion", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa/ki_mitziyyon", "status": "canonical", "label_en": "Ki mitzion", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh", "status": "canonical", "label_en": "Vetiggaleh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh/barukh", "status": "canonical", "label_en": "Barukh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh/vetiggaleh", "status": "canonical", "label_en": "Vetiggaleh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh"}
@@ -92,18 +92,18 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu", "status": "canonical", "label_en": "Yehalelu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu/congregation", "status": "canonical", "label_en": "Congregation", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu/reader", "status": "canonical", "label_en": "Reader", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu/vayarem", "status": "canonical", "label_en": "Vayarem", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu/vayyarem", "status": "canonical", "label_en": "Vayarem", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/yehalelu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "label_en": "Weekday Shacharit conclusion"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/al_tira", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion", "label_en": "Weekday Shacharit conclusion / Al tira"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion", "label_en": "Weekday Shacharit conclusion / Aleinu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu/al_ken", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "label_en": "Weekday Shacharit conclusion / Aleinu / al ken"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu/aleinu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "label_en": "Weekday Shacharit conclusion / Aleinu / Aleinu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu/veneemar", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "label_en": "Weekday Shacharit conclusion / Aleinu / veneemar"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion", "label_en": "Weekday Shacharit conclusion / Uva Letzion"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/barukh_elohenu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / barukh elohenu"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/targum_barukh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / targum barukh"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/targum_qadosh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / targum kadosh"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/targum_yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / targum yimlokh"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion", "label_en": "Weekday Shacharit conclusion / Uva Letzion"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/barukh_eloheinu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / barukh elohenu"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/targum_barukh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / targum barukh"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/targum_qadosh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / targum kadosh"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/targum_yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / targum yimlokh"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "label_en": "Psalms for days and occasions"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/friday", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms", "label_en": "Psalms for days and occasions / friday"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/friday/intro", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/friday", "label_en": "Psalms for days and occasions / friday / intro"}
@@ -119,14 +119,14 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms", "label_en": "Psalms for days and occasions / wednesday"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/intro", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday", "label_en": "Psalms for days and occasions / wednesday / intro"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday", "label_en": "Psalms for days and occasions / wednesday / psalm 95 opening"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu/vehaya", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "label_en": "Weekday Shacharit conclusion / Aleinu / vehaya"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu/vehayah", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "label_en": "Weekday Shacharit conclusion / Aleinu / vehaya"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu/yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/aleinu", "label_en": "Weekday Shacharit conclusion / Aleinu / yimlokh"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/ashrei", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / ashrei"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/chafetz", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / chafetz"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/hoshiah", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / hoshiah"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/tzvaot", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / tzvaot"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/vehu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / vehu"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion/yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letzion", "label_en": "Weekday Shacharit conclusion / Uva Letzion / yimlokh"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/ashrei", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / ashrei"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/chafetz", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / chafetz"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/hoshiah", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / hoshiah"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/tzevaot", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / tzvaot"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/vehu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / vehu"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon/yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/conclusion/uva_letziyyon", "label_en": "Weekday Shacharit conclusion / Uva Letzion / yimlokh"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/20", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms", "label_en": "Psalms for days and occasions / 20"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/20/10", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/20", "label_en": "Psalms for days and occasions / 20 / 10"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/81", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms", "label_en": "Psalms for days and occasions / 81"}
@@ -148,10 +148,10 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/shir_shel_yom", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit", "label_en": "Shir Shel Yom: the daily psalms"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings", "status": "canonical", "label_en": "Final morning readings", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/decalogue", "status": "canonical", "label_en": "Ten Commandments", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti", "status": "canonical", "label_en": "Closing verse and its permutations", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti/permutation_2", "status": "canonical", "label_en": "Second permutation", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti/permutation_3", "status": "canonical", "label_en": "Third permutation", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti/targum", "status": "canonical", "label_en": "Aramaic paraphrase and permutations", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatkha_qivviti"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti", "status": "canonical", "label_en": "Closing verse and its permutations", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti/permutation_2", "status": "canonical", "label_en": "Second permutation", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti/permutation_3", "status": "canonical", "label_en": "Third permutation", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti/targum", "status": "canonical", "label_en": "Aramaic paraphrase and permutations", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/final_readings/lishuatekha_qivviti"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/minchah", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol", "label_en": "Weekday afternoon service"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/minchah/amidah", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/minchah", "label_en": "Weekday afternoon Amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/minchah/avinu_malkenu", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/minchah", "label_en": "Avinu Malkenu at Minchah"}
@@ -169,7 +169,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/amidah", "status": "canonical", "label_en": "chol — arvit — amidah", "parent": "urn:x-opensiddur:text:siddur:chol/arvit"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai", "status": "canonical", "label_en": "chol — arvit — barukh adonai", "parent": "urn:x-opensiddur:text:siddur:chol/arvit"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai/by_day", "status": "canonical", "label_en": "chol — arvit — barukh adonai — by day", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai/elohenu", "status": "canonical", "label_en": "chol — arvit — barukh adonai — elohenu", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai/eloheinu", "status": "canonical", "label_en": "chol — arvit — barukh adonai — elohenu", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai/psalms_104_31", "status": "canonical", "label_en": "chol — arvit — barukh adonai — psalms 104 31", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai/psalms_113_2", "status": "canonical", "label_en": "chol — arvit — barukh adonai — psalms 113 2", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai/psalms_135_21", "status": "canonical", "label_en": "chol — arvit — barukh adonai — psalms 135 21", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/barukh_adonai"}
@@ -197,20 +197,20 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/arvit/shema/vehu_rachum/psalms_78_38", "status": "canonical", "label_en": "chol — arvit — shema — vehu rachum — psalms 78 38", "parent": "urn:x-opensiddur:text:siddur:chol/arvit/shema/vehu_rachum"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat", "status": "canonical", "label_en": "Sabbath", "label_he": "שבת"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/preparations", "status": "canonical", "label_en": "Before the Sabbath service", "label_he": "הכנות לשבת", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_service", "status": "canonical", "label_en": "Kabbalat Shabbat with its festival omission", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat", "status": "canonical", "label_en": "Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/anna_bekhoach", "status": "canonical", "label_en": "Ana Bekoach in Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/kaddish", "status": "canonical", "label_en": "Mourners’ Kaddish after Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/psalm_93", "status": "canonical", "label_en": "Psalm 93 in Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/romemu/psalms_99_5", "status": "canonical", "label_en": "רוֹמְמוּ — Psalm 99:5 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/romemu"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/romemu/psalms_99_9", "status": "canonical", "label_en": "רוֹמְמוּ — Psalm 99:9 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/romemu"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_service", "status": "canonical", "label_en": "Kabbalat Shabbat with its festival omission", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat", "status": "canonical", "label_en": "Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/anna_bekhoach", "status": "canonical", "label_en": "Ana Bekoach in Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/kaddish", "status": "canonical", "label_en": "Mourners’ Kaddish after Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/psalm_93", "status": "canonical", "label_en": "Psalm 93 in Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/romemu/psalms_99_5", "status": "canonical", "label_en": "רוֹמְמוּ — Psalm 99:5 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/romemu"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/romemu/psalms_99_9", "status": "canonical", "label_en": "רוֹמְמוּ — Psalm 99:9 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/romemu"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh/psalms_29_11", "status": "canonical", "label_en": "וְתִגָּלֶה וְתֵרָאֶה מַלְכוּתוֹ — Psalm 29:11 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening/psalms_95_1", "status": "canonical", "label_en": "לְכוּ נְרַנְּנָה — Psalm 95:1 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening/psalms_95_2", "status": "canonical", "label_en": "לְכוּ נְרַנְּנָה — Psalm 95:2 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening/psalms_95_3", "status": "canonical", "label_en": "לְכוּ נְרַנְּנָה — Psalm 95:3 (excerpt)", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/psalms/wednesday/psalm_95_opening"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/study", "status": "canonical", "label_en": "Study closing Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/study_kaddish", "status": "canonical", "label_en": "Kaddish d’Rabbanan after Bameh Madlikin", "parent": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/study_kaddish/yehe_shlama", "status": "canonical", "label_en": "Peace petition after Bameh Madlikin", "parent": "urn:x-opensiddur:text:siddur:shabbat/kabbalat_shabbat/study_kaddish"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/study", "status": "canonical", "label_en": "Study closing Kabbalat Shabbat", "parent": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/study_kaddish", "status": "canonical", "label_en": "Kaddish d’Rabbanan after Bameh Madlikin", "parent": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/study_kaddish/yehe_shelama", "status": "canonical", "label_en": "Peace petition after Bameh Madlikin", "parent": "urn:x-opensiddur:text:siddur:shabbat/qabbalat_shabbat/study_kaddish"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit", "status": "canonical", "label_en": "Evening service for Sabbaths and festivals", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/adon_olam", "status": "canonical", "label_en": "ADON OLAM", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/after_amidah", "status": "canonical", "label_en": "Vaykhullu and Me‘ein Sheva", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit"}
@@ -225,10 +225,10 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/vaykhulu", "status": "canonical", "label_en": "ויכלו", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/amidah/hatov_shimkha", "status": "canonical", "label_en": "Shabbat evening service — hatov shimkha", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/kiddush/savri", "status": "canonical", "label_en": "Shabbat evening service — savri", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/kiddush"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiku", "status": "canonical", "label_en": "תקעו בחדש שופר"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiqu", "status": "canonical", "label_en": "תקעו בחדש שופר"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/veshamru", "status": "canonical", "label_en": "ושמרו"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiku/psalms_81_4", "status": "canonical", "label_en": "Shabbat evening service — psalms 81 4", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiku"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiku/psalms_81_5", "status": "canonical", "label_en": "Shabbat evening service — psalms 81 5", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiku"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiqu/psalms_81_4", "status": "canonical", "label_en": "Shabbat evening service — psalms 81 4", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiqu"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiqu/psalms_81_5", "status": "canonical", "label_en": "Shabbat evening service — psalms 81 5", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/verses/tiqu"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/amidah/meditation", "status": "canonical", "label_en": "Shabbat evening service — meditation", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/arvit/blessings_after_shema/emet_seal", "status": "canonical", "label_en": "Shabbat evening service — emet seal", "parent": "urn:x-opensiddur:text:siddur:shabbat/arvit/blessings_after_shema"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/leil_shabbat", "status": "canonical", "label_en": "Friday-night home prayers and hymns", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
@@ -240,25 +240,25 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/leil_shabbat/kiddush/savri", "status": "canonical", "label_en": "KIDDUSH — savri", "parent": "urn:x-opensiddur:text:siddur:shabbat/leil_shabbat/kiddush"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit", "status": "canonical", "label_en": "MORNING SERVICE FOR SABBATHS AND FESTIVALS", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/opening", "status": "canonical", "label_en": "Morning service opening", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra", "status": "canonical", "label_en": "Pesukei Dezimrah", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/gadelu", "status": "canonical", "label_en": "chol — shacharit — torah — gadelu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah", "status": "canonical", "label_en": "Pesukei Dezimrah", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/gaddelu", "status": "canonical", "label_en": "chol — shacharit — torah — gadelu", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/leil_shabbat/guarding_verses/psalms_91_11", "status": "canonical", "label_en": "shabbat — leil shabbat — guarding verses — psalms 91 11", "parent": "urn:x-opensiddur:text:siddur:shabbat/leil_shabbat/guarding_verses"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/opening/kaddish", "status": "canonical", "label_en": "MOURNERS’ KADDISH", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/opening"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra/kaddish", "status": "canonical", "label_en": "Half Kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra/nishmat", "status": "canonical", "label_en": "NISHMATH", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra/psalm_91_repeat", "status": "canonical", "label_en": "shabbat — shacharit — pesukei dezimra — psalm 91 repeat", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/barukh_adonai/psalms_135_21", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — barukh adonai — psalms 135 21", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/barukh_adonai"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha/psalms_33_20", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — hoshia et amekha — psalms 33 20", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha/psalms_33_21", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — hoshia et amekha — psalms 33 21", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha/psalms_33_22", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — hoshia et amekha — psalms 33 22", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/hoshia_et_ammekha"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/psalms_135_13", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 135 13", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/psalms_135_4", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 135 4", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/psalms_33_10", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 33 10", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/psalms_33_11", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 33 11", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/psalms_33_9", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 33 9", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah/kaddish", "status": "canonical", "label_en": "Half Kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah/nishmat", "status": "canonical", "label_en": "NISHMATH", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah/psalm_91_repeat", "status": "canonical", "label_en": "shabbat — shacharit — pesukei dezimra — psalm 91 repeat", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/barukh_adonai/psalms_135_21", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — barukh adonai — psalms 135 21", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/barukh_adonai"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha/psalms_33_20", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — hoshia et amekha — psalms 33 20", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha/psalms_33_21", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — hoshia et amekha — psalms 33 21", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha/psalms_33_22", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — hoshia et amekha — psalms 33 22", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/hoshiah_et_ammekha"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/psalms_135_13", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 135 13", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/psalms_135_4", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 135 4", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/psalms_33_10", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 33 10", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/psalms_33_11", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 33 11", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/psalms_33_9", "status": "canonical", "label_en": "chol — shacharit — pesukei dezimra — yehi khevod — psalms 33 9", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh/psalms_19_8", "status": "canonical", "label_en": "chol — shacharit — torah — vetiggaleh — psalms 19 8", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh/psalms_19_9", "status": "canonical", "label_en": "chol — shacharit — torah — vetiggaleh — psalms 19 9", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vetiggaleh"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra/psalm_91_repeat/text", "status": "canonical", "label_en": "shabbat — shacharit — pesukei dezimra — psalm 91 repeat — text", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesukei_dezimra/psalm_91_repeat"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah/psalm_91_repeat/text", "status": "canonical", "label_en": "shabbat — shacharit — pesukei dezimra — psalm 91 repeat — text", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/pesuqei_dezimrah/psalm_91_repeat"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/shema", "status": "canonical", "label_en": "Shema and its blessings (Sabbath and festivals)", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit", "label_he": "קריאת שמע וברכותיה"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/shema/ahavah_rabbah", "status": "canonical", "label_en": "shabbat — shacharit — shema — ahavah rabbah", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/shema"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/shema/blessings_after", "status": "canonical", "label_en": "Emet Veyatziv (Sabbath and festivals)", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/shema", "label_he": "אמת ויציב"}
@@ -286,11 +286,11 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/opening", "status": "canonical", "label_en": "shabbat — shacharit — torah — opening", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "status": "canonical", "label_en": "shabbat — shacharit — torah — reading", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return", "status": "canonical", "label_en": "shabbat — shacharit — torah — return", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/yekum_purkan", "status": "canonical", "label_en": "shabbat — shacharit — torah — yekum purkan", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/yequm_purqan", "status": "canonical", "label_en": "shabbat — shacharit — torah — yekum purkan", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return/psalm24", "status": "canonical", "label_en": "shabbat — shacharit — torah — return — psalm24", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/opening/vayehi", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/opening", "label_en": "Torah service — opening — vayehi"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/opening/lekha", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/opening", "label_en": "Torah service — opening — lekha"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/veatem", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — veatem"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/veattem", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — veatem"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/blessings", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — blessings"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/hagomel", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — hagomel"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/vezot", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — vezot"}
@@ -302,6 +302,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah", "status": "canonical", "label_en": "Sabbath musaf — amidah", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah/shema", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah — shema", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah/uvdivrei", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah — uvdivrei", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/meditation", "status": "canonical", "label_en": "Sabbath musaf — amidah — meditation", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/ordinary", "status": "canonical", "label_en": "Sabbath musaf — amidah — ordinary", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/rosh_chodesh", "status": "canonical", "label_en": "Sabbath musaf — amidah — rosh chodesh", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
@@ -309,10 +310,10 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/anim_end/chronicles_1_29_11", "status": "canonical", "label_en": "Sabbath musaf — anim end — chronicles 1 29 11", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/anim_end"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/anim_kaddish", "status": "canonical", "label_en": "Sabbath musaf — anim kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/anim_zemirot", "status": "canonical", "label_en": "Sabbath musaf — anim zemirot", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/ein_kelohenu", "status": "canonical", "label_en": "Sabbath musaf — ein kelohenu", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/ein_keloheinu", "status": "canonical", "label_en": "Sabbath musaf — ein kelohenu", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/kaddish", "status": "canonical", "label_en": "Sabbath musaf — kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/kaveh", "status": "canonical", "label_en": "Sabbath musaf — kaveh", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/kaveh/psalms_27_14", "status": "canonical", "label_en": "Sabbath musaf — kaveh — psalms 27 14", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/kaveh"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/qavveh", "status": "canonical", "label_en": "Sabbath musaf — kaveh", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/qavveh/psalms_27_14", "status": "canonical", "label_en": "Sabbath musaf — kaveh — psalms 27 14", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/qavveh"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/offerings", "status": "canonical", "label_en": "Sabbath musaf — offerings", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/psalm27", "status": "canonical", "label_en": "Sabbath musaf — psalm27", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/psalm27_kaddish", "status": "canonical", "label_en": "Sabbath musaf — psalm27 kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
@@ -321,7 +322,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/shir_shel_yom/introduction", "status": "canonical", "label_en": "Sabbath musaf — shir shel yom — introduction", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/shir_shel_yom"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/study", "status": "canonical", "label_en": "Sabbath musaf — study", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/study/elazar", "status": "canonical", "label_en": "Sabbath musaf — study — elazar", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/study"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/study/elazar/al_tikra", "status": "canonical", "label_en": "Sabbath musaf — study — elazar — al tikra", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/study/elazar"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/study/elazar/al_tiqra", "status": "canonical", "label_en": "Sabbath musaf — study — elazar — al tikra", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/study/elazar"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/study_kaddish", "status": "canonical", "label_en": "Sabbath musaf — study kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal", "status": "canonical", "label_en": "Sabbath daytime meal", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush", "status": "canonical", "label_en": "Sabbath morning Kiddush", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal"}
@@ -329,8 +330,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush/exodus_20_11", "status": "canonical", "label_en": "Sabbath morning Kiddush — Exodus 20:11", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush/exodus_20_8", "status": "canonical", "label_en": "Sabbath morning Kiddush — Exodus 20:8", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush/exodus_20_9", "status": "canonical", "label_en": "Sabbath morning Kiddush — Exodus 20:9", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/kiddush"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/tzur_mishelo", "status": "canonical", "label_en": "Tzur Mishelo — Sabbath daytime printing", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/tzur_mishelo/3", "status": "canonical", "label_en": "Tzur Mishelo — Sabbath daytime printing — stanza 3", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/tzur_mishelo"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/tzur_mishello", "status": "canonical", "label_en": "Tzur Mishelo — Sabbath daytime printing", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/tzur_mishello/3", "status": "canonical", "label_en": "Tzur Mishelo — Sabbath daytime printing — stanza 3", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/tzur_mishello"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/yah_ribbon", "status": "canonical", "label_en": "Yah Ribbon — Sabbath daytime printing", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/yah_ribbon/1", "status": "canonical", "label_en": "Yah Ribbon — Sabbath daytime printing — stanza 1", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/yah_ribbon"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/day_meal/yah_ribbon/4", "status": "canonical", "label_en": "Yah Ribbon — Sabbath daytime printing — stanza 4", "parent": "urn:x-opensiddur:text:siddur:shabbat/day_meal/yah_ribbon"}
@@ -361,37 +362,37 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah", "status": "canonical", "label_en": "Sabbath Mincha — torah", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vetiggaleh", "status": "canonical", "label_en": "Sabbath Mincha — torah — vetiggaleh", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah_kaddish", "status": "canonical", "label_en": "Sabbath Mincha — torah kaddish", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/tzidkatkha", "status": "canonical", "label_en": "Sabbath Mincha — tzidkatkha", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/tzidkatkha/psalms_119_142", "status": "canonical", "label_en": "Sabbath Mincha — tzidkatkha — psalms 119 142", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/tzidkatkha"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letzion", "status": "canonical", "label_en": "Sabbath Mincha — uva letzion", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/vaani_tefilati", "status": "canonical", "label_en": "Sabbath Mincha — vaani tefilati", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letzion/barukh", "status": "canonical", "label_en": "Sabbath Mincha — uva letzion — barukh", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letzion"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/tzidqatekha", "status": "canonical", "label_en": "Sabbath Mincha — tzidkatkha", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/tzidqatekha/psalms_119_142", "status": "canonical", "label_en": "Sabbath Mincha — tzidkatkha — psalms 119 142", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/tzidqatekha"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letziyyon", "status": "canonical", "label_en": "Sabbath Mincha — uva letzion", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/vaani_tefillati", "status": "canonical", "label_en": "Sabbath Mincha — vaani tefilati", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letziyyon/barukh", "status": "canonical", "label_en": "Sabbath Mincha — uva letzion — barukh", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letziyyon"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho/ki_lekach", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — ki lekach", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho/kohanecha", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — kohanecha", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho/ki_leqach", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — ki lekach", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho/kohanekha", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — kohanecha", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vezot_hatorah", "status": "canonical", "label_en": "Sabbath Mincha — torah — vezot hatorah", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vezot_hatorah/adonai_chafetz", "status": "canonical", "label_en": "Sabbath Mincha — torah — vezot hatorah — adonai chafetz", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vezot_hatorah"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot", "status": "canonical", "label_en": "pirkei avot"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/1", "status": "canonical", "label_en": "pirkei avot 1"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/1/closing", "status": "canonical", "label_en": "pirkei avot 1 closing"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/1/opening", "status": "canonical", "label_en": "pirkei avot 1 opening"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/2", "status": "canonical", "label_en": "pirkei avot 2"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/2/closing", "status": "canonical", "label_en": "pirkei avot 2 closing"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/2/opening", "status": "canonical", "label_en": "pirkei avot 2 opening"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/3", "status": "canonical", "label_en": "pirkei avot 3"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/3/closing", "status": "canonical", "label_en": "pirkei avot 3 closing"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/3/opening", "status": "canonical", "label_en": "pirkei avot 3 opening"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/4", "status": "canonical", "label_en": "pirkei avot 4"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/4/closing", "status": "canonical", "label_en": "pirkei avot 4 closing"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/4/opening", "status": "canonical", "label_en": "pirkei avot 4 opening"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/5", "status": "canonical", "label_en": "pirkei avot 5"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/5/closing", "status": "canonical", "label_en": "pirkei avot 5 closing"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/5/opening", "status": "canonical", "label_en": "pirkei avot 5 opening"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/6", "status": "canonical", "label_en": "pirkei avot 6"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/6/closing", "status": "canonical", "label_en": "pirkei avot 6 closing"}
-{"urn": "urn:x-opensiddur:text:siddur:pirkei_avot/6/opening", "status": "canonical", "label_en": "pirkei avot 6 opening"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot", "status": "canonical", "label_en": "pirkei avot"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/1", "status": "canonical", "label_en": "pirkei avot 1"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/1/closing", "status": "canonical", "label_en": "pirkei avot 1 closing"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/1/opening", "status": "canonical", "label_en": "pirkei avot 1 opening"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/2", "status": "canonical", "label_en": "pirkei avot 2"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/2/closing", "status": "canonical", "label_en": "pirkei avot 2 closing"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/2/opening", "status": "canonical", "label_en": "pirkei avot 2 opening"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/3", "status": "canonical", "label_en": "pirkei avot 3"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/3/closing", "status": "canonical", "label_en": "pirkei avot 3 closing"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/3/opening", "status": "canonical", "label_en": "pirkei avot 3 opening"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/4", "status": "canonical", "label_en": "pirkei avot 4"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/4/closing", "status": "canonical", "label_en": "pirkei avot 4 closing"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/4/opening", "status": "canonical", "label_en": "pirkei avot 4 opening"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/5", "status": "canonical", "label_en": "pirkei avot 5"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/5/closing", "status": "canonical", "label_en": "pirkei avot 5 closing"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/5/opening", "status": "canonical", "label_en": "pirkei avot 5 opening"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/6", "status": "canonical", "label_en": "pirkei avot 6"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/6/closing", "status": "canonical", "label_en": "pirkei avot 6 closing"}
+{"urn": "urn:x-opensiddur:text:siddur:pirqei_avot/6/opening", "status": "canonical", "label_en": "pirkei avot 6 opening"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah", "status": "canonical", "label_en": "berakhot — birkat halevanah"}
-{"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/barukh_yotzrekh", "status": "canonical", "label_en": "berakhot — birkat halevanah — barukh yotzrekh"}
+{"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/barukh_yotzerekh", "status": "canonical", "label_en": "berakhot — birkat halevanah — barukh yotzrekh"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/blessing", "status": "canonical", "label_en": "berakhot — birkat halevanah — blessing"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/david", "status": "canonical", "label_en": "berakhot — birkat halevanah — david"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/greetings", "status": "canonical", "label_en": "berakhot — birkat halevanah — greetings"}
@@ -418,7 +419,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/psalm150/4", "status": "canonical", "label_en": "berakhot — birkat halevanah — psalm150 — 4"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/psalm150/5", "status": "canonical", "label_en": "berakhot — birkat halevanah — psalm150 — 5"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/psalm150/6", "status": "canonical", "label_en": "berakhot — birkat halevanah — psalm150 — 6"}
-{"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/siman_tov", "status": "canonical", "label_en": "berakhot — birkat halevanah — siman tov"}
+{"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/simman_tov", "status": "canonical", "label_en": "berakhot — birkat halevanah — siman tov"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/tana", "status": "canonical", "label_en": "berakhot — birkat halevanah — tana"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/tippol", "status": "canonical", "label_en": "berakhot — birkat halevanah — tippol"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/yehi_ratzon", "status": "canonical", "label_en": "berakhot — birkat halevanah — yehi ratzon"}
@@ -470,7 +471,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/ashrei", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — ashrei"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/avraham", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — avraham"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/barukh", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — barukh"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/barukh_elohenu", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — barukh elohenu"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/barukh_eloheinu", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — barukh elohenu"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/barukh_hagever", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — barukh hagever"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/bitchu", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — bitchu"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/chafetz", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — chafetz"}
@@ -481,12 +482,12 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/targum_qadosh", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — targum kadosh"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/targum_yimlokh", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — targum yimlokh"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/titten", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — titten"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/tzidkatkha", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — tzidkatkha"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/tzvaot", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — tzvaot"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/tzidqatekha", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — tzidkatkha"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/tzevaot", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — tzvaot"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/vatissa", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — vatissa"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/veattah", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — veatah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/vehu", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — vehu"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/vekara", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — vekara"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/veqara", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — vekara"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/veyivtechu", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — veyivtechu"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veattah_qadosh/yimlokh", "status": "canonical", "label_en": "shabbat — conclusion — veatah kadosh — yimlokh"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veyitten_lekha", "status": "canonical", "label_en": "shabbat — conclusion — veyitten lekha"}
@@ -506,10 +507,10 @@
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/psalm67/7", "status": "canonical", "label_en": "berakhot — birkat halevanah — psalm67 — 7"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/birkat_halevanah/psalm67/8", "status": "canonical", "label_en": "berakhot — birkat halevanah — psalm67 — 8"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/kaddish/yitbarakh", "status": "canonical", "label_en": "Saturday-night Kaddish — yitbarakh"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/kaddish/titkabal", "status": "canonical", "label_en": "Saturday-night Kaddish — titkabal"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/quoted_113_2", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/quoted_113_3", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod/quoted_113_4", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesukei_dezimra/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/kaddish/titqabbal", "status": "canonical", "label_en": "Saturday-night Kaddish — titkabal"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/quoted_113_2", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/quoted_113_3", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod/quoted_113_4", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/pesuqei_dezimrah/yehi_khevod"}
 {"urn": "urn:x-opensiddur:text:siddur:hallel", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:siddur:hallel/kaddish", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:hallel"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh"}
@@ -529,7 +530,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah/rain", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah/sim_shalom", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah/uminchatam", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah/veal_kulam", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah/veal_kullam", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah/yimlokh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_chodesh/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_chodesh", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim", "status": "canonical", "label_en": "regalim"}
@@ -566,8 +567,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/kiddush_sukkot", "status": "canonical", "label_en": "regalim / text / kiddush sukkot", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/kohanim", "status": "canonical", "label_en": "regalim / text / kohanim", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/ledor", "status": "canonical", "label_en": "regalim / text / ledor", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/text/mikra", "status": "canonical", "label_en": "regalim / text / mikra", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/text/mimkomekha", "status": "canonical", "label_en": "regalim / text / mimkomekha", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/text/miqra", "status": "canonical", "label_en": "regalim / text / mikra", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/text/mimeqomekha", "status": "canonical", "label_en": "regalim / text / mimkomekha", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/modim", "status": "canonical", "label_en": "regalim / text / modim", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/modim_derabbanan", "status": "canonical", "label_en": "regalim / text / modim derabbanan", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/rain", "status": "canonical", "label_en": "regalim / text / rain", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
@@ -575,7 +576,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/savri", "status": "canonical", "label_en": "regalim / text / savri", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/shalom_rav", "status": "canonical", "label_en": "regalim / text / shalom rav", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/sim_shalom", "status": "canonical", "label_en": "regalim / text / sim shalom", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/text/vatiten", "status": "canonical", "label_en": "regalim / text / vatiten", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/text/vattitten", "status": "canonical", "label_en": "regalim / text / vatiten", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/vayehi", "status": "canonical", "label_en": "regalim / text / vayehi", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/vaykhulu", "status": "canonical", "label_en": "regalim / text / vaykhulu", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/text/yaaleh", "status": "canonical", "label_en": "regalim / text / yaaleh", "parent": "urn:x-opensiddur:text:siddur:regalim/text"}
@@ -608,11 +609,11 @@
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim", "status": "canonical", "label_en": "Yizkor: av harachamim", "parent": "urn:x-opensiddur:text:siddur:yizkor/text"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/doresh", "status": "canonical", "label_en": "Yizkor: doresh", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/harninu", "status": "canonical", "label_en": "Yizkor: harninu", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
-{"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/lamah", "status": "canonical", "label_en": "Yizkor: lamah", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
+{"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/lammah", "status": "canonical", "label_en": "Yizkor: lamah", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/minachal", "status": "canonical", "label_en": "Yizkor: minachal", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/opening", "status": "canonical", "label_en": "Yizkor: opening", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/prophets", "status": "canonical", "label_en": "Yizkor: prophets", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
-{"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/venikketi", "status": "canonical", "label_en": "Yizkor: venikketi", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
+{"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/veniqqeiti", "status": "canonical", "label_en": "Yizkor: venikketi", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/veomer", "status": "canonical", "label_en": "Yizkor: veomer", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/veomer_again", "status": "canonical", "label_en": "Yizkor: veomer again", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
 {"urn": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim/writings", "status": "canonical", "label_en": "Yizkor: writings", "parent": "urn:x-opensiddur:text:siddur:yizkor/text/av_harachamim"}
@@ -637,8 +638,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/amidah/qedushat_hayom", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/amidah/kedushat hayom", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/amidah/offerings", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/amidah/offerings", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/adir", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/adir", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/adir_bamarom", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/adir bamarom", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/addir", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/adir", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/addir_bamarom", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/adir bamarom", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/am_qedoshekha", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/am kedoshekha", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/amidah_pesach", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/amidah pesach", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/amidah_shavuot", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/amidah shavuot", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
@@ -652,11 +653,11 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/barukh_chol", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/barukh chol", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/barukh_major", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/barukh major", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/dream", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/dream", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/eleh_moadei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/eleh moadei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/elleh_moadei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/eleh moadei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/elohai_netzor", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/elohai netzor", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/gevurot", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/gevurot", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/hatov", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/hatov", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/hu_elohenu", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/hu elohenu", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/hu_eloheinu", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/hu elohenu", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/qadosh_chol", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/kadosh chol", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/qadosh_major", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/kadosh major", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/kevodo", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/kevodo", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
@@ -683,12 +684,12 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/kohanim_ribbon", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/kohanim ribbon", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/kohanim_yehi", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/kohanim yehi", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/ledor", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/ledor", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/leumatam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/leumatam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/leummatam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/leumatam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/mekhalkel", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/mekhalkel", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/melekh_rachaman", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/melech rachaman", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/melekh", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/melekh", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/mikra", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/mikra", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/mimkomo", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/mimkomo", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/miqra", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/mikra", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/mimeqomo", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/mimkomo", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/modim", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/modim", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/modim_derabbanan", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/modim derabbanan", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/musaf_intro", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/musaf intro", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
@@ -696,7 +697,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/musaf_shavuot", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/musaf shavuot", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/musaf_shemini", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/musaf shemini", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/musaf_sukkot", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/musaf sukkot", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/naaritzkha", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/naaritzkha", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/naaritzekha", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/naaritzkha", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/naaseh", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/naaseh", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/neqaddesh", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/nekadesh", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/pesach_offering", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/pesach offering", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
@@ -741,12 +742,12 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/tal_response_3", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/tal response 3", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/tal_tehomot", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/tal tehomot", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uminchatam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uminchatam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/umipnei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/umipnei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/umippenei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/umipnei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uvdivrei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uvdivrei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uvdivrei_chol", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uvdivrei chol", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vatiten", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vatiten", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vattitten", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vatiten", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vayedaber", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vayedaber", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/veal_kulam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/veal kulam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/veal_kullam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/veal kulam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vehasi", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vehasi", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/veneeman", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/veneeman", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vetechezeinah", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vetechezenah", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
@@ -784,7 +785,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/sukkot_opening/verse/1", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/sukkot opening/verse/1", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text/sukkot_opening/verse"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/sukkot_opening/verse/2", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/sukkot opening/verse/2", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text/sukkot_opening/verse"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/morning_meal", "status": "canonical", "label_en": "Festival Musaf: regalim/morning meal", "parent": "urn:x-opensiddur:text:siddur:regalim"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/akdamut", "status": "canonical", "label_en": "regalim — akdamut", "parent": "urn:x-opensiddur:text:siddur:regalim"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/aqdamut", "status": "canonical", "label_en": "regalim — akdamut", "parent": "urn:x-opensiddur:text:siddur:regalim"}
 {"urn": "urn:x-opensiddur:text:siddur:sefirat_haomer", "status": "canonical", "label_en": "sefirat haomer"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah", "status": "canonical", "label_en": "rosh hashanah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/greeting", "status": "canonical", "label_en": "rosh hashanah — greeting", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah"}
@@ -803,8 +804,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/tashlikh", "status": "canonical", "label_en": "rosh hashanah — tashlikh", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text", "status": "canonical", "label_en": "rosh hashanah — text", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/adonai_sefatai", "status": "canonical", "label_en": "rosh hashanah — text — adonai sefatai", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ata_qadosh", "status": "canonical", "label_en": "rosh hashanah — text — ata kadosh", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ata_vechartanu", "status": "canonical", "label_en": "rosh hashanah — text — ata vehartanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/attah_qadosh", "status": "canonical", "label_en": "rosh hashanah — text — ata kadosh", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/attah_vechartanu", "status": "canonical", "label_en": "rosh hashanah — text — ata vehartanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/avot", "status": "canonical", "label_en": "rosh hashanah — text — avot", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/barukh", "status": "canonical", "label_en": "rosh hashanah — text — barukh", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/besefer", "status": "canonical", "label_en": "rosh hashanah — text — besefer", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
@@ -816,7 +817,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/qadosh", "status": "canonical", "label_en": "rosh hashanah — text — kadosh", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ki_shem", "status": "canonical", "label_en": "rosh hashanah — text — ki shem", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ledor_vador", "status": "canonical", "label_en": "rosh hashanah — text — ledor vador", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/leumatam", "status": "canonical", "label_en": "rosh hashanah — text — leumatam", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/leummatam", "status": "canonical", "label_en": "rosh hashanah — text — leumatam", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/mekhalkel", "status": "canonical", "label_en": "rosh hashanah — text — mekhalkel", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/melekh_ozer", "status": "canonical", "label_en": "rosh hashanah — text — melekh ozer", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/mi_khamokha", "status": "canonical", "label_en": "rosh hashanah — text — mi khamokha", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
@@ -880,8 +881,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/shehecheyanu", "status": "canonical", "label_en": "rosh hashanah — text — shehecheyanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ukhtov", "status": "canonical", "label_en": "rosh hashanah — text — ukhtov", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/uvdivrei", "status": "canonical", "label_en": "rosh hashanah — text — uvdivrei", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vatiten_lanu", "status": "canonical", "label_en": "rosh hashanah — text — vatiten lanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vatodienu", "status": "canonical", "label_en": "rosh hashanah — text — vatodienu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vattitten_lanu", "status": "canonical", "label_en": "rosh hashanah — text — vatiten lanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vattodienu", "status": "canonical", "label_en": "rosh hashanah — text — vatodienu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu — genesis", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/1", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu — genesis — 1", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis"}
@@ -890,8 +891,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/2/1", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu — genesis — 2 — 1", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/2"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/2/2", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu — genesis — 2 — 2", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/2"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/2/3", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu — genesis — 2 — 3", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu/genesis/2"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/veal_kulam", "status": "canonical", "label_en": "rosh hashanah — text — veal kulam", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vekhol_hahayim", "status": "canonical", "label_en": "rosh hashanah — text — vekhol hahayim", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/veal_kullam", "status": "canonical", "label_en": "rosh hashanah — text — veal kulam", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vekhol_hachayyim", "status": "canonical", "label_en": "rosh hashanah — text — vekhol hahayim", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vetechezeinah", "status": "canonical", "label_en": "rosh hashanah — text — vetehezena", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/wine", "status": "canonical", "label_en": "rosh hashanah — text — wine", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/yaaleh_veyavo", "status": "canonical", "label_en": "rosh hashanah — text — yaaleh veyavo", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
@@ -908,7 +909,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_aaron_response", "status": "canonical", "label_en": "sukkot — text — geshem aaron response", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_abraham_begin", "status": "canonical", "label_en": "sukkot — text — geshem abraham begin", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_abraham_response", "status": "canonical", "label_en": "sukkot — text — geshem abraham response", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_af_bri", "status": "canonical", "label_en": "sukkot — text — geshem af bri", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_af_beri", "status": "canonical", "label_en": "sukkot — text — geshem af bri", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_avot", "status": "canonical", "label_en": "sukkot — text — geshem avot", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_avot_close", "status": "canonical", "label_en": "sukkot — text — geshem avot close", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_blessing", "status": "canonical", "label_en": "sukkot — text — geshem blessing", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
@@ -925,38 +926,38 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_tribes", "status": "canonical", "label_en": "sukkot — text — geshem tribes", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_tribes_response", "status": "canonical", "label_en": "sukkot — text — geshem tribes response", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_wind", "status": "canonical", "label_en": "sukkot — text — geshem wind", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_yatriah", "status": "canonical", "label_en": "sukkot — text — geshem yatriah", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_1a", "status": "canonical", "label_en": "sukkot — text — hakafot 1a", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_1b", "status": "canonical", "label_en": "sukkot — text — hakafot 1b", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_2", "status": "canonical", "label_en": "sukkot — text — hakafot 2", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_3", "status": "canonical", "label_en": "sukkot — text — hakafot 3", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_4", "status": "canonical", "label_en": "sukkot — text — hakafot 4", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_5", "status": "canonical", "label_en": "sukkot — text — hakafot 5", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_6", "status": "canonical", "label_en": "sukkot — text — hakafot 6", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_7a", "status": "canonical", "label_en": "sukkot — text — hakafot 7a", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_7b", "status": "canonical", "label_en": "sukkot — text — hakafot 7b", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_ata_horeta", "status": "canonical", "label_en": "sukkot — text — hakafot ata horeta", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_david", "status": "canonical", "label_en": "sukkot — text — hakafot david", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_ein_kamokha", "status": "canonical", "label_en": "sukkot — text — hakafot ein kamokha", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_exalt", "status": "canonical", "label_en": "sukkot — text — hakafot exalt", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_father", "status": "canonical", "label_en": "sukkot — text — hakafot father", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_king", "status": "canonical", "label_en": "sukkot — text — hakafot king", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_kohanim", "status": "canonical", "label_en": "sukkot — text — hakafot kohanim", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_kuma", "status": "canonical", "label_en": "sukkot — text — hakafot kuma", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_leoseh", "status": "canonical", "label_en": "sukkot — text — hakafot leoseh", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_malkhut", "status": "canonical", "label_en": "sukkot — text — hakafot malkhut", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_one", "status": "canonical", "label_en": "sukkot — text — hakafot one", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_shema", "status": "canonical", "label_en": "sukkot — text — hakafot shema", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_sisu", "status": "canonical", "label_en": "sukkot — text — hakafot sisu", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_strength", "status": "canonical", "label_en": "sukkot — text — hakafot strength", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_vayehi", "status": "canonical", "label_en": "sukkot — text — hakafot vayehi", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_veamar", "status": "canonical", "label_en": "sukkot — text — hakafot veamar", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_veimru", "status": "canonical", "label_en": "sukkot — text — hakafot veimru", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_words", "status": "canonical", "label_en": "sukkot — text — hakafot words", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_yehi_immanu", "status": "canonical", "label_en": "sukkot — text — hakafot yehi imanu", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_yehi_khevod", "status": "canonical", "label_en": "sukkot — text — hakafot yehi khevod", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_yehi_shem", "status": "canonical", "label_en": "sukkot — text — hakafot yehi shem", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hakafot_zion", "status": "canonical", "label_en": "sukkot — text — hakafot zion", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/geshem_yatriach", "status": "canonical", "label_en": "sukkot — text — geshem yatriah", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_1a", "status": "canonical", "label_en": "sukkot — text — hakafot 1a", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_1b", "status": "canonical", "label_en": "sukkot — text — hakafot 1b", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_2", "status": "canonical", "label_en": "sukkot — text — hakafot 2", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_3", "status": "canonical", "label_en": "sukkot — text — hakafot 3", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_4", "status": "canonical", "label_en": "sukkot — text — hakafot 4", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_5", "status": "canonical", "label_en": "sukkot — text — hakafot 5", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_6", "status": "canonical", "label_en": "sukkot — text — hakafot 6", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_7a", "status": "canonical", "label_en": "sukkot — text — hakafot 7a", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_7b", "status": "canonical", "label_en": "sukkot — text — hakafot 7b", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_attah_horeta", "status": "canonical", "label_en": "sukkot — text — hakafot ata horeta", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_david", "status": "canonical", "label_en": "sukkot — text — hakafot david", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_ein_kamokha", "status": "canonical", "label_en": "sukkot — text — hakafot ein kamokha", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_exalt", "status": "canonical", "label_en": "sukkot — text — hakafot exalt", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_father", "status": "canonical", "label_en": "sukkot — text — hakafot father", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_king", "status": "canonical", "label_en": "sukkot — text — hakafot king", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_kohanim", "status": "canonical", "label_en": "sukkot — text — hakafot kohanim", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_qumah", "status": "canonical", "label_en": "sukkot — text — hakafot kuma", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_leoseh", "status": "canonical", "label_en": "sukkot — text — hakafot leoseh", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_malkhut", "status": "canonical", "label_en": "sukkot — text — hakafot malkhut", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_one", "status": "canonical", "label_en": "sukkot — text — hakafot one", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_shema", "status": "canonical", "label_en": "sukkot — text — hakafot shema", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_sisu", "status": "canonical", "label_en": "sukkot — text — hakafot sisu", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_strength", "status": "canonical", "label_en": "sukkot — text — hakafot strength", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_vayehi", "status": "canonical", "label_en": "sukkot — text — hakafot vayehi", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_veamar", "status": "canonical", "label_en": "sukkot — text — hakafot veamar", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_veimru", "status": "canonical", "label_en": "sukkot — text — hakafot veimru", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_words", "status": "canonical", "label_en": "sukkot — text — hakafot words", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_yehi_immanu", "status": "canonical", "label_en": "sukkot — text — hakafot yehi imanu", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_yehi_khevod", "status": "canonical", "label_en": "sukkot — text — hakafot yehi khevod", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_yehi_shem", "status": "canonical", "label_en": "sukkot — text — hakafot yehi shem", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/haqqafot_zion", "status": "canonical", "label_en": "sukkot — text — hakafot zion", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_a_add", "status": "canonical", "label_en": "sukkot — text — hoshanot a add", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_adam", "status": "canonical", "label_en": "sukkot — text — hoshanot adam", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_adam_add", "status": "canonical", "label_en": "sukkot — text — hoshanot adam add", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
@@ -975,7 +976,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_anna_azon_8", "status": "canonical", "label_en": "sukkot — text — hoshanot ana azon 8", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_anna_azon_9", "status": "canonical", "label_en": "sukkot — text — hoshanot ana azon 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_anna_el_na", "status": "canonical", "label_en": "sukkot — text — hoshanot ana el na", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_anna_hoshia", "status": "canonical", "label_en": "sukkot — text — hoshanot ana hoshia", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_anna_hoshiah", "status": "canonical", "label_en": "sukkot — text — hoshanot ana hoshia", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_ani_vaho_1", "status": "canonical", "label_en": "sukkot — text — hoshanot ani vaho 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_ani_vaho_2", "status": "canonical", "label_en": "sukkot — text — hoshanot ani vaho 2", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_ani_vaho_3", "status": "canonical", "label_en": "sukkot — text — hoshanot ani vaho 3", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
@@ -1002,36 +1003,36 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshana_b", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshana b", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshana_c", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshana c", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_add", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia add", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1 — 8", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8/59", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1 — 8 — 59", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8/60", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1 — 8 — 60", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — psalms", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha/kings_1/8/59", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1 — 8 — 59", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha/kings_1/8/60", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — kings 1 — 8 — 60", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/kings_1/8"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — psalms", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms/28", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — psalms — 28", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms/28/9", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — psalms — 28 — 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms/28"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha/psalms/28/9", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha — psalms — 28 — 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha/psalms/28"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_rabbah", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_rabbah"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1 — 8", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8/59", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1 — 8 — 59", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8/60", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1 — 8 — 60", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — psalms", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_rabbah/kings_1/8/59", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1 — 8 — 59", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_rabbah/kings_1/8/60", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — kings 1 — 8 — 60", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/kings_1/8"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — psalms", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_rabbah"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms/28", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — psalms — 28", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms/28/9", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — psalms — 28 — 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms/28"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_rabbah/psalms/28/9", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha rabbah — psalms — 28 — 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_rabbah/psalms/28"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_repeat", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_repeat"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1 — 8", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8/59", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1 — 8 — 59", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8/60", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1 — 8 — 60", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — psalms", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_repeat/kings_1/8/59", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1 — 8 — 59", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_repeat/kings_1/8/60", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — kings 1 — 8 — 60", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/kings_1/8"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — psalms", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_repeat"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms/28", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — psalms — 28", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms/28/9", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — psalms — 28 — 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms/28"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshiah_et_ammekha_repeat/psalms/28/9", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia et amekha repeat — psalms — 28 — 9", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_et_ammekha_repeat/psalms/28"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_hoshia_start", "status": "canonical", "label_en": "sukkot — text — hoshanot hoshia start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_kehosha_adam_start", "status": "canonical", "label_en": "sukkot — text — hoshanot kehosha adam start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_kehosha_start", "status": "canonical", "label_en": "sukkot — text — hoshanot kehosha start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_kol_mevaser_end", "status": "canonical", "label_en": "sukkot — text — hoshanot kol mevaser end", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_kol_mevaser_first", "status": "canonical", "label_en": "sukkot — text — hoshanot kol mevaser first", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_kol_mevaser_response", "status": "canonical", "label_en": "sukkot — text — hoshanot kol mevaser response", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_qol_mevasser_end", "status": "canonical", "label_en": "sukkot — text — hoshanot kol mevaser end", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_qol_mevasser_first", "status": "canonical", "label_en": "sukkot — text — hoshanot kol mevaser first", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_qol_mevasser_response", "status": "canonical", "label_en": "sukkot — text — hoshanot kol mevaser response", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lekha", "status": "canonical", "label_en": "sukkot — text — hoshanot lekha", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lekha/chronicles_1", "status": "canonical", "label_en": "sukkot — text — hoshanot lekha — chronicles 1", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lekha"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lekha/chronicles_1/29", "status": "canonical", "label_en": "sukkot — text — hoshanot lekha — chronicles 1 — 29", "parent": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lekha/chronicles_1"}
@@ -1048,7 +1049,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_shalem", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan shalem", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_aharon", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim aharon", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_baey", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim baey", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_baei", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim baey", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_daniel", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim daniel", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_david", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim david", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_elisha", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim elisha", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
@@ -1064,12 +1065,12 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_warriors", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim warriors", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_yehoshua", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim yehoshua", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tamim_yehudah", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tamim yehudah", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tsedek_start", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tsedek start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_om_netsurah_start", "status": "canonical", "label_en": "sukkot — text — hoshanot om netsurah start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_lemaan_tzadaq_start", "status": "canonical", "label_en": "sukkot — text — hoshanot lemaan tsedek start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_om_netzurah_start", "status": "canonical", "label_en": "sukkot — text — hoshanot om netsurah start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_opening", "status": "canonical", "label_en": "sukkot — text — hoshanot opening", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_rachem_na", "status": "canonical", "label_en": "sukkot — text — hoshanot rahem na", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_taaneh_emunim_first", "status": "canonical", "label_en": "sukkot — text — hoshanot taaneh emunim first", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
-{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_titnenu_start", "status": "canonical", "label_en": "sukkot — text — hoshanot titnenu start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
+{"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_tittenenu_start", "status": "canonical", "label_en": "sukkot — text — hoshanot titnenu start", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/hoshanot_yehi_ratzon_aravah", "status": "canonical", "label_en": "sukkot — text — hoshanot yehi ratzon aravah", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/lulav_lulav_blessing", "status": "canonical", "label_en": "sukkot — text — lulav lulav blessing", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/lulav_lulav_intent", "status": "canonical", "label_en": "sukkot — text — lulav lulav intent", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
@@ -1093,8 +1094,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:sukkot/text/ushpizin_invite", "status": "canonical", "label_en": "sukkot — text — ushpizin invite", "parent": "urn:x-opensiddur:text:siddur:sukkot/text"}
 {"urn": "urn:x-opensiddur:text:siddur:chanukah", "status": "canonical", "label_en": "chanukah"}
 {"urn": "urn:x-opensiddur:text:siddur:purim", "status": "canonical", "label_en": "purim"}
-{"urn": "urn:x-opensiddur:text:siddur:brit_milah", "status": "canonical", "label_en": "brit milah"}
-{"urn": "urn:x-opensiddur:text:siddur:brit_milah/grace", "status": "canonical", "label_en": "brit milah / grace", "parent": "urn:x-opensiddur:text:siddur:brit_milah"}
+{"urn": "urn:x-opensiddur:text:siddur:berit_milah", "status": "canonical", "label_en": "brit milah"}
+{"urn": "urn:x-opensiddur:text:siddur:berit_milah/grace", "status": "canonical", "label_en": "brit milah / grace", "parent": "urn:x-opensiddur:text:siddur:berit_milah"}
 {"urn": "urn:x-opensiddur:text:siddur:burial", "status": "canonical", "label_en": "burial"}
 {"urn": "urn:x-opensiddur:text:siddur:burial/chapel", "status": "canonical", "label_en": "burial / chapel", "parent": "urn:x-opensiddur:text:siddur:burial"}
 {"urn": "urn:x-opensiddur:text:siddur:lifecycle", "status": "canonical", "label_en": "lifecycle"}
@@ -1151,15 +1152,15 @@
 {"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/sick_psalm6/7", "status": "canonical", "label_en": "lifecycle / text / sick psalm6 / 7", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text/sick_psalm6"}
 {"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/sick_psalm6/8", "status": "canonical", "label_en": "lifecycle / text / sick psalm6 / 8", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text/sick_psalm6"}
 {"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/sick_psalm6/9", "status": "canonical", "label_en": "lifecycle / text / sick psalm6 / 9", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text/sick_psalm6"}
-{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/tzidduk_job", "status": "canonical", "label_en": "lifecycle / text / tzidduk job", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text"}
-{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/tzidduk_psalm78", "status": "canonical", "label_en": "lifecycle / text / tzidduk psalm78", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text"}
-{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/tzidduk_psalm92", "status": "canonical", "label_en": "lifecycle / text / tzidduk psalm92", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text"}
+{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/tzidduq_job", "status": "canonical", "label_en": "lifecycle / text / tzidduk job", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text"}
+{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/tzidduq_psalm78", "status": "canonical", "label_en": "lifecycle / text / tzidduk psalm78", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text"}
+{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/tzidduq_psalm92", "status": "canonical", "label_en": "lifecycle / text / tzidduk psalm92", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text"}
 {"urn": "urn:x-opensiddur:text:siddur:pidyon_haben", "status": "canonical", "label_en": "pidyon haben"}
 {"urn": "urn:x-opensiddur:text:siddur:tefillah_lecholeh", "status": "canonical", "label_en": "tefillah lecholeh"}
 {"urn": "urn:x-opensiddur:text:siddur:tefillah_lecholeh/psalm23", "status": "canonical", "label_en": "tefillah lecholeh / psalm23", "parent": "urn:x-opensiddur:text:siddur:tefillah_lecholeh"}
 {"urn": "urn:x-opensiddur:text:siddur:tefillat_haderekh", "status": "canonical", "label_en": "tefillat haderekh"}
 {"urn": "urn:x-opensiddur:text:siddur:tefillat_haderekh/psalm91", "status": "canonical", "label_en": "tefillat haderekh / psalm91", "parent": "urn:x-opensiddur:text:siddur:tefillat_haderekh"}
-{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/pidyon_present/shekel_hakodesh", "status": "canonical", "label_en": "lifecycle / text / pidyon present / shekel hakodesh", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text/pidyon_present"}
+{"urn": "urn:x-opensiddur:text:siddur:lifecycle/text/pidyon_present/shekel_haqodesh", "status": "canonical", "label_en": "lifecycle / text / pidyon present / shekel hakodesh", "parent": "urn:x-opensiddur:text:siddur:lifecycle/text/pidyon_present"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot", "status": "canonical", "label_en": "berakhot"}
 {"urn": "urn:x-opensiddur:text:siddur:berakhot/various", "status": "canonical", "label_en": "berakhot/various"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers", "status": "canonical", "label_en": "concluding prayers"}
@@ -1190,7 +1191,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_barukh", "status": "canonical", "label_en": "concluding prayers/text/child barukh"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_commit", "status": "canonical", "label_en": "concluding prayers/text/child commit"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_guardian", "status": "canonical", "label_en": "concluding prayers/text/child guardian"}
-{"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_hamapil", "status": "canonical", "label_en": "concluding prayers/text/child hamapil"}
+{"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_hamappil", "status": "canonical", "label_en": "concluding prayers/text/child hamapil"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_salvation", "status": "canonical", "label_en": "concluding prayers/text/child salvation"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/child_yehi", "status": "canonical", "label_en": "concluding prayers/text/child yehi"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/grace_chanukah", "status": "canonical", "label_en": "concluding prayers/text/grace hanukkah"}
@@ -1222,11 +1223,11 @@
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/psalm126/6", "status": "canonical", "label_en": "concluding prayers/text/psalm126/6"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/wedding_response", "status": "canonical", "label_en": "concluding prayers/text/wedding response"}
 {"urn": "urn:x-opensiddur:text:siddur:concluding_prayers/text/wedding_zimmun", "status": "canonical", "label_en": "concluding prayers/text/wedding zimmun"}
-{"urn": "urn:x-opensiddur:text:siddur:kriat_shema_al_hamitah", "status": "canonical", "label_en": "kriat shema al hamitah"}
-{"urn": "urn:x-opensiddur:text:siddur:kriat_shema_al_hamitah/adon_olam", "status": "canonical", "label_en": "kriat shema al hamitah/adon olam"}
-{"urn": "urn:x-opensiddur:text:siddur:kriat_shema_al_hamitah/psalm3", "status": "canonical", "label_en": "kriat shema al hamitah/psalm3"}
-{"urn": "urn:x-opensiddur:text:siddur:kriat_shema_al_hamitah/psalm3/9", "status": "canonical", "label_en": "kriat shema al hamitah/psalm3/9"}
-{"urn": "urn:x-opensiddur:text:siddur:kriat_shema_al_hamitah/yeladim", "status": "canonical", "label_en": "kriat shema al hamitah/yeladim"}
+{"urn": "urn:x-opensiddur:text:siddur:qeriat_shema_al_hamittah", "status": "canonical", "label_en": "kriat shema al hamitah"}
+{"urn": "urn:x-opensiddur:text:siddur:qeriat_shema_al_hamittah/adon_olam", "status": "canonical", "label_en": "kriat shema al hamitah/adon olam"}
+{"urn": "urn:x-opensiddur:text:siddur:qeriat_shema_al_hamittah/psalm3", "status": "canonical", "label_en": "kriat shema al hamitah/psalm3"}
+{"urn": "urn:x-opensiddur:text:siddur:qeriat_shema_al_hamittah/psalm3/9", "status": "canonical", "label_en": "kriat shema al hamitah/psalm3/9"}
+{"urn": "urn:x-opensiddur:text:siddur:qeriat_shema_al_hamittah/yeladim", "status": "canonical", "label_en": "kriat shema al hamitah/yeladim"}
 {"urn": "urn:x-opensiddur:text:siddur:marriage", "status": "canonical", "label_en": "marriage"}
 {"urn": "urn:x-opensiddur:text:siddur:marriage/grace", "status": "canonical", "label_en": "marriage/grace"}
 {"urn": "urn:x-opensiddur:text:siddur:meals", "status": "canonical", "label_en": "meals"}
@@ -1236,7 +1237,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veyitten_lekha/genesis", "status": "canonical", "label_en": "shabbat/conclusion/veyitten lekha/genesis"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veyitten_lekha/genesis/48", "status": "canonical", "label_en": "shabbat/conclusion/veyitten lekha/genesis/48"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/conclusion/veyitten_lekha/genesis/48/16", "status": "canonical", "label_en": "shabbat/conclusion/veyitten lekha/genesis/48/16"}
-{"urn": "urn:x-opensiddur:text:siddur:kriat_shema_al_hamitah/psalm91", "status": "canonical", "label_en": "kriat shema al hamitah/psalm91"}
+{"urn": "urn:x-opensiddur:text:siddur:qeriat_shema_al_hamittah/psalm91", "status": "canonical", "label_en": "kriat shema al hamitah/psalm91"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot", "status": "canonical", "label_en": "Selichot"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/first_day", "parent": "urn:x-opensiddur:text:siddur:selichot", "status": "canonical", "label_en": "First-day selichot"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/first_day/after_first_selichah_rubric", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:selichot/first_day", "label_en": "Selichot first day: after first selihah rubric"}
@@ -1440,7 +1441,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/burnt_offering_refrain_instruction/printed", "status": "canonical", "label_en": "selichot/erev rosh hashanah/burnt offering refrain instruction/printed", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/burnt_offering_refrain_instruction"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/after_shofet", "status": "canonical", "label_en": "selichot/erev rosh hashanah/after shofet", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/after_shofet/printed", "status": "canonical", "label_en": "selichot/erev rosh hashanah/after shofet/printed", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/after_shofet"}
-{"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/heitivah_virtzonkha", "status": "canonical", "label_en": "selichot/erev rosh hashanah/hetivah virtsonkha", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah"}
+{"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/heitivah_virtzonekha", "status": "canonical", "label_en": "selichot/erev rosh hashanah/hetivah virtsonkha", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/verses_after_heitivah", "status": "canonical", "label_en": "selichot/erev rosh hashanah/verses after hetivah", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/verses_after_heitivah/printed", "status": "canonical", "label_en": "selichot/erev rosh hashanah/verses after hetivah/printed", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/verses_after_heitivah"}
 {"urn": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah/selach_na_after_shofet", "status": "canonical", "label_en": "selichot/erev rosh hashanah/selah na after shofet", "parent": "urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah"}

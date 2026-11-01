@@ -3,14 +3,14 @@ from .notes_minchah import note
 from .shabbat_minchah import ROOT, ATAH, BIBLE
 
 NOTES = [
- note(ROOT+'/uva_letzion','is postponed till Minḥah on Sabbaths and festivals. The reason is explained on page 131.',lemma='ובא לציון'),
+ note(ROOT+'/uva_letziyyon','is postponed till Minḥah on Sabbaths and festivals. The reason is explained on page 131.',lemma='ובא לציון'),
  note(ROOT+'/opening_kaddish','is said between Rosh Hashanah and Yom Kippur.',lemma='לעילא לעילא'),
  note(ATAH,'is based on Zechariah 14:9; I Chronicles 17:21. The <tei:hi rend="italic">Siddur</tei:hi> of Amram Gaon records the following variant in use during the ninth century: <tei:foreign xml:lang="he">הנח לנו ה׳ אלהינו כי אתה אבינו... ואל תהי צרה ויגון ביום מנוחתנו, מנוחת אהבה ונדבה, מנוחת אמת ואמונה</tei:foreign>.',lemma='אתה אחד ... בארץ'),
  note(ATAH,'According to midrashic literature the patriarchs observed the Sabbath and fulfilled all the commands that were revealed later. The children of Abraham and of Isaac are not mentioned because Ishmael and Esau are not credited with the observance of the Sabbath.',lemma='יעקב ובניו ינוחו'),
  note(ROOT+'/amidah/modim','is based on Psalms 79:13 and 55:18, namely: <tei:foreign xml:lang="he">נודה לך לעולם, לדור ודור נספר תהלתך</tei:foreign> and <tei:foreign xml:lang="he">ערב ובקר וצהרים אשיחה</tei:foreign>.',lemma='מודים'),
  note(ROOT+'/amidah/modim_derabbanan','is a composite of variants suggested by several rabbis of the Talmud (Sotah 40a).',lemma='מודים דרבנן'),
  note(ROOT+'/amidah/chanukah','the leader of the Maccabean revolt against the Syrians, was the father of Simon who became High Priest in 141 before the common era. Hence, it is suggested that the epithet <tei:foreign xml:lang="he">כהן גדול</tei:foreign> refers to that fact. According to Sofrim 20:8, <tei:foreign xml:lang="he">מתתיהו</tei:foreign> and <tei:foreign xml:lang="he">חשמונאי</tei:foreign> were two different persons. There the reading is: <tei:foreign xml:lang="he">בימי מתתיהו... וחשמונאי ובניו</tei:foreign>.',lemma='מתתיהו'),
- note(ROOT+'/tzidkatkha','is regarded as a form of <tei:foreign xml:lang="he">צדוק הדין</tei:foreign> said on the occasion of a death. According to tradition, Moses died on Sabbath afternoon. These three verses, containing the words <tei:foreign xml:lang="he">ה׳ אלהים אמת</tei:foreign>, are arranged in a reverse order in the Sephardic <tei:hi rend="italic">Siddur</tei:hi>. <tei:foreign xml:lang="he">צדקתך צדק</tei:foreign> is presumably a substitute for the <tei:hi rend="italic">Taḥanun</tei:hi> of the <tei:hi rend="italic">Minḥah</tei:hi> for weekdays.',lemma='צדקתך צדק'),
+ note(ROOT+'/tzidqatekha','is regarded as a form of <tei:foreign xml:lang="he">צדוק הדין</tei:foreign> said on the occasion of a death. According to tradition, Moses died on Sabbath afternoon. These three verses, containing the words <tei:foreign xml:lang="he">ה׳ אלהים אמת</tei:foreign>, are arranged in a reverse order in the Sephardic <tei:hi rend="italic">Siddur</tei:hi>. <tei:foreign xml:lang="he">צדקתך צדק</tei:foreign> is presumably a substitute for the <tei:hi rend="italic">Taḥanun</tei:hi> of the <tei:hi rend="italic">Minḥah</tei:hi> for weekdays.',lemma='צדקתך צדק'),
  note(BIBLE+'psalms/104','(Psalm 104) is closely similar to the story of creation in Genesis. The psalmist celebrates God’s glory as seen in the forces of nature. It has been declared that it is worthwhile studying the Hebrew language for ten years in order to read Psalm 104 in the original.',lemma='ברכי נפשי'),
  note(BIBLE+'psalms/120','the title prefixed to the following fifteen psalms, is now generally understood to mean a psalm sung by the pilgrims as they went up to Jerusalem to celebrate the three pilgrim festivals in the center of national and religious life.',lemma='שיר המעלות'),
 ]
@@ -33,8 +33,8 @@ PSALM_COMMENTS = {
 }
 for n,text in PSALM_COMMENTS.items():
  NOTES.append(note(BIBLE+f'psalms/{n}' if n!=134 else ROOT+'/psalms/134',text))
-NOTES += [note(ROOT+'/vaani_tefilati','Psalm 69:14.',kind='citation',n='1'),
- note(ROOT+'/tzidkatkha','Psalms 119:142; 71:19; 36:7.',kind='citation',n='3')]
+NOTES += [note(ROOT+'/vaani_tefillati','Psalm 69:14.',kind='citation',n='1'),
+ note(ROOT+'/tzidqatekha','Psalms 119:142; 71:19; 36:7.',kind='citation',n='3')]
 
 NOTES += [
  note(ROOT+'/torah/vezot_hatorah','Deuteronomy 4:44; Numbers 9:23.',kind='citation',n='1'),

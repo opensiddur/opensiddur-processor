@@ -15,9 +15,9 @@ KADDISH = SERVICE+'/kaddish'
 SIGIL = '1949 shabbat/shacharit/amidah'
 READER = '<j:all>'+MINYAN+feature(RECITATION,'repetition')+'</j:all>'
 URNS = dict(az=PRAYER+'amidah/az_beqol_raash',
-            mimkomekha=PRAYER+'amidah/mimeqomekha_malkaynu_tofia',
-            yismach=PRAYER+'amidah/yismach_mosheh_bematenat',
-            velo_netato=PRAYER+'amidah/velo_netato_hashem')
+            mimeqomekha=PRAYER+'amidah/mimeqomekha_malkenu_tofia',
+            yismach=PRAYER+'amidah/yismach_mosheh_bemattenat',
+            velo_netatto=PRAYER+'amidah/velo_netatto_hashem')
 RANGES = {'amidah_adonai_sefatai':(349,349),'amidah_avot':(349,349),
           'amidah_gevurot':(349,351),'amidah_qedushah':(351,351),
           'amidah_qedushat_hashem':(353,353),'shabbat_arvit_veshamru_text':(353,353),
@@ -26,8 +26,8 @@ RANGES = {'amidah_adonai_sefatai':(349,349),'amidah_avot':(349,349),
           'al_hanissim_chanukah':(357,357),'amidah_birkat_kohanim':(357,357),
           'amidah_shalom':(359,359),'amidah_shalom_hamevarekh':(359,359),
           'amidah_shalom_besefer_chayyim':(359,359),'amidah_elohai_netzor':(359,359),
-          'amidah_yehi_ratzon':(359,359),'conclusion_titkabal':(361,361),
-          'kaddish_derabbanan_yitgadal':(361,361),'kaddish_derabbanan_yehe_shmeh':(361,361),
+          'amidah_yehi_ratzon':(359,359),'conclusion_titqabbal':(361,361),
+          'kaddish_derabbanan_yitgaddal':(361,361),'kaddish_derabbanan_yehe_shemeh':(361,361),
           'kaddish_derabbanan_yitbarakh':(361,361),'kaddish_yatom':(361,361)}
 
 
@@ -47,11 +47,11 @@ def shared(lang,prayers):
         p['body']=p['body'].replace(anchor,pb(page+side,sigil=SIGIL)+anchor,1)
     # Transclusions inherit active conditions at their source. Move the common
     # responses outside the weekday gate; its caller retains the same gate.
-    for part in ('qadosh','barukh_kevod','yimlokh','ledor_vador','haeil_haqadosh','hamelekh_haqadosh'):
+    for part in ('qadosh','barukh_kevod','yimlokh','ledor_vador','hael_haqadosh','hamelekh_haqadosh'):
         result.append(detach_division(by_name['amidah_qedushah'],
             PRAYER+'amidah/qedushah/'+part, 'amidah_qedushah_'+part,
-            first=(85 if part in ('ledor_vador','haeil_haqadosh','hamelekh_haqadosh') else 83)+side,
-            last=(85 if part in ('ledor_vador','haeil_haqadosh','hamelekh_haqadosh') else 83)+side))
+            first=(85 if part in ('ledor_vador','hael_haqadosh','hamelekh_haqadosh') else 83)+side,
+            last=(85 if part in ('ledor_vador','hael_haqadosh','hamelekh_haqadosh') else 83)+side))
     for part in ('modim_derabbanan','ukhtov'):
         page=91 if part=='modim_derabbanan' else 93
         result.append(detach_division(by_name['amidah_hodaah'],
@@ -62,7 +62,7 @@ def shared(lang,prayers):
 def prayers(lang,earlier):
     side=int(lang=='en');result=[]
     for key,he,en in data.ROWS:
-        page=351 if key in ('az','mimkomekha') else 353
+        page=351 if key in ('az','mimeqomekha') else 353
         urn=URNS[key]
         result.append(dict(name='shabbat_amidah_'+key+'_text',urn=urn,title=(he.split(',')[0],en.split(',')[0])[side],
             first=page+side,last=page+side,body=f'<tei:div corresp="{urn}">'+pb(page+side,sigil=SIGIL)+'<tei:p>'+text_xml((he,en)[side],SIGIL)+'</tei:p></tei:div>'))
@@ -81,9 +81,9 @@ def prayers(lang,earlier):
 def kedushah():
     parts=[transclude(ROOT+'/qedushah/neqaddesh'),transclude(PRAYER+'amidah/qedushah/qadosh'),
            transclude(URNS['az']),transclude(PRAYER+'amidah/qedushah/barukh_kevod'),
-           transclude(URNS['mimkomekha']),transclude(PRAYER+'amidah/qedushah/yimlokh'),
+           transclude(URNS['mimeqomekha']),transclude(PRAYER+'amidah/qedushah/yimlokh'),
            transclude(PRAYER+'amidah/qedushah/ledor_vador')]
-    for key,negate,rubric in [('haeil_haqadosh',True,'Except during the Ten Days of Repentance:'),
+    for key,negate,rubric in [('hael_haqadosh',True,'Except during the Ten Days of Repentance:'),
                               ('hamelekh_haqadosh',False,'Between Rosh Hashanah and Yom Kippur substitute:')]:
         parts.append(conditional('qedushah_'+key,rubric,TEN_DAYS,transclude(PRAYER+'amidah/qedushah/'+key),negate=negate))
     return ''.join(parts)
@@ -95,12 +95,12 @@ def amidah(lang,by_name):
     text+=''.join(transclude(by_name[n]['urn']) for n in ('amidah_adonai_sefatai','amidah_avot','amidah_gevurot'))
     text+=conditional('qedushah','When the Reader repeats the Amidah, the following Kedushah is said:',READER,transclude(ROOT+'/qedushah'))
     text+=conditional('attah_qadosh','In silent devotion:',READER,transclude(PRAYER+'amidah/qedushat_hashem'),negate=True)
-    text+=transclude(URNS['yismach'])+transclude(ARVIT['veshamru'])+transclude(URNS['velo_netato'])+transclude(ARVIT['retzeh'])
+    text+=transclude(URNS['yismach'])+transclude(ARVIT['veshamru'])+transclude(URNS['velo_netatto'])+transclude(ARVIT['retzeh'])
     text+=transclude(PRAYER+'amidah/avodah')
     text+=conditional('modim','When the Reader repeats the Amidah, the Congregation responds here by saying:',READER,transclude(PRAYER+'amidah/hodaah/modim_derabbanan'))
     text+=transclude(PRAYER+'amidah/hodaah/modim')
     text+=conditional('chanukah','On Ḥanukkah add:',holiday('hanukkah',8),transclude(PRAYER+'al_hanissim/chanukah'))
-    text+=transclude(PRAYER+'amidah/hodaah/veal_kulam')
+    text+=transclude(PRAYER+'amidah/hodaah/veal_kullam')
     text+=conditional('ukhtov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,transclude(PRAYER+'amidah/hodaah/ukhtov'))
     text+=transclude(PRAYER+'amidah/hodaah/hatov_shimkha')
     text+=conditional('kohanim','During the Reader’s repetition:',READER,transclude(PRAYER+'amidah/birkat_kohanim'))
@@ -118,7 +118,7 @@ def units(project,by_name):
     add('shabbat_shacharit_amidah_qedushah',ROOT+'/qedushah','קדושה','KEDUSHAH',351,351,kedushah())
     add('shabbat_shacharit_amidah',ROOT,'תפילת העמידה לשבת','AMIDAH',349,359,amidah(lang,by_name))
     text='<tei:p>'+instruction('Reader:')+'</tei:p>'
-    text+=''.join(transclude(PRAYER+'kaddish/'+k) for k in ('yitgadal','yehe_shmeh','yitbarakh','titkabal','yatom/yehe_shlama','yatom/oseh_shalom'))
+    text+=''.join(transclude(PRAYER+'kaddish/'+k) for k in ('yitgaddal','yehe_shemeh','yitbarakh','titqabbal','yatom/yehe_shelama','yatom/oseh_shalom'))
     add('shabbat_shacharit_kaddish',KADDISH,'קדיש שלם','Full Kaddish',361,361,
         conditional('kaddish','When a minyan holds service:',MINYAN,text))
     return tuple(result)
