@@ -473,9 +473,8 @@ def _render_blocks(
             for entry in closes.get(paragraph_number, []):
                 pending_close.insert(0, conditional_markers(entry, lang=lang)[1])
             urn = urn_for_section(slug, paragraph=paragraph_number)
-            parts.append(
-                f'<tei:milestone unit="paragraph" n="{paragraph_number}" corresp="{urn}"/>'
-            )
+            corresp = f' corresp="{urn}"' if urn else ""
+            parts.append(f'<tei:milestone unit="paragraph" n="{paragraph_number}"{corresp}/>')
         if block.kind == "instruction":
             note = f'<tei:note type="instruction">{_splice(text, block_breaks)}</tei:note>'
             if block.governs:

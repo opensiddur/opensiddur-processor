@@ -9,7 +9,7 @@ thing this script has to get right, because parallel alignment joins on exact UR
 Three shapes occur:
 
 - *The English parts where the Hebrew does not.* The Akedah is one paragraph in Hebrew and
-  four in English. Both sides carry one `prayer:akedah`, so the join is at the division and
+  four in English. Both sides carry one `prayer:aqedah`, so the join is at the division and
   the paragraphing inside it is each side's own.
 - *The Hebrew parts where the English does not.* Printed 25 breaks `לְפִיכָךְ` at the
   `Reader` label and printed 26 runs straight on. The Hebrew's parting is what creates the
@@ -137,7 +137,7 @@ def verse_block(name, title, slug, first, last, items, base=None, comment=None):
 AKEDAH_DOC = """The English of the Akedah and the setting for the Shema, printed pages 20 to 26.
 
 **The Akedah is one paragraph in Hebrew and four in English.** Both sides carry one
-`prayer:akedah`, so the two columns join at the division and each parts its own prose.
+`prayer:aqedah`, so the two columns join at the division and each parts its own prose.
 
 **`לְפִיכָךְ` and `אַתָּה הוּא` are parted in Hebrew and not in English.** Printed 25 sets a
 `Reader` label inside each, which makes the second half its own text with its own URN;

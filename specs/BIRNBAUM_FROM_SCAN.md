@@ -789,7 +789,7 @@ records them; the Hodu note is deferred with Hodu itself.
 
 The first three paragraphs are word-for-word the earlier Kaddish d’Rabbanan.
 Their existing context divisions remain, and **nested `tei:seg`s** give the common
-words the canonical names `prayer:kaddish/yitgadal`, `/yehe_shmeh`, `/yitbarakh`.
+words the canonical names `prayer:kaddish/yitgaddal`, `/yehe_shemeh`, `/yitbarakh`.
 Mourners’ Kaddish transcludes those segments. The earlier page break sits outside
 the shared segment, so printed 47 does not turn up inside printed 49. Its final two
 paragraphs have their own names under `kaddish/yatom`: they omit `טובים` and
@@ -1199,7 +1199,7 @@ text remains an unchanged prefix in both languages.
 
 ## Pirkei Avot (printed 477–534; IA n501–n558)
 
-The entire unit is `urn:x-opensiddur:text:siddur:pirkei_avot`, with six independently
+The entire unit is `urn:x-opensiddur:text:siddur:pirqei_avot`, with six independently
 addressable chapter wrappers at `/1` through `/6`. Each wrapper includes its printed
 Kol Yisrael and Rabbi Hananya formulas around the chapter text. The chapter texts
 use `urn:x-opensiddur:text:mishnah:avot/{chapter}/{mishnah}` milestones. Birnbaum’s
@@ -1244,7 +1244,7 @@ poems. The source audit is `scan_reading/hanukkah_purim/` in sourcetexts, includ
 unchanged initial readings and the enlarged-scan adjudication ledger.
 
 The addressable book sections are `siddur:chanukah` and `siddur:purim`.
-`prayer:megillat_hashmonaim` is independently reusable: its verse milestones
+`prayer:megillat_hachashmonaim` is independently reusable: its verse milestones
 preserve Hebrew-only printed numerals while the two languages retain their own
 paragraph breaks. It is not assigned biblical URNs. The quotation in verse 39
 uses bounded biblical source spans. Maoz Tzur’s untranslated sixth stanza keeps

@@ -136,8 +136,10 @@ A URN path component is lowercase ASCII, digits and `_`
 (`opensiddur.common.urn_registry.COMPONENT_RE`): no `-`, which marks a range, and none of `@`,
 `#`, `:`, `/`, `(`, `)` or `,`. Its Hebrew words follow the [table](#transliteration).
 
-A URN that is respelled is recorded in `specs/urn_registry/aliases.jsonl` as an alias of its new
-spelling; the registry check reports any project still emitting it.
+Until the first stable release (1.0) nothing outside these repositories depends on a URN, so a
+renamed URN replaces the old one outright: every use in the repositories changes with it, and
+no alias is kept. From 1.0, a renamed URN is recorded in `specs/urn_registry/aliases.jsonl` as an
+alias of its new name, and the registry check reports any project still emitting it.
 
 ## Transliteration
 

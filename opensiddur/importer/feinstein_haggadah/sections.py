@@ -237,7 +237,75 @@ def parent_index_slug(slug: str) -> str | None:
     return None
 
 
-def urn_for_section(slug: str, *, paragraph: int | None = None) -> str:
+#: Sections whose text is shared liturgy, named by its own URN rather than under `haggadah:`
+#: (specs/SIDDUR_URN_SCHEME.md, "Unification with the haggadah namespace"). Each is one
+#: paragraph, so it has no paragraph URN of its own.
+SHARED_TEXTS = {
+    "nishmat": "urn:x-opensiddur:text:prayer:nishmat",
+    "shokhen_ad": "urn:x-opensiddur:text:prayer:shokhen_ad",
+    "psalm_115": "urn:x-opensiddur:text:prayer:hallel/psalm_115",
+    "psalm_116": "urn:x-opensiddur:text:prayer:hallel/psalm_116",
+    "psalm_117": "urn:x-opensiddur:text:prayer:hallel/psalm_117",
+    "psalm_118": "urn:x-opensiddur:text:prayer:hallel/psalm_118",
+    "psalm_136": "urn:x-opensiddur:text:prayer:hallel_hagadol",
+    "al_hagefen": "urn:x-opensiddur:text:prayer:berakhah_acharonah/al_hagefen",
+    "sefirat_haomer": "urn:x-opensiddur:text:prayer:sefirat_haomer",
+    "psalm_113": "urn:x-opensiddur:text:prayer:hallel/psalm_113",
+    "psalm_114": "urn:x-opensiddur:text:prayer:hallel/psalm_114",
+    "yehalalukha": "urn:x-opensiddur:text:prayer:hallel/yehalelukha",
+    "hael_betaatzumot": "urn:x-opensiddur:text:prayer:hael_betaatzumot",
+    "befi_yesharim": "urn:x-opensiddur:text:prayer:befi_yesharim",
+    "uvemaqhalot": "urn:x-opensiddur:text:prayer:uvemaqhalot",
+    "yishtabbach": "urn:x-opensiddur:text:prayer:yishtabbach",
+    "psalm_126": "urn:x-opensiddur:text:prayer:birkat_hamazon/shir_hamaalot",
+}
+
+#: Paragraphs of a section that are shared liturgy, named by their own URNs: Birkat Hamazon's
+#: and Kiddush's parts, each a paragraph of the edition. A paragraph not listed keeps its
+#: `haggadah:` URN (Havdalah in Kiddush; the cup and Shefokh after Birkat Hamazon).
+SHARED_PARAGRAPHS = {
+    ("barekh", 1): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/hav_lan",
+    ("barekh", 2): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/yehi_shem",
+    ("barekh", 3): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/nevarekh",
+    ("barekh", 4): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_she_akhalnu",
+    ("barekh", 5): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_umevorakh",
+    ("barekh", 6): "urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_hu",
+    ("barekh", 7): "urn:x-opensiddur:text:prayer:birkat_hamazon/hazan",
+    ("barekh", 8): "urn:x-opensiddur:text:prayer:birkat_hamazon/nodeh_lekha",
+    ("barekh", 9): "urn:x-opensiddur:text:prayer:birkat_hamazon/veal_hakol",
+    ("barekh", 10): "urn:x-opensiddur:text:prayer:birkat_hamazon/rachem",
+    ("barekh", 11): "urn:x-opensiddur:text:prayer:birkat_hamazon/eloheinu_avinu",
+    ("barekh", 12): "urn:x-opensiddur:text:prayer:birkat_hamazon/retzeh_vehachalitzenu",
+    ("barekh", 13): "urn:x-opensiddur:text:prayer:yaaleh_veyavo",
+    ("barekh", 14): "urn:x-opensiddur:text:prayer:birkat_hamazon/uveneh_yerushalayim",
+    ("barekh", 15): "urn:x-opensiddur:text:prayer:birkat_hamazon/hatov_vehametiv",
+    ("barekh", 16): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yimlokh",
+    ("barekh", 17): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yitbarakh",
+    ("barekh", 18): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishtabbach",
+    ("barekh", 19): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yefarnesenu",
+    ("barekh", 20): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishbor_ullenu",
+    ("barekh", 21): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishlach_berakhah",
+    ("barekh", 22): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishlach_lanu",
+    ("barekh", 23): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yevarekh",
+    ("barekh", 24): "urn:x-opensiddur:text:prayer:birkat_hamazon/bamarom",
+    ("barekh", 25): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yanchilenu_shabbat",
+    ("barekh", 26): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yanchilenu_tov",
+    ("barekh", 27): "urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yezakkenu",
+    ("barekh", 28): "urn:x-opensiddur:text:prayer:birkat_hamazon/yiru_et_adonai",
+    ("qaddesh", 1): "urn:x-opensiddur:text:prayer:kiddush/vayekhulu",
+    ("qaddesh", 2): "urn:x-opensiddur:text:prayer:kiddush/savri",
+    ("qaddesh", 3): "urn:x-opensiddur:text:prayer:kiddush/asher_bachar_banu",
+    ("qaddesh", 5): "urn:x-opensiddur:text:prayer:shehecheyanu",
+}
+
+
+def urn_for_section(slug: str, *, paragraph: int | None = None) -> str | None:
+    """The URN of a section, or of one of its paragraphs. A shared text's paragraph has
+    none (:data:`SHARED_TEXTS`); a shared paragraph has its own (:data:`SHARED_PARAGRAPHS`)."""
+    if slug in SHARED_TEXTS:
+        return None if paragraph is not None else SHARED_TEXTS[slug]
+    if (slug, paragraph) in SHARED_PARAGRAPHS:
+        return SHARED_PARAGRAPHS[slug, paragraph]
     if slug == "index":
         base = "urn:x-opensiddur:text:haggadah:haggadah"
     else:

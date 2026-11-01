@@ -523,11 +523,15 @@ A canonical record names the URN, its parent, what kind of thing it is, and its 
 {"urn":"urn:x-opensiddur:text:prayer:amidah/avot","parent":"urn:x-opensiddur:text:prayer:amidah","kind":"berakhah","label_en":"Blessing of the Patriarchs","status":"canonical"}
 ```
 
-An alias record binds a URN already in the corpus to its canonical name:
+From the first stable release, an alias record will bind a URN no longer in use to its
+canonical name (until then a renamed URN is replaced outright; see `NAMING_SCHEME.md`):
 
 ```json
-{"urn":"urn:x-opensiddur:text:haggadah:hallel/yishtabach","canonical":"urn:x-opensiddur:text:prayer:pesuqei_dezimrah/yishtabbach","status":"alias"}
+{"urn":"urn:x-opensiddur:text:haggadah:hallel/yishtabach","canonical":"urn:x-opensiddur:text:prayer:yishtabbach","status":"alias"}
 ```
+
+A context record keeps a place-specific URN that reaches a shared text by transclusion
+(see *Unification with the haggadah namespace*).
 
 Registry URNs carry **no** `@project` and no `#fragment`: they name texts, not their
 realisations. Where a URN resolves stays `refdb`'s job. The registry adds the three
@@ -541,36 +545,35 @@ registered.
 
 ## Unification with the haggadah namespace
 
-`HAGGADAH_URN_SCHEME.md` already says shared liturgy should use `prayer:`. No project
-implements it — every one of these is currently `haggadah:`. They are recorded as aliases
-now and the projects rewritten later; deferring the edit does not defer the decision.
+`HAGGADAH_URN_SCHEME.md` says shared liturgy should use `prayer:`, and the Haggadah does: a
+shared section or paragraph is named by its own URN (`feinstein_haggadah/sections.py`,
+`SHARED_TEXTS` and `SHARED_PARAGRAPHS`).
 
-| Currently | Canonical |
+| Section | URN |
 |---|---|
-| `haggadah:hallel/psalm_113` … `/psalm_118` | `prayer:hallel/*` (+ `bible:psalms/*` milestones) |
-| `haggadah:hallel/yehalelukha` | `prayer:hallel/yehalelukha` |
-| `haggadah:hallel/psalm_136` | `prayer:hallel_hagadol` |
-| `haggadah:hallel/nishmat`, `/shokhen_ad`, `/ha_el_btaatzumot`, `/uvmakhalot`, `/bfi_yesharim`, `/yishtabach` | under review — see below |
-| `haggadah:barech/1` … `/28` | `prayer:birkat_hamazon/*` |
-| `haggadah:barech/psalm_126` | `prayer:birkat_hamazon/shir_hamaalot` |
-| `haggadah:nirtzah/al_hagefen` | `prayer:berakhah_acharonah/al_hagefen` |
-| `haggadah:nirtzah/sefirat_haomer` | `prayer:sefirat_haomer` |
-| `haggadah:kadesh/1` … `/5` | `prayer:qiddush/*` |
-| `haggadah:urechatz`, `rachtzah` | `prayer:netilat_yadayim` |
-| `haggadah:motzi_matzah` | `prayer:hamotzi` + a haggadah-specific remainder |
+| `maggid/psalm_113`, `/psalm_114`; `hallel/psalm_115` … `/psalm_118` | `prayer:hallel/psalm_113` … `/psalm_118` (+ `bible:psalms/*` milestones) |
+| `hallel/yehalalukha` | `prayer:hallel/yehalelukha` |
+| `hallel/psalm_136` | `prayer:hallel_hagadol` |
+| `hallel/nishmat`, `/shokhen_ad`, `/hael_betaatzumot`, `/uvemaqhalot`, `/befi_yesharim`, `/yishtabbach` | `prayer:nishmat`, `prayer:shokhen_ad`, `prayer:hael_betaatzumot`, `prayer:uvemaqhalot`, `prayer:befi_yesharim`, `prayer:yishtabbach` |
+| `barekh` paragraphs 1–28 | `prayer:birkat_hamazon/*`, by their opening words (`zimmun/hav_lan` … `yiru_et_adonai`), and `prayer:yaaleh_veyavo` |
+| `barekh/psalm_126` | `prayer:birkat_hamazon/shir_hamaalot` |
+| `qaddesh` paragraphs 1, 2, 3, 5 | `prayer:kiddush/vayekhulu`, `/savri`, `/asher_bachar_banu`; `prayer:shehecheyanu` |
+| `nirtzah/al_hagefen` | `prayer:berakhah_acharonah/al_hagefen` |
+| `nirtzah/sefirat_haomer` | `prayer:sefirat_haomer` |
 
-Two notes on the harder ones. **`barech/13` is Ya'aleh v'yavo**, an ordinal rather than a
-name; it is renamed to `prayer:yaaleh_veyavo` like any other alias, and that its haggadah
-copy carries only the Pesach wording is not a reason to re-encode it — see *Partial
-witnesses are normal*. **`prayer:ashrei`**, which already exists in `example_original-he`,
-is correct as it stands: Ashrei is said at several services, so it is top-level and needs
-no change.
+A shared section is one paragraph, which its own URN names, so it has no paragraph URN.
+**Ya'aleh v'yavo** is top-level, not under Birkat Hamazon: it is said in the Amidah too, and
+that the Haggadah's copy carries only the Pesach wording is not a reason to re-encode it — see
+*Partial witnesses are normal*. **The Nishmat-to-Yishtabbach block** is top-level for the same
+reason: it concludes P'sukei D'zimra on Shabbat and festivals and is said at the seder too, so
+it has two homes and no single parent. **`prayer:ashrei`** is top-level likewise.
 
-The Nishmat-to-Yishtabach block needs deciding under *Nest only what lives in one place*
-before it is renamed. It concludes P'sukei D'zimra on Shabbat and festivals and is also
-said at the seder, so whether these are `prayer:pesuqei_dezimrah/*` or top-level names
-turns on whether the seder is quoting P'sukei D'zimra or the texts have two homes. The
-registry records them as needing review rather than guessing.
+Some places keep a `haggadah:` URN for what is particular to them, with a context record in
+`specs/urn_registry/aliases.jsonl` that names the shared text they reach by transclusion
+(`references`): the cups (`maggid/kos_sheni`, `barekh/29`, `nirtzah/kos_revii`, each
+Borei peri hagafen), `rachatz` (Al netilat yadayim), `motzi_matzah` (Hamotzi and Al achilat
+matzah) and `urechatz`, which has no blessing. Kiddush's Havdalah paragraph (`qaddesh/4`) and
+Shefokh Chamatkha (`barekh/30`) stay `haggadah:` too.
 
 What stays in `haggadah:` is what is genuinely seder-specific: the fifteen simanim as an
 ordering, the Magid narrative, Shefokh Chamatkha, the Nirtzah songs, and the pre-Pesach

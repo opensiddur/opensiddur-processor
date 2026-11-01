@@ -37,8 +37,8 @@ REGISTRY_DIRECTORY = REPO_ROOT / "specs" / "urn_registry"
 SCHEME = "urn:x-opensiddur:"
 
 # Namespaces whose names this registry governs. `bible:` is excluded because its names
-# are fixed by the canon rather than chosen, and `haggadah:` because it predates the
-# scheme -- it appears here only on the left-hand side of an alias.
+# are fixed by the canon rather than chosen, and `haggadah:` because it names what is
+# particular to the seder -- it appears here only in context records.
 GOVERNED_NAMESPACES = frozenset({"prayer", "poem", "siddur", "mishnah", "talmud",
                                  "front"})
 

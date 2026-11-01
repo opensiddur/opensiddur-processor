@@ -21,7 +21,7 @@ from .identities import project_name
 TEI='http://www.tei-c.org/ns/1.0'
 J='http://jewishliturgy.org/ns/jlptei/2'
 XML='{http://www.w3.org/XML/1998/namespace}'
-POEM='urn:x-opensiddur:text:poem:bemotzaei_menuhah'
+POEM='urn:x-opensiddur:text:poem:bemotzaei_menuchah'
 PRAYER='urn:x-opensiddur:text:prayer:'
 IA='https://archive.org/details/selichothdavidasher1912'
 

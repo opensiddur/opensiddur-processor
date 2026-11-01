@@ -295,7 +295,7 @@ class RefdbCrossCheckTestCase(unittest.TestCase):
         self.assertEqual(severities(problems, ERROR), [])
 
     def test_a_live_alias_is_reported_as_pending_not_failed(self):
-        # The haggadah still emits its old URNs; that is a migration, not a breakage.
+        # A project still emitting a renamed URN is a migration, not a breakage.
         old = "urn:x-opensiddur:text:haggadah:hallel/yishtabach"
         registry = self.registry(
             canonical("yishtabach"),
