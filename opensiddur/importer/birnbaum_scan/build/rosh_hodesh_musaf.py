@@ -26,7 +26,7 @@ REUSE={
  'qadosh':PRAYER+'amidah/qedushah/qadosh',
  'leummatam':PRAYER+'amidah/qedushah/leummatam',
  'barukh':PRAYER+'amidah/qedushah/barukh_kevod',
- 'uvdivrei':PRAYER+'amidah/qedushah/uvdivrei',
+ 'uvedivrei':PRAYER+'amidah/qedushah/uvedivrei',
  'retzeh':PRAYER+'amidah/avodah/retzeh',
  'vetechezeinah':PRAYER+'amidah/avodah/vetechezeinah',
 }
@@ -87,7 +87,7 @@ def units(project):
         urn=ROOT+('/'+key if key else '')
         head=(f'<tei:head xml:lang="{lang}">'+(he,en)[side]+'</tei:head>') if printed else editorial_head(lang,he,en)
         result.append(dict(name='rosh_chodesh_musaf'+('_'+key.replace('/','_') if key else ''),urn=urn,title_he=he,title_en=en,pages=(first+side,last+side),body=f'<tei:div corresp="{urn}">'+head+pb(first+side,sigil=SIGIL)+body+'</tei:div>'))
-    ked=''.join(p(k) for k in ('neqaddesh','qadosh'))+pb(577+side,sigil=SIGIL)+''.join(p(k) for k in ('leummatam','barukh','uvdivrei','yimlokh'))+instruction('Reader:')+p('ledor')
+    ked=''.join(p(k) for k in ('neqaddesh','qadosh'))+pb(577+side,sigil=SIGIL)+''.join(p(k) for k in ('leummatam','barukh','uvedivrei','yimlokh'))+instruction('Reader:')+p('ledor')
     add('amidah/qedushah','קדושה','KEDUSHAH',575,577,ked,printed=bool(side))
     middle=''.join(p(k) for k in ('rashei','offerings','uminchatam','chaddesh'))
     add('amidah/qedushat_hayom','ראשי חדשים','Sanctification of Rosh Hodesh',577,579,middle)

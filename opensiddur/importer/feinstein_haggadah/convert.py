@@ -71,7 +71,7 @@ INDEX_TITLES: dict[str, str] = {
     "index": "Haggadah",
     "pre_seder": "Pre-Seder",
     "seder": "Seder",
-    "magid": "Magid",
+    "maggid": "Magid",
     "nirtzah": "Nirtzah",
     "hallel": "Hallel",
     "barekh": "Barech",

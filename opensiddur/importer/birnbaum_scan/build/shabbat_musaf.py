@@ -30,13 +30,13 @@ URNS = {key:PRAYER+'amidah/qedushah/'+key for key,_,_,_ in data.KEDUSHAH}
 # Its translation of וּבְדִבְרֵי ("the holy Scriptures") differs from the weekday Kedushah's ("thy
 # holy Scriptures"), so this printing keeps a local address and points to the common passage
 # by source.
-URNS['uvdivrei'] = ROOT+'/amidah/qedushah/uvdivrei'
+URNS['uvedivrei'] = ROOT+'/amidah/qedushah/uvedivrei'
 RANGES = {
  'minchah_ki_shem':[(391,391)], 'amidah_adonai_sefatai':[(391,391)],
  'amidah_avot':[(391,391)], 'amidah_gevurot':[(391,393)],
  'amidah_qedushat_hashem':[(393,393)], 'amidah_avodah':[(399,399)],
  'amidah_hodaah':[(399,401)],'amidah_hodaah_modim_derabbanan':[(399,401)],
- 'amidah_hodaah_ukhtov':[(401,401)],'al_hanissim_chanukah':[(401,401)],
+ 'amidah_hodaah_ukhetov':[(401,401)],'al_hanissim_chanukah':[(401,401)],
  'amidah_birkat_kohanim':[(403,403)],'amidah_shalom':[(403,403)],
  'amidah_shalom_hamevarekh':[(403,403)],'amidah_shalom_besefer_chayyim':[(403,403)],
  'amidah_elohai_netzor':[(403,403)],'amidah_yehi_ratzon':[(405,405)],
@@ -91,7 +91,7 @@ def prayers(lang,earlier):
     for key,page,he,en in data.KEDUSHAH:
         value=text_xml((he,en)[side],SIGIL)
         if key=='ani':value=f'<tei:seg source="{BIBLE}numbers/15/41">'+value+'</tei:seg>'
-        if key=='uvdivrei':value=f'<tei:seg source="{PRAYER}amidah/qedushah/uvdivrei">'+value+'</tei:seg>'
+        if key=='uvedivrei':value=f'<tei:seg source="{PRAYER}amidah/qedushah/uvedivrei">'+value+'</tei:seg>'
         add('qedushah_'+key,URNS[key],page,page,'<tei:p>'+value+'</tei:p>')
     # This translation differs from the previously printed complete Shema verse.
     add('qedushah_shema',ROOT+'/amidah/qedushah/shema',393,393,paragraph((
@@ -162,7 +162,7 @@ def prayers(lang,earlier):
 def kedushah():
     def p(key):return transclude(PRAYER+'amidah/qedushah/'+key)
     body=p('naaritz')+p('qadosh')+p('kevodo')+p('barukh_kevod')+p('mimeqomo')
-    body+=transclude(ROOT+'/amidah/qedushah/shema')+p('hu')+p('ani')+transclude(URNS['uvdivrei'])+p('yimlokh')+instruction('Reader:')+p('ledor_vador')
+    body+=transclude(ROOT+'/amidah/qedushah/shema')+p('hu')+p('ani')+transclude(URNS['uvedivrei'])+p('yimlokh')+instruction('Reader:')+p('ledor_vador')
     for key,negate in [('hael_haqadosh',True),('hamelekh_haqadosh',False)]:
         body+=conditional(key,'Except during the Ten Days of Repentance:' if negate else 'Between Rosh Hashanah and Yom Kippur say:',TEN_DAYS,p(key),negate=negate)
     return body
@@ -192,7 +192,7 @@ def units(project,by_name):
     body+=conditional('modim','When the Reader repeats the Amidah, the Congregation responds here by saying:',READER,p('amidah/hodaah/modim_derabbanan'))
     body+=p('amidah/hodaah/modim')
     body+=conditional('chanukah','On Ḥanukkah add:',holiday('hanukkah',8),p('al_hanissim/chanukah'))
-    body+=p('amidah/hodaah/veal_kullam')+conditional('ukhtov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,p('amidah/hodaah/ukhtov'))+p('amidah/hodaah/hatov_shimkha')
+    body+=p('amidah/hodaah/veal_kullam')+conditional('ukhetov','Between Rosh Hashanah and Yom Kippur add:',TEN_DAYS,p('amidah/hodaah/ukhetov'))+p('amidah/hodaah/hatov_shimkha')
     body+=conditional('kohanim','During the Reader’s repetition:',READER,p('amidah/birkat_kohanim'))+p('amidah/shalom')
     body+=conditional('meditation','After the Amidah add the following meditation:',READER,f'<tei:div corresp="{ROOT}/amidah/meditation">'+p('amidah/elohai_netzor/text')+'</tei:div>',negate=True)+p('amidah/yehi_ratzon')
     add('amidah','עמידה למוסף','Musaf Amidah',391,405,body)

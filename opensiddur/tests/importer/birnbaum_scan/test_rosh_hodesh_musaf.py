@@ -31,7 +31,7 @@ class TestRoshHodeshMusaf(unittest.TestCase):
 
     def test_no_unprinted_ten_days_yaaleh_or_kaddish(self):
         targets=self.built[AMIDAH].xpath('.//@target')
-        for unwanted in ('yaaleh','kaddish','zokhrenu','ukhtov','besefer'):
+        for unwanted in ('yaaleh','kaddish','zokhrenu','ukhetov','besefer'):
             self.assertFalse(any(unwanted in t for t in targets),unwanted)
         self.assertIn(URNS['retzeh'],targets)
         self.assertIn(URNS['vetechezeinah'],targets)

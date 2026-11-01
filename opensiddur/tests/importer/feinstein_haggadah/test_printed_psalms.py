@@ -149,7 +149,7 @@ class PrintedVerseBodyTest(unittest.TestCase):
     def test_div_keeps_its_haggadah_corresp(self) -> None:
         body = printed_verse_body(self.psalms["psalm_113"])
         self.assertIn(
-            '<tei:div corresp="urn:x-opensiddur:text:haggadah:magid/psalm_113">', body
+            '<tei:div corresp="urn:x-opensiddur:text:haggadah:maggid/psalm_113">', body
         )
 
     def test_a_folio_opening_a_psalm_is_marked_before_the_chapter(self) -> None:

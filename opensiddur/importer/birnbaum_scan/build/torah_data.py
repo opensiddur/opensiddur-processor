@@ -87,8 +87,8 @@ passage('psalm24', 127, 127, [
 ('9', 'psalms/24/9', 'שְׂאוּ שְׁעָרִים רָאשֵׁיכֶם, וּשְׂאוּ פִּתְחֵי עוֹלָם, וְיָבֹא מֶֽלֶךְ הַכָּבוֹד.', 'Raise your heads, O gates, raise yourselves, you ancient doors, that the glorious King may come in.'),
 ('10', 'psalms/24/10', 'מִי הוּא זֶה מֶֽלֶךְ הַכָּבוֹד, יְיָ צְבָאוֹת הוּא מֶֽלֶךְ הַכָּבוֹד, סֶֽלָה.', 'Who, then, is the glorious King? The Lord of hosts, he is the glorious King.'),
 ])
-passage('uvnucho', 127, 127, [
-('uvnucho', 'numbers/10/36', 'וּבְנֻחֹה יֹאמַר: שׁוּבָה, יְיָ, רִבְבוֹת אַלְפֵי יִשְׂרָאֵל.', 'When the ark rested, Moses would say: “Return, O Lord, to the myriads of Israel’s families.”'),
+passage('uvenuchoh', 127, 127, [
+('uvenuchoh', 'numbers/10/36', 'וּבְנֻחֹה יֹאמַר: שׁוּבָה, יְיָ, רִבְבוֹת אַלְפֵי יִשְׂרָאֵל.', 'When the ark rested, Moses would say: “Return, O Lord, to the myriads of Israel’s families.”'),
 ('kumah', 'psalms/132/8', 'קוּמָה יְיָ לִמְנוּחָתֶֽךָ, אַתָּה וַאֲרוֹן עֻזֶּֽךָ.', 'Arise, O Lord, for thy resting place, thou and thy glorious ark.'),
 ('kohanekha', 'psalms/132/9', 'כֹּהֲנֶֽיךָ יִלְבְּשׁוּ צֶֽדֶק, וַחֲסִידֶֽיךָ יְרַנֵּֽנוּ.', 'May thy priests be clothed with righteousness; may thy faithful followers shout for joy.'),
 ('baavur', 'psalms/132/10', 'בַּעֲבוּר דָּוִד עַבְדֶּֽךָ אַל תָּשֵׁב פְּנֵי מְשִׁיחֶֽךָ.', 'For the sake of thy servant David, reject not thy anointed.'),

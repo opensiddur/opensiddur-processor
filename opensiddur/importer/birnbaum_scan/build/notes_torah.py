@@ -27,7 +27,7 @@ for key, row, number, citation in (
     ('vezot_hatorah', 'vezot', '1', 'Deuteronomy 4:44; Numbers 9:23.'),
     ('vezot_hatorah', 'etz', '2', 'Proverbs 3:18, 17, 16; Isaiah 42:21.'),
     ('yehalelu', 'reader', '1', 'Psalm 148:13–14.'),
-    ('uvnucho', 'uvnucho', '2', 'Numbers 10:36; Psalm 132:8–10; Proverbs 4:2; 3:18, 17; Lamentations 5:21.'),
+    ('uvenuchoh', 'uvenuchoh', '2', 'Numbers 10:36; Psalm 132:8–10; Proverbs 4:2; 3:18, 17; Lamentations 5:21.'),
 ):
     source = next(r[1] for r in PASSAGES[key]['rows'] if r[0] == row)
     NOTES.append(dict(kind='citation', target=anchor(key, row, source), n=number,

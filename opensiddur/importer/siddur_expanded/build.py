@@ -108,7 +108,7 @@ class Builder:
             haft=self.gate(any_of(FAST,TISHA,holiday('yom-kippur')),self.s('prayer:birkhot_haftarah/asher_bachar')+reading['haftarah']+self.s('prayer:birkhot_haftarah/after'))
             target='siddur:shabbat/minchah/torah/vezot_hatorah'
             replacements[TEXT+target]=self.s('siddur:chol/shacharit/torah/vezot_hatorah')+haft
-            replacements[TEXT+'siddur:shabbat/minchah/torah/uvnucho']=self.s('siddur:chol/shacharit/torah/uvnucho')
+            replacements[TEXT+'siddur:shabbat/minchah/torah/uvenuchoh']=self.s('siddur:chol/shacharit/torah/uvenuchoh')
             body=self.s('siddur:shabbat/minchah/torah',replace=replacements)
         else:
             # Tisha B'Av has a morning haftarah too.

@@ -78,9 +78,9 @@
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/lekha_adonai/lekha", "status": "canonical", "label_en": "Lekha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/lekha_adonai"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/lekha_adonai/romemu_hadom", "status": "canonical", "label_en": "Romemu hadom", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/lekha_adonai"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/lekha_adonai/romemu_har", "status": "canonical", "label_en": "Romemu har", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/lekha_adonai"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho", "status": "canonical", "label_en": "Uvnucho", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho/derakheha", "status": "canonical", "label_en": "Derakheha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho"}
-{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho/etz", "status": "canonical", "label_en": "Etz", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvnucho"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvenuchoh", "status": "canonical", "label_en": "Uvnucho", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvenuchoh/derakheha", "status": "canonical", "label_en": "Derakheha", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvenuchoh"}
+{"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvenuchoh/etz", "status": "canonical", "label_en": "Etz", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/uvenuchoh"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa", "status": "canonical", "label_en": "Vayehi binsoa", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa/barukh", "status": "canonical", "label_en": "Barukh", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa"}
 {"urn": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa/ki_mitziyyon", "status": "canonical", "label_en": "Ki mitzion", "parent": "urn:x-opensiddur:text:siddur:chol/shacharit/torah/vayehi_binsoa"}
@@ -294,7 +294,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/blessings", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — blessings"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/hagomel", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — hagomel"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading/vezot", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/reading", "label_en": "Torah service — reading — vezot"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return/uvnucho", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return", "label_en": "Torah service — return — uvnucho"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return/uvenuchoh", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:shabbat/shacharit/torah/return", "label_en": "Torah service — return — uvnucho"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf", "status": "canonical", "label_en": "Sabbath musaf", "parent": "urn:x-opensiddur:text:siddur:shabbat"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/adon_olam", "status": "canonical", "label_en": "Sabbath musaf — adon olam", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/aleinu", "status": "canonical", "label_en": "Sabbath musaf — aleinu", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
@@ -302,7 +302,7 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah", "status": "canonical", "label_en": "Sabbath musaf — amidah", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah/shema", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah — shema", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah/uvdivrei", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah — uvdivrei", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah/uvedivrei", "status": "canonical", "label_en": "Sabbath musaf — amidah — kedushah — uvdivrei", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/qedushah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/meditation", "status": "canonical", "label_en": "Sabbath musaf — amidah — meditation", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/ordinary", "status": "canonical", "label_en": "Sabbath musaf — amidah — ordinary", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah/rosh_chodesh", "status": "canonical", "label_en": "Sabbath musaf — amidah — rosh chodesh", "parent": "urn:x-opensiddur:text:siddur:shabbat/musaf/amidah"}
@@ -367,9 +367,9 @@
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letziyyon", "status": "canonical", "label_en": "Sabbath Mincha — uva letzion", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/vaani_tefillati", "status": "canonical", "label_en": "Sabbath Mincha — vaani tefilati", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letziyyon/barukh", "status": "canonical", "label_en": "Sabbath Mincha — uva letzion — barukh", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/uva_letziyyon"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho/ki_leqach", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — ki lekach", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho"}
-{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho/kohanekha", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — kohanecha", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvnucho"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvenuchoh", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvenuchoh/ki_leqach", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — ki lekach", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvenuchoh"}
+{"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvenuchoh/kohanekha", "status": "canonical", "label_en": "Sabbath Mincha — torah — uvnucho — kohanecha", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/uvenuchoh"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vezot_hatorah", "status": "canonical", "label_en": "Sabbath Mincha — torah — vezot hatorah", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah"}
 {"urn": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vezot_hatorah/adonai_chafetz", "status": "canonical", "label_en": "Sabbath Mincha — torah — vezot hatorah — adonai chafetz", "parent": "urn:x-opensiddur:text:siddur:shabbat/minchah/torah/vezot_hatorah"}
 {"urn": "urn:x-opensiddur:text:siddur:pirqei_avot", "status": "canonical", "label_en": "pirkei avot"}
@@ -743,8 +743,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/tal_tehomot", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/tal tehomot", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uminchatam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uminchatam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/umippenei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/umipnei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uvdivrei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uvdivrei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
-{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uvdivrei_chol", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uvdivrei chol", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uvedivrei", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uvdivrei", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
+{"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/uvedivrei_chol", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/uvdivrei chol", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vattitten", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vatiten", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/vayedaber", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/vayedaber", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
 {"urn": "urn:x-opensiddur:text:siddur:regalim/musaf/text/veal_kullam", "status": "canonical", "label_en": "Festival Musaf: regalim/musaf/text/veal kulam", "parent": "urn:x-opensiddur:text:siddur:regalim/musaf/text"}
@@ -879,8 +879,8 @@
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/savri", "status": "canonical", "label_en": "rosh hashanah — text — savri", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/shalom_rav", "status": "canonical", "label_en": "rosh hashanah — text — shalom rav", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/shehecheyanu", "status": "canonical", "label_en": "rosh hashanah — text — shehecheyanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ukhtov", "status": "canonical", "label_en": "rosh hashanah — text — ukhtov", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
-{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/uvdivrei", "status": "canonical", "label_en": "rosh hashanah — text — uvdivrei", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/ukhetov", "status": "canonical", "label_en": "rosh hashanah — text — ukhtov", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/uvedivrei", "status": "canonical", "label_en": "rosh hashanah — text — uvdivrei", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vattitten_lanu", "status": "canonical", "label_en": "rosh hashanah — text — vatiten lanu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vattodienu", "status": "canonical", "label_en": "rosh hashanah — text — vatodienu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}
 {"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/text/vayekhulu", "status": "canonical", "label_en": "rosh hashanah — text — vayekhulu", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah/text"}

@@ -55,7 +55,7 @@ class TestFacsimileMapping(unittest.TestCase):
 
     def test_verso_follows_its_recto(self) -> None:
         self.assertEqual(facsimile_page("3r"), 5)
-        self.assertEqual(facsimile_page("3v"), 6)  # kadesh, checked in the viewer
+        self.assertEqual(facsimile_page("3v"), 6)  # qaddesh, checked in the viewer
 
     def test_alternation_is_unbroken_across_the_whole_book(self) -> None:
         pages = [facsimile_page(folio) for folio in ALL_FOLIOS]
@@ -67,7 +67,7 @@ class TestFacsimileMapping(unittest.TestCase):
                 facsimile_page(bad)
 
     def test_page_break_exposes_its_scan_page(self) -> None:
-        self.assertEqual(PageBreak(page="3v", section="kadesh").facsimile_page, 6)
+        self.assertEqual(PageBreak(page="3v", section="qaddesh").facsimile_page, 6)
 
     def test_url_deep_links_the_scan(self) -> None:
         self.assertEqual(
@@ -187,20 +187,20 @@ class TestSectionOrder(unittest.TestCase):
     def test_folio_38r_reads_as_printed(self) -> None:
         """Ki Lo Na'eh, לשנה הבאה, the two fourth-cup blessings, then Chasal Siddur Pesach."""
         order = INDEX_CHILDREN["nirtzah"]
-        start = order.index("ki_lo_na_eh")
+        start = order.index("ki_lo_naeh")
         self.assertEqual(
             order[start : start + 5],
             [
-                "ki_lo_na_eh",
-                "lshana_haba_ah",
-                "hagafen_fourth_cup",
+                "ki_lo_naeh",
+                "leshanah_habaah",
+                "kos_revii",
                 "al_hagefen",
                 "chasal_siddur_pesach",
             ],
         )
 
     def test_fourth_cup_blessings_left_hallel(self) -> None:
-        for slug in ("hagafen_fourth_cup", "al_hagefen"):
+        for slug in ("kos_revii", "al_hagefen"):
             self.assertNotIn(slug, INDEX_CHILDREN["hallel"])
 
     def test_hallel_transcludes_its_psalms_in_order(self) -> None:
@@ -211,12 +211,12 @@ class TestSectionOrder(unittest.TestCase):
         )
         # Yehalelukha sits between Psalms 118 and 136, which is why Hallel had to become an
         # index node rather than keeping the non-psalms inline.
-        self.assertLess(order.index("psalm_118"), order.index("yehalelukha"))
-        self.assertLess(order.index("yehalelukha"), order.index("psalm_136"))
+        self.assertLess(order.index("psalm_118"), order.index("yehalalukha"))
+        self.assertLess(order.index("yehalalukha"), order.index("psalm_136"))
 
     def test_second_cup_blessings_close_magid(self) -> None:
         self.assertEqual(
-            INDEX_CHILDREN["magid"][-2:], ["asher_ge_alanu", "hagafen_second_cup"]
+            INDEX_CHILDREN["maggid"][-2:], ["asher_gealanu", "kos_sheni"]
         )
 
     def test_barekh_transcludes_psalm_126(self) -> None:
@@ -250,7 +250,7 @@ class TestSectionOrder(unittest.TestCase):
 class TestPageRanges(unittest.TestCase):
     def test_section_with_a_break_at_its_start(self) -> None:
         ranges = page_ranges(load_page_breaks())
-        self.assertEqual(ranges["kadesh"], ("3v", "4r"))
+        self.assertEqual(ranges["qaddesh"], ("3v", "4r"))
 
     def test_section_beginning_on_the_preceding_page(self) -> None:
         """mah_nishtanah opens on 5r, which was opened by ha_lachma_anya."""
@@ -425,7 +425,7 @@ class TestPositionalTransclusion(unittest.TestCase):
         self.assertLess(body.index("אחרי"), body.index("<j:transclude"))
 
     def test_index_node_without_content_still_transcludes(self) -> None:
-        body = index_body("pre_seder", ["bedikat_chametz"], None, lang="he")
+        body = index_body("pre_seder", ["bediqat_chametz"], None, lang="he")
         self.assertIn("<j:transclude", body)
 
 
@@ -483,7 +483,7 @@ class TestLoading(unittest.TestCase):
 
     def test_grouping_preserves_book_order(self) -> None:
         grouped = page_breaks_by_section(load_page_breaks())
-        self.assertEqual([entry.page for entry in grouped["kadesh"]], ["3v", "4r"])
+        self.assertEqual([entry.page for entry in grouped["qaddesh"]], ["3v", "4r"])
 
 
 if __name__ == "__main__":

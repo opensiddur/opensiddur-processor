@@ -81,11 +81,11 @@ class TestParseCompilation(unittest.TestCase):
         self.assertIn("Evening came", rows[1].english)
 
         contents = build_section_contents(rows)
-        self.assertIn("kadesh", contents)
-        kadesh = contents["kadesh"]
-        self.assertEqual(kadesh.blocks[0].kind, "head")
-        self.assertIn("קַדֵּשׁ", kadesh.blocks[0].hebrew)
-        self.assertEqual(kadesh.blocks[1].kind, "paragraph")
+        self.assertIn("qaddesh", contents)
+        qaddesh = contents["qaddesh"]
+        self.assertEqual(qaddesh.blocks[0].kind, "head")
+        self.assertIn("קַדֵּשׁ", qaddesh.blocks[0].hebrew)
+        self.assertEqual(qaddesh.blocks[1].kind, "paragraph")
 
     def test_nirtzah_heading_goes_to_nirtzah_not_hallel(self) -> None:
         from opensiddur.importer.feinstein_haggadah.parse_compilation import (
@@ -122,7 +122,7 @@ class TestParseCompilation(unittest.TestCase):
         self.assertIn("מַצָּה זוּ", matzah.blocks[0].hebrew)
         self.assertFalse(any(block.kind == "head" for block in matzah.blocks))
         # The parent keeps its own h3-supplied head and does not swallow the subsection.
-        self.assertEqual(contents["magid"].blocks[0].kind, "head")
+        self.assertEqual(contents["maggid"].blocks[0].kind, "head")
 
     def test_english_instructions_become_notes(self) -> None:
         from opensiddur.importer.feinstein_haggadah.parse_compilation import (
@@ -146,12 +146,12 @@ class TestParseCompilation(unittest.TestCase):
         self.assertFalse(any(p.governs or p.governed for p in parts))
 
         contents = build_section_contents(parse_rows({"content": INSTRUCTION_HTML}))
-        kadesh = contents["kadesh"]
-        instructions = [b for b in kadesh.blocks if b.kind == "instruction"]
+        qaddesh = contents["qaddesh"]
+        instructions = [b for b in qaddesh.blocks if b.kind == "instruction"]
         self.assertTrue(instructions)
         self.assertIn("Shabbat", instructions[0].english)
         # The rubric leaves the running text; it must not be repeated there.
-        paragraphs = [b for b in kadesh.blocks if b.kind == "paragraph"]
+        paragraphs = [b for b in qaddesh.blocks if b.kind == "paragraph"]
         self.assertTrue(paragraphs)
         self.assertNotIn("On Shabbat", " ".join(b.english for b in paragraphs))
 

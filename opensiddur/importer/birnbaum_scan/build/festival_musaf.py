@@ -129,9 +129,9 @@ def units(project):
     def add(name,urn,he,en,first,last,body,printed=False):
         head='<tei:head>'+((he,en)[side])+'</tei:head>' if printed else editorial_head(lang,he,en)
         out.append(dict(name='festival_musaf_'+name,urn=urn,title_he=he,title_en=en,pages=(first+side,last+side),body=f'<tei:div corresp="{urn}">'+head+body+'</tei:div>'))
-    major=('naaritzekha','qadosh_major','kevodo','barukh_major','mimeqomo','shema','hu_eloheinu','ani','addir','uvdivrei','yimlokh_major')
+    major=('naaritzekha','qadosh_major','kevodo','barukh_major','mimeqomo','shema','hu_eloheinu','ani','addir','uvedivrei','yimlokh_major')
     add('qedushah_major',AMIDAH+'/qedushah/major','קדושה לימים טובים','KEDUSHAH FOR MAJOR FESTIVALS',609,611,seq(*major[:8])+instruction('Reader:')+seq(*major[8:]),True)
-    add('qedushah_chol',AMIDAH+'/qedushah/chol_hamoed','קדושה לחול המועד','KEDUSHAH FOR ḤOL HA-MO‘ED',611,613,seq('neqaddesh','qadosh_chol','leummatam','barukh_chol','uvdivrei_chol','yimlokh_chol'),True)
+    add('qedushah_chol',AMIDAH+'/qedushah/chol_hamoed','קדושה לחול המועד','KEDUSHAH FOR ḤOL HA-MO‘ED',611,613,seq('neqaddesh','qadosh_chol','leummatam','barukh_chol','uvedivrei_chol','yimlokh_chol'),True)
     def alternatives(prefix):
         return ''.join(c(prefix+key,label,holiday(name,last),p(prefix+'_'+key)) for key,label,name,last in HOLIDAYS)
     offerings=c('shabbat_offering','On Sabbath:',SHABBAT,p('shabbat_offering'))

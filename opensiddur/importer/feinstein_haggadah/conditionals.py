@@ -82,7 +82,7 @@ CONDITIONS: dict[str, str] = {
     ).markup(),
     # The search for leaven is made on the night of 14 Nisan -- the night of the 13th when the
     # 14th falls on Shabbat, the Friday being the 13th.
-    "bedikat_chametz": all_of(
+    "bediqat_chametz": all_of(
         Feature(HEBREW_DATE, "month", 1),
         any_of(
             all_of(Feature(HEBREW_DATE, "day", 14),
@@ -254,8 +254,8 @@ CONDITIONALS: tuple[Conditional, ...] = (
     # Vayechulu, said only when the seder falls on Friday night. The English marks it with a
     # rubric of its own; the Hebrew simply prints it.
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_vayechulu",
+        slug="qaddesh",
+        cond_id="qaddesh_vayechulu",
         condition="shabbat",
         scope_he=Paragraphs(1),
         scope_en=Paragraphs(1),
@@ -265,20 +265,20 @@ CONDITIONALS: tuple[Conditional, ...] = (
     # five of them into rubric spans, and leaves the sixth ("with love") unmarked in the
     # running text, so that one is anchored explicitly on both sides.
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_shabbatot_limnuha",
+        slug="qaddesh",
+        cond_id="qaddesh_shabbatot_limnuha",
         condition="shabbat",
         scope_he=Inline("בְּאַהֲבָה", "שַׁבָּתוֹת", "לִמְנוּחָה וּ", "מוֹעֲדִים"),
     ),
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_yom_hashabbat",
+        slug="qaddesh",
+        cond_id="qaddesh_yom_hashabbat",
         condition="shabbat",
         scope_he=Inline("אֶת יוֹם", "הַשַּׁבָּת", "וְאֶת יוֹם", "חַג הַמַּצוֹת"),
     ),
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_beahava",
+        slug="qaddesh",
+        cond_id="qaddesh_beahava",
         condition="shabbat",
         scope_he=Inline("חֵרוּתֵֽנוּ", "בְּאַהֲבָה", "בְּאַהֲבָה", "מִקְרָא קֹֽדֶשׁ"),
         # The English words are already in the running text, merely never bracketed, so the
@@ -292,27 +292,27 @@ CONDITIONALS: tuple[Conditional, ...] = (
         rubric_en="on Shabbat say:",
     ),
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_veshabbat",
+        slug="qaddesh",
+        cond_id="qaddesh_veshabbat",
         condition="shabbat",
         scope_he=Inline("מִכָׇּל־הָעַמִּים", "וְשָׁבָּת", "וְשָׁבָּת", "וּמוֹעֲדֵי"),
     ),
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_beahava_uvratzon",
+        slug="qaddesh",
+        cond_id="qaddesh_beahava_uvratzon",
         condition="shabbat",
         scope_he=Inline("קָׇדְשֶֽׁךָ", "בְּאַהֲבָה וּבְרָצוֹן", "וּבְרָצוֹן", "בְּשִׂמְחָה"),
     ),
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_mekadesh_hashabbat",
+        slug="qaddesh",
+        cond_id="qaddesh_mekadesh_hashabbat",
         condition="shabbat",
         scope_he=Inline("מְקַדֵּשׁ", "הַשָּׁבָּת", "הַשָּׁבָּת וְ", "יִשְׂרָאֵל"),
     ),
     # Havdalah, said when the seder falls on Saturday night.
     Conditional(
-        slug="kadesh",
-        cond_id="kadesh_havdalah",
+        slug="qaddesh",
+        cond_id="qaddesh_havdalah",
         condition="motzaei_shabbat",
         scope_he=Paragraphs(4),
         scope_en=Paragraphs(4),
@@ -352,8 +352,8 @@ CONDITIONALS: tuple[Conditional, ...] = (
         slug="nirtzah",
         cond_id="nirtzah_first_night",
         condition="first_night",
-        scope_he=Transclusion("it_happened_at_midnight"),
-        scope_en=Transclusion("it_happened_at_midnight"),
+        scope_he=Transclusion("vayehi_bachatzi_halailah"),
+        scope_en=Transclusion("vayehi_bachatzi_halailah"),
         rubric_he="בליל ראשון",
         rubric_en="On the first night recite the following:",
     ),
@@ -361,8 +361,8 @@ CONDITIONALS: tuple[Conditional, ...] = (
         slug="nirtzah",
         cond_id="nirtzah_second_night",
         condition="second_night",
-        scope_he=Transclusion("you_shall_say_pesach"),
-        scope_en=Transclusion("you_shall_say_pesach"),
+        scope_he=Transclusion("vaamartem_zevach_pesach"),
+        scope_en=Transclusion("vaamartem_zevach_pesach"),
         rubric_he="בליל שני",
         rubric_en="On the second night recite the following:",
     ),
@@ -404,10 +404,10 @@ CONDITIONALS: tuple[Conditional, ...] = (
     ),
     Conditional(
         slug="pre_seder",
-        cond_id="pre_seder_bedikat_chametz",
-        condition="bedikat_chametz",
-        scope_he=Transclusion("bedikat_chametz"),
-        scope_en=Transclusion("bedikat_chametz"),
+        cond_id="pre_seder_bediqat_chametz",
+        condition="bediqat_chametz",
+        scope_he=Transclusion("bediqat_chametz"),
+        scope_en=Transclusion("bediqat_chametz"),
     ),
     Conditional(
         slug="pre_seder",
@@ -469,36 +469,36 @@ CONDITIONALS: tuple[Conditional, ...] = (
     ),
     # -- Textual variants ------------------------------------------------------------------
     Conditional(
-        slug="lefikach",
-        cond_id="lefikach_shira_chadasha",
-        condition=variant_condition("lefikach", "shira_chadasha"),
+        slug="lefikhakh",
+        cond_id="lefikhakh_shirah_chadashah",
+        condition=variant_condition("lefikhakh", "shirah_chadashah"),
         scope_he=Inline("לְפָנָיו", "שִׁירָה חֲדָשָׁה", "שִׁירָה חֲדָשָׁה", "הַלְלוּיָהּ"),
     ),
     Conditional(
         slug="avadim_hayinu",
-        cond_id="avadim_hayinu_lfaro",
-        condition=variant_condition("avadim_hayinu", "lfaro"),
+        cond_id="avadim_hayinu_lefaroh",
+        condition=variant_condition("avadim_hayinu", "lefaroh"),
         scope_he=Inline(
             "מְשֻׁעְבָּדִים הָיִינוּ", "לְפַרְעֹה", "לְפַרְעֹה", "בְּמִצְרָיִם. וַאֲפִילוּ"
         ),
     ),
     Conditional(
-        slug="korech",
-        cond_id="korech_pesach",
-        condition=variant_condition("korech", "pesach"),
+        slug="korekh",
+        cond_id="korekh_pesach",
+        condition=variant_condition("korekh", "pesach"),
         scope_he=Inline("כּוֹרֵךְ", "פֶּסַח", "פֶּסַח", "מַצָּה וּמָרוֹר"),
         scope_en=Inline("a sandwich of", "the Passover sacrifice,", "the Passover sacrifice,", "the matzah"),
     ),
     Conditional(
-        slug="yehalelukha",
-        cond_id="yehalelukha_al",
-        condition=variant_condition("yehalelukha", "al"),
+        slug="yehalalukha",
+        cond_id="yehalalukha_al",
+        condition=variant_condition("yehalalukha", "al"),
         scope_he=Inline("אֱלֹהֵֽינוּ", "עַל", "עַל", "כָּל מַעֲשֶֽׂיךָ"),
     ),
     Conditional(
-        slug="asher_ge_alanu",
-        cond_id="asher_ge_alanu_higianu",
-        condition=variant_condition("asher_ge_alanu", "higianu"),
+        slug="asher_gealanu",
+        cond_id="asher_gealanu_haggienu",
+        condition=variant_condition("asher_gealanu", "haggienu"),
         scope_he=Inline("יַגִּיעֵֽנוּ", "הַגִּיעֵֽנוּ", "הַגִּיעֵֽנוּ", "לְמוֹעֲדִים"),
     ),
 )
@@ -558,8 +558,8 @@ RUBRIC_CONDITIONS: dict[str, str] = {
 #: "some add" introduces a different variant in each section it appears in, so the condition
 #: comes from the section rather than from the rubric's wording.
 VARIANT_RUBRIC_SECTIONS: dict[str, str] = {
-    "lefikach": "shira_chadasha",
-    "avadim_hayinu": "lfaro",
+    "lefikhakh": "shirah_chadashah",
+    "avadim_hayinu": "lefaroh",
 }
 
 

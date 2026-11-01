@@ -32,7 +32,7 @@ URNS.update({'mi_addir':POEM+'mi_addir','erusin':PRAYER+'birkat_erusin',
  'bed_rigzu':BIBLE+'psalms/4/5'})
 for k in ('shehakol_bara','yotzer_haadam','asher_yatzar_haadam','sos_tasis','sammeach_tesammach','asher_bara'):URNS[k]=SEVEN+'/'+k
 for k,suffix in {'hazan':'hazan','nodeh':'nodeh','veal_hakol':'veal_hakol','rachem':'rachem',
- 'retzeh_grace':'retzeh_vehachalitzenu','uvneh':'uvneh_yerushalayim','hatov':'hatov_vehametiv',
+ 'retzeh_grace':'retzeh_vehachalitzenu','uveneh':'uveneh_yerushalayim','hatov':'hatov_vehametiv',
  'bamarom':'bamarom','barukh_hu':'zimmun/barukh_hu','zimmun_leader':'zimmun/nevarekh',
  'zimmun_response':'zimmun/barukh_she_akhalnu','harachaman_reign':'harachaman/yimlokh',
  'harachaman_worship':'harachaman/yitbarakh','harachaman_praise':'harachaman/yishtabbach',
@@ -232,7 +232,7 @@ def units(project):
  core=p('hazan')+p('nodeh')
  for k,expr in [('chanukah',holiday('hanukkah',8)),('purim',holiday('purim-observed'))]:core+=opt('grace_'+k,RUBRICS[k],expr,p('grace_'+k))
  core+=p('veal_hakol')+p('rachem')+opt('retzeh',RUBRICS['retzeh'],SHABBAT,p('retzeh_grace'))
- core+=opt('yaaleh',RUBRICS['yaaleh'],'<j:any>'+RC+RH+FESTIVAL+'</j:any>',transclude(GRACE+'/yaaleh_veyavo'))+p('uvneh')+p('hatov')
+ core+=opt('yaaleh',RUBRICS['yaaleh'],'<j:any>'+RC+RH+FESTIVAL+'</j:any>',transclude(GRACE+'/yaaleh_veyavo'))+p('uveneh')+p('hatov')
  add('grace_four_blessings',GRACE+'/four_blessings','ברכות המזון','The four blessings',759,765,core,False)
  har=''.join(p('harachaman_'+k) for k in ('reign','worship','praise','livelihood','yoke','house','elijah'))
  har+=rubric('variations')+opt('self','At one’s own table:','<j:none>'+context('guest')+'</j:none>',p('harachaman_self'))+opt('hosts','When a guest:',context('guest'),p('harachaman_hosts'))+p('harachaman_all')+p('bamarom')
