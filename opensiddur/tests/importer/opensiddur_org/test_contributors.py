@@ -2,6 +2,7 @@ import json
 import unittest
 
 from opensiddur.importer.opensiddur_org.contributors import (
+    Credit,
     Contributors,
     candidate_line,
     post_credits,
@@ -68,6 +69,12 @@ class TestContributors(unittest.TestCase):
         self.assertEqual([c.slug for c in missing], ["new-person-transcription"])
         self.assertEqual(json.loads(candidate_line(missing[0]))["label_en"], "New Person")
 
+
+
+class TestCandidateLines(unittest.TestCase):
+    def test_directional_marks_are_dropped_from_the_label(self) -> None:
+        line = candidate_line(Credit(key="trc", resp="Transcribed by", name="أحمد\u200e", slug="achmed"))
+        self.assertEqual(json.loads(line)["label_en"], "أحمد")
 
 
 class TestPlaceholderAuthor(unittest.TestCase):

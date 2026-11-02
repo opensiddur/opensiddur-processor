@@ -13,10 +13,14 @@ evidence are used:
 - **Registry labels.** The post's title compared with ``label_en``/``label_he`` of the
   registry's top-level prayers and poems.
 
-Nothing here is recorded automatically except a decision there is nothing to decide: a post
-with no candidate at all is given a new URN (:func:`urns.mint`). Every proposal is written
-to ``output/`` and recorded in ``specs/opensiddur_org/post_urns.jsonl`` only once it has been
-reviewed (``--accept``).
+A proposal that names an existing text is one the title supports (a psalm, a registry label)
+or that at least half the rows support, and it is recorded in
+``specs/opensiddur_org/post_urns.jsonl`` without review: the post is a version of that text.
+Rows that do not map are where the version departs from the original; each run of them
+records the span of the original it stands in for (:attr:`Proposal.spans`). A post whose
+rows only resemble existing texts is given a new URN (:func:`urns.mint`), and the
+resemblances are dropped. Every proposal is also written to ``output/`` for review, and a
+reviewed one can still be recorded with ``--accept`` or replaced with ``--new``.
 """
 
 from __future__ import annotations
@@ -28,6 +32,7 @@ import logging
 import re
 import sys
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -39,7 +44,7 @@ from opensiddur.common.validate_names import load_spellings
 from opensiddur.importer.opensiddur_org.convert import select_posts
 from opensiddur.importer.opensiddur_org.naming import imported_projects
 from opensiddur.importer.opensiddur_org.parse_post import Post, load_post, node_text, normalize_key
-from opensiddur.importer.opensiddur_org.scope import content_scope, imported_columns
+from opensiddur.importer.opensiddur_org.scope import content_scope, imported_columns, table_views
 from opensiddur.importer.opensiddur_org.tei_builder import row_numbers, titles_by_language
 from opensiddur.importer.opensiddur_org.urns import (
     POST_URNS_PATH,
@@ -168,7 +173,8 @@ class IncipitIndex:
         return found
 
     def to_json(self) -> dict[str, list[str]]:
-        return {urn: list(words) for urn, words in sorted(self.incipit_of.items())}
+        # In the order the parts were found, which is the order of the texts.
+        return {urn: list(words) for urn, words in self.incipit_of.items()}
 
     @classmethod
     def from_json(cls, data: dict[str, list[str]]) -> "IncipitIndex":
@@ -246,7 +252,8 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY) -> IncipitI
 
 
 #: Bumped whenever the words the index stores are normalized differently.
-INDEX_VERSION = 1
+#: 2: parts are kept in document order, which the spans of departing rows need.
+INDEX_VERSION = 2
 
 
 def _index_signature(project_directory: Path) -> str:
@@ -293,20 +300,29 @@ class Proposal:
     urn: str | None
     rows: dict[int, str | None]
     evidence: list[str]
+    #: Unmapped row -> the span of the original it stands in for ("" for added material).
+    spans: dict[int, str] = field(default_factory=dict)
 
     def to_json(self) -> str:
-        return json.dumps(
-            {"post_id": self.post_id, "urn": self.urn,
-             "rows": {str(n): u for n, u in sorted(self.rows.items())}, "evidence": self.evidence},
-            ensure_ascii=False,
-        )
+        data = {"post_id": self.post_id, "urn": self.urn,
+                "rows": {str(n): u for n, u in sorted(self.rows.items())}, "evidence": self.evidence}
+        if self.spans:
+            data["spans"] = {str(n): u for n, u in sorted(self.spans.items())}
+        return json.dumps(data, ensure_ascii=False)
+
+    @classmethod
+    def from_json(cls, line: str) -> "Proposal":
+        data = json.loads(line)
+        return cls(int(data["post_id"]), data["urn"], {int(n): u for n, u in data["rows"].items()},
+                   data["evidence"], {int(n): u for n, u in (data.get("spans") or {}).items()})
 
     def as_post_urns(self, new_urn: PostUrns) -> PostUrns:
         """The record this proposal stands for, given the URN the post would be minted."""
         if self.urn is None:
             rows = {n: u for n, u in self.rows.items() if u}
             return PostUrns(post_id=self.post_id, kind="new", urn=new_urn.urn, rows=rows)
-        return PostUrns(post_id=self.post_id, kind="existing", urn=self.urn, rows=dict(self.rows))
+        return PostUrns(post_id=self.post_id, kind="existing", urn=self.urn, rows=dict(self.rows),
+                        spans=dict(self.spans))
 
 
 def _parent(urn: str) -> str:
@@ -368,9 +384,12 @@ def _hebrew_column(post: Post) -> int | None:
     return None
 
 
-def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]]) -> Proposal | None:
+def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]], *,
+            by_title: bool = True) -> Proposal | None:
+    """``by_title`` false leaves the post's slug and title out: one table of several is not
+    what the title names (4957, "Psalms 67 and Ana b'Khoach")."""
     numbers = row_numbers(post)
-    hint = bible_hint(post)
+    hint = bible_hint(post) if by_title else None
     evidence: list[str] = []
     rows: dict[int, str | None] = {n: None for n in numbers.values()}
     candidates_by_row: dict[int, set[str]] = {}
@@ -414,10 +433,11 @@ def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]]) -> Pro
     top = hint or (_common_prefix([_parent(u) for u in mapped]) if mapped else "")
     if mapped:
         evidence.append(f"{len(mapped)} of {len(rows)} row(s) open like a unit under {top or 'several texts'}")
-    labelled = label_matches(post, labels)
+    labelled = label_matches(post, labels) if by_title else set()
     if labelled:
         evidence.append("title matches the registry label of " + ", ".join(sorted(labelled)))
-        if not top:
+        # The text the title names, unless the rows are parts of one of its parts.
+        if not hint and not any(top == u or top.startswith(u + "/") for u in labelled):
             top = sorted(labelled)[0]
     if hint:
         evidence.insert(0, f"slug or title names {hint.rsplit(':', 1)[-1]}")
@@ -430,7 +450,57 @@ def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]]) -> Pro
     if not (hint or labelled) and len(mapped) < max(2, MIN_MAPPED_SHARE * len(rows)):
         evidence.append("too few rows map for the post to be that text; the post would be new")
         return Proposal(post.post_id, None, rows, evidence)
-    return Proposal(post.post_id, top, rows, evidence)
+    # A row mapped outside the text the post is a version of is a resemblance, not a part.
+    rows = {n: (u if u and u.startswith(top + "/") else None) for n, u in rows.items()}
+    return Proposal(post.post_id, top, rows, evidence, departure_spans(rows, top, index))
+
+
+def departure_spans(rows: dict[int, str | None], top: str, index: IncipitIndex) -> dict[int, str]:
+    """For each row that does not map, the span of ``top`` it stands in for: the parts
+    between the mapped rows on either side of its run, as a range (``psalms/29/3-6``), or ""
+    when nothing lies between them (material the version adds)."""
+    numbers = sorted(rows)
+    spans: dict[int, str] = {}
+    run: list[int] = []
+    mapped = {u for u in rows.values() if u}
+    used: set[str] = set()
+
+    def close(after: str | None) -> None:
+        if not run:
+            return
+        before = next((rows[n] for n in reversed(numbers) if n < run[0] and rows[n]), None)
+        parent = _parent(before or after or "") or top
+        parts = index.children.get(parent, [])
+        start = parts.index(before) + 1 if before in parts else 0
+        end = parts.index(after) if after in parts else len(parts)
+        if (before and before not in parts) or (after and after not in parts):
+            between: list[str] = []
+        else:
+            between = parts[start:end]
+        # Rows mapped out of order can leave a mapped part, or another run's span, between
+        # them; one URN marks one place, so the run then corresponds to nothing.
+        if any(part in mapped for part in between):
+            between = []
+        if not between:
+            span = ""
+        elif len(between) == 1:
+            span = between[0]
+        else:
+            span = f"{between[0]}-{between[-1].rsplit('/', 1)[1]}"
+        if span in used:
+            span = ""
+        used.add(span)
+        for n in run:
+            spans[n] = span
+        run.clear()
+
+    for n in numbers:
+        if rows[n]:
+            close(rows[n])
+        else:
+            run.append(n)
+    close(None)
+    return spans
 
 
 def _unmap_rows_running_on(
@@ -485,10 +555,8 @@ def main(argv: list[str] | None = None) -> int:
     if PROPOSALS_PATH.exists():
         for line in PROPOSALS_PATH.read_text(encoding="utf-8").splitlines():
             if line.strip():
-                data = json.loads(line)
-                proposals[int(data["post_id"])] = Proposal(
-                    int(data["post_id"]), data["urn"],
-                    {int(n): u for n, u in data["rows"].items()}, data["evidence"])
+                proposal = Proposal.from_json(line)
+                proposals[proposal.post_id] = proposal
     taken = taken_urns(REGISTRY_DIRECTORY, records)
     variants = load_spellings().variants
 
@@ -507,26 +575,50 @@ def main(argv: list[str] | None = None) -> int:
 
     index = load_incipit_index(OUTPUT_DIRECTORY / "opensiddur_org_incipits.json", args.project_directory)
     labels = registry_labels()
-    minted = 0
+    decided = 0
     for post_id in select_posts(data_dir, posts=args.post, categories=args.category):
         if post_id in records:
             continue
         post = load_post(data_dir / "posts" / f"{post_id}.json")
         if not content_scope(post).in_scope:
             continue
-        proposal = propose(post, index, labels)
-        if proposal is None:
-            records[post_id] = mint(post, taken, variants)
-            taken.add(records[post_id].urn)
-            minted += 1
-        else:
+        records[post_id], post_proposals = decide(post, index, labels, taken, variants)
+        taken.add(records[post_id].urn)
+        taken.update(t.urn for t in records[post_id].tables.values())
+        for proposal in post_proposals:
             proposals[post_id] = proposal
+        decided += 1
 
     save_post_urns(records, POST_URNS_PATH)
     PROPOSALS_PATH.parent.mkdir(parents=True, exist_ok=True)
     PROPOSALS_PATH.write_text("".join(proposals[k].to_json() + "\n" for k in sorted(proposals)), encoding="utf-8")
-    print(f"Minted {minted} new URN(s); {len(proposals)} proposal(s) awaiting review in {PROPOSALS_PATH}")
+    print(f"Decided the URNs of {decided} post(s); the proposals behind them are in {PROPOSALS_PATH}")
     return 0
+
+
+def decide(post: Post, index: IncipitIndex, labels: dict[str, set[str]], taken: set[str],
+           variants: Mapping[str, str]) -> tuple[PostUrns, list[Proposal]]:
+    """The URNs of a post no one has decided: an existing text's when a proposal names one,
+    else new ones. Each table of a post with several is matched on its own."""
+    if post.essay:
+        # An essay is a text of its own, whatever the passages it quotes.
+        return mint(post, taken, variants), []
+    views = table_views(post)
+    if len(views) == 1:
+        proposal = propose(post, index, labels)
+        if proposal is not None and proposal.urn is not None:
+            return proposal.as_post_urns(PostUrns(post.post_id, "new", "")), [proposal]
+        return mint(post, taken, variants), [proposal] if proposal else []
+    record = mint(post, taken, variants)
+    seen: set[str] = set()
+    for number, view in enumerate(views, 1):
+        # Each table on its rows alone; a text two tables would share stays the first's.
+        proposal = propose(view, index, labels, by_title=False)
+        if proposal is not None and proposal.urn is not None and proposal.urn not in seen:
+            seen.add(proposal.urn)
+            record.tables[number] = proposal.as_post_urns(PostUrns(post.post_id, "new", ""))
+    # The tables' evidence is in their records; the review file holds one proposal per post.
+    return record, []
 
 
 if __name__ == "__main__":

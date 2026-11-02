@@ -62,11 +62,18 @@ class LicenceDecisions:
 
     def for_column(self, post: Post, column: Column) -> LicenceDecision:
         post_entry = self.posts.get(post.post_id)
+        if post_entry is not None and lapsed(post_entry, post):
+            post_entry = None
+        if post_entry is not None and "hold" in post_entry:
+            held = post_entry.get("columns")
+            if held is None or column.lang in held:
+                return LicenceDecision("undecided", basis=f"held: {post_entry['hold']}")
+            post_entry = None
         if post_entry is not None:
             if "reject" in post_entry:
                 return LicenceDecision("reject", basis=str(post_entry["reject"]))
             if "allow" not in post_entry:
-                raise ValueError(f"licence decision for post {post.post_id} neither allows nor rejects: {post_entry}")
+                raise ValueError(f"licence decision for post {post.post_id} neither allows, rejects nor holds: {post_entry}")
             columns = post_entry.get("columns")
             if columns is None or column.lang in columns:
                 return LicenceDecision(
@@ -100,6 +107,17 @@ class LicenceDecisions:
             return LICENCES[licence_id]
         except KeyError as exc:
             raise ValueError(f"unknown licence id {licence_id!r} in licence decisions") from exc
+
+
+def lapsed(entry: dict[str, Any], post: Post) -> bool:
+    """Whether a decision about one post no longer holds: it was made against the post as last
+    updated on ``as_of`` under the licence ``licence``, and the post has since been updated or
+    relicensed. The post is then decided again, so a rejection is never permanent."""
+    if "as_of" in entry and str(entry["as_of"]) != post.last_updated:
+        return True
+    if "licence" in entry and normalize_licence_url(str(entry["licence"])) != normalize_licence_url(post.licence_url):
+        return True
+    return False
 
 
 def normalize_licence_url(url: str) -> str:

@@ -17,3 +17,12 @@ posts:
     reason: The original is in the public domain.
   502:
     reject: Rejected after review.
+  503:
+    reject: A modern work posted under a claim of fair use.
+    as_of: "2026-09-01"
+    licence: https://www.law.cornell.edu/uscode/text/17/107
+  504:
+    hold: Held until the translator licenses it.
+    columns: [en]
+  505:
+    hold: Held for permission.

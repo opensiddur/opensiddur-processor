@@ -5,8 +5,9 @@ from lxml import etree
 
 from opensiddur.importer.opensiddur_org.contributors import Contributors, post_credits
 from opensiddur.importer.opensiddur_org.licences import LICENCES, LicenceDecision
-from opensiddur.importer.opensiddur_org.parse_post import parse_post
-from opensiddur.importer.opensiddur_org.scope import imported_columns
+from opensiddur.importer.opensiddur_org.parse_post import node_text, parse_post
+from opensiddur.importer.opensiddur_org.post_decisions import NO_DECISIONS, PostDecisions
+from opensiddur.importer.opensiddur_org.scope import project_columns
 from opensiddur.importer.opensiddur_org.tei_builder import (
     build_project,
     front_language,
@@ -36,20 +37,22 @@ def project_id(lang: str) -> str:
     return f"a_song-poet-2020-{lang.lower()}"
 
 
-def build(post_data=None, *, urns: PostUrns | None = None, licence: LicenceDecision = ALLOW, with_front=None):
-    post = parse_post(post_data or make_post())
+def build(post_data=None, *, urns: PostUrns | None = None, licence: LicenceDecision = ALLOW, with_front=None,
+          decisions: PostDecisions = NO_DECISIONS, with_essay: str = "en"):
+    post = parse_post(post_data or make_post(), decisions)
     contributors = Contributors.load(FIXTURES / "contributors_by_id.json")
     credits = post_credits(post, contributors)
     urns = urns or PostUrns(post.post_id, "new", URN)
     out = {}
-    for index, column in imported_columns(post):
+    for column in project_columns(post):
         files = build_project(
-            post, index, column, urns=urns, credits=credits, licence=licence,
+            post, column, urns=urns, credits=credits, licence=licence,
             upstream_commit="0123456789abcdef", upstream_commit_date="2026-10-01",
             with_front=column.lang == "en" if with_front is None else with_front,
-            project_id=project_id(column.lang),
+            project_id=project_id(column.key.replace("/", "-")),
+            with_essay=column.key == with_essay,
         )
-        out[column.lang] = files
+        out[column.key] = files
     return post, out
 
 
@@ -211,6 +214,217 @@ class TestOther(unittest.TestCase):
         _, second = build()
         self.assertEqual({k: v.files for k, v in first.items()}, {k: v.files for k, v in second.items()})
 
+
+
+def assert_valid(case: unittest.TestCase, projects) -> None:
+    for project in projects.values():
+        for stem, document in project.files.items():
+            valid, errors = validate(prettify_xml(compact(document), remove_xml_declaration=True, keep_blank_text=True))
+            case.assertTrue(valid, f"{project.project_id}/{stem}: {errors}")
+
+
+class TestRules(unittest.TestCase):
+    """The rules of specs/OPENSIDDUR_ORG_IMPORT.md, "Columns the converter resolves"."""
+
+    def test_a_heading_inside_a_cell_opens_a_section_in_its_language(self) -> None:
+        rows = [[cell("heb-Hebr", "liturgy", "שורה"), cell("eng-Latn", "english", "<h3>Part One</h3><p>A line.</p>")],
+                [cell("heb-Hebr", "liturgy", "עוד"), cell("eng-Latn", "english", "<p>More.</p>")]]
+        _, projects = build(make_post(content=table(["Source (Hebrew)", "Translation (English)"], rows)))
+        english = tree(projects["en"].files[text_file_stem(URN)])
+        self.assertEqual(english.find(".//tei:div/tei:div/tei:head", NS).text, "Part One")
+        self.assertEqual([m.get("corresp") for m in english.iterfind(".//tei:milestone", NS)], [f"{URN}/1", f"{URN}/2"])
+        self.assertIsNone(tree(projects["he"].files[text_file_stem(URN)]).find(".//tei:div/tei:div", NS))
+        assert_valid(self, projects)
+
+    def test_verse_and_prose_in_one_column(self) -> None:
+        rows = [[cell("eng-Latn", "english", "A line<br />another")], [cell("eng-Latn", "english", "<p>Prose.</p>")]]
+        _, projects = build(make_post(content=table(["Source (English)"], rows)))
+        text = tree(projects["en"].files[text_file_stem(URN)])
+        self.assertIsNotNone(text.find(".//tei:lg", NS))
+        self.assertIsNotNone(text.find(".//tei:p", NS))
+        assert_valid(self, projects)
+
+    def test_commentary_and_description_are_notes(self) -> None:
+        rows = [[cell("eng-Latn", "english", "Reader:"), cell("eng-Latn", "english", "I sing"),
+                 cell("eng-Latn", "english", "A gloss")]]
+        _, projects = build(make_post(content=table(
+            ["Description (English)", "Translation (English)", "Commentary (English)"], rows)))
+        self.assertEqual(list(projects), ["en"])
+        text = tree(projects["en"].files[text_file_stem(URN)])
+        notes = [(n.get("type"), "".join(n.itertext()).strip()) for n in text.iterfind(".//tei:body//tei:note", NS)]
+        self.assertEqual(notes, [("description", "Reader:"), ("commentary", "A gloss")])
+        assert_valid(self, projects)
+
+    def test_two_columns_in_one_language_are_two_projects(self) -> None:
+        rows = [[cell("eng-Latn", "english", "Literal"), cell("eng-Latn", "english", "Singable")]]
+        _, projects = build(make_post(content=table(
+            ["Translation (English, literal)", "Translation (English, singable)"], rows)))
+        self.assertEqual(list(projects), ["en", "en/singable"])
+        assert_valid(self, projects)
+
+    def test_each_table_is_a_file(self) -> None:
+        first = table(["Source (Hebrew)", "Translation (English)"], [[cell("heb-Hebr", "liturgy", "א"), cell("eng-Latn", "english", "A")]])
+        second = table(["Source (Hebrew)", "Translation (English)"], [[cell("heb-Hebr", "liturgy", "ב"), cell("eng-Latn", "english", "B")]])
+        _, projects = build(make_post(content=first + second))
+        files = projects["he"].files
+        self.assertEqual(sorted(files), ["a_song_1", "a_song_2", "index"])
+        targets = [t.get("target") for t in tree(files["index"]).iterfind(".//j:transclude", NS)]
+        self.assertEqual(targets, [f"{URN}/1", f"{URN}/2"])
+        self.assertEqual([m.get("corresp") for m in tree(files["a_song_2"]).iterfind(".//tei:milestone", NS)],
+                         [f"{URN}/2/1"])
+        assert_valid(self, projects)
+
+    def test_a_version_departs_from_its_original(self) -> None:
+        song = "urn:x-opensiddur:text:poem:song"
+        rows = [[cell("heb-Hebr", "liturgy", f"שורה {n}"), cell("eng-Latn", "english", f"Line {n}")] for n in range(4)]
+        urns = PostUrns(101, "existing", song, {1: f"{song}/1", 2: None, 3: None, 4: None},
+                        spans={2: f"{song}/2-3", 3: f"{song}/2-3", 4: ""})
+        _, projects = build(make_post(content=table(["Source (Hebrew)", "Translation (English)"], rows)), urns=urns)
+        for lang in ("he", "en"):
+            text = tree(projects[lang].files["song"])
+            self.assertEqual([m.get("corresp") for m in text.iterfind(".//tei:milestone", NS)],
+                             [f"{song}/1", f"{song}/2-3", None])
+        assert_valid(self, projects)
+
+    def test_a_departing_row_holding_only_a_heading(self) -> None:
+        song = "urn:x-opensiddur:text:poem:song"
+        rows = [[cell("heb-Hebr", "liturgy", "א"), cell("eng-Latn", "english", "A")],
+                [cell("heb-Hebr", "liturgy", "ב"), cell("eng-Latn", "english", "<h3>Heading B</h3>")],
+                [cell("heb-Hebr", "liturgy", "ג"), cell("eng-Latn", "english", "C")]]
+        urns = PostUrns(101, "existing", song, {1: f"{song}/1", 2: None, 3: None},
+                        spans={2: f"{song}/2-3", 3: f"{song}/2-3"})
+        _, projects = build(make_post(content=table(["Source (Hebrew)", "Translation (English)"], rows)), urns=urns)
+        english = tree(projects["en"].files["song"])
+        self.assertEqual([m.get("corresp") for m in english.iterfind(".//tei:milestone", NS)],
+                         [f"{song}/1", f"{song}/2-3"])
+        assert_valid(self, projects)
+
+    def test_tables_holding_different_works_are_different_projects(self) -> None:
+        first = table(["Source (Hebrew)", "Translation (English)"], [[cell("heb-Hebr", "liturgy", "א"), cell("eng-Latn", "english", "A")]])
+        second = table(["Source (Hebrew)", "Translation (English, Talmud, adapted)"],
+                       [[cell("heb-Hebr", "liturgy", "ב"), cell("eng-Latn", "english", "B")]])
+        post, projects = build(make_post(content=first + second))
+        self.assertEqual(sorted(projects), ["en", "en/talmud_adapted", "he"])
+        self.assertEqual(sorted(projects["en"].files), ["a_song_1", "index"])
+        self.assertEqual(sorted(projects["en/talmud_adapted"].files), ["a_song_2", "index"])
+        self.assertEqual(sorted(projects["he"].files), ["a_song_1", "a_song_2", "index"])
+
+
+class TestColours(unittest.TestCase):
+    """Colours mean what each post's decision says (post_decisions.yaml)."""
+
+    def english(self, body: str, colours: dict[str, str]):
+        rows = [[cell("eng-Latn", "english", body)]]
+        _, projects = build(make_post(content=table(["Source (English)"], rows)),
+                            decisions=PostDecisions(colours={101: colours}))
+        assert_valid(self, projects)
+        return tree(projects["en"].files[text_file_stem(URN)])
+
+    def test_an_amendment_is_a_variant_of_the_text(self) -> None:
+        text = self.english('Our <span style="color: green">Mother</span> | Father in heaven', {"green": "amendment"})
+        conditions = text.findall(".//j:conditional", NS)
+        names = [(c.get("type"), c.find(".//tei:f", NS).get("name"), c.find(".//tei:binary", NS).get("value"))
+                 for c in conditions]
+        base = "urn:x-opensiddur:condition:prayer:a_song/amended"
+        self.assertEqual(names, [("marked", base, "true"), ("marked", base, "false")])
+        self.assertEqual("".join(text.find(".//tei:l", NS).itertext()), "Our Mother Father in heaven")
+
+    def test_a_whole_coloured_cell(self) -> None:
+        rows = [[cell("eng-Latn", "english", "One line")],
+                [f'<td><div class="english" lang="eng-Latn" style="color:green;">Added<br />lines</div></td>']]
+        _, projects = build(make_post(content=table(["Source (English)"], rows)),
+                            decisions=PostDecisions(colours={101: {"green": "amendment"}}))
+        assert_valid(self, projects)
+        text = tree(projects["en"].files[text_file_stem(URN)])
+        self.assertEqual(len(text.findall(".//tei:l/j:conditional", NS)), 2)
+
+    def test_alternatives_by_gender_and_rite(self) -> None:
+        text = self.english('to the <span style="color:blue">man</span><span style="color:red">woman</span> '
+                            '<span style="color:dodgerblue">A</span><span style="color:crimson">S</span>',
+                            {"blue": "alternative male", "red": "alternative female",
+                             "dodgerblue": "alternative ashkenaz", "crimson": "alternative sepharad"})
+        fs = [(f.getparent().get("type"), f.get("name")) for f in text.iterfind(".//j:conditional//tei:f", NS)]
+        self.assertEqual(fs, [("opensiddur:person", "gender"), ("opensiddur:person", "gender"),
+                              ("opensiddur:rite", "ashkenaz"), ("opensiddur:rite", "sepharad")])
+
+    def test_marks_that_are_not_conditions(self) -> None:
+        text = self.english('<span style="color:red">shuqa</span> <span style="color:blue">a verse</span> '
+                            '<span style="color:gray">filled</span> <span style="color:purple">sung</span> '
+                            '<span style="color:pink">loud</span>',
+                            {"red": "language arc", "blue": "quotation", "gray": "supplied scholars",
+                             "purple": "cantillation job", "pink": "none"})
+        self.assertEqual(text.find(".//tei:seg[@{http://www.w3.org/XML/1998/namespace}lang='arc']", NS).text, "shuqa")
+        self.assertEqual(text.find(".//tei:seg[@type='quotation']", NS).text, "a verse")
+        self.assertEqual(text.find(".//tei:seg[@type='supplied']", NS).get("subtype"), "scholars")
+        self.assertEqual(text.find(".//tei:seg[@type='cantillation']", NS).get("subtype"), "job")
+        self.assertIsNone(text.find(".//j:conditional", NS))
+        self.assertTrue("".join(text.find(".//tei:l", NS).itertext()).endswith("loud"))
+
+    def test_a_ketiv_takes_the_word_before_it_as_its_reading(self) -> None:
+        text = self.english('return our captivity <span style="color:gray">captivities</span> like streams', {"gray": "ketiv"})
+        choice = text.find(".//tei:choice", NS)
+        self.assertEqual((choice.find("j:written", NS).text, choice.find("j:read", NS).text), ("captivities", "captivity"))
+
+    def test_a_ketiv_before_its_reading(self) -> None:
+        text = self.english('<font color="brown">plaiah</font> <font color="blue">pliah</font> for me',
+                            {"brown": "ketiv first", "blue": "qere"})
+        choice = text.find(".//tei:choice", NS)
+        self.assertEqual((choice.find("j:written", NS).text, choice.find("j:read", NS).text), ("plaiah", "pliah"))
+        text = self.english('his <font color="brown">shirah</font> shiro with me', {"brown": "ketiv first"})
+        choice = text.find(".//tei:choice", NS)
+        self.assertEqual((choice.find("j:written", NS).text, choice.find("j:read", NS).text), ("shirah", "shiro"))
+        self.assertEqual("".join(text.find(".//tei:l", NS).itertext()), "his shirahshiro with me")
+
+    def test_a_colour_in_a_footnote(self) -> None:
+        body = ('You<span class="footnote_referrer"><a><sup>[1]</sup></a><span class="footnote_tooltip">'
+                'The <span style="color:red">shuqa</span>.</span></span>')
+        text = self.english(body, {"red": "language arc"})
+        self.assertIsNotNone(text.find(".//tei:standOff//tei:seg", NS))
+
+    def test_a_colour_in_the_posts_own_words_is_dropped(self) -> None:
+        content = '<p>Adapted text in <span style="color:green">GREEN</span>.</p>' + table(
+            ["Source (English)"], [[cell("eng-Latn", "english", '<span style="color:green">new</span>')]])
+        _, projects = build(make_post(content=content), decisions=PostDecisions(colours={101: {"green": "amendment"}}))
+        assert_valid(self, projects)
+
+    def test_hidden_text_is_kept_behind_a_condition(self) -> None:
+        text = self.english('Write <span style="color: white">a spell</span>.', {"white": "hidden"})
+        f = text.find(".//j:conditional//tei:f", NS)
+        self.assertEqual(f.get("name"), "urn:x-opensiddur:condition:prayer:a_song/concealed")
+
+
+class TestEssay(unittest.TestCase):
+    """An essay about the passages it quotes (post_decisions.yaml, ``essays``)."""
+
+    CONTENT = ("<p>Why we rise at midnight.</p>"
+               '<blockquote><div lang="heb-Hebr">קוּמִי רֹנִּי בַלַּיְלָה</div><div lang="eng-Latn">Arise, cry out in the night</div></blockquote>'
+               "<p>And the psalm says:</p>"
+               '<blockquote><div lang="heb-Hebr">חֲצוֹת לַיְלָה אָקוּם</div></blockquote>'
+               "<p>So the vigil began.</p><hr /><p>Transcribed by a friend.</p>")
+
+    def setUp(self) -> None:
+        decisions = PostDecisions(essays={101: "an essay"})
+        self.post, self.projects = build(make_post(content=self.CONTENT), decisions=decisions)
+
+    def test_the_passages_are_rows_of_a_table(self) -> None:
+        self.assertEqual(self.post.essay[1], 1)
+        self.assertEqual(self.post.essay[3], 2)
+        self.assertEqual([c.lang for c in self.post.columns], ["he", "en"])
+        self.assertEqual(len(self.post.rows), 2)
+        self.assertEqual([node_text(line) for line in self.post.notes], ["Transcribed by a friend."])
+
+    def test_the_essay_transcludes_each_passage(self) -> None:
+        english = self.projects["en"].files
+        self.assertEqual(sorted(english), ["a_song", "a_song_quoted", "index"])
+        essay = tree(english["a_song"])
+        self.assertEqual([t.get("target") for t in essay.iterfind(".//j:transclude", NS)],
+                         [f"{URN}/quoted/1", f"{URN}/quoted/2"])
+        self.assertEqual([t.get("target") for t in tree(english["index"]).iterfind(".//j:transclude", NS)], [URN])
+        hebrew = self.projects["he"].files
+        self.assertEqual(sorted(hebrew), ["a_song_quoted", "index"])
+        self.assertEqual([t.get("target") for t in tree(hebrew["index"]).iterfind(".//j:transclude", NS)],
+                         [f"{URN}/quoted"])
+        assert_valid(self, self.projects)
 
 
 class TestReviewRegressions(unittest.TestCase):

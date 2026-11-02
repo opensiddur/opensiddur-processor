@@ -10,6 +10,8 @@ from opensiddur.importer.opensiddur_org.match import (
     _words,
     bible_hint,
     build_incipit_index,
+    decide,
+    departure_spans,
     index_document,
     propose,
 )
@@ -139,6 +141,66 @@ class TestProposals(unittest.TestCase):
         post = hebrew_post("מִלִּים חֲדָשׁוֹת לְגַמְרֵי שֶׁלֹּא נִשְׁמְעוּ מֵעוֹלָם", title="שיר | Maoz Tzur")
         proposal = propose(post, index(), {"maoz tzur": {f"{P}poem:maoz_tzur"}})
         self.assertEqual(proposal.urn, f"{P}poem:maoz_tzur")
+
+    def test_departing_rows_record_the_span_they_stand_in_for(self) -> None:
+        post = hebrew_post("אֶרֶץ יָפָה וְהָרִים גְּבוֹהִים מְאֹד מְאֹד", "מִלִּים חֲדָשׁוֹת לְגַמְרֵי שֶׁלֹּא נִשְׁמְעוּ מֵעוֹלָם",
+                           "שִׁירוּ לְאֵל עֶלְיוֹן בְּקוֹל רָם וְנָעִים מְאֹד", "וְעוֹד בַּיִת חָדָשׁ שֶׁהַמְּשׁוֹרֵר הוֹסִיף כָּאן")
+        proposal = propose(post, index(), {})
+        self.assertEqual(proposal.rows, {1: f"{P}poem:song/1", 2: None, 3: f"{P}poem:song/3", 4: None})
+        self.assertEqual(proposal.spans, {2: f"{P}poem:song/2", 4: ""})
+        record = proposal.as_post_urns(PostUrns(post.post_id, "new", ""))
+        self.assertEqual((record.kind, record.spans), ("existing", proposal.spans))
+        self.assertEqual(Proposal.from_json(proposal.to_json()), proposal)
+
+    def test_a_run_of_departing_rows_spans_a_range(self) -> None:
+        spans = departure_spans({1: f"{P}poem:song/1", 2: None, 3: None}, f"{P}poem:song", index())
+        self.assertEqual(spans, {2: f"{P}poem:song/2-3", 3: f"{P}poem:song/2-3"})
+
+    def test_a_span_never_repeats_a_mapped_part(self) -> None:
+        # Rows mapped out of order: song/3 is mapped already, so nothing the runs stand in for
+        # can be named without naming it again.
+        spans = departure_spans({1: f"{P}poem:song/3", 2: None, 3: f"{P}poem:song/1", 4: None},
+                                f"{P}poem:song", index())
+        self.assertEqual(spans, {2: "", 4: ""})
+
+    def test_the_title_names_the_text(self) -> None:
+        post = hebrew_post("אֶרֶץ יָפָה וְהָרִים גְּבוֹהִים מְאֹד מְאֹד", title="שיר | Maoz Tzur")
+        proposal = propose(post, index(), {"maoz tzur": {f"{P}poem:maoz_tzur"}})
+        # The rows open another text: resemblances, not parts of the one the title names.
+        self.assertEqual((proposal.urn, proposal.rows), (f"{P}poem:maoz_tzur", {1: None}))
+
+    def test_decide_accepts_a_proposal_and_mints_otherwise(self) -> None:
+        stanzas = ("אֶרֶץ יָפָה וְהָרִים גְּבוֹהִים מְאֹד מְאֹד", "כְּרֹת עֵצִים בַּיַּעַר הַגָּדוֹל וְהָרָחָב תָּמִיד")
+        record, proposals = decide(hebrew_post(*stanzas), index(), {}, set(), {})
+        self.assertEqual((record.kind, record.urn, len(proposals)), ("existing", f"{P}poem:song", 1))
+        record, _ = decide(hebrew_post("מִלִּים חֲדָשׁוֹת לְגַמְרֵי שֶׁלֹּא נִשְׁמְעוּ מֵעוֹלָם"), index(), {}, set(), {})
+        self.assertEqual(record.kind, "new")
+
+    def test_each_table_is_matched_on_its_own(self) -> None:
+        first = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "אֶרֶץ יָפָה וְהָרִים גְּבוֹהִים מְאֹד מְאֹד")],
+                                            [cell("heb-Hebr", "liturgy", "כְּרֹת עֵצִים בַּיַּעַר הַגָּדוֹל וְהָרָחָב תָּמִיד")]])
+        second = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "מִלִּים חֲדָשׁוֹת לְגַמְרֵי שֶׁלֹּא נִשְׁמְעוּ מֵעוֹלָם")]])
+        post = parse_post(make_post(content=first + second))
+        record, _ = decide(post, index(), {}, set(), {})
+        self.assertEqual(record.kind, "new")
+        self.assertEqual(record.table(1, 2).urn, f"{P}poem:song")
+        self.assertEqual(record.table(2, 2).urn, f"{record.urn}/2")
+
+    def test_the_title_names_no_single_table(self) -> None:
+        # 4957: "Psalms 67 and Ana b'Khoach" -- the title's psalm is not every table's.
+        first = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "מִלִּים חֲדָשׁוֹת לְגַמְרֵי שֶׁלֹּא נִשְׁמְעוּ מֵעוֹלָם")]])
+        second = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "וְעוֹד בַּיִת חָדָשׁ שֶׁהַמְּשׁוֹרֵר הוֹסִיף כָּאן")]])
+        post = parse_post(make_post(content=first + second, slug="psalms-067-and-ana-bkhoah"))
+        record, _ = decide(post, index(), {}, set(), {})
+        self.assertEqual(record.tables, {})
+        self.assertEqual([record.table(n, 2).urn for n in (1, 2)], [f"{record.urn}/1", f"{record.urn}/2"])
+
+    def test_two_tables_never_share_a_text(self) -> None:
+        stanzas = [[cell("heb-Hebr", "liturgy", "אֶרֶץ יָפָה וְהָרִים גְּבוֹהִים מְאֹד מְאֹד")],
+                   [cell("heb-Hebr", "liturgy", "כְּרֹת עֵצִים בַּיַּעַר הַגָּדוֹל וְהָרָחָב תָּמִיד")]]
+        post = parse_post(make_post(content=table(["Source (Hebrew)"], stanzas) * 2))
+        record, _ = decide(post, index(), {}, set(), {})
+        self.assertEqual((record.table(1, 2).urn, record.table(2, 2).urn), (f"{P}poem:song", f"{record.urn}/2"))
 
     def test_proposal_json(self) -> None:
         proposal = Proposal(1, None, {1: None}, ["why"])

@@ -63,6 +63,13 @@ LANGUAGE_NAMES: dict[str, str] = {
     "lithuanian": "lit", "latvian": "lav", "estonian": "est", "icelandic": "isl",
     "afrikaans": "afr", "swahili": "swa", "indonesian": "ind", "vietnamese": "vie",
     "thai": "tha", "georgian": "kat", "armenian": "hye", "sanskrit": "san",
+    "judezmo": "lad", "bukhori": "bhh", "yevanic": "yej", "old norse": "non",
+    "old english": "ang", "gothic": "got",
+}
+
+#: Script names a header gives after a language: "Bukhori/Cyrillic".
+SCRIPT_NAMES: dict[str, str] = {
+    "cyrillic": "Cyrl", "latin": "Latn", "greek": "Grek", "arabic": "Arab", "hebrew": "Hebr",
 }
 
 #: The first word of a header's role -> the role this importer uses.
@@ -82,7 +89,23 @@ ROLE_WORDS: dict[str, str] = {
     "interpretive": "translation",
     "poetic": "translation",
     "rhyming": "translation",
+    "literal": "translation",
+    "singable": "translation",
+    "variation": "translation",
+    "amendation": "adaptation",
+    "amended": "adaptation",
+    "hebraization": "hebraization",
+    # Columns that are not texts of their own (see :data:`NOT_TEXT_ROLES`).
+    "initials": "initials",
+    "acrostic": "initials",
+    "commentary": "commentary",
+    "description": "description",
 }
+
+#: Roles of columns that do not become projects. "Initials" columns repeat the acrostic
+#: letters of the source beside it; commentary and description columns become notes on the
+#: column they sit beside.
+NOT_TEXT_ROLES = frozenset({"initials", "commentary", "description", "contribute"})
 
 _SCRIPT_RE = re.compile(r"^[A-Z][a-z]{3}$")
 
@@ -112,24 +135,41 @@ def language_from_lang_attribute(value: str) -> str | None:
 def _language_name(text: str) -> str:
     """A header's language name -> BCP 47, or "" when it names no language this table knows.
 
-    "Romanized Hebrew" is Hebrew in Latin script.
+    "Romanized Hebrew" is Hebrew in Latin script. What follows a comma is not the language
+    ("English, 1852"). After a slash comes another name for the language or its script:
+    "Judezmo/Ladino", "Bukhori/Cyrillic". A "Judeo-" language the table does not know is that
+    language in Hebrew letters: "Judeo-Old Norse".
     """
-    text = text.strip().lower().replace("’", "’")
+    text = text.split(",", 1)[0].strip().lower().replace("’", "’")
     romanized = False
     for prefix in ("romanized ", "romanised ", "transliterated "):
         if text.startswith(prefix):
             romanized = True
             text = text[len(prefix):]
-    code = LANGUAGE_NAMES.get(text.strip())
+    first, *rest = [part.strip() for part in text.split("/")]
+    script = "Latn" if romanized else ""
+    code = LANGUAGE_NAMES.get(first)
+    if not code and first.startswith("judeo-") and first[len("judeo-"):] in LANGUAGE_NAMES:
+        code, script = LANGUAGE_NAMES[first[len("judeo-"):]], script or "Hebr"
+    for part in rest:
+        if part in SCRIPT_NAMES and code:
+            script = script or SCRIPT_NAMES[part]
+        elif not code:
+            code = LANGUAGE_NAMES.get(part, "")
     if not code:
         return ""
-    return bcp47(code, "Latn" if romanized else "")
+    return bcp47(code, script)
 
 
 def _with_role(role: str, language: str) -> tuple[str, str]:
     """A transliteration is in Latin script whatever the header says: "Transliteration
     (Ge’ez)" is Ge’ez in Latin letters. A transliteration headed "(English)" names the
-    reader, not the language, so the header's language is ignored."""
+    reader, not the language, so the header's language is ignored. A hebraization is the
+    language in Hebrew letters."""
+    if role == "hebraization" and language:
+        primary = language.split("-")[0]
+        iso639_3 = next((k for k, v in ISO639_1.items() if v == primary), primary)
+        return role, bcp47(iso639_3, "Hebr")
     if role == "transliteration" and language and "-Latn" not in language:
         if language == "en":
             return role, ""
@@ -192,3 +232,30 @@ def same_language(a: str, b: str) -> bool:
     if primary_a == primary_b:
         return True
     return any(primary_a in family and primary_b in family for family in LANGUAGE_FAMILIES)
+
+
+#: Jewish languages and the language each is a variety of (primary subtags). A header that
+#: names the Jewish language is more precise than markup naming the other: "Ladino" over
+#: ``spa-Latn``, "Judeo-Italian" over ``ita``.
+JEWISH_VARIETY_OF: dict[str, str] = {
+    "lad": "es", "itk": "it", "yej": "el", "jrb": "ar", "jye": "ar", "ajt": "ar", "aju": "ar",
+    "yhd": "ar", "yud": "ar", "bhh": "tg", "yi": "de", "sdt": "oc", "jpr": "fa",
+}
+
+#: What WordPress writes when no one chose a language: the markup's word counts for little.
+DEFAULT_MARKUP_LANGUAGES = frozenset({"he", "en"})
+
+
+def resolve_disagreement(header_lang: str, markup_lang: str) -> str:
+    """Which language a column is in when its header and its markup disagree.
+
+    The header wins when the markup is WordPress's default (``heb``, ``eng``), and when the
+    header names a Jewish variety of the markup's language. Otherwise the markup, which
+    someone chose, wins: a "Source (Hebrew)" column marked ``yid-Hebr`` holds Yiddish.
+    """
+    header_primary, markup_primary = header_lang.split("-")[0], markup_lang.split("-")[0]
+    if markup_primary in DEFAULT_MARKUP_LANGUAGES:
+        return header_lang
+    if JEWISH_VARIETY_OF.get(header_primary) == markup_primary:
+        return header_lang
+    return markup_lang

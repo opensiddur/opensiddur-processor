@@ -12,12 +12,14 @@ An in-scope post is **standard** when the converter can encode it without help, 
 
 from __future__ import annotations
 
+import dataclasses
 import html
 from dataclasses import dataclass
 from typing import Any
 
-from opensiddur.importer.opensiddur_org.languages import UNKNOWN_LANGUAGE
+from opensiddur.importer.opensiddur_org.languages import NOT_TEXT_ROLES, UNKNOWN_LANGUAGE
 from opensiddur.importer.opensiddur_org.parse_post import Cell, Column, Post
+from opensiddur.importer.opensiddur_org.post_decisions import PostDecisions, default_post_decisions
 
 PRAYERS_CATEGORY = 1132
 
@@ -61,10 +63,14 @@ class Scope:
     reason: str
 
 
-def content_scope(post: Post) -> Scope:
-    """Whether the post sets prayer text itself (the category test is separate)."""
+def content_scope(post: Post, decisions: PostDecisions | None = None) -> Scope:
+    """Whether the post sets prayer text itself (the category test is separate). Art and
+    essays that quote no prayer are out of scope by decision (``post_decisions.yaml``)."""
     if post.slug.startswith("list-of-"):
         return Scope(False, "index post")
+    decided = (decisions or default_post_decisions()).out_of_scope.get(post.post_id)
+    if decided:
+        return Scope(False, decided)
     if post.columns and any(
         _cell_has_text(row.cells[i])
         for row in post.rows
@@ -82,13 +88,35 @@ def content_scope(post: Post) -> Scope:
 
 
 def imported_columns(post: Post) -> list[tuple[int, Column]]:
-    """The columns that become projects: every column with text, other than an empty
-    "Contribute a translation" column (a source-only post is one project)."""
+    """The columns of the post's (first) table that become projects: every column with text,
+    other than an empty "Contribute a translation" column (a source-only post is one project)
+    and the columns that are not texts of their own (initials, commentary)."""
     return [
         (index, column)
         for index, column in enumerate(post.columns)
-        if any(_cell_has_text(row.cells[index]) for row in post.rows)
+        if column.role not in NOT_TEXT_ROLES
+        and any(_cell_has_text(row.cells[index]) for row in post.rows)
     ]
+
+
+def table_view(post: Post, table_index: int) -> Post:
+    """The post as if it had only its table ``table_index``: every per-table function reads
+    ``post.columns`` and ``post.rows``."""
+    table = post.tables[table_index]
+    return dataclasses.replace(post, columns=table.columns, rows=table.rows, tables=[table])
+
+
+def table_views(post: Post) -> list[Post]:
+    return [table_view(post, i) for i in range(len(post.tables))] or [post]
+
+
+def project_columns(post: Post) -> list[Column]:
+    """One column for each project the post makes, across all its tables, in order."""
+    found: dict[str, Column] = {}
+    for view in table_views(post):
+        for _, column in imported_columns(view):
+            found.setdefault(column.key, column)
+    return list(found.values())
 
 
 def column_mode(post: Post, index: int) -> set[str]:
@@ -116,31 +144,17 @@ def irregularities(post: Post) -> list[str]:
     and registries.
     """
     reasons: list[str] = []
-    if not post.columns:
-        reasons.append("prose with no table")
+    if not post.tables:
+        reasons.append("prose blocks that do not alternate languages")
         return reasons
-    if post.table_count > 1:
-        reasons.append("more than one table")
-    if post.has_colour_alignment:
-        reasons.append("colour-coded alignment")
-    columns = imported_columns(post)
-    seen_langs: set[str] = set()
-    for index, column in columns:
-        if column.mismatch:
-            reasons.append(f"column {column.header!r}: {column.mismatch}")
-        if not column.role:
-            reasons.append(f"column {column.header!r}: unknown role")
-        if column.lang == UNKNOWN_LANGUAGE:
-            reasons.append(f"column {column.header!r}: unknown language")
-        if column.lang in seen_langs:
-            reasons.append(f"two columns in {column.lang}")
-        seen_langs.add(column.lang)
-        if len(column_mode(post, index)) > 1:
-            reasons.append(f"column {column.header!r}: mixes verse and prose")
-    for row_index, row in enumerate(post.rows):
-        if is_heading_row(post, row_index):
-            continue
-        if any(block.kind == "heading" for cell in row.cells for block in cell.blocks):
-            reasons.append("a heading inside a cell of text")
-            break
+    if post.between_blocks:
+        reasons.append("text between its blocks")
+    if post.undecided_colours:
+        reasons.append("colour-coded text: " + ", ".join(sorted(post.undecided_colours)))
+    for view in table_views(post):
+        for index, column in imported_columns(view):
+            if not column.role:
+                reasons.append(f"column {column.header!r}: unknown role")
+            if column.lang == UNKNOWN_LANGUAGE:
+                reasons.append(f"column {column.header!r}: unknown language")
     return reasons

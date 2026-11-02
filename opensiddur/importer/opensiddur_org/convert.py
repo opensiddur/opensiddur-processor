@@ -39,18 +39,20 @@ from opensiddur.importer.opensiddur_org.contributors import (
     unregistered,
 )
 from opensiddur.importer.opensiddur_org.download import MANIFEST_NAME, load_manifest
-from opensiddur.importer.opensiddur_org.licences import LicenceDecisions, load_decisions
+from opensiddur.importer.opensiddur_org.licences import LicenceDecision, LicenceDecisions, load_decisions
 from opensiddur.importer.opensiddur_org.naming import Candidate, assign_project_ids, imported_projects
-from opensiddur.importer.opensiddur_org.parse_post import Post, load_post
+from opensiddur.importer.opensiddur_org.parse_post import Column, Post, load_post
 from opensiddur.importer.opensiddur_org.scope import (
     content_scope,
     descendant_categories,
-    imported_columns,
     irregularities,
     posts_in_categories,
+    project_columns,
+    table_views,
 )
 from opensiddur.importer.opensiddur_org.tei_builder import (
     build_project,
+    essay_language,
     front_language,
     row_numbers,
     titles_by_language,
@@ -75,7 +77,8 @@ class PostPlan:
 
     post: Post
     reasons: list[str] = field(default_factory=list)
-    columns: list[tuple[int, object, object]] = field(default_factory=list)
+    #: (column, licence decision) for each project the post makes.
+    columns: list[tuple[Column, LicenceDecision]] = field(default_factory=list)
     skipped_columns: dict[str, str] = field(default_factory=dict)
     candidates: list[str] = field(default_factory=list)
 
@@ -130,20 +133,15 @@ def plan_post(post: Post, context: Context) -> PostPlan:
         plan.reasons.append("unregistered contributor(s): " + ", ".join(c.slug for c in missing))
         plan.candidates = [candidate_line(c) for c in missing]
 
-    urns = context.post_urns.get(post.post_id)
-    if urns is None:
+    if post.post_id not in context.post_urns:
         plan.reasons.append("no URN decision")
-    elif urns.kind == "existing":
-        unmapped = [n for n in row_numbers(post).values() if not urns.rows.get(n)]
-        if unmapped:
-            plan.reasons.append(f"existing URN {urns.urn}: rows {unmapped} are not mapped")
 
-    for index, column in imported_columns(post):
+    for column in project_columns(post):
         decision = context.decisions.for_column(post, column)
         if decision.status == "allow":
-            plan.columns.append((index, column, decision))
+            plan.columns.append((column, decision))
         else:
-            plan.skipped_columns[column.lang] = f"{decision.status}: {decision.basis}"
+            plan.skipped_columns[column.key] = f"{decision.status}: {decision.basis}"
     if not plan.columns and not plan.reasons:
         plan.reasons.append("no column may be imported: " + "; ".join(
             f"{lang} {why}" for lang, why in sorted(plan.skipped_columns.items())))
@@ -182,7 +180,7 @@ def project_ids(plans: list[PostPlan], project_directory: Path,
               if p.is_dir() and p.name not in held and p.name not in freed]
              if directory.is_dir() else [])
     return assign_project_ids(
-        (Candidate(plan.post, column) for plan in plans if plan.standard for _, column, _ in plan.columns),
+        (Candidate(plan.post, column) for plan in plans if plan.standard for column, _ in plan.columns),
         taken,
         held,
     )
@@ -198,17 +196,22 @@ def convert_post(
     post = plan.post
     urns = context.post_urns[post.post_id]
     credits = post_credits(post, context.contributors)
-    languages = [column.lang for _, column, _ in plan.columns]
+    languages = [column.lang for column, _ in plan.columns]
     front_lang = front_language(post, languages)
+    # The first project in that language has it, not a variant.
+    front_key = next((column.key for column, _ in plan.columns if column.lang == front_lang), None)
+    essay_lang = essay_language(post, languages) if post.essay else None
+    essay_key = next((column.key for column, _ in plan.columns if column.lang == essay_lang), None)
     written_projects: list[str] = []
-    for index, column, decision in plan.columns:
+    for column, decision in plan.columns:
         files = build_project(
-            post, index, column,
+            post, column,
             urns=urns, credits=credits, licence=decision,
             upstream_commit=context.upstream_commit,
             upstream_commit_date=context.upstream_commit_date,
-            with_front=column.lang == front_lang,
-            project_id=ids[(post.post_id, column.lang)],
+            with_front=column.key == front_key,
+            with_essay=column.key == essay_key,
+            project_id=ids[(post.post_id, column.key)],
         )
         project_dir = project_directory / files.project_id
         project_dir.mkdir(parents=True, exist_ok=True)
@@ -251,27 +254,39 @@ def register_urns(plans: list[PostPlan], context: Context, registry_directory: P
         titles: dict[str, str] = {}
         for lang, title in titles_by_language(plan.post):
             titles.setdefault(lang, title)
-        imported = [index for index, _, _ in plan.columns]
-        rows_with_text = [
-            n for row_index, n in row_numbers(plan.post).items()
-            if any(not plan.post.rows[row_index].cells[i].is_empty for i in imported)
-        ]
-        lines = registry_lines(
-            urns, rows_with_text,
-            label_en=titles.get("en", ""), label_he=titles.get("he", ""),
-        )
-        if not lines:
-            continue
-        namespace = urns.urn.split(":")[3]
-        path = registry_directory / f"{namespace}.jsonl"
-        new = [line for line in lines if line["urn"] not in existing]
-        if not new:
-            continue
-        with path.open("a", encoding="utf-8") as handle:
-            for line in new:
+        keys = {column.key for column, _ in plan.columns}
+        views = table_views(plan.post)
+        lines = []
+        essay_urn = None
+        if plan.post.essay:
+            # The essay, and the passages it quotes as its part.
+            lines += registry_lines(urns, [], label_en=titles.get("en", ""), label_he=titles.get("he", ""))
+            essay_urn, urns = urns.urn, urns.quoted()
+            titles = {"en": f"{titles.get('en', '')} (quoted passages)".strip()}
+        elif len(views) > 1:
+            # The post as a whole, whose tables are its parts.
+            lines += registry_lines(urns, [], label_en=titles.get("en", ""), label_he=titles.get("he", ""))
+        for number, view in enumerate(views, 1):
+            imported = [i for i, column in enumerate(view.columns) if column.key in keys]
+            rows_with_text = [
+                n for row_index, n in row_numbers(view).items()
+                if any(not view.rows[row_index].cells[i].is_empty for i in imported)
+            ]
+            table_urns = urns.table(number, len(views))
+            label = titles.get("en", "") if len(views) == 1 else f"{titles.get('en', '')} / {number}".strip(" /")
+            lines += registry_lines(
+                table_urns, rows_with_text, label_en=label,
+                label_he=titles.get("he", "") if len(views) == 1 else "",
+                parent=essay_urn or (urns.urn if table_urns is not urns and table_urns.urn.startswith(urns.urn + "/") else None),
+            )
+        for line in lines:
+            if line["urn"] in existing:
+                continue
+            path = registry_directory / f"{str(line['urn']).split(':')[3]}.jsonl"
+            with path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(line, ensure_ascii=False) + "\n")
-                existing.add(str(line["urn"]))
-                added += 1
+            existing.add(str(line["urn"]))
+            added += 1
     return added
 
 
@@ -327,7 +342,7 @@ def main(argv: list[str] | None = None) -> int:
 
     converted = 0
     for plan in standard:
-        if any((plan.post.post_id, column.lang) not in ids for _, column, _ in plan.columns):
+        if any((plan.post.post_id, column.key) not in ids for column, _ in plan.columns):
             print(f"{plan.post.post_id}: skipped: a project of it could not be named")
             continue
         if not args.dry_run:

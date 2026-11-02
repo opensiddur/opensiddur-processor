@@ -116,8 +116,8 @@ boilerplate. It reads:
   "Transliteration (romanized Hebrew)".
   - Roles are matched forgivingly, because the site has typos such as "Souce" and
     "Tranlsation".
-  - When the `<th>` and the `div@lang` name different languages, the `<th>` wins and the
-    post is irregular.
+  - When the `<th>` and the `div@lang` name different languages, the rules in
+    [Columns the converter resolves](#columns-the-converter-resolves) decide which is right.
   - They may differ only in precision and still agree: "Aramaic" over `jpa-Hebr`, or a
     transliteration whose markup leaves out the Latin script.
 - **Rows:** one `<tr>` per stanza or block. Lines are split on `<br>`, and a line holding
@@ -145,6 +145,93 @@ are:
 - two columns in the same language
 - an unregistered contributor
 - no URN decision, or an existing URN with unmapped rows
+
+#### Columns the converter resolves
+
+These rules were decided on 2026-11-01, from the survey of all of category 1132. A post that
+one of them settles is not irregular for that reason.
+
+- **When the header and the markup disagree on a language:**
+  1. If the markup is a WordPress default (`heb`, `eng`), the header wins. The Kaddish's
+     "Source (Aramaic)" is often marked `heb-Hebr`, and Romanian or German columns `eng-Latn`.
+  2. If the header names a Jewish variety of the markup's language, the header wins, because
+     it is the more specific: "Ladino" over `spa-Latn`, "Judeo-Italian" over `ita`.
+  3. Otherwise the markup wins. A "Source (Hebrew)" column marked `yid-Hebr`, `fra-Latn` or
+     `ara-Arab` holds Yiddish, French or Arabic, and an "Arabic" column marked `jye` is
+     Judeo-Yemeni Arabic.
+  4. Posts these rules get wrong are listed in `post_decisions.yaml`: the header wins in
+     62205 (`arc`, not `txb-Hebr`) and 64855 (`en`, not `mr`). In 36267, rule 2 already
+     reads "Romanization (Yiddish)" over `deu-Latn` as `yi-Latn`.
+- **A transliteration header that names no language**, such as "Transliteration
+  (Romanization)", takes the source column's language with `-Latn`.
+- **"Hebraization (X)"** is a transliteration into Hebrew letters: `<X>-Hebr`.
+- **Two columns in one language but different scripts** get script subtags, e.g.
+  "Bukhori/Cyrillic" and "Bukhori/Judeo-Tajik" become `bhh-Cyrl` and `bhh-Hebr`.
+- **Two or more columns in the same language and script are each their own project**, aligned
+  by the same row milestones. This covers translations from different dates or translators,
+  literal and singable versions, a source and its adaptation, and masculine and feminine
+  god-language. The first column in a language has the plain name; each later one adds a
+  variant before the language, drawn from its header (`1852`, `literal`, `adaptation`), or its
+  column number when the header says nothing more. Like a title, the variant follows the
+  header, so editing the header renames the project.
+- **"Initials", "Acrostic Initials" and "Acrostic" columns are dropped.** Their letters are marked in the
+  source text as `seg type="acrostic"` where a line begins with the stanza's initial.
+- **"Commentary" and "Description" columns become notes** on their row in the project of the
+  column they sit beside (the nearest column with text to the left, else to the right): a
+  commentary as `note type="commentary"` after the row's text, a description as
+  `note type="description"` before it (see "Kinds of rubric" in `schema/JLPTEI-3.md`).
+- **A table with no column headers** takes each column's role from the column in the same
+  language of another table in the post; where there is none, the Hebrew column is the source
+  and the others are translations.
+- **Coloured text means what the post's introduction says it means**, so each colour of each
+  colour-coded post is given a meaning, recorded in `post_decisions.yaml` (decided
+  2026-11-01):
+
+  | The colour marks (meaning) | Encoding |
+  |---|---|
+  | the author's amendment of, or addition to, an older prayer (`amendment`) | `j:conditional type="marked"` on the `opensiddur:variant` feature `urn:x-opensiddur:condition:<text URN's path>/amended`, true; a word it replaces (`green \| original`, 19667) is wrapped in the same condition, false |
+  | alternative wordings (`alternative <name>`) | the same, one variant `…/<name>` per alternative; `male`/`female` test `opensiddur:person` `gender`, and a rite's name tests `opensiddur:rite` |
+  | the melody to read in (`cantillation <melody>`) | `seg type="cantillation" subtype="<melody>"` |
+  | words in another language (`language <lang>`) | `seg xml:lang="<lang>"` |
+  | a quoted verse (`quotation`) | `seg type="quotation"` |
+  | words supplied to fill a gap (`supplied <who>`) | `seg type="supplied" subtype="<who>"` |
+  | a ketiv beside its qere (`ketiv`, 67262) | `tei:choice` with `j:written`, and the word before it as `j:read` |
+  | a ketiv before its qere (`ketiv first`, 1548, 1769, 2657, 28690) | the same, with the word after it, or the span coloured `qere`, as `j:read` |
+  | acrostic letters (`acrostic`, 52874) | `seg type="acrostic"` |
+  | text the site hides in white (`hidden`, 38069: instructions to destroy a place or kill a person) | kept, in a condition on the variant `…/concealed`; a setting that makes it false leaves it out |
+  | emphasis only (`none`, 21219, 38595) | the colour is dropped |
+
+  A cell set in a colour has each of its lines coloured; `<font color>` is a colour too. JLPTEI's quotation, supplied and
+  cantillation `seg` types are documented in `schema/JLPTEI-3.md`.
+
+  A condition's default cannot be written into the text: a declaration in the text would
+  override the settings file, and nothing could choose the original. So when no setting
+  chooses, both readings stand, set off as any undecided passage is. A settings file chooses
+  by setting the variant (or the rite, or the gender).
+- **A post with no table** is read from its `div[lang]` blocks:
+  - When they are all in one language, the post is one project and each block is a row, as
+    in a one-column table.
+  - When they alternate languages (Hebrew, English, Hebrew, English…), each consecutive pair
+    is one aligned row, as in a two-column table. An empty block still holds its place.
+    Blocks that do not alternate cleanly leave the post irregular, to be decided one by one:
+    3778 and 14515 open with English blocks before the pairs begin, and 11906 breaks its
+    pairing once.
+  - Text before the first block and after the last is the post's own words, as with a table.
+  - A post with text between its blocks may be an essay about the prayers it quotes, such as
+    1769 (Tikkun Ḥatsot); which posts are essays is decided one by one (`essays` in
+    `post_decisions.yaml`). Each top-level element holding `div[lang]` blocks (a blockquote) is
+    one quoted passage: a row of a table with a column per language, the text
+    `<post URN>/quoted`, in every language's project. The essay's paragraphs are the post's
+    text, `<post URN>`, in the project of its own language, transcluding `<post URN>/quoted/<k>`
+    where passage *k* stands. That project's index transcludes the essay; the others' the
+    passages. What follows the last rule (`<hr>`) is the post's own words. An essay is always
+    given new URNs, whatever its passages quote.
+  - Art and essays that quote no prayer text are out of scope: 3393, 55035 and 56696
+    (shiviti and illustrations), 12374 (a periodic table of the aleph-bet), 25888
+    (pedagogy), 12754 (a reflection) and 56027 (a role-playing activity).
+- **Verse and prose in one column, a heading inside a cell, and more than one table** are
+  encoded as [Body](#3-convert-tei_builderpy-convertpy) describes, and are no longer reasons
+  a post is irregular.
 
 **`survey`** writes `output/opensiddur_org_triage.{json,md}`, which is untracked. It gives
 counts by irregularity, language set, licence and category; the licences awaiting a
@@ -179,7 +266,19 @@ decision; and the URN proposals.
   project's language.
 - Each row opens a `tei:milestone` (`unit="stanza"`, or `"paragraph"` for prose) whose
   `corresp` is the same in every language. That is what aligns the parallel texts.
-- Line cells become `lg`/`l`; prose cells become `p`. One text never mixes the two.
+- Line cells become `lg`/`l`; prose cells become `p`. A column may mix the two: each row's
+  cell keeps its own form, side by side in the same `div`, with the row milestones between
+  them.
+- A heading inside a cell closes the current `tei:div` of that column's project and opens a
+  new one headed by it. Row milestones are unaffected, so the languages stay aligned.
+- A post with more than one table holds that many texts. Each table is its own file, with its
+  own URN, in the same project, and the project's `index.xml` transcludes them in order.
+  - A column belongs to the project of the column in an earlier table with the same language,
+    role and header words. Another work in that language (a different translation, or the
+    source where an earlier table had a translation) is a project of its own, named by a
+    variant, so that its credits and licence are its own.
+  - Each table is matched on its rows alone: the post's title names the post, not every table
+    (4957, "Psalms 67 and Ana b'Khoach"). Two tables never share a text's URN.
 - A cell in another language than its column (Aramaic in a Hebrew column) carries
   `xml:lang`.
 - Spans and notes map as follows:
@@ -267,7 +366,12 @@ in the original edition). It is encoded so that the two can be told apart:
   included, waits for a decision about that post.
 - **Anything else, and no licence at all,** is undecided until the maintainer decides. The
   decision is recorded in the YAML's `posts`, for the whole post or for some of its
-  columns.
+  columns. A column can also be **held** while permission is sought; it is skipped like an
+  undecided one, and reported as held.
+- **No decision about a post is permanent.** Each records the post's `last_updated` and
+  licence when it was made (`as_of`, `licence`). When a later export updates or relicenses
+  the post, the decision lapses and the post is decided again. The export of 2026-11-02, for
+  example, relicensed 53593 (rejected in the pilot as fair use) CC BY-SA 4.0.
 
 `convert` imports allowed columns, skips rejected ones, and reports undecided ones.
 
@@ -300,11 +404,26 @@ Each post's URN decision is made once. It is recorded in
 {"post_id": 22916, "kind": "new", "urn": "urn:x-opensiddur:text:poem:banu_choshekh_leqaddesh_seidenberg"}
 ```
 
-- An `existing` post is a version of a text in the collection, and names each row's URN.
-  Its rows must all be mapped before it converts.
+- An `existing` post is, as a whole, a version of a text in the collection: a translation,
+  including an interpretive one, or an adaptation. It takes that text's URN and has no URN of
+  its own.
+  - Rows that map carry the existing part URNs.
+  - Where the version departs from the original (verses merged, a passage rewritten, a stanza
+    added), the first departing row's milestone corresponds to the span of the original the
+    run stands in for, as a range (`…:bible:psalms/29/3-6`), and the rest of the run carries
+    no milestone of its own. Added material gets a milestone with no `corresp`, which only
+    ends the scope before it. `match` records each departing row's span in `spans`.
+  - So everything stays aligned and no URN is minted. The departing text is an alternative to
+    the original's: an edition that wants it gives the post's project priority as a source
+    for the transclusion. (A transclusion can only target a URN, which is why a departure is
+    not a file of its own.)
+  - Such a post is not marked with `opensiddur:variant`: the version is the work itself.
+    `opensiddur:variant` is for posts that draw attention to an amendment (see the colours,
+    under [Columns the converter resolves](#columns-the-converter-resolves)).
 - A `new` post's rows are `<urn>/<n>`, numbered from 1 over rows that are not headings,
-  except where `rows` names an existing text. A post made of existing prayers, like the
-  Ḥanukkah blessings, is new as a whole but shares its parts.
+  except where `rows` names an existing text. A post that includes an existing text among
+  other material, like the Ḥanukkah blessings, is new as a whole: it keeps its own URN and row
+  milestones, and corresponds to the existing text where it includes it.
 
 **`match`** proposes existing URNs. It works from an index of the opening words of every
 `@corresp` scope in the collection's Hebrew projects (prayers, poems and the Bible, never
@@ -345,9 +464,15 @@ How `match` handles each post:
     kept once given (`specs/opensiddur_org/post_urns.jsonl`), so a rule changed later renames
     an older post's text only when that file is respelled with it.
   - If that name is taken, `_<post_id>` is appended.
-- Every other post gets a proposal in `output/opensiddur_org_urn_proposals.jsonl`. The
-  proposal is reviewed, and may be edited, then recorded with `match --accept <id>`, or
-  replaced by a new URN with `--new <id>`.
+- Every other post gets a proposal in `output/opensiddur_org_urn_proposals.jsonl`.
+  - A proposal is accepted without review when the slug or title names the text (a psalm, a
+    registry label) or at least half its rows map. A sample of the accepted proposals is
+    listed in the pull request.
+  - A proposal with neither gives the post a new URN.
+  - Rows of a new post that resemble an existing text are ignored: a shared opening phrase is
+    not enough, and a false correspondence is worse than a missing one.
+  - A proposal can still be reviewed and edited, then recorded with `match --accept <id>`, or
+    replaced by a new URN with `--new <id>`.
 
 ### 4. Pilot: Ḥanukkah (category 183)
 

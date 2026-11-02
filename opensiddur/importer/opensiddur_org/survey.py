@@ -20,7 +20,7 @@ from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.importer.opensiddur_org.convert import load_context, plan_post, select_posts
 from opensiddur.importer.opensiddur_org.match import load_incipit_index, propose, registry_labels
 from opensiddur.importer.opensiddur_org.parse_post import load_post
-from opensiddur.importer.opensiddur_org.scope import imported_columns
+from opensiddur.importer.opensiddur_org.scope import project_columns
 from opensiddur.importer.util.pages import opensiddur_org_data_directory
 
 TRIAGE_JSON = OUTPUT_DIRECTORY / "opensiddur_org_triage.json"
@@ -56,9 +56,9 @@ def survey(data_dir: Path, *, posts: list[int] | None, categories: list[int] | N
             "title": post.title,
             "permalink": post.permalink,
             "category": category_path(post.permalink),
-            "languages": [column.lang for _, column in imported_columns(post)],
+            "languages": [column.key for column in project_columns(post)],
             "licence": post.licence_url,
-            "columns": {column.lang: "allow" for _, column, _ in plan.columns} | {
+            "columns": {column.key: "allow" for column, _ in plan.columns} | {
                 lang: why for lang, why in plan.skipped_columns.items()},
             "class": "standard" if not reasons else "irregular",
             "reasons": reasons,

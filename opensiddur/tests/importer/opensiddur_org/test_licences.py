@@ -61,6 +61,26 @@ class TestLicenceDecisions(unittest.TestCase):
     def test_post_rejection_overrides_the_licence(self) -> None:
         self.assertEqual(self.decide(make_post(502), "he").status, "reject")
 
+    def test_a_rejection_lapses_when_the_post_is_updated(self) -> None:
+        fair_use = licence("https://www.law.cornell.edu/uscode/text/17/107")
+        self.assertEqual(self.decide(make_post(503, licence=fair_use, last_updated="2026-09-01"), "en").status, "reject")
+        # Updated since: decided again, and the fair-use claim is undecided.
+        self.assertEqual(self.decide(make_post(503, licence=fair_use, last_updated="2026-10-26"), "en").status, "undecided")
+
+    def test_a_rejection_lapses_when_the_post_is_relicensed(self) -> None:
+        decision = self.decide(make_post(503, last_updated="2026-09-01"), "en")
+        self.assertEqual((decision.status, decision.licence.id), ("allow", "cc-by-sa-4.0"))
+
+    def test_a_held_post(self) -> None:
+        self.assertEqual(self.decide(make_post(505), "he").status, "undecided")
+        self.assertEqual(self.decide(make_post(505), "en").basis, "held: Held for permission.")
+
+    def test_a_held_column(self) -> None:
+        decision = self.decide(make_post(504), "en")
+        self.assertEqual((decision.status, decision.basis), ("undecided", "held: Held until the translator licenses it."))
+        # The other columns follow the post's licence.
+        self.assertEqual(self.decide(make_post(504), "he").status, "allow")
+
 
 class TestNormalization(unittest.TestCase):
     def test_creative_commons_forms(self) -> None:

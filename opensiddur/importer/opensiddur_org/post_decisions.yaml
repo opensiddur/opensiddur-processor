@@ -1,0 +1,70 @@
+# Decisions about single posts that the rules in specs/OPENSIDDUR_ORG_IMPORT.md get wrong or
+# leave open. Each was made once, by a person, and is not asked again.
+
+# Posts filed under Prayers & Praxes that quote no prayer text: art and essays.
+out_of_scope:
+  3393: shiviti art
+  12374: a periodic table of the aleph-bet
+  12754: a reflection on belief in prayer
+  25888: an essay on kavvanah
+  55035: an illustration
+  56027: a role-playing activity
+  56696: shiviti art
+
+# Essays about the prayers they quote: the essay is the post's text, and it transcludes each
+# quoted passage, which is imported as an aligned text of its own.
+essays:
+  1769: an essay on Tikkun Ḥatzot quoting Lamentations, Psalms and the Shulḥan Arukh
+
+# A column's language where the header/markup rule reads it wrongly: post -> header -> language.
+column_languages:
+  62205:
+    Source (Aramaic): arc  # marked txb-Hebr; the text is the Aramaic Ḥad Gadya
+  64855:
+    Translation (English): en  # marked Marathi
+
+# What each colour-coded post's colours mean, read from its introduction. Meanings:
+#   amendment     the author's change to an older text: the opensiddur:variant <text>/amended
+#   alternative   one of several wordings: an opensiddur:variant each (a rite or a gender where
+#                 the feature exists)
+#   cantillation  the melody to read in: seg type="cantillation"
+#   language      words in another language: seg xml:lang
+#   quotation     a quoted verse: seg type="quotation"
+#   supplied      words supplied to fill a gap: seg type="supplied", subtype who supplied them
+#   ketiv         a written form after its reading: tei:choice/j:written, the word before as j:read
+#   ketiv first   a written form before its reading: the word after it, or the span coloured as
+#                 the qere, is its j:read
+#   qere          a reading coloured beside its ketiv
+#   acrostic      acrostic letters: seg type="acrostic"
+#   hidden        text the site hides: kept, behind the opensiddur:variant <text>/concealed
+#   none          emphasis only: the colour is dropped
+colours:
+  1548: {brown: ketiv first, blue: qere}  # <font color>: פלאיה beside פְּלִיאָה
+  1769: {brown: ketiv first, blue: qere}
+  2657: {brown: ketiv first}  # the reading is the word after it, uncoloured
+  5094: {green: amendment}
+  18422: {green: amendment}  # Hertz's change to the first stanza of Maoz Tsur
+  19667: {green: amendment}  # "green | original" offers the green as the alternative
+  19721: {green: amendment}  # Seidenberg's additions to Waskow
+  20101: {green: amendment}
+  21219: {red: none}
+  26340: {dodgerblue: cantillation job}
+  26901: {blue: cantillation job}
+  28690: {brown: ketiv first, blue: qere}
+  28941: {blue: cantillation job}
+  30495: {dodgerblue: cantillation eikhah, red: cantillation entrances}
+  31607: {"#808080": supplied}
+  36276: {dodgerblue: alternative saadia, red: alternative yemenite}
+  38069: {white: hidden}
+  38595: {blue: none, red: none}
+  50901: {crimson: language arc, dodgerblue: quotation}
+  52874: {dodgerblue: acrostic}
+  62119: {blue: alternative male, red: alternative female}  # opensiddur:person gender
+  63691: {dodgerblue: alternative ashkenaz, red: alternative sepharad}  # opensiddur:rite
+  65814: {gray: supplied scholars, purple: supplied author}
+  66797: {red: language arc}  # the green is the site's acrostic class
+  67262: {gray: ketiv}
+  67442: {red: alternative aram_tzova, blue: alternative kaffa}  # the Mahzor Aram Tzova and Minhag Kaffa forms
+  68328: {red: amendment}  # in the oldest manuscripts, completing the acrostic
+  68472: {dodgerblue: quotation, red: quotation, magenta: quotation}
+  69351: {dodgerblue: cantillation eikhah, red: cantillation niggun}

@@ -74,7 +74,7 @@ class TestPlans(ConvertTestCase):
     def test_standard(self) -> None:
         plan = self.plan(0)
         self.assertTrue(plan.standard, plan.reasons)
-        self.assertEqual([column.lang for _, column, _ in plan.columns], ["he", "en"])
+        self.assertEqual([column.lang for column, _ in plan.columns], ["he", "en"])
 
     def test_no_urn_decision(self) -> None:
         self.assertIn("no URN decision", self.plan(1).reasons)
@@ -186,6 +186,32 @@ class TestRejection(ConvertTestCase):
         register_urns([plan], self.context, self.registry)
         urns = [json.loads(l)["urn"] for l in (self.registry / "prayer.jsonl").read_text(encoding="utf-8").splitlines()]
         self.assertEqual(urns, [f"{URN}_101", f"{URN}_101/1", f"{URN}_101/3"])
+
+
+class TestRegisteringParts(ConvertTestCase):
+    def registered(self, post) -> list[dict]:
+        register_urns([plan_post(post, self.context)], self.context, self.registry)
+        return [json.loads(l) for l in (self.registry / "prayer.jsonl").read_text(encoding="utf-8").splitlines()]
+
+    def test_each_table_is_a_part_of_the_post(self) -> None:
+        from opensiddur.tests.importer.opensiddur_org.support import cell, table
+
+        one = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "א")]])
+        lines = self.registered(parse_post(make_post(101, content=one + one)))
+        self.assertEqual([(l["urn"], l.get("parent")) for l in lines], [
+            (f"{URN}_101", None), (f"{URN}_101/1", f"{URN}_101"), (f"{URN}_101/1/1", f"{URN}_101/1"),
+            (f"{URN}_101/2", f"{URN}_101"), (f"{URN}_101/2/1", f"{URN}_101/2")])
+
+    def test_an_essay_and_its_quoted_passages(self) -> None:
+        from opensiddur.importer.opensiddur_org.post_decisions import PostDecisions
+
+        content = ('<p>An essay.</p><blockquote><div lang="heb-Hebr">א</div><div lang="eng-Latn">A</div></blockquote>'
+                   '<p>More.</p>')
+        post = parse_post(make_post(101, content=content), PostDecisions(essays={101: "an essay"}))
+        lines = self.registered(post)
+        self.assertEqual([(l["urn"], l.get("parent")) for l in lines], [
+            (f"{URN}_101", None), (f"{URN}_101/quoted", f"{URN}_101"),
+            (f"{URN}_101/quoted/1", f"{URN}_101/quoted")])
 
 
 if __name__ == "__main__":

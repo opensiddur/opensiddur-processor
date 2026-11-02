@@ -99,11 +99,13 @@ is cloned beside the repositories, at `opensiddur-repos/opensiddur.org/` (`$OPEN
 ```bash
 uv run python -m opensiddur.importer.opensiddur_org.download --category 183   # copy in-scope posts; no-op when unchanged
 uv run python -m opensiddur.importer.opensiddur_org.survey                    # output/opensiddur_org_triage.{json,md}
-uv run python -m opensiddur.importer.opensiddur_org.match                     # URN decisions; proposals for review in output/
+uv run python -m opensiddur.importer.opensiddur_org.match                     # URN decisions, recorded at once; the evidence in output/
 uv run python -m opensiddur.importer.opensiddur_org.convert --register        # standard posts -> <title>-<author>-<date>-<lang> projects
 ```
 Licence decisions live in `opensiddur/importer/opensiddur_org/licence_decisions.yaml`; a licence or post not
-decided there is asked about, then recorded. `convert --emit-contributor-candidates` writes lines for
+decided there is asked about, then recorded. A decision about one post lapses when a later export updates or
+relicenses it. Decisions about single posts that the spec's rules get wrong or leave open (out of scope, a column's
+language, what a post's colours mean, essays) live in `post_decisions.yaml`. `convert --emit-contributor-candidates` writes lines for
 unregistered contributors to `output/` for review; they are never registered automatically.
 
 **Download the Birnbaum siddur** — three sources for one book, all writing into

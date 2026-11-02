@@ -48,7 +48,7 @@ ROLE_KEYS: tuple[tuple[str, str, str], ...] = (
 #: text; a translator made the translation. Anything else is credited everywhere.
 RESP_COLUMN_ROLES: dict[str, frozenset[str]] = {
     "trl": frozenset({"translation", "adaptation"}),
-    "trc": frozenset({"source", "transliteration", "reconstruction", ""}),
+    "trc": frozenset({"source", "transliteration", "hebraization", "reconstruction", ""}),
 }
 
 
@@ -181,10 +181,10 @@ def registered_contributors(registry_directory: Path = REGISTRY_DIRECTORY) -> se
 
 
 def candidate_line(credit: Credit) -> str:
-    """A ``contributor.jsonl`` line for a person not yet registered, for review."""
-    return json.dumps(
-        {"urn": credit.urn, "status": "canonical", "label_en": credit.name}, ensure_ascii=False
-    )
+    """A ``contributor.jsonl`` line for a person not yet registered, for review. Directional
+    marks the site leaves after a name in another script are dropped from the label."""
+    label = re.sub("[\u200e\u200f\u202a-\u202e]", "", credit.name).strip()
+    return json.dumps({"urn": credit.urn, "status": "canonical", "label_en": label}, ensure_ascii=False)
 
 
 def unregistered(credits: Credits, registered: set[str]) -> list[Credit]:
