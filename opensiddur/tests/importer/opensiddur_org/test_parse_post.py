@@ -11,6 +11,7 @@ from opensiddur.importer.opensiddur_org.parse_post import (
     post_id_from_path,
     split_title,
 )
+from opensiddur.importer.opensiddur_org.post_decisions import NO_DECISIONS, PostDecisions
 from opensiddur.tests.importer.opensiddur_org.support import (
     HEBREW_EN_ROWS,
     cell,
@@ -167,9 +168,18 @@ class TestSurroundings(unittest.TestCase):
         ])
 
     def test_prose_post_without_a_table(self) -> None:
-        post = parse_post(make_post(content='<p>Intro</p><div class="english" lang="eng-Latn">A prayer<br />in lines</div>'))
-        self.assertEqual(post.columns, [])
-        self.assertEqual(len(post.loose_cells), 1)
+        post = parse_post(make_post(content='<p>Intro</p><div class="english" lang="eng-Latn">A prayer<br />in lines</div><p>After</p>'))
+        self.assertEqual([(c.role, c.lang) for c in post.columns], [("source", "en")])
+        self.assertEqual(len(post.rows), 1)
+        self.assertEqual([node_text(line) for line in post.intro], ["Intro"])
+        self.assertEqual([node_text(line) for line in post.notes], ["After"])
+
+    def test_alternating_prose_blocks_pair_into_rows(self) -> None:
+        post = parse_post(make_post(content='<div lang="eng-Latn">A</div><div lang="heb-Hebr">א</div>'
+                                            '<div lang="eng-Latn">B</div><div lang="heb-Hebr">ב</div>'))
+        self.assertEqual([(c.role, c.lang) for c in post.columns], [("translation", "en"), ("source", "he")])
+        self.assertEqual([[node_text(c.blocks[0].lines[0]) for c in row.cells] for row in post.rows],
+                         [["A", "א"], ["B", "ב"]])
 
     def test_file_links_and_embeds(self) -> None:
         post = parse_post(make_post(content='<p><a class="mtli_attachment mtli_pdf" href="https://x/y.pdf">PDF</a></p>'))
@@ -214,9 +224,63 @@ class TestReviewRegressions(unittest.TestCase):
         self.assertEqual(node_text(line), "a &lt;b&gt; c")
 
     def test_explicit_non_latin_script_under_a_transliteration_header(self) -> None:
+        # Markup that names a script on purpose wins over the header (post 53572).
         post = parse_post(make_post(content=table(["Transliteration (Judeo-Arabic)"], [[cell("jrb-Hebr", "judeo-arabic", "שלאם")]])))
-        self.assertEqual(post.columns[0].lang, "jrb-Latn")
+        self.assertEqual(post.columns[0].lang, "jrb")
         self.assertTrue(post.columns[0].mismatch)
+
+
+class TestColumnRules(unittest.TestCase):
+    def lang(self, header: str, markup: str, decisions: PostDecisions = NO_DECISIONS) -> str:
+        post = parse_post(make_post(content=table([header], [[cell(markup, "x", "text")]])), decisions)
+        return post.columns[0].lang
+
+    def test_default_markup_loses_to_the_header(self) -> None:
+        self.assertEqual(self.lang("Source (Aramaic)", "heb-Hebr"), "arc")
+        self.assertEqual(self.lang("Translation (Romanian)", "eng-Latn"), "ro")
+
+    def test_a_jewish_variety_in_the_header_wins(self) -> None:
+        self.assertEqual(self.lang("Source (Ladino)", "spa-Latn"), "lad")
+        self.assertEqual(self.lang("Translation (Judeo-Italian)", "ita"), "itk")
+
+    def test_chosen_markup_wins(self) -> None:
+        self.assertEqual(self.lang("Source (Hebrew)", "yid-Hebr"), "yi")
+        self.assertEqual(self.lang("Source (Arabic)", "jye"), "jye")
+
+    def test_a_decision_wins_over_both(self) -> None:
+        decisions = PostDecisions(column_languages={101: {"Source (Aramaic)": "arc"}})
+        self.assertEqual(self.lang("Source (Aramaic)", "txb-Hebr", decisions), "arc")
+        self.assertEqual(self.lang("Source (Aramaic)", "txb-Hebr"), "txb-Hebr")
+
+    def test_transliteration_naming_no_language_romanizes_the_source(self) -> None:
+        rows = [[cell("heb-Hebr", "liturgy", "שלום"), cell("eng-Latn", "x", "shalom")]]
+        post = parse_post(make_post(content=table(["Source (Hebrew)", "Transliteration (Romanization)"], rows)))
+        self.assertEqual(post.columns[1].lang, "he-Latn")
+
+    def test_header_names(self) -> None:
+        self.assertEqual(self.lang("Translation (Bukhori/Cyrillic)", "eng-Latn"), "bhh-Cyrl")
+        self.assertEqual(self.lang("Translation (English, 1852)", "eng-Latn"), "en")
+        self.assertEqual(self.lang("Hebraization (Judeo-Old Norse)", "heb-Hebr"), "non-Hebr")
+
+    def test_variant_names_come_from_the_header(self) -> None:
+        rows = [[cell("eng-Latn", "x", "A"), cell("eng-Latn", "x", "B"), cell("eng-Latn", "x", "C")]]
+        post = parse_post(make_post(content=table(
+            ["Translation, 2022 (English)", "Translation, 1852 (English)", "Translation (English)"], rows)))
+        self.assertEqual([c.key for c in post.columns], ["en", "en/1852", "en/3"])
+
+    def test_a_table_with_no_headers(self) -> None:
+        headed = table(["Source (Hebrew)", "Adaptation (English)"], [[cell("heb-Hebr", "x", "א"), cell("eng-Latn", "x", "A")]])
+        bare = table(["", ""], [[cell("heb-Hebr", "x", "ב"), cell("eng-Latn", "x", "B")]])
+        post = parse_post(make_post(content=headed + bare))
+        self.assertEqual([c.role for c in post.tables[1].columns], ["source", "adaptation"])
+        post = parse_post(make_post(content=table(["", ""], [[cell("eng-Latn", "x", "B"), cell("heb-Hebr", "x", "ב")]])))
+        self.assertEqual([c.role for c in post.columns], ["translation", "source"])
+
+    def test_initials_mark_the_acrostic(self) -> None:
+        rows = [[cell("heb-Hebr", "x", "א"), cell("heb-Hebr", "liturgy", "אֲשִׁירָה לְךָ")]]
+        post = parse_post(make_post(content=table(["Initials (Hebrew)", "Source (Hebrew)"], rows)))
+        first = post.rows[0].cells[1].blocks[0].lines[0][0]
+        self.assertEqual((first.kind, node_text(first.children)), ("acrostic", "אֲ"))
 
 
 if __name__ == "__main__":

@@ -82,9 +82,22 @@ class TestRecords(unittest.TestCase):
         self.assertEqual((lines[0]["label_en"], lines[0]["label_he"]), ("P", "פ"))
         self.assertEqual(lines[1]["parent"], "urn:x-opensiddur:text:prayer:p")
 
+    def test_tables(self) -> None:
+        psalm = PostUrns(1, "existing", "urn:x-opensiddur:text:bible:psalms/67")
+        record = PostUrns(1, "new", "urn:x-opensiddur:text:prayer:p", tables={1: psalm})
+        self.assertIs(record.table(1, 1), record)
+        self.assertIs(record.table(1, 2), psalm)
+        self.assertEqual(record.table(2, 2).urn, "urn:x-opensiddur:text:prayer:p/2")
+        lines = registry_lines(record.table(2, 2), [1], label_en="P / 2", parent=record.urn)
+        self.assertEqual(lines[0]["parent"], record.urn)
+
     def test_round_trip(self) -> None:
         records = {
-            2: PostUrns(2, "existing", "urn:x-opensiddur:text:poem:a", {1: "urn:x-opensiddur:text:poem:a/1", 2: None}),
+            3: PostUrns(3, "new", "urn:x-opensiddur:text:prayer:d",
+                        tables={2: PostUrns(3, "existing", "urn:x-opensiddur:text:bible:psalms/67", {1: None},
+                                            spans={1: "urn:x-opensiddur:text:bible:psalms/67/2-8"})}),
+            2: PostUrns(2, "existing", "urn:x-opensiddur:text:poem:a", {1: "urn:x-opensiddur:text:poem:a/1", 2: None},
+                        spans={2: ""}),
             1: PostUrns(1, "new", "urn:x-opensiddur:text:prayer:b", {3: "urn:x-opensiddur:text:prayer:c"}),
         }
         with tempfile.TemporaryDirectory() as tmp:

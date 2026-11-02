@@ -74,7 +74,7 @@ class TestPlans(ConvertTestCase):
     def test_standard(self) -> None:
         plan = self.plan(0)
         self.assertTrue(plan.standard, plan.reasons)
-        self.assertEqual([column.lang for _, column, _ in plan.columns], ["he", "en"])
+        self.assertEqual([column.lang for column, _ in plan.columns], ["he", "en"])
 
     def test_no_urn_decision(self) -> None:
         self.assertIn("no URN decision", self.plan(1).reasons)

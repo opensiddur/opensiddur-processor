@@ -756,6 +756,15 @@ the rendering is left to the exporter.
 <tei:l><tei:seg type="acrostic">מָ</tei:seg>עוֹז צוּר יְשׁוּעָתִי</tei:l>
 ```
 
+Other inline spans that are marked by what they are, often shown in a source by colour:
+
+* `<tei:seg type="quotation">`: words quoted from another text, such as a verse a translation renders.
+* `<tei:seg type="supplied" subtype="...">`: words not in the source, supplied to fill a gap. The
+  `subtype` says who supplied them (`scholars`, `author`).
+* `<tei:seg type="cantillation" subtype="...">`: words read in a different melody from the text
+  around them. The `subtype` names it (`job`, `eikhah`).
+* `<tei:seg xml:lang="...">`: words in another language from the text around them.
+
 #### Front matter
 
 Material that precedes the main text — a title page, a preface, a translator's note — goes in `tei:front`, a

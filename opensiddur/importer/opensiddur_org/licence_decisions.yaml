@@ -19,8 +19,14 @@
 #   <post_id>:
 #     reject: <reason>         the whole post is skipped
 #     allow: <licence id>      every column, or only `columns` when given
+#     hold: <reason>           every column, or only `columns`, waits (permission is being
+#                              sought); the other columns follow the post's licence
 #     columns: [<lang>, ...]
 #     reason: <text>
+#     as_of: <date>            the post's last_updated when this was decided, and
+#     licence: <url>           its licence then. When a later export updates or relicenses
+#                              the post, the decision lapses and the post is decided again:
+#                              no rejection is permanent.
 
 licences:
   https://creativecommons.org/publicdomain/zero/1.0/:
@@ -61,3 +67,27 @@ posts:
     reason: John Keble's poem was published in 1834 and is in the public domain.
   53593:
     reject: A modern work posted under a claim of fair use.
+    as_of: "2026-09-25"
+    licence: https://www.law.cornell.edu/uscode/text/17/107
+  # Decided 2026-11-01, from the export of 2026-11-02.
+  4017:
+    hold: Held until Rabbi David Seidenberg gives permission for this adaptation of Rabbi Danny Nevins's 1992 work.
+    as_of: "2026-10-26"
+    licence: https://www.law.cornell.edu/uscode/text/17/107
+  29942:
+    hold: The English is Aharon N. Varady's own translation, posted under a claim of fair use; held until he licenses it.
+    columns: [en]
+    as_of: "2026-11-01"
+    licence: https://www.law.cornell.edu/uscode/text/17/107
+  29959:
+    reject: A published modern translation (Devra Kay's), posted under a claim of fair use.
+    as_of: "2026-11-01"
+    licence: https://www.law.cornell.edu/uscode/text/17/107
+  36831:
+    reject: Harry Nilsson's lyrics (1967) are under copyright, posted under a claim of fair use.
+    as_of: "2026-10-26"
+    licence: https://www.law.cornell.edu/uscode/text/17/107
+  52834:
+    reject: Kurt Vonnegut's text (1963) and its 1978 Hebrew translation are under copyright, posted under a claim of fair use.
+    as_of: "2026-10-26"
+    licence: https://www.law.cornell.edu/uscode/text/17/107

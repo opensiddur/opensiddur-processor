@@ -17,8 +17,9 @@ A post is named by what it is, not by its number on the site:
   was made is rarely recorded, and the post's date would say something false.
 - ``lang``: the column's language.
 
-Two posts that would share an identifier are told apart by their post IDs, added before the
-language. A post that already has the plain identifier keeps it, and otherwise the older post,
+A second column in the same language as another (a literal and a singable translation) is
+told apart by its variant, added before the language. Two posts that would share an identifier
+are told apart by their post IDs, added before the language. A post that already has the plain identifier keeps it, and otherwise the older post,
 by ID, has it, so adding a post never renames an older one. A post's projects are found again by the post ID in their ``index.xml``, not by
 their names.
 """
@@ -325,7 +326,7 @@ def assign_project_ids(
     taken: Iterable[str] = (),
     held: Mapping[str, int] | None = None,
 ) -> dict[tuple[int, str], str]:
-    """Each candidate's project identifier, keyed by ``(post_id, lang)``.
+    """Each candidate's project identifier, keyed by ``(post_id, column key)``.
 
     ``taken`` are identifiers no candidate may have: projects no post made, or that posts not
     being named hold. ``held`` maps an identifier on disk to the post holding it. Of the
@@ -337,9 +338,12 @@ def assign_project_ids(
     taken = set(taken)
     held = held or {}
     wanting: dict[str, list[tuple[Candidate, str, str]]] = {}
-    for candidate in sorted(candidates, key=lambda c: (c.post.post_id, c.column.lang)):
+    for candidate in sorted(candidates, key=lambda c: (c.post.post_id, c.column.key)):
         lang = candidate.column.lang.lower()
         base = base_project_id(candidate.post, candidate.column)
+        if candidate.column.variant:
+            # A second column in one language, told apart by its header (see parse_post).
+            base = f"{base}-{candidate.column.variant}"
         wanting.setdefault(f"{base}-{lang}", []).append((candidate, base, lang))
 
     ids: dict[tuple[int, str], str] = {}
@@ -357,7 +361,7 @@ def assign_project_ids(
                 logger.warning("post %s: cannot be named %r; not converted", post_id, pid)
                 continue
             used.add(pid)
-            ids[(post_id, candidate.column.lang)] = pid
+            ids[(post_id, candidate.column.key)] = pid
     return ids
 
 

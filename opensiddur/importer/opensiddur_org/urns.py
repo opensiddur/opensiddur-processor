@@ -14,7 +14,14 @@ A ``new`` post's rows are ``<urn>/<n>``, numbered from 1 over the rows that are 
 headings, except where ``rows`` names an existing URN: a post that strings together prayers
 already in the collection (the Ḥanukkah blessings, say) is new as a whole but shares its
 parts. An ``existing`` post names each row's URN, or null for a row that matches no part of
-the existing text; such a post is irregular until every row is mapped.
+the existing text: a place where the version departs from the original. ``spans`` records
+which part of the original each such row stands in for, which its milestone corresponds to.
+
+A post with more than one table holds that many texts. Table ``k`` is the text
+``<urn>/<k>``, unless ``tables`` records a decision of its own for it (an existing text, say):
+
+    {"post_id": 4957, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:scaling_the_walls",
+     "tables": {"1": {"kind": "existing", "urn": "urn:x-opensiddur:text:bible:psalms/67", ...}}}
 """
 
 from __future__ import annotations
@@ -43,6 +50,21 @@ class PostUrns:
     kind: str
     urn: str
     rows: dict[int, str | None] = field(default_factory=dict)
+    #: Table number -> its own decision, for a post with more than one table.
+    tables: dict[int, "PostUrns"] = field(default_factory=dict)
+    #: For an ``existing`` post, each unmapped row -> the span of the original it stands in
+    #: for, a range like ``…:bible:psalms/29/3-6``, or "" for material the version adds.
+    spans: dict[int, str] = field(default_factory=dict)
+
+    def table(self, number: int, count: int) -> "PostUrns":
+        """The URNs of the post's table ``number`` (from 1) of ``count``."""
+        if count == 1:
+            return self
+        return self.tables.get(number) or PostUrns(self.post_id, "new", f"{self.urn}/{number}")
+
+    def quoted(self) -> "PostUrns":
+        """For an essay, whose own URN is the essay's: the text of the passages it quotes."""
+        return PostUrns(self.post_id, "new", f"{self.urn}/quoted")
 
     def row_urn(self, n: int) -> str | None:
         if self.kind == "new":
@@ -54,13 +76,26 @@ class PostUrns:
         rows = {str(n): urn for n, urn in sorted(self.rows.items()) if urn or self.kind == "existing"}
         if rows:
             data["rows"] = rows
+        if self.spans:
+            data["spans"] = {str(n): span for n, span in sorted(self.spans.items())}
+        if self.tables:
+            data["tables"] = {str(n): json.loads(t.to_json()) for n, t in sorted(self.tables.items())}
+            for table in data["tables"].values():
+                del table["post_id"]
         return json.dumps(data, ensure_ascii=False)
 
     @classmethod
     def from_json(cls, line: str) -> "PostUrns":
-        data = json.loads(line)
+        return cls.from_data(json.loads(line))
+
+    @classmethod
+    def from_data(cls, data: dict, post_id: int | None = None) -> "PostUrns":
+        post_id = int(data["post_id"]) if post_id is None else post_id
         rows = {int(n): urn for n, urn in (data.get("rows") or {}).items()}
-        return cls(post_id=int(data["post_id"]), kind=data["kind"], urn=data["urn"], rows=rows)
+        tables = {int(n): cls.from_data(t, post_id) for n, t in (data.get("tables") or {}).items()}
+        spans = {int(n): span for n, span in (data.get("spans") or {}).items()}
+        return cls(post_id=post_id, kind=data["kind"], urn=data["urn"], rows=rows, tables=tables,
+                   spans=spans)
 
 
 def load_post_urns(path: Path = POST_URNS_PATH) -> dict[int, PostUrns]:
@@ -106,14 +141,18 @@ def mint(post: "Post", taken: set[str], variants: Mapping[str, str] | None = Non
 
 
 def registry_lines(
-    record: PostUrns, rows: Iterable[int], *, label_en: str, label_he: str = ""
+    record: PostUrns, rows: Iterable[int], *, label_en: str, label_he: str = "",
+    parent: str | None = None,
 ) -> list[dict[str, object]]:
-    """The registry records a ``new`` post's URNs need: the post and each of ``rows`` (the
-    row numbers that have text in some imported column)."""
+    """The registry records a ``new`` post's URNs need: the post (under ``parent``, for one
+    table of several) and each of ``rows`` (the row numbers that have text in some imported
+    column)."""
     if record.kind != "new":
         return []
     label_en = label_en or record.urn.rsplit(":", 1)[-1]
     top: dict[str, object] = {"urn": record.urn, "status": "canonical", "label_en": label_en}
+    if parent:
+        top["parent"] = parent
     if label_he:
         top["label_he"] = label_he
     lines: list[dict[str, object]] = [top]

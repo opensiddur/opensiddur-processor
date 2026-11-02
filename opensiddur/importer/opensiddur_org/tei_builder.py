@@ -25,6 +25,7 @@ from opensiddur.importer.opensiddur_org.languages import DEFAULT_SCRIPT, ISO639_
 from opensiddur.importer.opensiddur_org.licences import LicenceDecision
 from opensiddur.importer.opensiddur_org.parse_post import (
     Block,
+    Cell,
     Column,
     FootnoteRef,
     Line,
@@ -34,7 +35,12 @@ from opensiddur.importer.opensiddur_org.parse_post import (
     Text,
     node_text,
 )
-from opensiddur.importer.opensiddur_org.scope import column_mode, is_heading_row
+from opensiddur.importer.opensiddur_org.scope import (
+    column_mode,
+    imported_columns,
+    is_heading_row,
+    table_views,
+)
 from opensiddur.importer.opensiddur_org.urns import PostUrns
 from opensiddur.importer.util.tei_project import PROJECT_SOURCE_BIBL_ID, tei_document, xml_id_ref
 
@@ -52,7 +58,15 @@ SPAN_MARKUP: dict[str, tuple[str, str]] = {
     "bold": ('<tei:hi rend="bold">', "</tei:hi>"),
     "superscript": ('<tei:hi rend="superscript">', "</tei:hi>"),
     "subscript": ('<tei:hi rend="subscript">', "</tei:hi>"),
+    # From colours (see post_decisions.yaml).
+    "quotation": ('<tei:seg type="quotation">', "</tei:seg>"),
+    "choice": ("<tei:choice>", "</tei:choice>"),
+    "written": ("<j:written>", "</j:written>"),
+    "read": ("<j:read>", "</j:read>"),
 }
+
+#: Column roles whose cells are notes on the column beside them.
+NOTE_ROLES = frozenset({"commentary", "description"})
 
 #: Span kinds that may not nest inside themselves or a note, and are dropped there.
 _NOTE_UNSAFE = frozenset({"instruction"})
@@ -112,13 +126,63 @@ def titles_by_language(post: Post) -> list[tuple[str, str]]:
 
 @dataclass
 class _Notes:
-    """The footnotes a document anchors, collected while its text is rendered."""
+    """What a document collects while its text is rendered: the footnotes it anchors, and the
+    conditions it numbers. ``condition_base`` names the text's own variants:
+    ``urn:x-opensiddur:condition:<the text URN's path>``."""
 
     entries: list[tuple[int, tuple[Node, ...]]]
+    condition_base: str = ""
+    conditions: int = 0
 
     def anchor(self, ref: FootnoteRef) -> str:
         self.entries.append((ref.number, ref.note))
         return f'<tei:anchor xml:id="note_{ref.number}"/>'
+
+    def conditional(self, kind: str, inner: str) -> str:
+        """``inner`` as the scope of a condition, set off as the source marks it (by colour).
+        When no setting decides the condition, both readings stand, set off."""
+        self.conditions += 1
+        cond_id = f"cond_{self.conditions}"
+        return (f'<j:conditional xml:id="{cond_id}" type="marked">{condition_fs(kind, self.condition_base)}'
+                f'</j:conditional>{inner}<j:endConditional target="#{cond_id}"/>')
+
+
+
+
+def condition_base(text_urn: str) -> str:
+    """The condition URNs of a text's variants: ``…:text:prayer:x`` -> ``…:condition:prayer:x``."""
+    return "urn:x-opensiddur:condition:" + text_urn.split("urn:x-opensiddur:text:", 1)[-1]
+
+
+def condition_fs(kind: str, base: str) -> str:
+    """The feature structure a colour's condition tests: ``variant:amended`` -> the text's
+    variant ``…/amended``, true (``:original`` makes it false); ``gender:female`` and
+    ``rite:ashkenaz`` test the features JLPTEI has for them."""
+    family, name, *rest = kind.split(":") + [""]
+    if family == "gender":
+        return (f'<tei:fs type="opensiddur:person"><tei:f name="gender">'
+                f'<tei:symbol value="{attr(name)}"/></tei:f></tei:fs>')
+    if family == "rite":
+        return f'<tei:fs type="opensiddur:rite"><tei:f name="{attr(name)}"><tei:binary value="true"/></tei:f></tei:fs>'
+    value = "false" if "original" in rest else "true"
+    return (f'<tei:fs type="opensiddur:variant"><tei:f name="{attr(base)}/{attr(name)}">'
+            f'<tei:binary value="{value}"/></tei:f></tei:fs>')
+
+
+def _render_span(kind: str, inner: str, notes: _Notes | None) -> str:
+    """A span whose kind has a particular after a colon (see ``parse_post.colour_kind``)."""
+    family, _, particular = kind.partition(":")
+    if family == "lang":
+        return f'<tei:seg xml:lang="{attr(particular)}">{inner}</tei:seg>'
+    if family in ("supplied", "cantillation"):
+        # Who supplied the words ("scholars", "author"), or the melody to read in ("job").
+        subtype = f' subtype="{attr(particular)}"' if particular else ""
+        return f'<tei:seg type="{family}"{subtype}>{inner}</tei:seg>'
+    if family in ("variant", "gender", "rite", "concealed") and notes is not None:
+        return notes.conditional(kind if family != "concealed" else "variant:concealed", inner)
+    if family in ("variant", "gender", "rite", "concealed"):
+        return inner  # in a note: the condition belongs to the text
+    raise ValueError(f"no encoding for a span of kind {kind!r}")
 
 
 def render_inline(nodes: tuple[Node, ...] | Line, notes: _Notes | None, *, in_note: bool = False) -> str:
@@ -133,6 +197,9 @@ def render_inline(nodes: tuple[Node, ...] | Line, notes: _Notes | None, *, in_no
             inner = render_inline(node.children, notes, in_note=in_note or node.kind == "instruction")
             if in_note and node.kind in _NOTE_UNSAFE:
                 out.append(inner)
+                continue
+            if node.kind not in SPAN_MARKUP:
+                out.append(_render_span(node.kind, inner, None if in_note else notes))
                 continue
             opening, closing = SPAN_MARKUP[node.kind]
             out.append(f"{opening}{inner}{closing}")
@@ -185,39 +252,126 @@ def row_numbers(post: Post) -> dict[int, int]:
     return numbers
 
 
+def hosted_notes(post: Post, column_index: int) -> list[tuple[int, Column]]:
+    """The commentary and description columns whose cells are notes on ``column_index``: each
+    belongs to the nearest column with text to its left, or else to its right."""
+    texts = [index for index, _ in imported_columns(post)]
+    hosted = []
+    for index, column in enumerate(post.columns):
+        if column.role not in NOTE_ROLES or not texts:
+            continue
+        left = [i for i in texts if i < index]
+        host = left[-1] if left else min(texts)
+        if host == column_index:
+            hosted.append((index, column))
+    return hosted
+
+
+def _note(kind: str, cell: Cell, notes: _Notes, lang: str) -> str:
+    """A cell of a commentary or description column, as a note. A description is a rubric,
+    set inline like the source's ("Reader:"); a commentary may run to paragraphs."""
+    lines = ["<tei:lb/>".join(render_inline(line, notes, in_note=True) for line in block.lines)
+             for block in cell.blocks]
+    body = "<tei:lb/>".join(lines) if kind == "description" else "".join(f"<tei:p>{p}</tei:p>" for p in lines)
+    return f'<tei:note type="{kind}"{_lang_attr(cell.lang, lang)}>{body}</tei:note>'
+
+
 def text_body(post: Post, column_index: int, column: Column, urns: PostUrns) -> tuple[str, str]:
-    """The body ``tei:div`` of one column, and its ``tei:standOff`` (or "")."""
-    notes = _Notes([])
+    """The body ``tei:div`` of one column, and its ``tei:standOff`` (or "").
+
+    A heading row opens a section in every language; a heading inside a cell opens one in its
+    column's language only. Either way the row milestones are untouched, so the languages
+    stay aligned.
+    """
+    notes = _Notes([], condition_base=condition_base(urns.urn))
     unit = "paragraph" if column_mode(post, column_index) == {"paragraph"} else "stanza"
     numbers = row_numbers(post)
+    hosted = hosted_notes(post, column_index)
     parts: list[str] = [f'<tei:div corresp="{attr(urns.urn)}">']
     head = next((title for lang, title in titles_by_language(post) if lang == column.lang), "")
     if head:
         parts.append(f"<tei:head>{esc(head)}</tei:head>")
     in_section = False
+    #: The span of the original the departing rows being set stand in for (see below).
+    departure: str | None = None
+
+    def open_section(heading_lines: tuple[Line, ...], lang_attr: str) -> None:
+        nonlocal in_section
+        if in_section:
+            parts.append("</tei:div>")
+        parts.append("<tei:div>")
+        in_section = True
+        if heading_lines:
+            heading = "<tei:lb/>".join(render_inline(line, notes) for line in heading_lines)
+            parts.append(f"<tei:head{lang_attr}>{heading}</tei:head>")
+
     for index, row in enumerate(post.rows):
         cell = row.cells[column_index]
+        lang_attr = _lang_attr(cell.lang, column.lang)
         if index not in numbers:
-            # A heading row opens a section; the next heading row closes it.
-            if in_section:
-                parts.append("</tei:div>")
-            parts.append("<tei:div>")
-            in_section = True
-            if not cell.is_empty:
-                heading = "<tei:lb/>".join(render_inline(line, notes) for line in cell.blocks[0].lines)
-                parts.append(f"<tei:head{_lang_attr(cell.lang, column.lang)}>{heading}</tei:head>")
+            open_section(cell.blocks[0].lines if not cell.is_empty else (), lang_attr)
             continue
         if cell.is_empty:
             continue
         row_urn = urns.row_urn(numbers[index])
         if row_urn:
-            parts.append(f'<tei:milestone unit="{unit}" corresp="{attr(row_urn)}"/>')
-        lang_attr = _lang_attr(cell.lang, column.lang)
-        parts.extend(render_block(block, notes, lang_attr) for block in cell.blocks)
+            milestone = f'<tei:milestone unit="{unit}" corresp="{attr(row_urn)}"/>'
+            departure = None
+        elif urns.kind == "existing":
+            # Where a version departs from the original, one milestone opens the run of rows,
+            # corresponding to the span of the original they stand in for; added material
+            # corresponds to nothing, and its milestone only ends the scope before it.
+            span = urns.spans.get(numbers[index], "")
+            milestone = "" if span == departure else (
+                f'<tei:milestone unit="{unit}" corresp="{attr(span)}"/>' if span
+                else f'<tei:milestone unit="{unit}"/>')
+            departure = span
+        else:
+            milestone = ""
+        blocks = list(cell.blocks)
+        # Headings that open the cell open their section before the row begins.
+        while blocks and blocks[0].kind == "heading":
+            open_section(blocks.pop(0).lines, lang_attr)
+        if not blocks:
+            continue
+        parts.append(milestone)
+        parts.extend(_note("description", row.cells[i], notes, column.lang)
+                     for i, c in hosted if c.role == "description" and not row.cells[i].is_empty)
+        for block in blocks:
+            if block.kind == "heading":
+                open_section(block.lines, lang_attr)
+            else:
+                parts.append(render_block(block, notes, lang_attr))
+        parts.extend(_note("commentary", row.cells[i], notes, column.lang)
+                     for i, c in hosted if c.role == "commentary" and not row.cells[i].is_empty)
     if in_section:
         parts.append("</tei:div>")
     parts.append("</tei:div>")
     return f"<tei:body>{''.join(parts)}</tei:body>", standoff(notes, column.lang)
+
+
+def essay_body(post: Post, lang: str, urns: PostUrns) -> tuple[str, str]:
+    """An essay's body: its paragraphs, transcluding each passage it quotes where it stands."""
+    notes = _Notes([], condition_base=condition_base(urns.urn))
+    quoted = urns.quoted()
+    parts = [f'<tei:div corresp="{attr(urns.urn)}">']
+    head = next((title for title_lang, title in titles_by_language(post) if title_lang == lang), "")
+    if head:
+        parts.append(f"<tei:head>{esc(head)}</tei:head>")
+    for item in post.essay:
+        if isinstance(item, int):
+            parts.append(f'<j:transclude type="external" target="{attr(quoted.row_urn(item))}"/>')
+        else:
+            parts.append(f"<tei:p>{render_inline(item, notes)}</tei:p>")
+    parts.append("</tei:div>")
+    return f"<tei:body>{''.join(parts)}</tei:body>", standoff(notes, lang)
+
+
+def essay_language(post: Post, languages: list[str]) -> str | None:
+    """The project an essay is written in: the language of its paragraphs (as
+    :func:`front_language` judges it), else English, else the first."""
+    lines = [item for item in post.essay if not isinstance(item, int)]
+    return _written_language(lines, languages)
 
 
 def standoff(notes: _Notes, lang: str) -> str:
@@ -382,7 +536,11 @@ def front(post: Post, lang: str, id_prefix: str) -> tuple[str, str]:
 def front_language(post: Post, languages: list[str]) -> str | None:
     """The project the front matter goes in: the one whose language it is written in, else
     English, else the first."""
-    text = " ".join(node_text(line) for line in post.intro + post.notes)
+    return _written_language(post.intro + post.notes, languages)
+
+
+def _written_language(lines: list[Line], languages: list[str]) -> str | None:
+    text = " ".join(node_text(line) for line in lines)
     if not text.strip():
         return None
     if re.search(r"[A-Za-z]", text):
@@ -410,7 +568,6 @@ class ProjectFiles:
 
 def build_project(
     post: Post,
-    column_index: int,
     column: Column,
     *,
     urns: PostUrns,
@@ -420,18 +577,37 @@ def build_project(
     upstream_commit_date: str,
     with_front: bool,
     project_id: str,
+    with_essay: bool = False,
 ) -> ProjectFiles:
+    """One project of the post: the column ``column.key`` of each of its tables. A post with
+    more than one table holds that many texts, each in a file of its own, which the index
+    transcludes in order.
+
+    An essay's table is the passages it quotes (``<urn>/quoted``). The project of the essay's
+    language (``with_essay``) also holds the essay, ``<urn>``, which transcludes each passage
+    where it stands; its index transcludes the essay, and the other projects' the passages."""
     lang = column.lang
     pid = project_id
-    stem = text_file_stem(urns.urn)
     column_credits = credits.for_column_role(column.role)
-
-    body, notes = text_body(post, column_index, column, urns)
     text_header = header(
         post, lang=lang, credits=column_credits, licence=licence,
         source_desc=f'<tei:bibl><tei:ptr target="{xml_id_ref(pid, "index", PROJECT_SOURCE_BIBL_ID)}"/></tei:bibl>',
     )
-    text_document = tei_document(text_header, body, lang=lang, standoff_xml=notes)
+    views = table_views(post)
+    files: dict[str, str] = {}
+    transclusions: list[str] = []
+    for number, view in enumerate(views, 1):
+        index = next((i for i, c in imported_columns(view) if c.key == column.key), None)
+        if index is None:
+            continue
+        text_urns = urns.quoted() if post.essay else urns.table(number, len(views))
+        body, notes = text_body(view, index, view.columns[index], text_urns)
+        files[text_file_stem(text_urns.urn)] = tei_document(text_header, body, lang=lang, standoff_xml=notes)
+        transclusions.append(f'<j:transclude type="external" target="{attr(text_urns.urn)}"/>')
+    if post.essay and with_essay:
+        body, notes = essay_body(post, lang, urns)
+        files[text_file_stem(urns.urn)] = tei_document(text_header, body, lang=lang, standoff_xml=notes)
+        transclusions = [f'<j:transclude type="external" target="{attr(urns.urn)}"/>']
 
     index_header = header(
         post, lang=lang, credits=column_credits, licence=licence,
@@ -439,11 +615,9 @@ def build_project(
             post, credits, upstream_commit=upstream_commit, upstream_commit_date=upstream_commit_date
         ),
     )
-    index_body = (
-        f'<tei:body><tei:div><j:transclude type="external" target="{attr(urns.urn)}"/></tei:div></tei:body>'
-    )
+    index_body = f"<tei:body><tei:div>{''.join(transclusions)}</tei:div></tei:body>"
     front_xml, front_notes = front(post, lang, f"osp_{post.post_id}") if with_front else ("", "")
     index_document = tei_document(
         index_header, index_body, lang=lang, front_xml=front_xml, standoff_xml=front_notes
     )
-    return ProjectFiles(pid, lang, {"index": index_document, stem: text_document})
+    return ProjectFiles(pid, lang, {"index": index_document, **files})
