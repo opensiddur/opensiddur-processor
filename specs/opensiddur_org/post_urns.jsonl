@@ -203,7 +203,7 @@
 {"post_id": 11878, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:oy_meh_haya_lanu_barukh"}
 {"post_id": 11883, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:alelai_li_elazar"}
 {"post_id": 11890, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:a_prayer_for_justice_spatz"}
-{"post_id": 11906, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:seven_blessings_for_interlinking_souls_weiss"}
+{"post_id": 11906, "kind": "existing", "urn": "urn:x-opensiddur:text:prayer:sheva_berakhot", "rows": {"1": "urn:x-opensiddur:text:prayer:borei_peri_hagafen", "2": "urn:x-opensiddur:text:prayer:sheva_berakhot/shehakol_bara", "3": "urn:x-opensiddur:text:prayer:sheva_berakhot/yotzer_haadam", "4": "urn:x-opensiddur:text:prayer:sheva_berakhot/asher_yatzar_haadam", "5": "urn:x-opensiddur:text:prayer:sheva_berakhot/sos_tasis", "6": "urn:x-opensiddur:text:prayer:sheva_berakhot/sammeach_tesammach", "7": "urn:x-opensiddur:text:prayer:sheva_berakhot/asher_bara"}}
 {"post_id": 11926, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:a_memorys_fire_burns_within_me_still_meit"}
 {"post_id": 11935, "kind": "new", "urn": "urn:x-opensiddur:text:poem:bendigamos_al_altisimo"}
 {"post_id": 11958, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:oracion_neohasid_org"}
@@ -270,7 +270,7 @@
 {"post_id": 14429, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:my_ten_days_of_repentance_writing_exercise_wolkin"}
 {"post_id": 14447, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:positive_vidui_weiss"}
 {"post_id": 14458, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:benediction_schonfeld"}
-{"post_id": 14515, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:vidui_meditation_cohen"}
+{"post_id": 14515, "kind": "existing", "urn": "urn:x-opensiddur:text:prayer:ashamnu", "rows": {"1": "urn:x-opensiddur:text:prayer:ashamnu/1", "2": "urn:x-opensiddur:text:prayer:ashamnu/2", "3": "urn:x-opensiddur:text:prayer:ashamnu/3", "4": "urn:x-opensiddur:text:prayer:ashamnu/4", "5": "urn:x-opensiddur:text:prayer:ashamnu/5", "6": "urn:x-opensiddur:text:prayer:ashamnu/6", "7": "urn:x-opensiddur:text:prayer:ashamnu/7", "8": "urn:x-opensiddur:text:prayer:ashamnu/8", "9": "urn:x-opensiddur:text:prayer:ashamnu/9", "10": "urn:x-opensiddur:text:prayer:ashamnu/10", "11": "urn:x-opensiddur:text:prayer:ashamnu/11", "12": "urn:x-opensiddur:text:prayer:ashamnu/12", "13": "urn:x-opensiddur:text:prayer:ashamnu/13", "14": "urn:x-opensiddur:text:prayer:ashamnu/14", "15": "urn:x-opensiddur:text:prayer:ashamnu/15", "16": "urn:x-opensiddur:text:prayer:ashamnu/16", "17": "urn:x-opensiddur:text:prayer:ashamnu/17", "18": "urn:x-opensiddur:text:prayer:ashamnu/18", "19": "urn:x-opensiddur:text:prayer:ashamnu/19", "20": "urn:x-opensiddur:text:prayer:ashamnu/20", "21": "urn:x-opensiddur:text:prayer:ashamnu/21", "22": "urn:x-opensiddur:text:prayer:ashamnu/22", "23": "urn:x-opensiddur:text:prayer:ashamnu/23", "24": "urn:x-opensiddur:text:prayer:ashamnu/24"}}
 {"post_id": 14598, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:israelite_samaritan_prayers_for_the_shabbat_torah_reading_tsedaka"}
 {"post_id": 14599, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:israelite_samaritan_kiddush_for_the_shabbat_evening_meal_tsedaka"}
 {"post_id": 14626, "kind": "new", "urn": "urn:x-opensiddur:text:poem:loss_of_what_could_be_but_is_a_prayer_poem_in_eulogy_after_meit"}

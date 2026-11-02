@@ -34,6 +34,7 @@ from opensiddur.importer.opensiddur_org.parse_post import (
     Span,
     Text,
     node_text,
+    transcluded_urn,
 )
 from opensiddur.importer.opensiddur_org.scope import (
     column_mode,
@@ -513,18 +514,26 @@ def header(
 # --------------------------------------------------------------------------------------------
 
 
-def front(post: Post, lang: str, id_prefix: str) -> tuple[str, str]:
+def front(post: Post, lang: str, id_prefix: str, *, shared: bool = True,
+          own_introduction: bool = False) -> tuple[str, str]:
     """The post's own words, the paragraphs before and after its table, as colophon divisions
     gated on paratext, and the standOff of their footnotes. They are about the digital edition,
     not part of the source, so ``type="colophon"`` keeps them apart from front matter a source
     printed; the exporter sets them after its own colophon. They go in the project whose
-    language they are written in (see :func:`front_language`)."""
+    language they are written in (see :func:`front_language`): ``shared``. An introduction the
+    post gives in several languages goes, each language's, in the project of that language:
+    ``own_introduction``."""
     notes = _Notes([])
     sections = []
-    for name, lines in (("introduction", post.intro), ("notes", post.notes)):
+    intro = (post.intro if shared else []) + (post.intros_by_language.get(lang, []) if own_introduction else [])
+    for name, lines in (("introduction", intro), ("notes", post.notes if shared else [])):
         if not lines:
             continue
-        paragraphs = "".join(f"<tei:p>{render_inline(line, notes)}</tei:p>" for line in lines)
+        paragraphs = "".join(
+            f'<j:transclude type="external" target="{attr(urn)}"/>' if (urn := transcluded_urn(line))
+            else f"<tei:p>{render_inline(line, notes)}</tei:p>"
+            for line in lines
+        )
         cond_id = f"{id_prefix}_{name}"
         sections.append(
             f'<j:conditional xml:id="{cond_id}"><tei:fs type="opensiddur:paratext">'
@@ -582,6 +591,7 @@ def build_project(
     with_front: bool,
     project_id: str,
     with_essay: bool = False,
+    with_own_introduction: bool = False,
 ) -> ProjectFiles:
     """One project of the post: the column ``column.key`` of each of its tables. A post with
     more than one table holds that many texts, each in a file of its own, which the index
@@ -620,7 +630,10 @@ def build_project(
         ),
     )
     index_body = f"<tei:body><tei:div>{''.join(transclusions)}</tei:div></tei:body>"
-    front_xml, front_notes = front(post, lang, f"osp_{post.post_id}") if with_front else ("", "")
+    front_xml, front_notes = (
+        front(post, lang, f"osp_{post.post_id}", shared=with_front, own_introduction=with_own_introduction)
+        if with_front or with_own_introduction else ("", "")
+    )
     index_document = tei_document(
         index_header, index_body, lang=lang, front_xml=front_xml, standoff_xml=front_notes
     )

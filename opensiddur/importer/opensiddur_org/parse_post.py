@@ -42,6 +42,7 @@ from opensiddur.importer.opensiddur_org.languages import (
 )
 from opensiddur.importer.opensiddur_org.post_decisions import (
     NO_DECISIONS,
+    Layout,
     PostDecisions,
     default_post_decisions,
 )
@@ -99,6 +100,18 @@ class FootnoteRef:
 
 Node = Union[Text, Span, FootnoteRef]
 Line = tuple[Node, ...]
+
+#: A line of the post's own words that is a transclusion of the URN after this prefix: a text
+#: in the collection that the post quotes (see ``Layout.transclusions``). It has no text.
+TRANSCLUSION_KIND = "transclusion:"
+TRANSCLUSION_ATTRIBUTE = "data-opensiddur-transclude"
+
+
+def transcluded_urn(line: Line) -> str | None:
+    """The URN a line transcludes, if it is a transclusion."""
+    if len(line) == 1 and isinstance(line[0], Span) and line[0].kind.startswith(TRANSCLUSION_KIND):
+        return line[0].kind[len(TRANSCLUSION_KIND):]
+    return None
 
 
 @dataclass(frozen=True)
@@ -191,6 +204,9 @@ class Post:
     #: texts, each its own file.
     tables: list[Table] = field(default_factory=list)
     intro: list[Line] = field(default_factory=list)
+    #: An introduction the post gives in more than one language, by language. Each goes in the
+    #: project of its language (see :class:`Layout`).
+    intros_by_language: dict[str, list[Line]] = field(default_factory=dict)
     notes: list[Line] = field(default_factory=list)
     sources: list[SourceRef] = field(default_factory=list)
     #: Body ``div[lang]`` blocks set outside any table: the prose-only layout.
@@ -615,6 +631,9 @@ def _paragraph_lines(elements: list[HtmlElement], footnotes: _Footnotes) -> list
             continue
         if element.tag in ("hr",):
             continue
+        if element.get(TRANSCLUSION_ATTRIBUTE):
+            lines.append((Span(f"{TRANSCLUSION_KIND}{element.get(TRANSCLUSION_ATTRIBUTE)}", ()),))
+            continue
         for line, _gap in _split_lines(_inline_nodes(element, footnotes)):
             if line and not _only_download_labels(line):
                 lines.append(line)
@@ -714,6 +733,8 @@ def parse_post(data: dict[str, Any], decisions: PostDecisions = NO_DECISIONS) ->
     )
     _strip_noise(root)
     footnotes = _Footnotes()
+    layout = decisions.layouts.get(post.post_id)
+    introduction = _apply_layout(root, layout) if layout else None
 
     top = _top_level(root)
     tables = root.xpath('//table[contains(@class, "toggleable-table")]')
@@ -736,14 +757,22 @@ def parse_post(data: dict[str, Any], decisions: PostDecisions = NO_DECISIONS) ->
         table_tops = [top_index(table) for table in tables]
         first_at, last_at = min(table_tops), max(table_tops)
         sources_at = sources_heading(last_at)
-        post.intro = _paragraph_lines(top[:first_at], footnotes)
+        intro_top = top.index(introduction) if introduction is not None and introduction in top else None
+        if intro_top is not None:
+            post.intros_by_language = _intros_by_language(introduction, footnotes)
+        post.intro = _paragraph_lines([el for i, el in enumerate(top[:first_at]) if i != intro_top], footnotes)
         overrides = decisions.column_languages.get(post.post_id, {})
         post.tables = [_parse_table(table, footnotes, overrides) for table in tables]
         _roles_of_unheaded_columns(post.tables)
         _keys_across_tables(post.tables)
         post.columns, post.rows = post.tables[0].columns, post.tables[0].rows
         # Text between tables is the post's own words too, kept with what follows the last.
-        between = [el for i, el in enumerate(top[first_at:sources_at], first_at) if i not in table_tops]
+        between = [el for i, el in enumerate(top[first_at:sources_at], first_at)
+                   if i not in table_tops and i != intro_top]
+        if layout and layout.credit_after:
+            after = [el for el in between if top.index(el) > last_at]
+            between = [el for el in between if top.index(el) < last_at]
+            post.sources = _credits(after)
         post.notes = _paragraph_lines(between, footnotes)
     elif post.post_id in decisions.essays:
         _parse_essay(post, top, footnotes, sources_heading)
@@ -774,9 +803,93 @@ def parse_post(data: dict[str, Any], decisions: PostDecisions = NO_DECISIONS) ->
         if table is not None:
             post.tables = [table]
             post.columns, post.rows = table.columns, table.rows
-    post.sources = _source_refs(top[sources_at:])
+    post.sources += _source_refs(top[sources_at:])
     apply_colours(post, decisions.colours.get(post.post_id, {}))
     return post
+
+
+def _apply_layout(root: HtmlElement, layout: Layout) -> HtmlElement | None:
+    """Mark the post's text as the site marks it in a toggleable table, by its ``layout``
+    decision, so the table rules read it. Returns the introduction's element, if it has one.
+    Every path is read against the post as it came, before any of them changes it."""
+    def one(path: str) -> HtmlElement:
+        found = root.xpath(path)
+        if len(found) != 1:
+            raise ValueError(f"layout: {path!r} finds {len(found)} elements, not one")
+        return found[0]
+
+    texts = [one(path) for path in layout.text]
+    introduction = one(layout.introduction) if layout.introduction is not None else None
+    quoted = [(one(path), urn) for path, urn in layout.transclusions.items()]
+    for element, urn in quoted:
+        marker = lxml.html.fromstring("<div></div>")
+        marker.set(TRANSCLUSION_ATTRIBUTE, urn)
+        marker.tail = element.tail
+        element.getparent().replace(element, marker)
+    for element in texts:
+        if element.tag != "table":
+            # A text in one language: a table of one column.
+            table = lxml.html.fromstring('<table class="toggleable-table"><tbody><tr><td/></tr></tbody></table>')
+            element.addprevious(table)
+            table.find(".//td").append(element)
+            continue
+        element.set("class", f"{element.get('class') or ''} toggleable-table".strip())
+        if layout.split:
+            _split_columns(element, layout.split)
+    while introduction is not None and introduction.getparent() is not None and introduction.getparent() is not root:
+        introduction = introduction.getparent()
+    return introduction
+
+
+def _split_columns(table: HtmlElement, split: dict[int, tuple[str | None, ...]]) -> None:
+    """Make each part of a split column's cells a column of its own, under its header: the
+    text before the cell's first paragraph, then each ``p``."""
+    width = max(len(tr.xpath("./td")) for tr in table.xpath(".//tr[td]"))
+    headers: list[str] = []
+    for number in range(1, width + 1):
+        headers.extend(h for h in split.get(number, ("",)) if h is not None)
+    for tr in table.xpath(".//tr[td]"):
+        for number, td in reversed(list(enumerate(tr.xpath("./td"), 1))):
+            if number not in split:
+                continue
+            div = td.find("div")
+            if div is None:
+                raise ValueError(f"layout: column {number} has a cell with no div[@lang]")
+            parts = [div.text or ""] + [lxml.html.tostring(p, encoding="unicode") for p in div.findall("p")]
+            if len(parts) != len(split[number]):
+                raise ValueError(f"layout: a cell of column {number} has {len(parts)} parts, "
+                                 f"not {len(split[number])}")
+            for part, header in reversed(list(zip(parts, split[number]))):
+                if header is None:
+                    continue
+                cell = lxml.html.fromstring(f"<td><div>{part}</div></td>")
+                for name, value in div.attrib.items():
+                    cell.find("div").set(name, value)
+                td.addnext(cell)
+            td.getparent().remove(td)
+    thead = lxml.html.fromstring(f"<thead><tr>{''.join(f'<th>{html.escape(h)}</th>' for h in headers)}</tr></thead>")
+    for old in table.xpath("./thead"):
+        table.remove(old)
+    table.insert(0, thead)
+
+
+def _intros_by_language(element: HtmlElement, footnotes: _Footnotes) -> dict[str, list[Line]]:
+    intros: dict[str, list[Line]] = {}
+    for div in element.xpath(".//div[@lang][not(ancestor::div[@lang])]"):
+        lang = language_from_lang_attribute(div.get("lang", "")) or UNKNOWN_LANGUAGE
+        intros.setdefault(lang, []).extend(line for block in _cell_blocks(div, footnotes) for line in block.lines)
+    return intros
+
+
+def _credits(elements: list[HtmlElement]) -> list[SourceRef]:
+    """Lines crediting where the text was first published, each with the first link it has."""
+    refs = []
+    for element in elements:
+        caption = _WS_RE.sub(" ", clean_text(element.text_content())).strip()
+        links = element.xpath(".//a/@href")
+        if caption and links:
+            refs.append(SourceRef(caption, safe_uri(links[0])))
+    return refs
 
 
 def _parse_table(table: HtmlElement, footnotes: _Footnotes, overrides: dict[str, str]) -> Table:
@@ -1108,6 +1221,8 @@ def apply_colours(post: Post, meanings: dict[str, str]) -> None:
     # In the post's own words a colour only shows which colour it is explaining ("Adapted text
     # in GREEN above"): it is dropped.
     post.intro = [_uncoloured(line) for line in post.intro]
+    post.intros_by_language = {lang: [_uncoloured(line) for line in lines]
+                               for lang, lines in post.intros_by_language.items()}
     post.notes = [_uncoloured(line) for line in post.notes]
     post.essay = [item if isinstance(item, int) else _uncoloured(item) for item in post.essay]
 
