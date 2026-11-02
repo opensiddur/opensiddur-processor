@@ -186,6 +186,22 @@ class TestProposals(unittest.TestCase):
         self.assertEqual(record.table(1, 2).urn, f"{P}poem:song")
         self.assertEqual(record.table(2, 2).urn, f"{record.urn}/2")
 
+    def test_the_title_names_no_single_table(self) -> None:
+        # 4957: "Psalms 67 and Ana b'Khoach" -- the title's psalm is not every table's.
+        first = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "מִלִּים חֲדָשׁוֹת לְגַמְרֵי שֶׁלֹּא נִשְׁמְעוּ מֵעוֹלָם")]])
+        second = table(["Source (Hebrew)"], [[cell("heb-Hebr", "liturgy", "וְעוֹד בַּיִת חָדָשׁ שֶׁהַמְּשׁוֹרֵר הוֹסִיף כָּאן")]])
+        post = parse_post(make_post(content=first + second, slug="psalms-067-and-ana-bkhoah"))
+        record, _ = decide(post, index(), {}, set(), {})
+        self.assertEqual(record.tables, {})
+        self.assertEqual([record.table(n, 2).urn for n in (1, 2)], [f"{record.urn}/1", f"{record.urn}/2"])
+
+    def test_two_tables_never_share_a_text(self) -> None:
+        stanzas = [[cell("heb-Hebr", "liturgy", "אֶרֶץ יָפָה וְהָרִים גְּבוֹהִים מְאֹד מְאֹד")],
+                   [cell("heb-Hebr", "liturgy", "כְּרֹת עֵצִים בַּיַּעַר הַגָּדוֹל וְהָרָחָב תָּמִיד")]]
+        post = parse_post(make_post(content=table(["Source (Hebrew)"], stanzas) * 2))
+        record, _ = decide(post, index(), {}, set(), {})
+        self.assertEqual((record.table(1, 2).urn, record.table(2, 2).urn), (f"{P}poem:song", f"{record.urn}/2"))
+
     def test_proposal_json(self) -> None:
         proposal = Proposal(1, None, {1: None}, ["why"])
         self.assertIn('"urn": null', proposal.to_json())

@@ -31,11 +31,17 @@ column_languages:
 #   language      words in another language: seg xml:lang
 #   quotation     a quoted verse: seg type="quotation"
 #   supplied      words supplied to fill a gap: seg type="supplied", subtype who supplied them
-#   ketiv         a written form beside its reading: tei:choice/j:written
+#   ketiv         a written form after its reading: tei:choice/j:written, the word before as j:read
+#   ketiv first   a written form before its reading: the word after it, or the span coloured as
+#                 the qere, is its j:read
+#   qere          a reading coloured beside its ketiv
 #   acrostic      acrostic letters: seg type="acrostic"
 #   hidden        text the site hides: kept, behind the opensiddur:variant <text>/concealed
 #   none          emphasis only: the colour is dropped
 colours:
+  1548: {brown: ketiv first, blue: qere}  # <font color>: פלאיה beside פְּלִיאָה
+  1769: {brown: ketiv first, blue: qere}
+  2657: {brown: ketiv first}  # the reading is the word after it, uncoloured
   5094: {green: amendment}
   18422: {green: amendment}  # Hertz's change to the first stanza of Maoz Tsur
   19667: {green: amendment}  # "green | original" offers the green as the alternative
@@ -44,6 +50,7 @@ colours:
   21219: {red: none}
   26340: {dodgerblue: cantillation job}
   26901: {blue: cantillation job}
+  28690: {brown: ketiv first, blue: qere}
   28941: {blue: cantillation job}
   30495: {dodgerblue: cantillation eikhah, red: cantillation entrances}
   31607: {"#808080": supplied}

@@ -314,9 +314,9 @@ def text_body(post: Post, column_index: int, column: Column, urns: PostUrns) -> 
         if cell.is_empty:
             continue
         row_urn = urns.row_urn(numbers[index])
+        span: str | None = None
         if row_urn:
             milestone = f'<tei:milestone unit="{unit}" corresp="{attr(row_urn)}"/>'
-            departure = None
         elif urns.kind == "existing":
             # Where a version departs from the original, one milestone opens the run of rows,
             # corresponding to the span of the original they stand in for; added material
@@ -325,7 +325,6 @@ def text_body(post: Post, column_index: int, column: Column, urns: PostUrns) -> 
             milestone = "" if span == departure else (
                 f'<tei:milestone unit="{unit}" corresp="{attr(span)}"/>' if span
                 else f'<tei:milestone unit="{unit}"/>')
-            departure = span
         else:
             milestone = ""
         blocks = list(cell.blocks)
@@ -335,6 +334,8 @@ def text_body(post: Post, column_index: int, column: Column, urns: PostUrns) -> 
         if not blocks:
             continue
         parts.append(milestone)
+        # Only a milestone set down opens (or continues) a departing run.
+        departure = span
         parts.extend(_note("description", row.cells[i], notes, column.lang)
                      for i, c in hosted if c.role == "description" and not row.cells[i].is_empty)
         for block in blocks:
@@ -354,13 +355,16 @@ def essay_body(post: Post, lang: str, urns: PostUrns) -> tuple[str, str]:
     """An essay's body: its paragraphs, transcluding each passage it quotes where it stands."""
     notes = _Notes([], condition_base=condition_base(urns.urn))
     quoted = urns.quoted()
+    # Passage k is row k of the table, numbered as its milestones are (headings skipped).
+    numbers = row_numbers(post)
     parts = [f'<tei:div corresp="{attr(urns.urn)}">']
     head = next((title for title_lang, title in titles_by_language(post) if title_lang == lang), "")
     if head:
         parts.append(f"<tei:head>{esc(head)}</tei:head>")
     for item in post.essay:
         if isinstance(item, int):
-            parts.append(f'<j:transclude type="external" target="{attr(quoted.row_urn(item))}"/>')
+            if item - 1 in numbers:
+                parts.append(f'<j:transclude type="external" target="{attr(quoted.row_urn(numbers[item - 1]))}"/>')
         else:
             parts.append(f"<tei:p>{render_inline(item, notes)}</tei:p>")
     parts.append("</tei:div>")

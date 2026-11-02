@@ -71,6 +71,10 @@ class TestLicenceDecisions(unittest.TestCase):
         decision = self.decide(make_post(503, last_updated="2026-09-01"), "en")
         self.assertEqual((decision.status, decision.licence.id), ("allow", "cc-by-sa-4.0"))
 
+    def test_a_held_post(self) -> None:
+        self.assertEqual(self.decide(make_post(505), "he").status, "undecided")
+        self.assertEqual(self.decide(make_post(505), "en").basis, "held: Held for permission.")
+
     def test_a_held_column(self) -> None:
         decision = self.decide(make_post(504), "en")
         self.assertEqual((decision.status, decision.basis), ("undecided", "held: Held until the translator licenses it."))

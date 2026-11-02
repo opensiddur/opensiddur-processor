@@ -353,11 +353,13 @@ _PLAIN_COLOURS = frozenset({"#000000", "#000", "black", "inherit", "initial", "t
 
 
 def _colour(element: HtmlElement) -> str:
-    """The text colour an element's style sets, lowercased (``dodgerblue``, ``#808080``), or ""."""
+    """The text colour an element sets, by its style or a ``<font color>``, lowercased
+    (``dodgerblue``, ``#808080``), or ""."""
     match = _COLOUR_RE.search(element.get("style") or "")
-    if not match or match.group(1).lower() in _PLAIN_COLOURS:
+    colour = match.group(1) if match else (element.get("color") or "").strip()
+    if not colour or colour.lower() in _PLAIN_COLOURS:
         return ""
-    return match.group(1).lower()
+    return colour.lower()
 
 
 def _wrap(kind: str, inner: list[Node | str]) -> list[Node | str]:
@@ -697,6 +699,7 @@ def parse_post(data: dict[str, Any], decisions: PostDecisions = NO_DECISIONS) ->
         overrides = decisions.column_languages.get(post.post_id, {})
         post.tables = [_parse_table(table, footnotes, overrides) for table in tables]
         _roles_of_unheaded_columns(post.tables)
+        _keys_across_tables(post.tables)
         post.columns, post.rows = post.tables[0].columns, post.tables[0].rows
         # Text between tables is the post's own words too, kept with what follows the last.
         between = [el for i, el in enumerate(top[first_at:sources_at], first_at) if i not in table_tops]
@@ -773,7 +776,7 @@ def _parse_essay(post: Post, top: list[HtmlElement], footnotes: _Footnotes, sour
         element = top[index]
         if index in passages:
             cells: dict[str, Cell] = {}
-            for div in element.xpath("descendant-or-self::div[@lang]"):
+            for div in element.xpath("descendant-or-self::div[@lang][not(ancestor::div[@lang])]"):
                 lang = language_from_lang_attribute(div.get("lang", "")) or UNKNOWN_LANGUAGE
                 cell = cells.setdefault(lang, Cell(lang=lang, css_class=div.get("class"), blocks=[],
                                                    raw_lang=div.get("lang", "")))
@@ -791,6 +794,30 @@ def _parse_essay(post: Post, top: list[HtmlElement], footnotes: _Footnotes, sour
     if columns:
         post.tables = [Table(columns, rows)]
         post.columns, post.rows = columns, rows
+
+
+def _keys_across_tables(tables: list[Table]) -> None:
+    """Give each column of a later table the project of the same work in an earlier one: the
+    same language, role and header words. A column that is another work (a different
+    translation, or the source where an earlier table had a translation) is a project of its
+    own, named by a variant."""
+    projects: dict[tuple[str, str, str], str] = {}
+    used: set[str] = set()
+    for number, table in enumerate(tables):
+        for index, column in enumerate(table.columns):
+            if column.role in NOT_TEXT_ROLES or not any(not row.cells[index].is_empty for row in table.rows):
+                continue
+            work = (column.lang, column.role, _variant_name(column.header))
+            if number and work in projects:
+                key = projects[work]
+                column.variant = key.split("/", 1)[1] if "/" in key else ""
+            elif number and column.key in used:
+                name = _variant_name(column.header) or column.role or f"table_{number + 1}"
+                while f"{column.lang}/{name}" in used:
+                    name = f"{name}_{number + 1}"
+                column.variant = name
+            projects.setdefault(work, column.key)
+            used.add(column.key)
 
 
 def _roles_of_unheaded_columns(tables: list[Table]) -> None:
@@ -940,6 +967,7 @@ _COLOUR_MEANINGS = {
     "alternative": "variant",
     "hidden": "concealed",
     "ketiv": "ketiv",
+    "qere": "qere",
 }
 #: Alternatives named for a feature that already exists: a gender, or a rite.
 _GENDERS = frozenset({"male", "female"})
@@ -967,6 +995,9 @@ def colour_kind(meaning: str) -> str | None:
         if particular in _RITES:
             return f"rite:{particular}"
         return f"variant:{particular or 'alternative'}"
+    if word == "ketiv":
+        # "ketiv first": the reading follows the written form (1548), else it precedes it.
+        return "ketiv:first" if particular == "first" else "ketiv"
     return f"{kind}:{particular}" if particular else kind
 
 
@@ -974,8 +1005,9 @@ def apply_colours(post: Post, meanings: dict[str, str]) -> None:
     """Give the post's coloured spans the meanings decided for them; colours with no meaning
     are left as they are and listed in ``post.undecided_colours``.
 
-    A ketiv takes the word before it as its reading. An amendment followed by ``| word``
-    offers the word as the original it replaces (post 19667), the opposite reading.
+    A ketiv takes the word before it as its reading (67262); a ``ketiv first`` takes the word
+    after it, or the span after it coloured as the ``qere`` (1548). An amendment followed by
+    ``| word`` offers the word as the original it replaces (post 19667), the opposite reading.
     """
     def convert_line(line: Line) -> Line:
         out: list[Node] = []
@@ -997,6 +1029,17 @@ def apply_colours(post: Post, meanings: dict[str, str]) -> None:
                         out.extend(children)
                     elif kind == "ketiv":
                         out.extend(_ketiv(out, children))
+                    elif kind == "ketiv:first":
+                        consumed, reading, rest = _reading_after(nodes[i + 1:], meanings)
+                        if reading is None:
+                            out.extend(children)
+                        else:
+                            out.append(Span("choice", (Span("written", children), Span("read", convert_line(reading)))))
+                            out.extend(rest)
+                            i += 1 + consumed
+                            continue
+                    elif kind == "qere":
+                        out.extend(children)  # a reading with no written form beside it
                     else:
                         out.append(Span(kind, children))
                         if kind.startswith("variant:") and i + 1 < len(nodes) and isinstance(nodes[i + 1], Text):
@@ -1042,6 +1085,26 @@ def _uncoloured(line: Line) -> Line:
         else:
             out.append(node)
     return tuple(out)
+
+
+def _reading_after(following: list[Node], meanings: dict[str, str]) -> tuple[int, tuple[Node, ...] | None, list[Node]]:
+    """The reading after a written form: a span coloured as the qere, after at most a space,
+    or else the next word. Returns how many nodes it took, the reading (None if there is
+    none), and what is left of the last node taken."""
+    index = 0
+    if following and isinstance(following[0], Text) and not following[0].text.strip():
+        index = 1
+    if index < len(following) and isinstance(following[index], Span):
+        span = following[index]
+        if (span.kind.startswith(COLOUR_KIND)
+                and meanings.get(span.kind[len(COLOUR_KIND):], "").split(" ")[0] == "qere"):
+            return index + 1, span.children, [Text(" ")] if index else []
+    if following and isinstance(following[0], Text):
+        match = re.match(r"^(\s*)(\S+)(.*)$", following[0].text, re.S)
+        if match:
+            rest = [Text(match.group(3))] if match.group(3) else []
+            return 1, (Text(match.group(2)),), rest
+    return 0, None, []
 
 
 def _ketiv(before: list[Node], written: tuple[Node, ...]) -> list[Node]:

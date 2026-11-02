@@ -286,6 +286,29 @@ class TestRules(unittest.TestCase):
                              [f"{song}/1", f"{song}/2-3", None])
         assert_valid(self, projects)
 
+    def test_a_departing_row_holding_only_a_heading(self) -> None:
+        song = "urn:x-opensiddur:text:poem:song"
+        rows = [[cell("heb-Hebr", "liturgy", "א"), cell("eng-Latn", "english", "A")],
+                [cell("heb-Hebr", "liturgy", "ב"), cell("eng-Latn", "english", "<h3>Heading B</h3>")],
+                [cell("heb-Hebr", "liturgy", "ג"), cell("eng-Latn", "english", "C")]]
+        urns = PostUrns(101, "existing", song, {1: f"{song}/1", 2: None, 3: None},
+                        spans={2: f"{song}/2-3", 3: f"{song}/2-3"})
+        _, projects = build(make_post(content=table(["Source (Hebrew)", "Translation (English)"], rows)), urns=urns)
+        english = tree(projects["en"].files["song"])
+        self.assertEqual([m.get("corresp") for m in english.iterfind(".//tei:milestone", NS)],
+                         [f"{song}/1", f"{song}/2-3"])
+        assert_valid(self, projects)
+
+    def test_tables_holding_different_works_are_different_projects(self) -> None:
+        first = table(["Source (Hebrew)", "Translation (English)"], [[cell("heb-Hebr", "liturgy", "א"), cell("eng-Latn", "english", "A")]])
+        second = table(["Source (Hebrew)", "Translation (English, Talmud, adapted)"],
+                       [[cell("heb-Hebr", "liturgy", "ב"), cell("eng-Latn", "english", "B")]])
+        post, projects = build(make_post(content=first + second))
+        self.assertEqual(sorted(projects), ["en", "en/talmud_adapted", "he"])
+        self.assertEqual(sorted(projects["en"].files), ["a_song_1", "index"])
+        self.assertEqual(sorted(projects["en/talmud_adapted"].files), ["a_song_2", "index"])
+        self.assertEqual(sorted(projects["he"].files), ["a_song_1", "a_song_2", "index"])
+
 
 class TestColours(unittest.TestCase):
     """Colours mean what each post's decision says (post_decisions.yaml)."""
@@ -341,6 +364,16 @@ class TestColours(unittest.TestCase):
         text = self.english('return our captivity <span style="color:gray">captivities</span> like streams', {"gray": "ketiv"})
         choice = text.find(".//tei:choice", NS)
         self.assertEqual((choice.find("j:written", NS).text, choice.find("j:read", NS).text), ("captivities", "captivity"))
+
+    def test_a_ketiv_before_its_reading(self) -> None:
+        text = self.english('<font color="brown">plaiah</font> <font color="blue">pliah</font> for me',
+                            {"brown": "ketiv first", "blue": "qere"})
+        choice = text.find(".//tei:choice", NS)
+        self.assertEqual((choice.find("j:written", NS).text, choice.find("j:read", NS).text), ("plaiah", "pliah"))
+        text = self.english('his <font color="brown">shirah</font> shiro with me', {"brown": "ketiv first"})
+        choice = text.find(".//tei:choice", NS)
+        self.assertEqual((choice.find("j:written", NS).text, choice.find("j:read", NS).text), ("shirah", "shiro"))
+        self.assertEqual("".join(text.find(".//tei:l", NS).itertext()), "his shirahshiro with me")
 
     def test_a_colour_in_a_footnote(self) -> None:
         body = ('You<span class="footnote_referrer"><a><sup>[1]</sup></a><span class="footnote_tooltip">'

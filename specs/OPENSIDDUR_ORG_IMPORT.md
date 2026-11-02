@@ -196,11 +196,12 @@ one of them settles is not irregular for that reason.
   | a quoted verse (`quotation`) | `seg type="quotation"` |
   | words supplied to fill a gap (`supplied <who>`) | `seg type="supplied" subtype="<who>"` |
   | a ketiv beside its qere (`ketiv`, 67262) | `tei:choice` with `j:written`, and the word before it as `j:read` |
+  | a ketiv before its qere (`ketiv first`, 1548, 1769, 2657, 28690) | the same, with the word after it, or the span coloured `qere`, as `j:read` |
   | acrostic letters (`acrostic`, 52874) | `seg type="acrostic"` |
   | text the site hides in white (`hidden`, 38069: instructions to destroy a place or kill a person) | kept, in a condition on the variant `…/concealed`; a setting that makes it false leaves it out |
   | emphasis only (`none`, 21219, 38595) | the colour is dropped |
 
-  A cell set in a colour has each of its lines coloured. JLPTEI's quotation, supplied and
+  A cell set in a colour has each of its lines coloured; `<font color>` is a colour too. JLPTEI's quotation, supplied and
   cantillation `seg` types are documented in `schema/JLPTEI-3.md`.
 
   A condition's default cannot be written into the text: a declaration in the text would
@@ -272,6 +273,12 @@ decision; and the URN proposals.
   new one headed by it. Row milestones are unaffected, so the languages stay aligned.
 - A post with more than one table holds that many texts. Each table is its own file, with its
   own URN, in the same project, and the project's `index.xml` transcludes them in order.
+  - A column belongs to the project of the column in an earlier table with the same language,
+    role and header words. Another work in that language (a different translation, or the
+    source where an earlier table had a translation) is a project of its own, named by a
+    variant, so that its credits and licence are its own.
+  - Each table is matched on its rows alone: the post's title names the post, not every table
+    (4957, "Psalms 67 and Ana b'Khoach"). Two tables never share a text's URN.
 - A cell in another language than its column (Aramaic in a Hebrew column) carries
   `xml:lang`.
 - Spans and notes map as follows:

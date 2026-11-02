@@ -384,9 +384,12 @@ def _hebrew_column(post: Post) -> int | None:
     return None
 
 
-def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]]) -> Proposal | None:
+def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]], *,
+            by_title: bool = True) -> Proposal | None:
+    """``by_title`` false leaves the post's slug and title out: one table of several is not
+    what the title names (4957, "Psalms 67 and Ana b'Khoach")."""
     numbers = row_numbers(post)
-    hint = bible_hint(post)
+    hint = bible_hint(post) if by_title else None
     evidence: list[str] = []
     rows: dict[int, str | None] = {n: None for n in numbers.values()}
     candidates_by_row: dict[int, set[str]] = {}
@@ -430,7 +433,7 @@ def propose(post: Post, index: IncipitIndex, labels: dict[str, set[str]]) -> Pro
     top = hint or (_common_prefix([_parent(u) for u in mapped]) if mapped else "")
     if mapped:
         evidence.append(f"{len(mapped)} of {len(rows)} row(s) open like a unit under {top or 'several texts'}")
-    labelled = label_matches(post, labels)
+    labelled = label_matches(post, labels) if by_title else set()
     if labelled:
         evidence.append("title matches the registry label of " + ", ".join(sorted(labelled)))
         # The text the title names, unless the rows are parts of one of its parts.
@@ -607,13 +610,15 @@ def decide(post: Post, index: IncipitIndex, labels: dict[str, set[str]], taken: 
             return proposal.as_post_urns(PostUrns(post.post_id, "new", "")), [proposal]
         return mint(post, taken, variants), [proposal] if proposal else []
     record = mint(post, taken, variants)
-    found = []
+    seen: set[str] = set()
     for number, view in enumerate(views, 1):
-        proposal = propose(view, index, labels)
-        if proposal is not None and proposal.urn is not None:
+        # Each table on its rows alone; a text two tables would share stays the first's.
+        proposal = propose(view, index, labels, by_title=False)
+        if proposal is not None and proposal.urn is not None and proposal.urn not in seen:
+            seen.add(proposal.urn)
             record.tables[number] = proposal.as_post_urns(PostUrns(post.post_id, "new", ""))
-            found.append(proposal)
-    return record, found
+    # The tables' evidence is in their records; the review file holds one proposal per post.
+    return record, []
 
 
 if __name__ == "__main__":

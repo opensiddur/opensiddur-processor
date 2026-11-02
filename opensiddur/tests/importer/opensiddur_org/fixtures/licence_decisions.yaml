@@ -24,3 +24,5 @@ posts:
   504:
     hold: Held until the translator licenses it.
     columns: [en]
+  505:
+    hold: Held for permission.
