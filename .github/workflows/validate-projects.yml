@@ -123,12 +123,10 @@ jobs:
           for p in ${affected}; do
             project_args="${project_args} --project ${p}"
           done
-          {
-            echo "affected<<EOF"
-            echo "${affected}"
-            echo "EOF"
-            echo "project_args=${project_args}"
-          } >> "$GITHUB_OUTPUT"
+          # The list goes in a file, not an environment variable: one variable may hold at most
+          # 128 KB, which a bulk import's few thousand project names exceed.
+          printf '%s\n' "${affected}" > "$RUNNER_TEMP/affected_projects.txt"
+          echo "project_args=${project_args}" >> "$GITHUB_OUTPUT"
           echo "Affected projects: ${affected:-<all>}"
 
       # Schema-validation results are cached between runs so a file is revalidated only when
@@ -202,24 +200,25 @@ jobs:
         if: always()
         continue-on-error: true
         working-directory: opensiddur-processor
-        env:
-          AFFECTED: ${{ steps.scope.outputs.affected }}
         run: |
           set -uo pipefail
-          projects="${AFFECTED}"
+          projects=$(cat "$RUNNER_TEMP/affected_projects.txt" 2>/dev/null || true)
           if [ -z "${projects}" ]; then
             projects=$(ls "$GITHUB_WORKSPACE/projects/project")
           fi
-          rc=0
+          existing=()
           for p in ${projects}; do
-            if [ ! -d "$GITHUB_WORKSPACE/projects/project/$p" ]; then
-              continue
+            if [ -d "$GITHUB_WORKSPACE/projects/project/$p" ]; then
+              existing+=("$p")
             fi
-            uv run python -m opensiddur.exporter.validate_urn_references "$p" \
-              --project-directory "$GITHUB_WORKSPACE/projects/project" \
-              --reference-db "$RUNNER_TEMP/reference.db" || rc=$?
           done
-          exit $rc
+          if [ "${#existing[@]}" -eq 0 ]; then
+            exit 0
+          fi
+          # One process for all of them: starting one per project takes hours for thousands.
+          uv run python -m opensiddur.exporter.validate_urn_references "${existing[@]}" \
+            --project-directory "$GITHUB_WORKSPACE/projects/project" \
+            --reference-db "$RUNNER_TEMP/reference.db"
 
       - name: Validate the URN registry (repo-wide)
         id: urn_registry

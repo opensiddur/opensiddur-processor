@@ -510,6 +510,29 @@ The 15 posts not converted are the worked examples for the skill (stage 6):
 
 Post 34548's English translation is not imported until its licence is clarified.
 
+### 4a. Bulk import (the export of 2026-11-02)
+
+3,249 in-scope posts at upstream commit `624215eef0`.
+
+- **3,242 converted**, into 5,661 projects in 108 languages and scripts. The largest groups
+  are English (3,211), Hebrew (1,549), German (312), Yiddish (93) and Jewish Palestinian
+  Aramaic (60).
+- **URNs:** 176 posts use existing URNs and 3,073 have new ones.
+- **Not converted:**
+  - 3778, 11906 and 14515 wait on decisions about each post.
+  - 4017 and 29942's English are held (see `licence_decisions.yaml`).
+  - 29959, 36831 and 52834 are rejected on licence.
+- **Checks:** `urn_registry --check` and `validate_names` have no errors, and every URN
+  and contributor reference resolves.
+- **Rendering:** parallel PDFs and HTML of 4957 (two tables), 19667 and 67442 (colour-coded
+  alternatives) and 1769 (an essay) render and align.
+  - 1769's essay quotes a Hebrew passage that has no translation. A book of the English
+    project must therefore list the Hebrew project in `priority.transclusion`.
+- **What the full export turned up:**
+  - Malformed source links: a second `#` (50267) and a truncated `%` escape (50879).
+  - Lines that only named a post's download files ("DOWNLOAD: PDF | ODT"), in 39 posts.
+    These are dropped.
+
 ## Later work
 
 ### 5. Updater (`update.py`)

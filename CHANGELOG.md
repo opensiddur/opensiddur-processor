@@ -50,6 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- `validate_urn_references` takes one or more projects, and `validate-projects.yml` checks all
+  the changed projects in one run of it. A pull request changing thousands of projects (the
+  opensiddur.org bulk import, #186) overflowed the step's environment, and starting a process
+  per project would have taken hours.
 - **Three names that split a prefix from its word are joined**, as the table writes them:
   `prayer:birkat_hamazon/zimmun/barukh_she_akhalnu` is `…/barukh_sheakhalnu` (בָּרוּךְ
   שֶׁאָכַלְנוּ), `prayer:me_ein_sheva` is `prayer:meein_sheva` (מֵעֵין שֶׁבַע), and the Chumash's

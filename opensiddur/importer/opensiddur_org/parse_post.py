@@ -24,6 +24,7 @@ import html
 import json
 import re
 import unicodedata
+from urllib.parse import quote
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, Union
@@ -606,6 +607,8 @@ def _column_language(header: str, cells: list[Cell], override: str = "") -> tupl
 
 
 def _paragraph_lines(elements: list[HtmlElement], footnotes: _Footnotes) -> list[Line]:
+    """The lines of ``elements``, less any that only names download files (see
+    :data:`_DOWNLOAD_LABELS_RE`); an essay's too, as in post 1769."""
     lines: list[Line] = []
     for element in elements:
         if not isinstance(element.tag, str) or element.tag in DROPPED_TAGS:
@@ -613,9 +616,47 @@ def _paragraph_lines(elements: list[HtmlElement], footnotes: _Footnotes) -> list
         if element.tag in ("hr",):
             continue
         for line, _gap in _split_lines(_inline_nodes(element, footnotes)):
-            if line:
+            if line and not _only_download_labels(line):
                 lines.append(line)
     return lines
+
+
+# A line that only named the files a post offered ("DOWNLOAD: PDF | ODT", "PDF | TXT (v.3.0)").
+# Its links are not imported, so the labels are left saying nothing. A file's description in
+# parentheses goes with it, unless it credits someone ("PDF (sung by Y)").
+_FILE_TYPE = r"(?:PDF|ODT|TXT|DOCX?|RTF|EPUB|IDML|MP3|ZIP)(?:\s*\((?![^)]*\bby\b)[^)]*\))?"
+_DOWNLOAD_LABELS_RE = re.compile(
+    rf"(?i:download)\s*:?\s*|(?:(?i:download)\s*:?\s*)?{_FILE_TYPE}"
+    rf"(?:\s*(?:\||/|,|and)\s*{_FILE_TYPE})*"
+)
+
+
+def _has_footnote(nodes: tuple[Node, ...]) -> bool:
+    return any(isinstance(node, FootnoteRef) or (isinstance(node, Span) and _has_footnote(node.children))
+               for node in nodes)
+
+
+def _only_download_labels(line: Line) -> bool:
+    # A footnote on the line is content of its own.
+    return not _has_footnote(line) and bool(_DOWNLOAD_LABELS_RE.fullmatch(node_text(line).strip()))
+
+
+_STRAY_PERCENT_RE = re.compile(r"%(?![0-9A-Fa-f]{2})")
+_AUTHORITY_RE = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*://[^/?#]*")
+
+
+def safe_uri(url: str) -> str:
+    """``url`` as a valid URI: characters a URI may not hold are percent-encoded, and so is
+    every ``#`` after the first (an embed's ``…/embed/#?secret=x#?secret=y``, post 50267) and
+    every ``%`` that does not begin an escape (a truncated ``…%2#page``, post 50879). Brackets
+    are kept only in the host, where an IPv6 address needs them."""
+    url = _STRAY_PERCENT_RE.sub("%25", url.strip())
+    authority = _AUTHORITY_RE.match(url)
+    host = authority.group(0) if authority else ""
+    base, hash_, fragment = url[len(host):].partition("#")
+    safe = ":/?&=%@+,;!$'()*~"
+    return (quote(host, safe=safe + "[]") + quote(base, safe=safe)
+            + (hash_ + quote(fragment, safe=safe) if hash_ else ""))
 
 
 def _source_refs(elements: list[HtmlElement]) -> list[SourceRef]:
@@ -629,11 +670,11 @@ def _source_refs(elements: list[HtmlElement]) -> list[SourceRef]:
             caption = " ".join(caption_div.xpath('.//*[contains(@class, "wp-caption-text")]//text()'))
             if links and links[0] not in seen:
                 seen.add(links[0])
-                refs.append(SourceRef(_WS_RE.sub(" ", clean_text(caption)).strip(), links[0]))
+                refs.append(SourceRef(_WS_RE.sub(" ", clean_text(caption)).strip(), safe_uri(links[0])))
         for url in element.xpath("descendant-or-self::iframe/@src | descendant-or-self::a[contains(@class, 'mtli_')]/@href"):
             if url not in seen:
                 seen.add(url)
-                refs.append(SourceRef("", url))
+                refs.append(SourceRef("", safe_uri(url)))
     return refs
 
 

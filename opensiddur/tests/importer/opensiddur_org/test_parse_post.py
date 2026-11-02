@@ -1,6 +1,7 @@
 import unittest
 
 from opensiddur.importer.opensiddur_org.parse_post import (
+    safe_uri,
     FootnoteRef,
     Span,
     Text,
@@ -219,6 +220,19 @@ class TestReviewRegressions(unittest.TestCase):
         post = self.english("Text", before="<h3>About the source</h3><p>Intro.</p>", after="<hr /><p>Afterword.</p>")
         self.assertEqual([node_text(line) for line in post.notes], ["Afterword."])
 
+    def test_lines_naming_only_download_files_are_dropped(self) -> None:
+        before = ('<p><strong>DOWNLOAD:</strong> <a href="a.pdf">PDF</a> | <a href="a.odt">ODT</a></p>'
+                  '<p>The rite (1803):<br /><a href="b.pdf">PDF</a> | <a href="b.txt">TXT</a> (v.3.0)</p>'
+                  '<p>Calendar: <a href="c.pdf">PDF</a></p>')
+        post = self.english("Text", before=before)
+        self.assertEqual([node_text(line) for line in post.intro], ["The rite (1803):", "Calendar: PDF"])
+
+    def test_a_download_line_with_a_credit_or_a_footnote_is_kept(self) -> None:
+        before = ('<p>MP3 (sung by Y)</p><p>PDF / ODT (v2)</p>'
+                  '<p>PDF<span class="footnote_referrer"><span class="footnote_tooltip">A note.</span></span></p>')
+        post = self.english("Text", before=before)
+        self.assertEqual([node_text(line) for line in post.intro], ["MP3 (sung by Y)", "PDF"])
+
     def test_entities_are_decoded_once(self) -> None:
         line = self.english("a &amp;lt;b&amp;gt; c").rows[0].cells[0].blocks[0].lines[0]
         self.assertEqual(node_text(line), "a &lt;b&gt; c")
@@ -228,6 +242,25 @@ class TestReviewRegressions(unittest.TestCase):
         post = parse_post(make_post(content=table(["Transliteration (Judeo-Arabic)"], [[cell("jrb-Hebr", "judeo-arabic", "שלאם")]])))
         self.assertEqual(post.columns[0].lang, "jrb")
         self.assertTrue(post.columns[0].mismatch)
+
+
+class TestSafeUri(unittest.TestCase):
+    def test_a_second_fragment_is_encoded(self) -> None:
+        self.assertEqual(safe_uri("https://x.org/a/embed/#?secret=1#?secret=2"),
+                         "https://x.org/a/embed/#?secret=1%23?secret=2")
+
+    def test_spaces_are_encoded(self) -> None:
+        self.assertEqual(safe_uri(" https://x.org/a b.pdf "), "https://x.org/a%20b.pdf")
+
+    def test_a_valid_uri_is_unchanged(self) -> None:
+        url = "https://x.org/a%20b/c;d?e=f&g=h+i,j!$'()*@~#k:l/m?n"
+        self.assertEqual(safe_uri(url), url)
+
+    def test_brackets_are_kept_only_in_the_host(self) -> None:
+        self.assertEqual(safe_uri("http://[::1]/a[1].pdf?b=[2]#[3]"), "http://[::1]/a%5B1%5D.pdf?b=%5B2%5D#%5B3%5D")
+
+    def test_a_stray_percent_is_encoded(self) -> None:
+        self.assertEqual(safe_uri("https://x.org/a%28b%2#page/1"), "https://x.org/a%28b%252#page/1")
 
 
 class TestColumnRules(unittest.TestCase):

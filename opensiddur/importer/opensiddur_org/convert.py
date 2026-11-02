@@ -22,6 +22,7 @@ import logging
 import re
 import shutil
 import sys
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -172,12 +173,13 @@ def project_ids(plans: list[PostPlan], project_directory: Path,
     named = {plan.post.post_id for plan in plans if plan.standard}
     rejected = {plan.post.post_id for plan in plans if is_rejected(plan)}
     # A name a post being named holds stays its own (see assign_project_ids). A rejected post's
-    # projects are about to be removed, so their names are free. Any other name is taken.
+    # projects are about to be removed, so their names are free, as are empty directories (a
+    # failed conversion's leftovers). Any other name is taken.
     held = {path.name: post_id for post_id, paths in existing.items() if post_id in named
             for path in paths}
     freed = {path.name for post_id, paths in existing.items() if post_id in rejected for path in paths}
     taken = ([p.name for p in directory.iterdir()
-              if p.is_dir() and p.name not in held and p.name not in freed]
+              if p.is_dir() and any(p.iterdir()) and p.name not in held and p.name not in freed]
              if directory.is_dir() else [])
     return assign_project_ids(
         (Candidate(plan.post, column) for plan in plans if plan.standard for column, _ in plan.columns),
@@ -192,7 +194,40 @@ def convert_post(
     existing: dict[int, list[Path]] | None = None,
     registry_directory: Path = REGISTRY_DIRECTORY,
 ) -> list[str]:
-    """Write the post's projects, named by ``ids`` (see :func:`project_ids`). Returns their IDs."""
+    """Write the post's projects, named by ``ids`` (see :func:`project_ids`). Returns their IDs.
+
+    All or nothing: when a file or a reference check fails, every directory the post touched
+    is put back as it was, and the error is raised."""
+    project_directory = Path(project_directory)
+    if existing is None:
+        existing = imported_projects(project_directory)
+    touched = sorted({project_directory / pid for (post_id, _), pid in ids.items()
+                      if post_id == plan.post.post_id}
+                     | set(existing.get(plan.post.post_id, [])))
+    with tempfile.TemporaryDirectory() as backup:
+        saved = []
+        for directory in touched:
+            if directory.is_dir():
+                shutil.copytree(directory, Path(backup) / directory.name)
+                saved.append(directory)
+        try:
+            return _write_post(plan, context, project_directory, ids=ids, existing=existing,
+                               registry_directory=registry_directory)
+        except Exception:
+            for directory in touched:
+                if directory.exists():
+                    shutil.rmtree(directory)
+            for directory in saved:
+                shutil.copytree(Path(backup) / directory.name, directory)
+            raise
+
+
+def _write_post(
+    plan: PostPlan, context: Context, project_directory: Path, *,
+    ids: dict[tuple[int, str], str],
+    existing: dict[int, list[Path]],
+    registry_directory: Path,
+) -> list[str]:
     post = plan.post
     urns = context.post_urns[post.post_id]
     credits = post_credits(post, context.contributors)
@@ -222,8 +257,6 @@ def convert_post(
 
     # A language the post no longer has (or may no longer import), or a name its retitling
     # changed, leaves no project behind.
-    if existing is None:
-        existing = imported_projects(project_directory)
     # A name another post is given this run is that post's project now, whatever was there.
     given = set(ids.values())
     for stale in existing.get(post.post_id, []):
@@ -341,12 +374,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(lines)} contributor candidate(s) written to {CANDIDATES_PATH}")
 
     converted = 0
+    failed: list[int] = []
     for plan in standard:
         if any((plan.post.post_id, column.key) not in ids for column, _ in plan.columns):
             print(f"{plan.post.post_id}: skipped: a project of it could not be named")
             continue
         if not args.dry_run:
-            convert_post(plan, context, args.project_directory, ids=ids, existing=existing)
+            try:
+                convert_post(plan, context, args.project_directory, ids=ids, existing=existing)
+            except Exception as error:  # one post's failure must not stop the others
+                print(f"{plan.post.post_id}: FAILED: {error}")
+                failed.append(plan.post.post_id)
+                continue
             if args.register:
                 register_urns([plan], context, REGISTRY_DIRECTORY)
         converted += 1
@@ -369,6 +408,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{plan.post.post_id}: WARNING: {', '.join(p.name for p in earlier)} "
                   "were converted earlier and are left as they were")
     print(f"{'Would convert' if args.dry_run else 'Converted'} {converted} of {len(plans)} post(s).")
+    if failed:
+        print(f"{len(failed)} post(s) failed: {', '.join(map(str, failed))}")
+        return 1
     return 0
 
 
