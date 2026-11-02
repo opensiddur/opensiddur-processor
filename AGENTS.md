@@ -101,6 +101,7 @@ uv run python -m opensiddur.importer.opensiddur_org.download --category 183   # 
 uv run python -m opensiddur.importer.opensiddur_org.survey                    # output/opensiddur_org_triage.{json,md}
 uv run python -m opensiddur.importer.opensiddur_org.match                     # URN decisions, recorded at once; the evidence in output/
 uv run python -m opensiddur.importer.opensiddur_org.convert --register        # standard posts -> <title>-<author>-<date>-<lang> projects
+uv run python -m opensiddur.importer.opensiddur_org.update [--prune]          # monthly: all of the above for what the new export changed; report in output/
 ```
 Licence decisions live in `opensiddur/importer/opensiddur_org/licence_decisions.yaml`; a licence or post not
 decided there is asked about, then recorded. A decision about one post lapses when a later export updates or
