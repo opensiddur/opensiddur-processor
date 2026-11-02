@@ -733,3 +733,19 @@ class TestMainExitCode(unittest.TestCase):
                     "--reference-db", str(base / "ref.db"),
                 ])
             self.assertEqual(code, 0)
+
+    def test_several_projects_exit_2_when_any_is_bad(self):
+        with TemporaryDirectory() as td:
+            base = Path(td)
+            project_directory = base / "project"
+            _write_credits(project_directory, "good", "a.xml", CONTRIBUTOR + "en.wikisource.org/Prosody")
+            _write_credits(project_directory, "bad", "b.xml", "urn:x-opensiddur:opensiddur.org/eve-feinstein")
+            stdout = io.StringIO()
+            with patch("sys.stdout", stdout):
+                code = main([
+                    "bad", "good",
+                    "--project-directory", str(project_directory),
+                    "--reference-db", str(base / "ref.db"),
+                ])
+            self.assertEqual(code, 2)
+            self.assertIn("b.xml", stdout.getvalue())

@@ -377,7 +377,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         description="Validate that compilation-relevant URN references are resolvable using refdb (post-conversion)."
     )
-    parser.add_argument("project", help="Project name under project/ (e.g., tanakh-wlc-he, tanakh-jps-1917-en)")
+    parser.add_argument(
+        "projects", nargs="+", metavar="project",
+        help="Project name under project/ (e.g., tanakh-wlc-he, tanakh-jps-1917-en); one or more",
+    )
     parser.add_argument(
         "--project-directory",
         default=str(PROJECT_DIRECTORY),
@@ -395,34 +398,38 @@ def main(argv: Optional[list[str]] = None) -> int:
     )
 
     args = parser.parse_args(argv)
+    project_directory = Path(args.project_directory)
+    reference_db_path = Path(args.reference_db)
 
-    failures = validate_project_urn_references(
-        args.project,
-        project_directory=Path(args.project_directory),
-        reference_db_path=Path(args.reference_db),
-        index_before_validate=args.index,
-    )
-    # Reported but not fatal: a reference that coarsens still compiles, and for a project
-    # that cannot carry the finer division there is nothing to fix in the reference itself.
-    for c in find_coarsened_urn_references(
-        args.project,
-        project_directory=Path(args.project_directory),
-        reference_db_path=Path(args.reference_db),
-    ):
-        print(_format_coarsened(c))
+    status = 0
+    for project in args.projects:
+        failures = validate_project_urn_references(
+            project,
+            project_directory=project_directory,
+            reference_db_path=reference_db_path,
+            index_before_validate=args.index,
+        )
+        # Reported but not fatal: a reference that coarsens still compiles, and for a project
+        # that cannot carry the finer division there is nothing to fix in the reference itself.
+        for c in find_coarsened_urn_references(
+            project,
+            project_directory=project_directory,
+            reference_db_path=reference_db_path,
+        ):
+            print(_format_coarsened(c))
 
-    contributor_failures = validate_project_contributor_references(
-        args.project,
-        project_directory=Path(args.project_directory),
-    )
+        contributor_failures = validate_project_contributor_references(
+            project,
+            project_directory=project_directory,
+        )
 
-    if failures or contributor_failures:
-        for f in failures:
-            print(_format_failure(f))
-        for c in contributor_failures:
-            print(_format_contributor(c))
-        return 2
-    return 0
+        if failures or contributor_failures:
+            for f in failures:
+                print(_format_failure(f))
+            for c in contributor_failures:
+                print(_format_contributor(c))
+            status = 2
+    return status
 
 
 if __name__ == "__main__":  # pragma: no cover
