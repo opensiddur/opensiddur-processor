@@ -12,7 +12,7 @@ from opensiddur.importer.opensiddur_org.licences import LICENCES, LicenceDecisio
 from opensiddur.importer.opensiddur_org.parse_post import node_text, parse_post, transcluded_urn
 from opensiddur.importer.opensiddur_org.post_decisions import Layout, PostDecisions, load_post_decisions
 from opensiddur.importer.opensiddur_org.scope import irregularities, project_columns
-from opensiddur.importer.opensiddur_org.tei_builder import build_project
+from opensiddur.importer.opensiddur_org.tei_builder import build_project, front_language
 from opensiddur.importer.opensiddur_org.urns import PostUrns
 from opensiddur.tests.importer.opensiddur_org.support import FIXTURES, make_post
 
@@ -132,6 +132,65 @@ class TestParsing(unittest.TestCase):
             parse(BLESSINGS, layout)
 
 
+class TestReviewRegressions(unittest.TestCase):
+    def test_a_split_part_is_in_the_language_its_header_names(self) -> None:
+        post = parse(BLESSINGS, BLESSINGS_LAYOUT)
+        self.assertEqual([c.lang for c in post.rows[0].cells], ["he", "en", "en", "he-Latn"])
+        self.assertEqual([[b.kind for b in c.blocks] for c in post.rows[0].cells[1:]], [["paragraph"]] * 3)
+
+    def test_a_split_keeps_markup_before_the_first_paragraph(self) -> None:
+        content = ('<table><tr><td><div lang="heb-Hebr">א</div></td>'
+                   '<td><div lang="eng-Latn">Tom &amp; <em>Jerry</em> 1&lt;2<p>Blessed</p></div></td></tr></table>')
+        layout = Layout(text=("(//table)[1]",), split={2: ("Commentary (English)", "Translation (English)")})
+        post = parse(content, layout)
+        self.assertEqual(text_lines(post.rows[0].cells[1]), ["Tom & Jerry 1<2"])
+
+    def test_a_split_keeps_the_other_columns_headers(self) -> None:
+        content = ('<table><thead><tr><th>Source (Aramaic)</th><th>Translation (English)</th></tr></thead>'
+                   '<tr><td><div lang="heb-Hebr">א</div></td>'
+                   '<td><div lang="eng-Latn">Why<p>Blessed</p></div></td></tr></table>')
+        layout = Layout(text=("(//table)[1]",), split={2: ("Commentary (English)", "Translation (English)")})
+        self.assertEqual(parse(content, layout).columns[0].lang, "arc")
+
+    def test_a_split_cell_with_more_than_its_div_is_an_error(self) -> None:
+        content = ('<table><tr><td><div lang="heb-Hebr">א</div></td>'
+                   '<td><div lang="eng-Latn">Why<p>Blessed</p></div>And more.</td></tr></table>')
+        layout = Layout(text=("(//table)[1]",), split={2: ("Commentary (English)", "Translation (English)")})
+        with self.assertRaisesRegex(ValueError, "not one div"):
+            parse(content, layout)
+
+    def test_a_note_after_the_text_without_a_link_stays_a_note(self) -> None:
+        content = BLESSINGS + '<p>Sing it slowly.</p><p>DOWNLOAD: <a href="x.pdf">PDF</a></p>'
+        post = parse(content, BLESSINGS_LAYOUT)
+        self.assertEqual([node_text(line) for line in post.notes], ["Sing it slowly."])
+        self.assertEqual([s.caption for s in post.sources], ["First published on a blog."])
+
+    def test_a_wrapped_block_keeps_the_text_after_it(self) -> None:
+        content = '<div lang="eng-Latn">Let it go.</div>Trailing words.<p>A note.</p>'
+        post = parse(content, Layout(text=("(//div[@lang])[1]",)))
+        self.assertEqual([node_text(line) for line in post.notes], ["Trailing words.", "A note."])
+
+    def test_a_nested_transclusion_is_an_error(self) -> None:
+        content = PRACTICE.replace("<table>", "<blockquote><table>").replace("</table>", "</table></blockquote>")
+        layout = Layout(text=("(//div[@lang])[1]",), transclusions={"(//table)[1]": MICAH})
+        with self.assertRaisesRegex(ValueError, "not at the post's top level"):
+            parse(content, layout)
+
+    def test_introduction_text_outside_its_languages_is_an_error(self) -> None:
+        content = BLESSINGS.replace("</tr></table>", "<td>Loose words</td></tr></table>", 1)
+        with self.assertRaisesRegex(ValueError, "text outside its div"):
+            parse(content, BLESSINGS_LAYOUT)
+
+    def test_an_introduction_needs_its_text(self) -> None:
+        with self.assertRaisesRegex(ValueError, "beside the text"):
+            parse(BLESSINGS, Layout(introduction="(//table)[1]"))
+
+    def test_notes_of_only_a_transclusion_are_placed(self) -> None:
+        content = '<div lang="eng-Latn">Let it go.</div><table><tr><td><div lang="heb-Hebr">א</div></td></tr></table>'
+        post = parse(content, Layout(text=("(//div[@lang])[1]",), transclusions={"(//table)[1]": MICAH}))
+        self.assertEqual(front_language(post, ["en"]), "en")
+
+
 class TestBuilding(unittest.TestCase):
     def build(self, content: str, layout: Layout, urns: PostUrns, **flags) -> dict:
         post = parse(content, layout)
@@ -155,6 +214,19 @@ class TestBuilding(unittest.TestCase):
         self.assertEqual([p.text for p in indexes["en"].iterfind(intro, NS)], ["Why we wrote it.", "And how."])
         self.assertEqual([p.text for p in indexes["he"].iterfind(intro, NS)], ["למה כתבנו.", "ואיך."])
         self.assertIsNone(indexes["he-Latn"].find(".//tei:front", NS))
+
+    def test_a_split_transliteration_is_not_marked_english(self) -> None:
+        post = parse(BLESSINGS, BLESSINGS_LAYOUT)
+        credits = post_credits(post, Contributors.load(FIXTURES / "contributors_by_id.json"))
+        column = next(c for c in project_columns(post) if c.key == "he-Latn")
+        files = build_project(
+            post, column, urns=PostUrns(101, "new", URN), credits=credits,
+            licence=LicenceDecision("allow", LICENCES["cc-by-sa-4.0"]),
+            upstream_commit="0123456789abcdef", upstream_commit_date="2026-10-01",
+            with_front=False, project_id="a_song-he-latn",
+        )
+        text = next(doc for stem, doc in files.files.items() if stem != "index")
+        self.assertNotIn('xml:lang="en"', text.split("<tei:text>", 1)[1])
 
     def test_a_transclusion_stands_in_the_notes(self) -> None:
         indexes = self.build(PRACTICE, PRACTICE_LAYOUT, PostUrns(101, "new", URN),

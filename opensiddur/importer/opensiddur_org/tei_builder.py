@@ -548,8 +548,13 @@ def front(post: Post, lang: str, id_prefix: str, *, shared: bool = True,
 
 def front_language(post: Post, languages: list[str]) -> str | None:
     """The project the front matter goes in: the one whose language it is written in, else
-    English, else the first."""
-    return _written_language(post.intro + post.notes, languages)
+    English, else the first. Front matter with no words of its own, only a transclusion, goes
+    in the first."""
+    lines = post.intro + post.notes
+    found = _written_language(lines, languages)
+    if found is None and any(transcluded_urn(line) for line in lines) and languages:
+        return languages[0]
+    return found
 
 
 def _written_language(lines: list[Line], languages: list[str]) -> str | None:
