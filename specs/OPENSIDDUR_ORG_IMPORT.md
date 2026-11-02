@@ -563,9 +563,14 @@ This runs monthly, after each upstream export:
 uv run python -m opensiddur.importer.opensiddur_org.update [--prune]
 ```
 
-1. It downloads the export (stage 1) and compares the manifest before and after, by post ID
-   (`_(ID)`), not by path. A post's `last_updated` decides whether it changed, so the
-   export's bulk re-saves are not changes.
+1. It downloads the export (stage 1). It then compares the new manifest with the one
+   `sourcetexts` last committed, by post ID (`_(ID)`), not by path. A post's `last_updated`
+   decides whether it changed, so the export's bulk re-saves are not changes.
+   - Comparing with the committed manifest, not the one on disk, makes a run that stopped
+     partway safe to run again: it finds the same changes. The same holds after a
+     download run by hand.
+   - Move the `sourcetexts` checkout to its latest commit before running, so that the
+     comparison is with the last import.
 2. It also compares the full set of exported IDs, to tell deletions from posts that left
    scope.
 3. It classifies each post the download wrote or removed:
@@ -580,17 +585,28 @@ uv run python -m opensiddur.importer.opensiddur_org.update [--prune]
 
 4. It converts the new and changed posts and registers their new URNs. Conversion is
    all or nothing per post: a post that fails leaves its projects as they were.
-5. `--prune` removes a departed post's projects unless another project refers to a URN that
-   only they hold (its `corresp`), which would leave the reference with nothing to resolve
-   to. Those are kept and reported.
+5. `--prune` removes a departed post's projects, unless another project would be left with a
+   reference that resolves to nothing. Such projects are kept and reported. A reference
+   counts when it:
+   - is a `target` or `targetEnd`, a range counting as both its ends. `source` attributes
+     are citations, and do not count;
+   - is pinned to one of those projects (`…@project`);
+   - has, as its nearest held URN (itself, else the nearest enclosing one), a URN that only
+     those projects hold.
 6. It writes `output/opensiddur_org_update_<date>.md`, named by the export's date. That file
    becomes the description of the run's pull requests. It lists, under **Needs review**:
    - stale decisions;
    - posts that failed or were not converted, with the reason. A licence decision about
      one post lapses when the post is updated or relicensed, so a held or rejected post
-     that changed is listed here and asked about again;
-   - changed posts whose rows changed in number. Their row URNs were decided against the
-     old rows, so `post_urns.jsonl` is reviewed for them.
+     that changed is listed here and asked about again. So is a column a converted post
+     could not import, and any per-post licence decision that lapsed;
+   - changed posts, stale overrides included, whose rows changed in number. Their row URNs
+     were decided against the old rows, so `post_urns.jsonl` is reviewed for them. A new
+     post that already had a URN decision is listed too: it left the import and came back.
+
+   It also lists the URNs decided for new posts. The proposals behind those that matched
+   existing texts are in `output/opensiddur_org_urn_proposals.jsonl`. Contributor
+   candidates are written as `convert --emit-contributor-candidates` writes them.
 
 Reconverting a post whose content did not change produces no TEI diff, because the output
 is deterministic. A run against the export already imported does nothing.

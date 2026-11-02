@@ -7,6 +7,7 @@ from unittest import mock
 
 from opensiddur.importer.opensiddur_org.convert import (
     convert_post,
+    convert_posts,
     load_context,
     main,
     plan_post,
@@ -230,6 +231,33 @@ class TestRegisteringParts(ConvertTestCase):
         self.assertEqual([(l["urn"], l.get("parent")) for l in lines], [
             (f"{URN}_101", None), (f"{URN}_101/quoted", f"{URN}_101"),
             (f"{URN}_101/quoted/1", f"{URN}_101/quoted")])
+
+
+class TestConvertPosts(ConvertTestCase):
+    def earlier(self, name: str, post_id: int) -> Path:
+        (self.projects / name).mkdir()
+        (self.projects / name / "index.xml").write_text(imported_index(post_id), encoding="utf-8")
+        return self.projects / name
+
+    def test_a_rejected_post_loses_its_earlier_projects(self) -> None:
+        earlier = self.earlier("rejected-poet-2020-he", 502)
+        run = convert_posts(self.data_dir, self.projects, posts=[502], context=self.context,
+                            registry_directory=self.registry)
+        self.assertEqual(run.removed, {502: ["rejected-poet-2020-he"]})
+        self.assertFalse(earlier.exists())
+
+    def test_an_irregular_post_keeps_its_earlier_projects(self) -> None:
+        earlier = self.earlier("needs_urn-poet-2020-he", 102)
+        run = convert_posts(self.data_dir, self.projects, posts=[102], context=self.context,
+                            registry_directory=self.registry)
+        self.assertEqual(run.left, {102: ["needs_urn-poet-2020-he"]})
+        self.assertIn("no URN decision", run.skipped[102])
+        self.assertTrue(earlier.exists())
+
+    def test_converted_posts_are_listed(self) -> None:
+        run = convert_posts(self.data_dir, self.projects, posts=[101], context=self.context,
+                            registry_directory=self.registry)
+        self.assertEqual((run.converted, run.failed), ([101], {}))
 
 
 class TestMain(ConvertTestCase):
