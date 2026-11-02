@@ -557,26 +557,43 @@ Post 34548's English translation is not imported until its licence is clarified.
 
 ### 5. Updater (`update.py`)
 
-This runs monthly, after each upstream export.
+This runs monthly, after each upstream export:
 
-1. List changed post IDs between the manifest's commit and the new one, by `_(ID)`, not by
-   path.
-2. Also compare the full set of IDs, to catch deletions.
-3. Classify each changed post:
+```bash
+uv run python -m opensiddur.importer.opensiddur_org.update [--prune]
+```
+
+1. It downloads the export (stage 1) and compares the manifest before and after, by post ID
+   (`_(ID)`), not by path. A post's `last_updated` decides whether it changed, so the
+   export's bulk re-saves are not changes.
+2. It also compares the full set of exported IDs, to tell deletions from posts that left
+   scope.
+3. It classifies each post the download wrote or removed:
 
 | Class | Meaning | Action |
 |---|---|---|
-| `new` | newly published, or entered scope | match and convert it |
-| `changed` | `last_updated` differs | refresh and reconvert it |
-| `left-scope` / `deleted` | gone, or no longer a prayer | report; delete only with `--prune` when nothing references its URNs |
-| `override-stale` | a hand-made override exists and the post changed under it | report; send it back for review |
+| `new` | newly published, or entered scope | match its URNs (stage 3) and convert it |
+| `changed` | `last_updated` differs | reconvert it |
+| `override-stale` | changed, and `post_decisions.yaml` holds a decision about it | report it, for the decision to be reviewed; not reconverted |
+| `left-scope` | still exported, but no longer a prayer or no longer filed under 1132 | report it; with `--prune`, remove its projects |
+| `deleted` | no longer exported | likewise |
 
-4. Write `output/opensiddur_org_update_<date>.md`. It becomes the description for the
-   matching pull requests.
+4. It converts the new and changed posts and registers their new URNs. Conversion is
+   all or nothing per post: a post that fails leaves its projects as they were.
+5. `--prune` removes a departed post's projects unless another project refers to a URN that
+   only they hold (its `corresp`), which would leave the reference with nothing to resolve
+   to. Those are kept and reported.
+6. It writes `output/opensiddur_org_update_<date>.md`, named by the export's date. That file
+   becomes the description of the run's pull requests. It lists, under **Needs review**:
+   - stale decisions;
+   - posts that failed or were not converted, with the reason. A licence decision about
+     one post lapses when the post is updated or relicensed, so a held or rejected post
+     that changed is listed here and asked about again;
+   - changed posts whose rows changed in number. Their row URNs were decided against the
+     old rows, so `post_urns.jsonl` is reviewed for them.
 
 Reconverting a post whose content did not change produces no TEI diff, because the output
-is deterministic. A post whose rows change after its URNs were registered needs its row
-URNs reviewed.
+is deterministic. A run against the export already imported does nothing.
 
 ### 6. A skill for irregular posts
 

@@ -342,6 +342,90 @@ def select_posts(data_dir: Path, *, posts: list[int] | None, categories: list[in
     return available
 
 
+@dataclass
+class ConvertRun:
+    """What a conversion run did with each post it was asked about."""
+
+    plans: list[PostPlan]
+    converted: list[int] = field(default_factory=list)
+    #: Post ID -> the error that stopped it.
+    failed: dict[int, str] = field(default_factory=dict)
+    #: Post ID -> why it was not converted.
+    skipped: dict[int, str] = field(default_factory=dict)
+    #: Post ID -> the projects removed because the post is now rejected.
+    removed: dict[int, list[str]] = field(default_factory=dict)
+    #: Post ID -> projects converted earlier and left as they were.
+    left: dict[int, list[str]] = field(default_factory=dict)
+
+
+def convert_posts(
+    data_dir: Path,
+    project_directory: Path,
+    *,
+    posts: list[int] | None = None,
+    categories: list[int] | None = None,
+    register: bool = False,
+    dry_run: bool = False,
+    candidates_path: Path | None = None,
+    context: Context | None = None,
+    registry_directory: Path = REGISTRY_DIRECTORY,
+) -> ConvertRun:
+    """Convert the standard posts among those selected (default: all), and report the rest."""
+    context = context or load_context(data_dir)
+    # Every post is planned, so that names are given against the whole export. One that cannot
+    # be read is reported, and stops only a run that asked for it.
+    every_plan: dict[int, PostPlan] = {}
+    selected = select_posts(data_dir, posts=posts, categories=categories)
+    for post_id in select_posts(data_dir, posts=None, categories=None):
+        try:
+            every_plan[post_id] = plan_post(load_post(data_dir / "posts" / f"{post_id}.json"), context)
+        except Exception:
+            if post_id in selected:
+                raise
+            logger.warning("%s: could not be read; its names are given without it", post_id)
+    plans = [every_plan[post_id] for post_id in selected]
+    run = ConvertRun(plans)
+    existing = imported_projects(project_directory)
+    ids = project_ids(list(every_plan.values()), project_directory, existing)
+
+    if candidates_path is not None:
+        lines = sorted({line for plan in plans for line in plan.candidates})
+        candidates_path.parent.mkdir(parents=True, exist_ok=True)
+        candidates_path.write_text("".join(line + "\n" for line in lines), encoding="utf-8")
+        print(f"{len(lines)} contributor candidate(s) written to {candidates_path}")
+
+    for plan in plans:
+        post_id = plan.post.post_id
+        if not plan.standard:
+            run.skipped[post_id] = "; ".join(plan.reasons)
+            earlier = sorted(existing.get(post_id, []))
+            if not earlier:
+                continue
+            if is_rejected(plan):
+                # A decision not to import the post: what an earlier run wrote must go.
+                if not dry_run:
+                    for path in earlier:
+                        shutil.rmtree(path)
+                run.removed[post_id] = [p.name for p in earlier]
+            else:
+                run.left[post_id] = [p.name for p in earlier]
+            continue
+        if any((post_id, column.key) not in ids for column, _ in plan.columns):
+            run.skipped[post_id] = "a project of it could not be named"
+            continue
+        if not dry_run:
+            try:
+                convert_post(plan, context, project_directory, ids=ids, existing=existing,
+                             registry_directory=registry_directory)
+            except Exception as error:  # one post's failure must not stop the others
+                run.failed[post_id] = str(error)
+                continue
+            if register:
+                register_urns([plan], context, registry_directory)
+        run.converted.append(post_id)
+    return run
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--post", type=int, action="append", help="convert this post; repeatable")
@@ -356,69 +440,32 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    data_dir = opensiddur_org_data_directory(args.sourcetexts_root)
-    context = load_context(data_dir)
-    # Every post is planned, so that names are given against the whole export. One that cannot
-    # be read is reported, and stops only a run that asked for it.
-    every_plan: dict[int, PostPlan] = {}
-    selected = select_posts(data_dir, posts=args.post, categories=args.category)
-    for post_id in select_posts(data_dir, posts=None, categories=None):
-        try:
-            every_plan[post_id] = plan_post(load_post(data_dir / "posts" / f"{post_id}.json"), context)
-        except Exception:
-            if post_id in selected:
-                raise
-            logger.warning("%s: could not be read; its names are given without it", post_id)
-    plans = [every_plan[post_id] for post_id in selected]
-    standard = [plan for plan in plans if plan.standard]
-    existing = imported_projects(args.project_directory)
-    ids = project_ids(list(every_plan.values()), args.project_directory, existing)
+    run = convert_posts(
+        opensiddur_org_data_directory(args.sourcetexts_root), args.project_directory,
+        posts=args.post, categories=args.category, register=args.register, dry_run=args.dry_run,
+        candidates_path=CANDIDATES_PATH if args.emit_contributor_candidates else None,
+    )
+    print_run(run, dry_run=args.dry_run)
+    return 1 if run.failed else 0
 
-    if args.emit_contributor_candidates:
-        lines = sorted({line for plan in plans for line in plan.candidates})
-        CANDIDATES_PATH.parent.mkdir(parents=True, exist_ok=True)
-        CANDIDATES_PATH.write_text("".join(line + "\n" for line in lines), encoding="utf-8")
-        print(f"{len(lines)} contributor candidate(s) written to {CANDIDATES_PATH}")
 
-    converted = 0
-    failed: list[int] = []
-    for plan in standard:
-        if any((plan.post.post_id, column.key) not in ids for column, _ in plan.columns):
-            print(f"{plan.post.post_id}: skipped: a project of it could not be named")
-            continue
-        if not args.dry_run:
-            try:
-                convert_post(plan, context, args.project_directory, ids=ids, existing=existing)
-            except Exception as error:  # one post's failure must not stop the others
-                print(f"{plan.post.post_id}: FAILED: {error}")
-                failed.append(plan.post.post_id)
-                continue
-            if args.register:
-                register_urns([plan], context, REGISTRY_DIRECTORY)
-        converted += 1
-        for lang, why in sorted(plan.skipped_columns.items()):
-            print(f"{plan.post.post_id}: {lang} not imported ({why})")
-    for plan in plans:
-        if plan.standard:
-            continue
-        print(f"{plan.post.post_id}: skipped: {'; '.join(plan.reasons)}")
-        earlier = sorted(existing.get(plan.post.post_id, []))
-        if not earlier:
-            continue
-        if is_rejected(plan):
-            # A decision not to import the post: what an earlier run wrote must go.
-            if not args.dry_run:
-                for path in earlier:
-                    shutil.rmtree(path)
-            print(f"{plan.post.post_id}: removed {', '.join(p.name for p in earlier)} (rejected)")
-        else:
-            print(f"{plan.post.post_id}: WARNING: {', '.join(p.name for p in earlier)} "
+def print_run(run: ConvertRun, *, dry_run: bool = False) -> None:
+    for post_id, error in run.failed.items():
+        print(f"{post_id}: FAILED: {error}")
+    for plan in run.plans:
+        if plan.post.post_id in run.converted:
+            for lang, why in sorted(plan.skipped_columns.items()):
+                print(f"{plan.post.post_id}: {lang} not imported ({why})")
+    for post_id, why in run.skipped.items():
+        print(f"{post_id}: skipped: {why}")
+        if post_id in run.removed:
+            print(f"{post_id}: removed {', '.join(run.removed[post_id])} (rejected)")
+        if post_id in run.left:
+            print(f"{post_id}: WARNING: {', '.join(run.left[post_id])} "
                   "were converted earlier and are left as they were")
-    print(f"{'Would convert' if args.dry_run else 'Converted'} {converted} of {len(plans)} post(s).")
-    if failed:
-        print(f"{len(failed)} post(s) failed: {', '.join(map(str, failed))}")
-        return 1
-    return 0
+    print(f"{'Would convert' if dry_run else 'Converted'} {len(run.converted)} of {len(run.plans)} post(s).")
+    if run.failed:
+        print(f"{len(run.failed)} post(s) failed: {', '.join(map(str, run.failed))}")
 
 
 if __name__ == "__main__":
