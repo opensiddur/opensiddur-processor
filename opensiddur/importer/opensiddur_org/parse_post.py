@@ -24,6 +24,7 @@ import html
 import json
 import re
 import unicodedata
+from urllib.parse import quote
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, Union
@@ -618,6 +619,19 @@ def _paragraph_lines(elements: list[HtmlElement], footnotes: _Footnotes) -> list
     return lines
 
 
+_STRAY_PERCENT_RE = re.compile(r"%(?![0-9A-Fa-f]{2})")
+
+
+def safe_uri(url: str) -> str:
+    """``url`` as a valid URI: characters a URI may not hold are percent-encoded, and so is
+    every ``#`` after the first (an embed's ``…/embed/#?secret=x#?secret=y``, post 50267) and
+    every ``%`` that does not begin an escape (a truncated ``…%2#page``, post 50879)."""
+    url = _STRAY_PERCENT_RE.sub("%25", url.strip())
+    base, hash_, fragment = url.partition("#")
+    safe = ":/?&=%@+,;!$'()*[]~"
+    return quote(base, safe=safe) + (hash_ + quote(fragment, safe=safe) if hash_ else "")
+
+
 def _source_refs(elements: list[HtmlElement]) -> list[SourceRef]:
     refs: list[SourceRef] = []
     seen: set[str] = set()
@@ -629,11 +643,11 @@ def _source_refs(elements: list[HtmlElement]) -> list[SourceRef]:
             caption = " ".join(caption_div.xpath('.//*[contains(@class, "wp-caption-text")]//text()'))
             if links and links[0] not in seen:
                 seen.add(links[0])
-                refs.append(SourceRef(_WS_RE.sub(" ", clean_text(caption)).strip(), links[0]))
+                refs.append(SourceRef(_WS_RE.sub(" ", clean_text(caption)).strip(), safe_uri(links[0])))
         for url in element.xpath("descendant-or-self::iframe/@src | descendant-or-self::a[contains(@class, 'mtli_')]/@href"):
             if url not in seen:
                 seen.add(url)
-                refs.append(SourceRef("", url))
+                refs.append(SourceRef("", safe_uri(url)))
     return refs
 
 

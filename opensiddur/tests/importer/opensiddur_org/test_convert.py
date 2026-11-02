@@ -119,7 +119,12 @@ class TestConversion(ConvertTestCase):
 
     def test_a_name_another_project_has_adds_the_post_id(self) -> None:
         (self.projects / "a_song-poet-2020-he").mkdir()  # a project no post made
+        (self.projects / "a_song-poet-2020-he" / "index.xml").write_text("<x/>", encoding="utf-8")
         self.assertEqual(self.convert(0), ["a_song-poet-2020-101-he", "a_song-translator-en"])
+
+    def test_an_empty_directory_does_not_take_a_name(self) -> None:
+        (self.projects / "a_song-poet-2020-he").mkdir()  # left by a failed conversion
+        self.assertEqual(self.convert(0), ["a_song-poet-2020-he", "a_song-translator-en"])
 
     def test_a_post_keeps_its_name_from_an_older_post(self) -> None:
         # Post 900 already has the name; post 101, the same song, becomes convertible later.

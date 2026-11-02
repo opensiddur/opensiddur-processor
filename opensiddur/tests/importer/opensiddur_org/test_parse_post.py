@@ -1,6 +1,7 @@
 import unittest
 
 from opensiddur.importer.opensiddur_org.parse_post import (
+    safe_uri,
     FootnoteRef,
     Span,
     Text,
@@ -228,6 +229,18 @@ class TestReviewRegressions(unittest.TestCase):
         post = parse_post(make_post(content=table(["Transliteration (Judeo-Arabic)"], [[cell("jrb-Hebr", "judeo-arabic", "שלאם")]])))
         self.assertEqual(post.columns[0].lang, "jrb")
         self.assertTrue(post.columns[0].mismatch)
+
+
+class TestSafeUri(unittest.TestCase):
+    def test_a_second_fragment_is_encoded(self) -> None:
+        self.assertEqual(safe_uri("https://x.org/a/embed/#?secret=1#?secret=2"),
+                         "https://x.org/a/embed/#?secret=1%23?secret=2")
+
+    def test_spaces_are_encoded(self) -> None:
+        self.assertEqual(safe_uri(" https://x.org/a b.pdf "), "https://x.org/a%20b.pdf")
+
+    def test_a_stray_percent_is_encoded(self) -> None:
+        self.assertEqual(safe_uri("https://x.org/a%28b%2#page/1"), "https://x.org/a%28b%252#page/1")
 
 
 class TestColumnRules(unittest.TestCase):

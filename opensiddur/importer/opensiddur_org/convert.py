@@ -172,12 +172,13 @@ def project_ids(plans: list[PostPlan], project_directory: Path,
     named = {plan.post.post_id for plan in plans if plan.standard}
     rejected = {plan.post.post_id for plan in plans if is_rejected(plan)}
     # A name a post being named holds stays its own (see assign_project_ids). A rejected post's
-    # projects are about to be removed, so their names are free. Any other name is taken.
+    # projects are about to be removed, so their names are free, as are empty directories (a
+    # failed conversion's leftovers). Any other name is taken.
     held = {path.name: post_id for post_id, paths in existing.items() if post_id in named
             for path in paths}
     freed = {path.name for post_id, paths in existing.items() if post_id in rejected for path in paths}
     taken = ([p.name for p in directory.iterdir()
-              if p.is_dir() and p.name not in held and p.name not in freed]
+              if p.is_dir() and any(p.iterdir()) and p.name not in held and p.name not in freed]
              if directory.is_dir() else [])
     return assign_project_ids(
         (Candidate(plan.post, column) for plan in plans if plan.standard for column, _ in plan.columns),
@@ -341,12 +342,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(lines)} contributor candidate(s) written to {CANDIDATES_PATH}")
 
     converted = 0
+    failed: list[int] = []
     for plan in standard:
         if any((plan.post.post_id, column.key) not in ids for column, _ in plan.columns):
             print(f"{plan.post.post_id}: skipped: a project of it could not be named")
             continue
         if not args.dry_run:
-            convert_post(plan, context, args.project_directory, ids=ids, existing=existing)
+            try:
+                convert_post(plan, context, args.project_directory, ids=ids, existing=existing)
+            except Exception as error:  # one post's failure must not stop the others
+                print(f"{plan.post.post_id}: FAILED: {error}")
+                failed.append(plan.post.post_id)
+                continue
             if args.register:
                 register_urns([plan], context, REGISTRY_DIRECTORY)
         converted += 1
@@ -369,6 +376,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{plan.post.post_id}: WARNING: {', '.join(p.name for p in earlier)} "
                   "were converted earlier and are left as they were")
     print(f"{'Would convert' if args.dry_run else 'Converted'} {converted} of {len(plans)} post(s).")
+    if failed:
+        print(f"{len(failed)} post(s) failed: {', '.join(map(str, failed))}")
+        return 1
     return 0
 
 
