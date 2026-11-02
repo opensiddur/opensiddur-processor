@@ -3,10 +3,12 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from opensiddur.importer.opensiddur_org.convert import (
     convert_post,
     load_context,
+    main,
     plan_post,
     project_ids,
     register_urns,
@@ -117,6 +119,17 @@ class TestConversion(ConvertTestCase):
         self.assertTrue((self.projects / "a_song-poet-2020-yi").exists())
         self.assertTrue((self.projects / "tanakh-wlc-he").exists())
 
+    def test_a_failed_post_leaves_its_projects_as_they_were(self) -> None:
+        self.convert(0)
+        before = {p.relative_to(self.projects): p.read_bytes() for p in self.projects.rglob("*") if p.is_file()}
+        self.posts[0] = make_post(101, title="A Retitled Song")
+        failing = mock.patch("opensiddur.importer.opensiddur_org.convert.validate_project_urn_references",
+                             return_value=["unresolvable"])
+        with failing, self.assertRaises(RuntimeError):
+            self.convert(0)
+        after = {p.relative_to(self.projects): p.read_bytes() for p in self.projects.rglob("*") if p.is_file()}
+        self.assertEqual(after, before)
+
     def test_a_name_another_project_has_adds_the_post_id(self) -> None:
         (self.projects / "a_song-poet-2020-he").mkdir()  # a project no post made
         (self.projects / "a_song-poet-2020-he" / "index.xml").write_text("<x/>", encoding="utf-8")
@@ -217,6 +230,32 @@ class TestRegisteringParts(ConvertTestCase):
         self.assertEqual([(l["urn"], l.get("parent")) for l in lines], [
             (f"{URN}_101", None), (f"{URN}_101/quoted", f"{URN}_101"),
             (f"{URN}_101/quoted/1", f"{URN}_101/quoted")])
+
+
+class TestMain(ConvertTestCase):
+    def test_a_failed_post_does_not_stop_the_others(self) -> None:
+        save_post_urns({pid: PostUrns(pid, "new", f"{URN}_{pid}") for pid in (101, 105)}, self.post_urns)
+        data_dir = write_data_dir(Path(self.tmp.name) / "sources2", [make_post(101), make_post(105, slug="another")])
+        context = load_context(data_dir, post_urns_path=self.post_urns, registry_directory=self.registry,
+                               decisions=load_decisions(FIXTURES / "licence_decisions.yaml"))
+        module = "opensiddur.importer.opensiddur_org.convert"
+        converted: list[int] = []
+
+        def convert(plan, *args, **kwargs):
+            if plan.post.post_id == 101:
+                raise RuntimeError("broken")
+            converted.append(plan.post.post_id)
+            return []
+
+        with mock.patch(f"{module}.opensiddur_org_data_directory", return_value=data_dir), \
+                mock.patch(f"{module}.load_context", return_value=context), \
+                mock.patch(f"{module}.convert_post", side_effect=convert), \
+                mock.patch(f"{module}.register_urns") as register, \
+                mock.patch("sys.stdout"):
+            status = main(["--project-directory", str(self.projects), "--register"])
+        self.assertEqual(status, 1)
+        self.assertEqual(converted, [105])
+        self.assertEqual([call.args[0][0].post.post_id for call in register.call_args_list], [105])
 
 
 if __name__ == "__main__":

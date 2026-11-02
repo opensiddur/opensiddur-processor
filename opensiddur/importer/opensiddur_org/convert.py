@@ -22,6 +22,7 @@ import logging
 import re
 import shutil
 import sys
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -193,7 +194,40 @@ def convert_post(
     existing: dict[int, list[Path]] | None = None,
     registry_directory: Path = REGISTRY_DIRECTORY,
 ) -> list[str]:
-    """Write the post's projects, named by ``ids`` (see :func:`project_ids`). Returns their IDs."""
+    """Write the post's projects, named by ``ids`` (see :func:`project_ids`). Returns their IDs.
+
+    All or nothing: when a file or a reference check fails, every directory the post touched
+    is put back as it was, and the error is raised."""
+    project_directory = Path(project_directory)
+    if existing is None:
+        existing = imported_projects(project_directory)
+    touched = sorted({project_directory / pid for (post_id, _), pid in ids.items()
+                      if post_id == plan.post.post_id}
+                     | set(existing.get(plan.post.post_id, [])))
+    with tempfile.TemporaryDirectory() as backup:
+        saved = []
+        for directory in touched:
+            if directory.is_dir():
+                shutil.copytree(directory, Path(backup) / directory.name)
+                saved.append(directory)
+        try:
+            return _write_post(plan, context, project_directory, ids=ids, existing=existing,
+                               registry_directory=registry_directory)
+        except Exception:
+            for directory in touched:
+                if directory.exists():
+                    shutil.rmtree(directory)
+            for directory in saved:
+                shutil.copytree(Path(backup) / directory.name, directory)
+            raise
+
+
+def _write_post(
+    plan: PostPlan, context: Context, project_directory: Path, *,
+    ids: dict[tuple[int, str], str],
+    existing: dict[int, list[Path]],
+    registry_directory: Path,
+) -> list[str]:
     post = plan.post
     urns = context.post_urns[post.post_id]
     credits = post_credits(post, context.contributors)
@@ -223,8 +257,6 @@ def convert_post(
 
     # A language the post no longer has (or may no longer import), or a name its retitling
     # changed, leaves no project behind.
-    if existing is None:
-        existing = imported_projects(project_directory)
     # A name another post is given this run is that post's project now, whatever was there.
     given = set(ids.values())
     for stale in existing.get(post.post_id, []):
