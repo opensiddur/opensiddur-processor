@@ -213,9 +213,22 @@ one of them settles is not irregular for that reason.
     in a one-column table.
   - When they alternate languages (Hebrew, English, Hebrew, English…), each consecutive pair
     is one aligned row, as in a two-column table. An empty block still holds its place.
-    Blocks that do not alternate cleanly leave the post irregular, to be decided one by one:
-    3778 and 14515 open with English blocks before the pairs begin, and 11906 breaks its
-    pairing once.
+    Blocks that do not alternate cleanly leave the post irregular, to be decided one by one.
+  - **A post that sets its text outside the site's toggleable tables** is described by a
+    `layouts` decision in `post_decisions.yaml`: XPaths to the elements holding its text, in
+    order (a `table`, or a `div[lang]` that becomes a one-column table). Before the first is
+    the introduction and after the last the notes, as with a table. A layout may also:
+    - name a table holding the introduction in several languages, a column each; each
+      language's introduction goes in the project of that language (11906);
+    - split a column whose cells hold several parts (the text before the first paragraph,
+      then each `p`) into a column per part, under headers it gives, so the header rules read
+      their roles; `null` drops a part (11906: number, explanation, translation,
+      transliteration);
+    - make what follows the text a source rather than notes, when it credits where the text
+      was first published (14515);
+    - transclude, where it stands in the notes, a passage the post quotes from a text already
+      in the collection, rather than copying it: a book sets it from the edition it prefers,
+      and the post's authors are not credited with it (3778's Micah 7:19).
   - Text before the first block and after the last is the post's own words, as with a table.
   - A post with text between its blocks may be an essay about the prayers it quotes, such as
     1769 (Tikkun Ḥatsot); which posts are essays is decided one by one (`essays` in
@@ -519,7 +532,14 @@ Post 34548's English translation is not imported until its licence is clarified.
   Aramaic (60).
 - **URNs:** 176 posts use existing URNs and 3,073 have new ones.
 - **Not converted:**
-  - 3778, 11906 and 14515 wait on decisions about each post.
+  - 3778, 11906 and 14515 waited on decisions about each post, since made (`layouts`):
+    - 3778, Dolgin's Tashlikh practice: one English text; its notes transclude Micah 7:19.
+    - 11906, Weiss and Rank's Seven Blessings: Hebrew, English and `he-Latn`, each row on
+      the existing Sheva Berakhot URNs (`borei_peri_hagafen`, then
+      `sheva_berakhot/shehakol_bara` … `asher_bara`), with the authors' explanation of each
+      blessing as a note and their essay as each language's introduction.
+    - 14515, Cohen's Vidui meditation: Hebrew and English on `ashamnu/1`–`24`, registered for
+      it as parts of the existing `ashamnu`, one per confession in the traditional order.
   - 4017 and 29942's English are held (see `licence_decisions.yaml`).
   - 29959, 36831 and 52834 are rejected on licence.
 - **Checks:** `urn_registry --check` and `validate_names` have no errors, and every URN

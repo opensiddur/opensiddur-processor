@@ -235,6 +235,12 @@ def _write_post(
     front_lang = front_language(post, languages)
     # The first project in that language has it, not a variant.
     front_key = next((column.key for column, _ in plan.columns if column.lang == front_lang), None)
+    # An introduction in several languages: each in the first project of its language.
+    own_intro_keys = {next(column.key for column, _ in plan.columns if column.lang == lang)
+                      for lang in post.intros_by_language if lang in languages}
+    for lang in sorted(set(post.intros_by_language) - set(languages)):
+        logger.warning("%s: its introduction in %s has no project of that language; not imported",
+                       post.post_id, lang)
     essay_lang = essay_language(post, languages) if post.essay else None
     essay_key = next((column.key for column, _ in plan.columns if column.lang == essay_lang), None)
     written_projects: list[str] = []
@@ -246,6 +252,7 @@ def _write_post(
             upstream_commit_date=context.upstream_commit_date,
             with_front=column.key == front_key,
             with_essay=column.key == essay_key,
+            with_own_introduction=column.key in own_intro_keys,
             project_id=ids[(post.post_id, column.key)],
         )
         project_dir = project_directory / files.project_id

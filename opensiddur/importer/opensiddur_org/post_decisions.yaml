@@ -16,6 +16,25 @@ out_of_scope:
 essays:
   1769: an essay on Tikkun Ḥatzot quoting Lamentations, Psalms and the Shulḥan Arukh
 
+# Posts that set their text outside the site's toggleable tables: where it is (see Layout in
+# post_decisions.py). Everything else before the text is the introduction, and after it notes.
+layouts:
+  3778:  # Dolgin's Tashlikh practice, then notes on Tashlikh
+    text: ["(//div[@lang])[1]"]
+    transclusions:
+      # Micah 7:19, in Hebrew and the JPS 1917 translation: set from the Bible a book prefers
+      "(//table)[1]": urn:x-opensiddur:text:bible:micah/7/19
+  11906:  # Weiss and Rank's Seven Blessings
+    introduction: "(//table)[1]"  # their essay, in English and Hebrew side by side
+    text: ["(//table)[2]"]
+    split:
+      # Each English cell: the blessing's number, the authors' explanation, the
+      # translation, a transliteration.
+      2: [null, Commentary (English), Translation (English), Transliteration (romanized Hebrew)]
+  14515:  # Cohen's Vidui meditation
+    text: ["(//table)[1]"]
+    credit_after: true  # "first published by Danny Cohen on his Facebook page"
+
 # A column's language where the header/markup rule reads it wrongly: post -> header -> language.
 column_languages:
   62205:

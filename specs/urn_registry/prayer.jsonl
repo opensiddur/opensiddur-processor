@@ -1052,6 +1052,30 @@
 {"urn": "urn:x-opensiddur:text:prayer:viduy", "status": "canonical", "label_en": "viduy"}
 {"urn": "urn:x-opensiddur:text:prayer:viduy/introduction", "status": "canonical", "label_en": "viduy/introduction", "parent": "urn:x-opensiddur:text:prayer:viduy"}
 {"urn": "urn:x-opensiddur:text:prayer:ashamnu", "status": "canonical", "label_en": "ashamnu"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/1", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "אשמנו", "label_en": "ashamnu/1"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/2", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "בגדנו", "label_en": "ashamnu/2"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/3", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "גזלנו", "label_en": "ashamnu/3"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/4", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "דברנו דפי", "label_en": "ashamnu/4"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/5", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "העוינו", "label_en": "ashamnu/5"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/6", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "והרשענו", "label_en": "ashamnu/6"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/7", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "זדנו", "label_en": "ashamnu/7"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/8", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "חמסנו", "label_en": "ashamnu/8"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/9", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "טפלנו שקר", "label_en": "ashamnu/9"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/10", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "יעצנו רע", "label_en": "ashamnu/10"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/11", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "כזבנו", "label_en": "ashamnu/11"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/12", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "לצנו", "label_en": "ashamnu/12"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/13", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "מרדנו", "label_en": "ashamnu/13"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/14", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "נאצנו", "label_en": "ashamnu/14"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/15", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "סררנו", "label_en": "ashamnu/15"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/16", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "עוינו", "label_en": "ashamnu/16"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/17", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "פשענו", "label_en": "ashamnu/17"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/18", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "צררנו", "label_en": "ashamnu/18"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/19", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "קשינו עורף", "label_en": "ashamnu/19"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/20", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "רשענו", "label_en": "ashamnu/20"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/21", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "שחתנו", "label_en": "ashamnu/21"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/22", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "תעבנו", "label_en": "ashamnu/22"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/23", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "תעינו", "label_en": "ashamnu/23"}
+{"urn": "urn:x-opensiddur:text:prayer:ashamnu/24", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:ashamnu", "label_he": "תעתענו", "label_en": "ashamnu/24"}
 {"urn": "urn:x-opensiddur:text:prayer:meshiach_tzidqekha", "status": "canonical", "label_en": "meshiah tsidqekha"}
 {"urn": "urn:x-opensiddur:text:prayer:anenu", "status": "canonical", "label_en": "anenu"}
 {"urn": "urn:x-opensiddur:text:prayer:mi_sheanah", "status": "canonical", "label_en": "mi sheanah"}
@@ -23260,3 +23284,5 @@
 {"urn": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar/4", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar", "label_en": "A Tefilah for Election Day (Tzohar, 2026) / 4"}
 {"urn": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar/5", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar", "label_en": "A Tefilah for Election Day (Tzohar, 2026) / 5"}
 {"urn": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar/6", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar", "label_en": "A Tefilah for Election Day (Tzohar, 2026) / 6"}
+{"urn": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin", "status": "canonical", "label_en": "A Ten-Step, Four-Worlds, One-Earth Tashlikh, by Avi Dolgin"}
+{"urn": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin/1", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin", "label_en": "A Ten-Step, Four-Worlds, One-Earth Tashlikh, by Avi Dolgin / 1"}

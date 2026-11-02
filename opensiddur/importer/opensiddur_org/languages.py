@@ -110,6 +110,13 @@ NOT_TEXT_ROLES = frozenset({"initials", "commentary", "description", "contribute
 _SCRIPT_RE = re.compile(r"^[A-Z][a-z]{3}$")
 
 
+def site_lang(tag: str) -> str:
+    """A BCP 47 tag as the site writes ``lang``: ``he-Latn`` is ``heb-Latn``, ``en`` is ``eng``."""
+    language, _, script = tag.partition("-")
+    three = next((k for k, v in ISO639_1.items() if v == language), language)
+    return f"{three}-{script}" if script else three
+
+
 def bcp47(iso639_3: str, script: str = "") -> str:
     """BCP 47 for an ISO 639-3 code and an optional ISO 15924 script."""
     iso639_3 = iso639_3.lower()

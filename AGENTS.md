@@ -105,7 +105,7 @@ uv run python -m opensiddur.importer.opensiddur_org.convert --register        # 
 Licence decisions live in `opensiddur/importer/opensiddur_org/licence_decisions.yaml`; a licence or post not
 decided there is asked about, then recorded. A decision about one post lapses when a later export updates or
 relicenses it. Decisions about single posts that the spec's rules get wrong or leave open (out of scope, a column's
-language, what a post's colours mean, essays) live in `post_decisions.yaml`. `convert --emit-contributor-candidates` writes lines for
+language, what a post's colours mean, essays, where a post outside the site's tables keeps its text) live in `post_decisions.yaml`. `convert --emit-contributor-candidates` writes lines for
 unregistered contributors to `output/` for review; they are never registered automatically.
 
 **Download the Birnbaum siddur** — three sources for one book, all writing into
