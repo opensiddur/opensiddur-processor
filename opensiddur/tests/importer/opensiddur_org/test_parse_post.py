@@ -220,6 +220,13 @@ class TestReviewRegressions(unittest.TestCase):
         post = self.english("Text", before="<h3>About the source</h3><p>Intro.</p>", after="<hr /><p>Afterword.</p>")
         self.assertEqual([node_text(line) for line in post.notes], ["Afterword."])
 
+    def test_lines_naming_only_download_files_are_dropped(self) -> None:
+        before = ('<p><strong>DOWNLOAD:</strong> <a href="a.pdf">PDF</a> | <a href="a.odt">ODT</a></p>'
+                  '<p>The rite (1803):<br /><a href="b.pdf">PDF</a> | <a href="b.txt">TXT</a> (v.3.0)</p>'
+                  '<p>Calendar: <a href="c.pdf">PDF</a></p>')
+        post = self.english("Text", before=before)
+        self.assertEqual([node_text(line) for line in post.intro], ["The rite (1803):", "Calendar: PDF"])
+
     def test_entities_are_decoded_once(self) -> None:
         line = self.english("a &amp;lt;b&amp;gt; c").rows[0].cells[0].blocks[0].lines[0]
         self.assertEqual(node_text(line), "a &lt;b&gt; c")

@@ -614,9 +614,18 @@ def _paragraph_lines(elements: list[HtmlElement], footnotes: _Footnotes) -> list
         if element.tag in ("hr",):
             continue
         for line, _gap in _split_lines(_inline_nodes(element, footnotes)):
-            if line:
+            if line and not _DOWNLOAD_LABELS_RE.fullmatch(node_text(line).strip()):
                 lines.append(line)
     return lines
+
+
+# A line that only named the files a post offered ("DOWNLOAD: PDF | ODT", "PDF | TXT (v.3.0)").
+# Its links are not imported, so the labels are left saying nothing.
+_FILE_TYPE = r"(?:PDF|ODT|TXT|DOCX?|RTF|EPUB|IDML|MP3|ZIP)"
+_DOWNLOAD_LABELS_RE = re.compile(
+    rf"(?i:download)\s*:?\s*|(?:(?i:download)\s*:?\s*)?{_FILE_TYPE}(?:\s*\([^)]*\))?"
+    rf"(?:\s*(?:\||,|and)\s*{_FILE_TYPE}(?:\s*\([^)]*\))?)*"
+)
 
 
 _STRAY_PERCENT_RE = re.compile(r"%(?![0-9A-Fa-f]{2})")
