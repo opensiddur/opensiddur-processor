@@ -321,10 +321,6 @@ class TestFacingPages(_KeepTogether, unittest.TestCase):
     FACING_PAGES = True
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 @_NEEDS_TEX
 class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
     """A heading in a ``\\Columns`` column that runs to several lines, with a translated
@@ -364,8 +360,10 @@ class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
                                cwd=work, capture_output=True, text=True)
             boxes = subprocess.run(["pdftotext", "-bbox", "t.pdf", "-"],
                                    cwd=work, capture_output=True, text=True).stdout
-        cls.x = {word: float(x) for x, word in re.findall(
-            r'<word xMin="([\d.]+)"[^>]*>([^<]*)</word>', boxes)}
+        found = re.findall(
+            r'<word xMin="([\d.]+)" yMin="([\d.]+)"[^>]*>([^<]*)</word>', boxes)
+        cls.x = {word: float(x) for x, _, word in found}
+        cls.y = {word: round(float(y)) for _, y, word in found}
 
     def test_every_word_of_the_heading_is_in_the_right_column(self):
         # The right column's text marks where that column begins.
@@ -377,5 +375,9 @@ class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
 
     def test_the_heading_runs_to_several_lines(self):
         # Otherwise there is no last line to lose, and the test above proves nothing.
-        lefts = {round(x) for w, x in self.x.items() if w.startswith("RHw")}
-        self.assertLess(min(lefts), max(lefts))
+        lines = {y for w, y in self.y.items() if w.startswith("RHw")}
+        self.assertGreater(len(lines), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
