@@ -4715,7 +4715,8 @@ class TestKeepTogether(unittest.TestCase):
 
     def test_a_translated_title_cannot_be_broken_from_its_heading(self):
         out = _transform(self.SINGLE)
-        self.assertIn(r"\newcommand{\OSheadTranslation}[1]{\par\nobreak", out)
+        self.assertIn(r"\newcommand{\OSheadTranslation}[1]{\par\OSheadNobreak", out)
+        self.assertIn(r"\newcommand{\OSheadNobreak}{\ifl@dpairing\else\nobreak\fi}", out)
 
     def test_the_next_pstart_takes_the_keep(self):
         out = _transform(self.SINGLE)
