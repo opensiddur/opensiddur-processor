@@ -23286,3 +23286,5 @@
 {"urn": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar/6", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_tefillah_for_election_day_tzohar", "label_en": "A Tefilah for Election Day (Tzohar, 2026) / 6"}
 {"urn": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin", "status": "canonical", "label_en": "A Ten-Step, Four-Worlds, One-Earth Tashlikh, by Avi Dolgin"}
 {"urn": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin/1", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin", "label_en": "A Ten-Step, Four-Worlds, One-Earth Tashlikh, by Avi Dolgin / 1"}
+{"urn": "urn:x-opensiddur:text:prayer:preview", "status": "canonical", "label_en": "Synthetic settings preview"}
+{"urn": "urn:x-opensiddur:text:prayer:preview/parallel", "status": "canonical", "label_en": "Synthetic parallel preview passage", "parent": "urn:x-opensiddur:text:prayer:preview"}
