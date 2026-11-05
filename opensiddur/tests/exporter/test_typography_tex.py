@@ -627,12 +627,27 @@ class TestHeadingTranslation(unittest.TestCase):
     r"""The translated title under a heading, where a division is titled twice."""
 
     def test_the_default_cannot_be_broken_from_its_heading(self):
-        """\\nobreak after the \\par, or a page could end between the two (#208)."""
+        """\\nobreak after the \\par (outside a reledpar column), or a page could end
+        between the two (#208)."""
         self.assertEqual(
-            r"\newcommand{\OSheadTranslation}[1]{\par\nobreak\mbox{}\hfill"
+            r"\newcommand{\OSheadTranslation}[1]{\par\OSheadNobreak\mbox{}\hfill"
             r"{\normalfont\normalsize\itshape #1}\hfill\mbox{}}",
             _macro(_tex({}), r"\OSheadTranslation"),
         )
+
+    def test_the_nobreak_is_left_out_in_a_reledpar_column(self):
+        """A penalty in a column cuts reledpar's line list short, and a title's last line
+        is set outside its column. There the heading-line keep (\\OSKeepHeadBegin) holds
+        the title to what follows instead."""
+        tex = _tex({})
+        self.assertEqual(
+            r"\newcommand{\OSheadNobreak}{\ifl@dpairing\else\nobreak\fi}",
+            _macro(tex, r"\OSheadNobreak"),
+        )
+        lines = tex.splitlines()
+        at = next(i for i, l in enumerate(lines) if l.startswith(r"\newcommand{\OSheadNobreak}"))
+        self.assertEqual(r"\makeatletter", lines[at - 1])
+        self.assertEqual(r"\makeatother", lines[at + 1])
 
     def test_a_configured_style_reaches_the_macro(self):
         tex = _tex({"styles": {"heading_translation":

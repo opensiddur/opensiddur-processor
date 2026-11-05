@@ -321,5 +321,63 @@ class TestFacingPages(_KeepTogether, unittest.TestCase):
     FACING_PAGES = True
 
 
+@_NEEDS_TEX
+class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
+    """A heading in a ``\\Columns`` column that runs to several lines, with a translated
+    title under it, is set wholly in its own column.
+
+    A \\nobreak between the two used to cut reledpar's reading of the column short, and the
+    heading's last line was set full width, under the other column (Birnbaum's "TALMUDIC
+    EXPOSITION OF THE SCRIPTURES", whose "TURES" landed under the Hebrew)."""
+
+    HEADING_WORDS = 14
+
+    @classmethod
+    def setUpClass(cls):
+        long_head = " ".join(f"RHw{n}" for n in range(cls.HEADING_WORDS))
+        document = f"""<?xml version="1.0" encoding="UTF-8"?>
+<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+         xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en">
+  <tei:text><tei:body>
+    <p:parallel column-order="primary_first">
+      <p:parallelItem role="primary" xml:lang="en"><tei:div corresp="urn:x-opensiddur:text:t:s0"><tei:p>{_words("LP0", 40)}</tei:p></tei:div></p:parallelItem>
+      <p:parallelItem role="parallel" xml:lang="en"><tei:div corresp="urn:x-opensiddur:text:t:s0"><tei:head>{long_head}</tei:head><tei:head>RT0</tei:head><tei:p>{_words("RP0", 40)}</tei:p></tei:div></p:parallelItem>
+    </p:parallel>
+  </tei:body></tei:text>
+</tei:TEI>"""
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / "in.xml").write_text(document)
+            transform_xml_to_tex(
+                work / "in.xml", output_file=str(work / "t.tex"),
+                typography=TypographyConfig.model_validate(
+                    {"parallel": {"layout": "pairs"}, "headings": {"from": "both"}}),
+                project_directory=work,
+                distribution=NO_NOTICES,
+            )
+            for _ in range(3):
+                subprocess.run(["lualatex", "-interaction=nonstopmode", "t.tex"],
+                               cwd=work, capture_output=True, text=True)
+            boxes = subprocess.run(["pdftotext", "-bbox", "t.pdf", "-"],
+                                   cwd=work, capture_output=True, text=True).stdout
+        found = re.findall(
+            r'<word xMin="([\d.]+)" yMin="([\d.]+)"[^>]*>([^<]*)</word>', boxes)
+        cls.x = {word: float(x) for x, _, word in found}
+        cls.y = {word: round(float(y)) for _, y, word in found}
+
+    def test_every_word_of_the_heading_is_in_the_right_column(self):
+        # The right column's text marks where that column begins.
+        column = min(x for w, x in self.x.items() if w.startswith("RP0w"))
+        heading = {w: x for w, x in self.x.items() if w.startswith("RHw")}
+        self.assertEqual(len(heading), self.HEADING_WORDS)
+        outside = [w for w, x in heading.items() if x < column - 1]
+        self.assertEqual(outside, [])
+
+    def test_the_heading_runs_to_several_lines(self):
+        # Otherwise there is no last line to lose, and the test above proves nothing.
+        lines = {y for w, y in self.y.items() if w.startswith("RHw")}
+        self.assertGreater(len(lines), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

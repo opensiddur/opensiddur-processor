@@ -536,9 +536,22 @@ def _styles_section(config: TypographyConfig) -> list[str]:
     # translation would leave the translation heading a page it does not name (#198).
     # Set at whichever of the four levels the heading is, so it takes one style rather
     # than four.
+    #
+    # Not in a reledpar column, though. There reledpar cuts the paragraph into lines for
+    # the column, and a penalty between a title's last line and its translation stops
+    # that cut short: the title's last line escapes the column and is set full width
+    # under the other one -- "TALMUDIC EXPO- / SITION OF THE SCRIP-" in the English
+    # column and "TURES" under the Hebrew. The keep is not lost there: \OSKeepHeadBegin
+    # tags both lines as heading, and the line-level keep holds them to what follows.
+    # reledmac's own single stream copes with the penalty and keeps it.
+    lines.extend([
+        r"\makeatletter",
+        r"\newcommand{\OSheadNobreak}{\ifl@dpairing\else\nobreak\fi}",
+        r"\makeatother",
+    ])
     define(
         "heading_translation",
-        lambda s: r"\newcommand{\OSheadTranslation}[1]{\par\nobreak"
+        lambda s: r"\newcommand{\OSheadTranslation}[1]{\par\OSheadNobreak"
         + _inline_aligned(s, r"{\normalfont" + tokens(s) + " #1}")
         + "}",
     )
