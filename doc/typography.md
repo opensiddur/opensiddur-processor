@@ -221,6 +221,23 @@ as the surrounding text has it.
 | `styles.line_number` | inherits | Marginal line numbers. |
 | `styles.section_separator` | centered | The separator between unheaded sections. |
 | `styles.list_label` | small-caps | The label naming an item of a labelled list, set on a line of its own above the item. Like the headings, it is set inside an aligned unit rather than as a block, so `space_before` and `space_after` do nothing here; the space above it is the space between one aligned unit and the next. See [`lists`](#lists) for the item's indent. |
+| `styles.highlight_italic` | italic | Text the source highlights in italics (`tei:hi` with `rend="italic"`). Each look-changing `rend` token has a role of its own, and a highlight with several tokens nests them in order. Layout and reading tokens (`centered`, `align-right`, `ketiv-only`, `qeri-only`) have none. |
+| `styles.highlight_bold` | bold | Text the source highlights in bold (`rend="bold"`). |
+| `styles.highlight_small_caps` | small-caps | Text the source sets in small capitals (`rend="small-caps"`). |
+| `styles.highlight_superscript` | inherits | Text the source raises above the line (`rend` `sup`, `superscript`, `raised` or `suspended`). It is always raised and reduced; the style sets its face and size. |
+| `styles.highlight_large` | `x-large` | Text the source sets larger (`rend="large"`). |
+| `styles.highlight_small` | `small` | Text the source sets smaller (`rend="small"`). |
+| `styles.foreign` | inherits | A phrase in another language than the text around it (`tei:foreign`), such as Hebrew quoted in English. Its script's font is selected either way. |
+| `styles.reference` | inherits | The words of a reference or link (`tei:ref`). A page reference's text is generated and does not take it. |
+| `styles.poetry_line` | inherits | A line of poetry (`tei:l`). |
+| `styles.list_item` | inherits | The text of an item in a list. See [`lists`](#lists) for its indent. |
+| `styles.abbreviation` | inherits | An abbreviation, where `readings.abbreviations` reads them as printed. |
+| `styles.expansion` | inherits | An abbreviation's expansion, where `readings.abbreviations` reads them expanded. |
+| `styles.printed_error` | inherits | A misprint as printed, where `readings.errors` reads them so. |
+| `styles.correction` | inherits | A misprint's correction, where `readings.errors` reads them corrected (the default). |
+| `styles.qere` | italic | The qere: a word as it is read, where that differs from how it is written. |
+| `styles.ketiv` | inherits | The ketiv: a word as it is written, in parentheses after the qere when both are given. |
+| `styles.alternative_reading` | inherits | A second or later wording, in parentheses after the first, where a text gives more than one (`j:option`). |
 
 ## `line_numbers`
 

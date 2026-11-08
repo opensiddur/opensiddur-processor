@@ -1238,9 +1238,9 @@ class TestSourceWhitespaceIsNotAParagraphBreak(unittest.TestCase):
         )
         body = self._document_body(out)
         self.assertNotIn("wordnext", body)
-        self.assertNotIn(r"}\textit{next", body)
+        self.assertNotIn(r"}\OSHighlightItalic{next", body)
         # A single-newline run is left exactly as it was: the space survives.
-        self.assertRegex(body, r"word\}\n[ \t]*\\textit\{next")
+        self.assertRegex(body, r"word\}\n[ \t]*\\OSHighlightItalic\{next")
 
     def test_the_postamble_keeps_its_blank_lines(self):
         """Why the collapse is scoped to a numbered stream and not applied to the
@@ -1341,7 +1341,7 @@ class TestInlineFormatting(unittest.TestCase):
           </tei:p></tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\textsc{Lord}", out)
+        self.assertIn(r"\OSHighlightSmallCaps{Lord}", out)
 
     def test_kri_ktiv_choice(self):
         xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -1356,8 +1356,8 @@ class TestInlineFormatting(unittest.TestCase):
           </tei:p></tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\textit{read}", out)
-        self.assertIn("(written)", out)
+        self.assertIn(r"\OSQere{read}", out)
+        self.assertIn(r"(\OSKetiv{written})", out)
 
     def test_special_characters_are_tex_escaped(self):
         """LaTeX-special characters in body text must be escaped to avoid
@@ -1878,7 +1878,7 @@ class TestOptionRendering(unittest.TestCase):
             <tei:choice><j:read>a <tei:hi rend="small-caps">Lord</tei:hi></j:read><j:written>b</j:written></tei:choice>
           </tei:p></tei:body></tei:text>
         </tei:TEI>"""
-        self.assertIn("\\textsc{", _transform(xml))
+        self.assertIn("\\OSHighlightSmallCaps{", _transform(xml))
 
 
 class TestStructuralElements(unittest.TestCase):
@@ -2062,7 +2062,7 @@ class TestStructuralElements(unittest.TestCase):
         out = _transform(xml)
         self.assertIn(
             r"\OSheadA{{\textdir TLT\foreignlanguage{english}{"
-            r"\texthebrew{רות}\quad RUTH}}",
+            r"\texthebrew{\OSForeign{רות}}\quad RUTH}}",
             out,
         )
         # ...but a line break in body text is still a line break. Scoped to the typeset
@@ -4287,7 +4287,7 @@ class TestLabelledLists(unittest.TestCase):
         for text in ("Blessed art thou.", "Through thy abundant goodness.",
                      "Blessed art thou, who feedest."):
             with self.subTest(text=text):
-                self.assertIn(r"\pstart\relax \OSListItemPar " + text, front)
+                self.assertIn(r"\pstart\relax \OSListItemPar \OSListItem{" + text, front)
 
     def test_prose_around_the_list_is_not_indented(self):
         front = self._front()
@@ -4330,8 +4330,8 @@ class TestLabelledLists(unittest.TestCase):
           </tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\pstart\relax \OSListItemPar Alpha\pend", out)
-        self.assertIn(r"\pstart\relax \OSListItemPar Beta\pend", out)
+        self.assertIn(r"\pstart\relax \OSListItemPar \OSListItem{Alpha}\pend", out)
+        self.assertIn(r"\pstart\relax \OSListItemPar \OSListItem{Beta}\pend", out)
         self.assertIn(r"\pstart\relax After.\pend", out)
 
     def test_an_item_of_paragraphs_gets_no_second_break(self):
@@ -4384,7 +4384,7 @@ class TestLabelledLists(unittest.TestCase):
         out = _transform(xml)
         note = out[out.index(r"\Bfootnote{"):]
         note = note[:note.index(r"\pend")]
-        self.assertIn(r"Alpha\newline Beta", note)
+        self.assertIn(r"\OSListItem{Alpha}\newline \OSListItem{Beta}", note)
         self.assertNotIn(r"\par", note)
         self.assertNotIn(r"\OSListItemPar", note)
 
@@ -4793,7 +4793,7 @@ class TestEnglishForeignDirection(unittest.TestCase):
         <tei:text><tei:body><tei:p>אשרי <tei:foreign xml:lang="en">Ps. cxlv.</tei:foreign>
         תהלה</tei:p></tei:body></tei:text></tei:TEI>'''
         out = _transform(xml)
-        self.assertIn(r'\leavevmode{\textdir TLT\foreignlanguage{english}{\textit{Ps. cxlv.}}}', out)
+        self.assertIn(r'\leavevmode{\textdir TLT\foreignlanguage{english}{\OSForeign{Ps. cxlv.}}}', out)
         self.assertEqual(out.count('Ps. cxlv.'), 1)
         self.assertIn('תהלה', out)
 
@@ -4803,8 +4803,8 @@ class TestEnglishForeignDirection(unittest.TestCase):
         <tei:foreign xml:lang="he">אשרי</tei:foreign>.</tei:foreign>
         </tei:p></tei:body></tei:text></tei:TEI>'''
         out = _transform(xml)
-        self.assertIn(r'\texthebrew{אשרי}', out)
-        self.assertIn(r'\textdir TLT\foreignlanguage{english}{\textit{Say', out)
+        self.assertIn(r'\texthebrew{\OSForeign{אשרי}}', out)
+        self.assertIn(r'\textdir TLT\foreignlanguage{english}{\OSForeign{Say', out)
 
 
 class TestNoteParagraphDirection(unittest.TestCase):
@@ -4849,17 +4849,17 @@ class TestRendAndEscaping(unittest.TestCase):
 
     def test_sup_is_superscript_not_bold(self):
         out = self._p('a<tei:hi rend="sup">*</tei:hi>')
-        self.assertIn("\\textsuperscript{*}", out)
-        self.assertNotIn("\\textbf{*}", out)
+        self.assertIn("\\textsuperscript{\\OSHighlightSuperscript{*}}", out)
+        self.assertNotIn("\\OSHighlightBold{*}", out)
 
     def test_every_token_of_a_rend_is_applied(self):
         out = self._p('<tei:hi rend="small superscript">x</tei:hi>')
-        self.assertIn("{\\small \\textsuperscript{x}}", out)
+        self.assertIn("\\OSHighlightSmall{\\textsuperscript{\\OSHighlightSuperscript{x}}}", out)
 
     def test_a_layout_mark_sets_its_text_plain(self):
         out = self._p('<tei:hi rend="ketiv-only">(((x)))</tei:hi>')
         self.assertIn("(((x)))", out)
-        self.assertNotIn("\\textbf", out.split("\\begin{document}")[1])
+        self.assertNotIn("\\OSHighlight", out.split("\\begin{document}")[1])
 
     def test_a_backslash_is_escaped_once(self):
         out = self._p("a\\b")
@@ -4882,12 +4882,12 @@ class TestRendAndEscaping(unittest.TestCase):
         """Inside a Hebrew paragraph, a he-Latn run is wrapped left to right, not set bare."""
         out = self._p('שמע <tei:foreign xml:lang="he-Latn">Shema Yisrael</tei:foreign>', lang="he")
         self.assertIn("\\textdir TLT", out.split("\\begin{document}")[1])
-        self.assertNotIn("\\textit{Shema Yisrael}", out)
+        self.assertNotIn("\\texthebrew{\\OSForeign{Shema Yisrael}", out)
 
     def test_align_right_nests_inside_other_styles(self):
-        """A paragraph break inside \\textbf{} is a fatal TeX error; align-right has none."""
+        """A paragraph break inside a role's group is a fatal TeX error; align-right has none."""
         out = self._p('<tei:hi rend="bold align-right">ימין</tei:hi>').split("\\begin{document}")[1]
-        self.assertIn("\\textbf{\\hspace*{\\fill}", out)
+        self.assertIn("\\OSHighlightBold{\\hspace*{\\fill}", out)
         self.assertNotIn("\\par}", out)
 
     def test_a_note_inside_a_verse_milestone_is_set(self):
@@ -5035,3 +5035,81 @@ class TestTextInAnotherLanguageThanTheRoot(unittest.TestCase):
         self.assertLess(body.index("שלום"), body.index(r"\end{hebrew}"))
         self.assertGreater(body.index("שוב"), body.rindex(r"\begin{hebrew}"))
 
+
+
+class TestInlineRoles(unittest.TestCase):
+    """Each kind of inline text is set in its role's macro (typography_tex.INLINE_ROLE_MACROS)."""
+
+    @staticmethod
+    def _body(content: str, lang: str = "en") -> str:
+        out = _transform(f"""<?xml version="1.0" encoding="UTF-8"?>
+        <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+                 xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="{lang}">
+          <tei:text><tei:body>{content}</tei:body></tei:text>
+        </tei:TEI>""")
+        return out.split("\\begin{document}")[1]
+
+    def test_a_poetry_line_is_set_in_its_role(self):
+        body = self._body("<tei:lg><tei:l>first line</tei:l><tei:l>second</tei:l></tei:lg>")
+        self.assertIn(r"\OSPoetryLine{first line}", body)
+        self.assertIn(r"\OSPoetryLine{second}", body)
+
+    def test_the_line_role_is_outside_a_highlight_in_it(self):
+        """So the highlight's own role, the inner one, overrides the line's."""
+        body = self._body('<tei:lg><tei:l>a <tei:hi rend="italic">b</tei:hi></tei:l></tei:lg>')
+        self.assertIn(r"\OSPoetryLine{\OSHighlightItalic{b}}", body)
+        self.assertNotIn(r"\OSHighlightItalic{\OSPoetryLine", body)
+
+    def test_a_note_in_a_line_is_not_set_in_the_line_role(self):
+        body = self._body("<tei:lg><tei:l>words<tei:note>a note</tei:note></tei:l></tei:lg>")
+        self.assertIn(r"\OSPoetryLine{words}", body)
+        self.assertNotIn(r"\OSPoetryLine{a note", body)
+
+    def test_prose_is_not_set_in_a_container_role(self):
+        body = self._body("<tei:p>just prose</tei:p>")
+        self.assertNotIn(r"\OSPoetryLine", body)
+        self.assertNotIn(r"\OSListItem", body)
+
+    def test_each_reading_form_is_set_in_its_role(self):
+        body = self._body(
+            "<tei:p><tei:choice><tei:abbr>abbr</tei:abbr><tei:expan>expan</tei:expan></tei:choice> "
+            "<tei:choice><tei:sic>sic</tei:sic><tei:corr>corr</tei:corr></tei:choice> "
+            "<tei:choice><tei:expan>only expan</tei:expan></tei:choice> "
+            "<tei:choice><tei:sic>only sic</tei:sic></tei:choice> "
+            "<tei:choice><j:option>one</j:option><j:option>two</j:option></tei:choice></tei:p>")
+        self.assertIn(r"\OSAbbreviation{abbr}", body)
+        self.assertNotIn("expan}", body.replace(r"\OSExpansion{only expan}", ""))
+        self.assertIn(r"\OSCorrection{corr}", body)
+        self.assertIn(r"\OSExpansion{only expan}", body)
+        self.assertIn(r"\OSPrintedError{only sic}", body)
+        self.assertIn(r"one (\OSAlternativeReading{two})", body)
+
+    def test_a_qere_alone_and_a_ketiv_alone(self):
+        body = self._body("<tei:p><tei:choice><j:read>r</j:read></tei:choice> "
+                          "<tei:choice><j:written>w</j:written></tei:choice></tei:p>")
+        self.assertIn(r"\OSQere{r}", body)
+        self.assertIn(r"\OSKetiv{w}", body)
+        self.assertNotIn("(", body.split(r"\OSQere{r}")[1].split(r"\OSKetiv")[0])
+
+    def test_a_reference_is_set_in_its_role(self):
+        body = self._body('<tei:p><tei:ref target="https://example.org/">a link</tei:ref> '
+                          '<tei:ref>bare</tei:ref></tei:p>')
+        self.assertIn(r"\href{https://example.org/}{\OSReference{a link}}", body)
+        self.assertIn(r"\OSReference{bare}", body)
+
+    def test_a_foreign_phrase_is_set_in_its_role(self):
+        body = self._body('<tei:p>say <tei:foreign xml:lang="la">ecce</tei:foreign></tei:p>')
+        self.assertIn(r"\OSForeign{ecce}", body)
+        self.assertNotIn(r"\textit", body)
+
+    def test_every_styled_rend_token_has_its_role(self):
+        for token, macro in (("italic", "OSHighlightItalic"), ("bold", "OSHighlightBold"),
+                             ("small-caps", "OSHighlightSmallCaps"), ("smallcaps", "OSHighlightSmallCaps"),
+                             ("large", "OSHighlightLarge"), ("small", "OSHighlightSmall")):
+            with self.subTest(token=token):
+                body = self._body(f'<tei:p><tei:hi rend="{token}">x</tei:hi></tei:p>')
+                self.assertIn(rf"\{macro}{{x}}", body)
+        for token in ("sup", "superscript", "raised", "suspended"):
+            with self.subTest(token=token):
+                body = self._body(f'<tei:p><tei:hi rend="{token}">x</tei:hi></tei:p>')
+                self.assertIn(r"\textsuperscript{\OSHighlightSuperscript{x}}", body)

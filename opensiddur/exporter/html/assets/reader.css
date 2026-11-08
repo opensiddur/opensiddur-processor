@@ -67,12 +67,9 @@ span:is(.div, .lg, .list, .item, .label, .head, .doc-title) { display: block; }
 .os-distribution img { display: block; margin: 0 auto 0.75rem; max-width: 100%; height: auto; }
 .os-distribution p { text-align: center; margin: 0.15rem 0; }
 
-.rend-italic { font-style: italic; }
-.rend-bold { font-weight: bold; }
-.rend-small-caps, .rend-smallcaps { font-variant: small-caps; }
+/* The look of each rend token is its styles.highlight_* role (css.py); only the raise of
+   a superscript, which no setting changes, is here. */
 .rend-sup, .rend-superscript, .rend-suspended, .rend-raised { vertical-align: super; --os-rend-scale: 0.75; }
-.rend-small { --os-rend-scale: 0.85; }
-.rend-large { --os-rend-scale: 1.2; }
 .rend-centered, .rend-centred, .rend-center { --os-role-align: center; }
 .rend-align-right { display: block; --os-role-align: right; }
 .divineName { white-space: nowrap; }
@@ -97,7 +94,6 @@ span:is(.div, .lg, .list, .item, .label, .head, .doc-title) { display: block; }
 .page-ref:hover, .page-ref:focus-visible { text-decoration: underline; }
 .option-alt::before, .written-alt::before { content: " ("; }
 .option-alt::after, .written-alt::after { content: ")"; }
-.read { font-style: italic; }
 .list { padding-inline-start: 1.5em; }
 
 /* ── Rubrics and notes ───────────────────────────────────────────────── */

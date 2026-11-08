@@ -231,6 +231,23 @@ class TestStructure(unittest.TestCase):
             [(o.text, _classes(o)) for o in main.xpath("//h:span[contains(@class, 'option')]", namespaces=NS)],
             [("one", ["option"]), ("two", ["option", "option-alt"])])
 
+    def test_reading_forms_carry_their_role_classes(self):
+        """css.py styles each form by these classes (styles.abbreviation and the rest)."""
+        main = _render('<tei:p><tei:choice><tei:expan>expanded</tei:expan></tei:choice>'
+                       '<tei:choice><tei:sic>printed</tei:sic></tei:choice>'
+                       '<tei:choice><tei:abbr>abbr.</tei:abbr></tei:choice>'
+                       '<tei:choice><tei:corr>corrected</tei:corr></tei:choice></tei:p>')
+        for name, text in (("expan", "expanded"), ("sic", "printed"), ("abbr", "abbr."),
+                           ("corr", "corrected")):
+            with self.subTest(name=name):
+                self.assertEqual(
+                    main.xpath(f"string(//h:span[@class='{name}'])", namespaces=NS), text)
+
+    def test_a_link_carries_the_reference_class(self):
+        main = _render('<tei:p><tei:ref target="https://example.org/">a link</tei:ref></tei:p>')
+        link = main.xpath("//h:a[@href='https://example.org/']", namespaces=NS)[0]
+        self.assertEqual(_classes(link), ["ref"])
+
     def test_unknown_elements_keep_their_words(self):
         main = _render('<tei:p><tei:unknownThing>kept</tei:unknownThing></tei:p>')
         self.assertEqual(main.xpath("string(//h:span[@class='tei-unknownThing'])", namespaces=NS),

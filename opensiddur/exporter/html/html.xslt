@@ -323,6 +323,7 @@
     <!-- ── Words ──────────────────────────────────────────────────────────── -->
 
     <xsl:template match="tei:seg | tei:hi | tei:foreign | tei:label | tei:emph | tei:q
+                         | tei:abbr | tei:expan | tei:sic | tei:corr
                          | tei:docAuthor | tei:docDate | tei:publisher | tei:pubPlace
                          | j:divineName | p:transcludeInline | p:span">
         <span>
@@ -339,7 +340,9 @@
 
     <xsl:template match="tei:ref[matches(@target, '^https?://')]">
         <a href="{@target}">
-            <xsl:call-template name="attributes"/>
+            <xsl:call-template name="attributes">
+                <xsl:with-param name="class" select="'ref'"/>
+            </xsl:call-template>
             <xsl:apply-templates/>
         </a>
     </xsl:template>

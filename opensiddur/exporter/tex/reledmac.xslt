@@ -265,7 +265,8 @@
              (tex/typography_tex.py), at the value typography.py resolves: the faces, the
              paragraph lengths, every role's macro (\vno, \chno, \OScitation, \OSaliyah,
              \OSParsha, \OSheadA-D, \OSheadTranslation, the title-page macros,
-             \instructionnote, \notenote, \OSSectionSeparatorStyle, \OSListLabelStyle), the
+             \instructionnote, \notenote, \OSSectionSeparatorStyle, \OSListLabelStyle, and
+             the inline roles' macros listed in typography_tex.INLINE_ROLE_MACROS), the
              note marks, the conditional markers, the line numbering, the column geometry
              and the interleaved layout's macros. None of them has a copy here, so there is
              nothing for the two to disagree about.
@@ -3340,23 +3341,57 @@
     </xsl:template>
 
     <!-- tei:hi/@rend is a list of tokens, each wrapped around the content in order: "small
-         superscript" is small and raised. A token with no styling of its own (a layout or
-         reading mark such as centered, ketiv-only) sets the text plain; an unknown one does
-         too, with a warning, rather than in bold as everything unrecognised once was. The
-         electronic book styles the same tokens as rend-* classes (reader.css). -->
+         superscript" is small and raised. A token that changes the look of the text is set
+         with its role's macro (styles.highlight_*, defined in the typography preamble); the
+         raise of a superscript is fixed, and the role styles the raised text. A token with
+         no styling of its own (a layout or reading mark such as centered, ketiv-only) sets
+         the text plain; an unknown one does too, with a warning, rather than in bold as
+         everything unrecognised once was. The electronic book styles the same tokens as
+         rend-* classes (css.py). -->
     <xsl:variable name="hi-rend-tex" as="map(xs:string, xs:string+)" select="map {
-        'small-caps': ('\textsc{', '}'),
-        'smallcaps': ('\textsc{', '}'),
-        'italic': ('\textit{', '}'),
-        'bold': ('\textbf{', '}'),
-        'sup': ('\textsuperscript{', '}'),
-        'superscript': ('\textsuperscript{', '}'),
-        'suspended': ('\textsuperscript{', '}'),
-        'raised': ('\textsuperscript{', '}'),
-        'large': ('{\Large ', '}'),
-        'small': ('{\small ', '}'),
+        'small-caps': ('\OSHighlightSmallCaps{', '}'),
+        'smallcaps': ('\OSHighlightSmallCaps{', '}'),
+        'italic': ('\OSHighlightItalic{', '}'),
+        'bold': ('\OSHighlightBold{', '}'),
+        'sup': ('\textsuperscript{\OSHighlightSuperscript{', '}}'),
+        'superscript': ('\textsuperscript{\OSHighlightSuperscript{', '}}'),
+        'suspended': ('\textsuperscript{\OSHighlightSuperscript{', '}}'),
+        'raised': ('\textsuperscript{\OSHighlightSuperscript{', '}}'),
+        'large': ('\OSHighlightLarge{', '}'),
+        'small': ('\OSHighlightSmall{', '}'),
         'align-right': ('\hspace*{\fill}', '')
     }"/>
+
+    <!-- The role of the line or list item a word is set in (styles.poetry_line,
+         styles.list_item), as the macro that sets it: the nearest tei:l or tei:item, unless
+         a note is nearer, since a note's words are the apparatus's. Empty when an inline
+         element between the two (a highlight, a foreign phrase, a reading, a reference)
+         already carries the line's style around the word, so that the line's style is
+         always the outer one and the word's own role overrides it. -->
+    <xsl:function name="f:container-macro" as="xs:string">
+        <xsl:param name="node" as="node()"/>
+        <xsl:variable name="container" as="element()?"
+                      select="($node/ancestor::*[self::tei:l or self::tei:item or self::tei:note])[last()]"/>
+        <xsl:sequence select="
+            if (empty($container) or $container/self::tei:note
+                or exists($node/ancestor::*[self::tei:hi or self::tei:emph or self::tei:foreign
+                                            or self::tei:choice or self::tei:ref]
+                                           [. >> $container]))
+            then ''
+            else if ($container/self::tei:l) then 'OSPoetryLine' else 'OSListItem'"/>
+    </xsl:function>
+
+    <!-- The words of a poetry line or a list item, in its role. Matched at the outermost
+         inline node in the line, above every template that sets one, so that the role
+         wraps whatever those emit. Whitespace is left bare: a group around it gains
+         nothing, and the stream tests leaves for whitespace by their being text. -->
+    <xsl:template match="(text()[normalize-space(.)] | tei:hi | tei:emph | tei:foreign
+                          | tei:choice | tei:ref)[f:container-macro(.) ne '']"
+                  mode="emit" priority="30">
+        <xsl:value-of select="concat('\', f:container-macro(.), '{')"/>
+        <xsl:next-match/>
+        <xsl:text>}</xsl:text>
+    </xsl:template>
     <xsl:variable name="hi-rend-plain" as="xs:string*"
                   select="('centered', 'centred', 'center', 'ketiv-only', 'qeri-only')"/>
 
@@ -3393,11 +3428,13 @@
         <xsl:text>}</xsl:text>
     </xsl:template>
 
+    <!-- A foreign phrase is set in its role (styles.foreign) inside whatever selects its
+         language and direction, so that the role's face, if it names one, wins. -->
     <xsl:template match="tei:foreign[@xml:lang][f:is-hebrew-lang(string(@xml:lang))]"
                   mode="emit" priority="10">
-        <xsl:text>\texthebrew{</xsl:text>
+        <xsl:text>\texthebrew{\OSForeign{</xsl:text>
         <xsl:apply-templates mode="emit"/>
-        <xsl:text>}</xsl:text>
+        <xsl:text>}}</xsl:text>
     </xsl:template>
 
     <!-- An apparatus catchword, which is a quotation of the text and therefore a
@@ -3432,13 +3469,13 @@
          surrounding paragraph before switching direction so a citation-only
          span does not change the paragraph direction. -->
     <xsl:template match="tei:foreign[@xml:lang='en']" mode="emit" priority="10">
-        <xsl:text>\leavevmode{\textdir TLT\foreignlanguage{english}{\textit{</xsl:text>
+        <xsl:text>\leavevmode{\textdir TLT\foreignlanguage{english}{\OSForeign{</xsl:text>
         <xsl:apply-templates mode="emit"/>
         <xsl:text>}}}</xsl:text>
     </xsl:template>
 
     <xsl:template match="tei:foreign" mode="emit">
-        <xsl:text>\textit{</xsl:text>
+        <xsl:text>\OSForeign{</xsl:text>
         <xsl:apply-templates mode="emit"/>
         <xsl:text>}</xsl:text>
     </xsl:template>
@@ -3604,10 +3641,18 @@
         <xsl:text>\pageref{</xsl:text><xsl:value-of select="@target"/><xsl:text>}</xsl:text>
     </xsl:template>
 
+    <!-- A reference's words are set in its role (styles.reference); a page reference's are
+         generated, and are not. -->
     <xsl:template match="tei:ref[@target]" mode="emit">
         <xsl:text>\href{</xsl:text>
         <xsl:value-of select="f:escape-url(@target)"/>
-        <xsl:text>}{</xsl:text>
+        <xsl:text>}{\OSReference{</xsl:text>
+        <xsl:apply-templates mode="emit"/>
+        <xsl:text>}}</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="tei:ref" mode="emit">
+        <xsl:text>\OSReference{</xsl:text>
         <xsl:apply-templates mode="emit"/>
         <xsl:text>}</xsl:text>
     </xsl:template>
@@ -3668,48 +3713,77 @@
     <!-- Each reading is emitted, not flattened to a string: it can hold markup (a divine
          name, a highlighted letter) and the anchor of a note, whose mark belongs where the
          anchor is. string() spliced the note's text into the middle of the word. -->
+    <!-- Each form is set in its role (styles.abbreviation, styles.expansion,
+         styles.printed_error, styles.correction, styles.qere, styles.ketiv,
+         styles.alternative_reading). The parentheses around a second form are the
+         text's, outside the role. -->
     <xsl:template match="tei:choice" mode="emit">
         <xsl:choose>
             <xsl:when test="tei:abbr or tei:expan">
                 <!-- Compiled choices contain one selected form. Uncompiled input defaults
                      to the printed abbreviation, rather than concatenating both. -->
-                <xsl:apply-templates select="(tei:abbr, tei:expan)[1]/node()" mode="emit"/>
+                <xsl:call-template name="reading-form">
+                    <xsl:with-param name="form" select="(tei:abbr, tei:expan)[1]"/>
+                    <xsl:with-param name="macro"
+                                    select="if (tei:abbr) then 'OSAbbreviation' else 'OSExpansion'"/>
+                </xsl:call-template>
             </xsl:when>
             <xsl:when test="tei:sic or tei:corr">
                 <!-- Likewise one form of an edition error; uncompiled input reads the
                      correction, as the exporter's default does. -->
-                <xsl:apply-templates select="(tei:corr, tei:sic)[1]/node()" mode="emit"/>
+                <xsl:call-template name="reading-form">
+                    <xsl:with-param name="form" select="(tei:corr, tei:sic)[1]"/>
+                    <xsl:with-param name="macro"
+                                    select="if (tei:corr) then 'OSCorrection' else 'OSPrintedError'"/>
+                </xsl:call-template>
             </xsl:when>
             <xsl:when test="j:option">
                 <!-- Alternate wordings: exactly one is read, but nothing here has chosen
                      between them, so all are shown, the first plain and the rest bracketed
                      as the 1822 print does. -->
                 <xsl:for-each select="j:option">
-                    <xsl:if test="position() gt 1">
-                        <xsl:text> (</xsl:text>
-                    </xsl:if>
-                    <xsl:apply-templates select="node()" mode="emit"/>
-                    <xsl:if test="position() gt 1">
-                        <xsl:text>)</xsl:text>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="position() gt 1">
+                            <xsl:text> (</xsl:text>
+                            <xsl:call-template name="reading-form">
+                                <xsl:with-param name="form" select="."/>
+                                <xsl:with-param name="macro" select="'OSAlternativeReading'"/>
+                            </xsl:call-template>
+                            <xsl:text>)</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="node()" mode="emit"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:for-each>
             </xsl:when>
-            <xsl:when test="j:read and j:written">
-                <xsl:text>\textit{</xsl:text>
-                <xsl:apply-templates select="j:read/node()" mode="emit"/>
-                <xsl:text>} (</xsl:text>
-                <xsl:apply-templates select="j:written/node()" mode="emit"/>
-                <xsl:text>)</xsl:text>
-            </xsl:when>
-            <xsl:when test="j:read">
-                <xsl:text>\textit{</xsl:text>
-                <xsl:apply-templates select="j:read/node()" mode="emit"/>
-                <xsl:text>}</xsl:text>
-            </xsl:when>
-            <xsl:when test="j:written">
-                <xsl:apply-templates select="j:written/node()" mode="emit"/>
-            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="reading-form">
+                    <xsl:with-param name="form" select="j:read"/>
+                    <xsl:with-param name="macro" select="'OSQere'"/>
+                </xsl:call-template>
+                <xsl:if test="j:read and j:written">
+                    <xsl:text> (</xsl:text>
+                </xsl:if>
+                <xsl:call-template name="reading-form">
+                    <xsl:with-param name="form" select="j:written"/>
+                    <xsl:with-param name="macro" select="'OSKetiv'"/>
+                </xsl:call-template>
+                <xsl:if test="j:read and j:written">
+                    <xsl:text>)</xsl:text>
+                </xsl:if>
+            </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="reading-form">
+        <xsl:param name="form" as="element()?"/>
+        <xsl:param name="macro" as="xs:string"/>
+        <xsl:if test="exists($form)">
+            <xsl:value-of select="concat('\', $macro, '{')"/>
+            <xsl:apply-templates select="$form/node()" mode="emit"/>
+            <xsl:text>}</xsl:text>
+        </xsl:if>
     </xsl:template>
 
     <!-- Notes become reledmac apparatus footnotes. Editorial/commentary notes
