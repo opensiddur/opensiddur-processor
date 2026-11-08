@@ -432,13 +432,14 @@ class TestCss(unittest.TestCase):
         styles give none a value of their own that could disagree with typography.py."""
         from opensiddur.exporter.html.html import ASSETS
 
-        written = re.findall(r"(--[a-z-]+):", typography_css(TypographyConfig()))
+        root = typography_css(TypographyConfig()).split("}", 1)[0]
+        written = set(re.findall(r"(--[a-z-]+):", root))
         self.assertTrue(written)
         reader = (ASSETS / "reader.css").read_text(encoding="utf-8")
         for variable in written:
             with self.subTest(variable=variable):
                 self.assertNotIn(variable + ":", reader)
-                self.assertIn(f"var({variable})", reader)
+                self.assertRegex(reader, rf"var\({re.escape(variable)}(?:\)|,)")
 
 
 class TestSettingsCatalogue(unittest.TestCase):

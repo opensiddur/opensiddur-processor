@@ -35,60 +35,56 @@ body {
   padding: 0 16px 4rem;
   color: var(--ink);
   background: var(--paper);
-  font-family: var(--font-latin);
-  font-size: 1.125rem;
   line-height: var(--line-spacing);
 }
 
-:lang(he), :lang(arc), :lang(yi) { font-family: var(--font-hebrew); }
-/* A transliteration (he-Latn) is in Latin letters, whatever its language. */
-:lang(he-Latn), :lang(arc-Latn), :lang(yi-Latn) { font-family: var(--font-latin); }
-/* Pointed Hebrew wants a size more than the Latin beside it. Set on the column, once: :lang()
-   follows inheritance, so a rule on it would compound at every level. */
-.col:is([lang|="he"], [lang|="arc"], [lang|="yi"]):not([lang$="-Latn"]) { font-size: 1.12em; }
+/* Set script defaults at explicit language boundaries so English inside a Hebrew
+   work resets to Latin. Role overrides and logical sizes remain inherited. */
+:where([lang]) {
+  --os-script-family: var(--font-latin);
+  --os-script-normal: var(--normal-latin);
+}
+:where([lang]):where(:lang(he), :lang(arc), :lang(yi), [lang*="-Hebr" i]):not(:where([lang*="-Latn" i], [lang*="-Arab" i], [lang*="-Syrc" i])) {
+  --os-script-family: var(--font-hebrew);
+  --os-script-normal: var(--normal-hebrew);
+}
 
 .os-book { max-width: 72rem; margin: 0 auto; }
 
 /* ── Text ────────────────────────────────────────────────────────────── */
 
-p, .lg { margin: 0 0 var(--paragraph-spacing); }
-p { text-align: var(--text-align); hyphens: auto; }
-.np { display: block; margin-top: 0.4em; }
+p, .lg, .np { margin: 0 0 var(--paragraph-spacing); }
+p { hyphens: auto; }
+.os-book :is(p, .np) { text-indent: var(--paragraph-indent); }
+.os-book .list > .item { margin-inline: var(--list-indent); }
+.np { display: block; }
 span:is(.div, .lg, .list, .item, .label, .head, .doc-title) { display: block; }
 .l { padding-inline-start: 1.5em; text-indent: -1.5em; }
-.head { font-weight: normal; line-height: 1.25; margin: 1.6em 0 0.6em; text-align: center; }
-h1.head { font-size: 1.8em; }
-h2.head { font-size: 1.45em; }
-h3.head { font-size: 1.2em; }
-h4.head, h5.head, h6.head { font-size: 1.05em; font-variant: small-caps; }
+.head { margin: 1.6em 0 0.6em; text-align: center; }
 
 .title-page { text-align: center; margin: 3rem 0; }
-.titlePart-main { font-size: 2.2em; }
-.title-page p { text-align: center; }
-.os-distribution { text-align: center; font-size: 0.85em; margin: 2rem 0 3rem; }
+.os-distribution { text-align: center; margin: 2rem 0 3rem; }
 .os-distribution img { display: block; margin: 0 auto 0.75rem; max-width: 100%; height: auto; }
 .os-distribution p { text-align: center; margin: 0.15rem 0; }
 
 .rend-italic { font-style: italic; }
 .rend-bold { font-weight: bold; }
 .rend-small-caps, .rend-smallcaps { font-variant: small-caps; }
-.rend-sup, .rend-superscript, .rend-suspended, .rend-raised { vertical-align: super; font-size: 0.75em; }
-.rend-small { font-size: 0.85em; }
-.rend-large { font-size: 1.2em; }
-.rend-centered, .rend-centred, .rend-center { text-align: center; }
-.rend-align-right { display: block; text-align: right; }
+.rend-sup, .rend-superscript, .rend-suspended, .rend-raised { vertical-align: super; --os-rend-scale: 0.75; }
+.rend-small { --os-rend-scale: 0.85; }
+.rend-large { --os-rend-scale: 1.2; }
+.rend-centered, .rend-centred, .rend-center { --os-role-align: center; }
+.rend-align-right { display: block; --os-role-align: right; }
 .divineName { white-space: nowrap; }
 
 .v {
-  font-size: 0.65em;
   vertical-align: super;
   color: var(--muted);
   padding-inline-end: 0.2em;
-  font-family: var(--font-latin);
 }
-.ch { font-size: 1.6em; font-weight: bold; padding-inline-end: 0.3em; color: var(--accent); }
-.aliyah, .parsha { font-variant: small-caps; font-size: 0.85em; color: var(--accent); padding-inline: 0.3em; }
-.citation { display: block; text-align: center; font-style: italic; color: var(--muted); margin: 0.4em 0; }
+.ch { padding-inline-end: 0.3em; color: var(--accent); }
+.aliyah, .parsha { color: var(--accent); padding-inline: 0.3em; }
+.citation { display: block; text-align: center; color: var(--muted); margin: 0.4em 0; }
 .section-separator { display: block; text-align: center; margin: 1em 0; color: var(--muted); }
 .pb { display: none; }
 /* Where print gives a page number, a link to the passage. */
@@ -106,17 +102,10 @@ h4.head, h5.head, h6.head { font-size: 1.05em; font-variant: small-caps; }
 
 /* ── Rubrics and notes ───────────────────────────────────────────────── */
 
-.rubric {
-  font-family: var(--font-latin);
-  font-style: italic;
-  font-size: 0.9em;
-  color: var(--accent);
-}
-p.rubric { text-align: start; }
+.rubric { color: var(--accent); }
 
 .note-ref {
   font: inherit;
-  font-size: 0.65em;
   vertical-align: super;
   line-height: 1;
   color: var(--accent);
@@ -133,11 +122,8 @@ p.rubric { text-align: start; }
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 6px;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  text-align: start;
 }
-.note-number { font-weight: bold; padding-inline-end: 0.5em; color: var(--accent); }
+.note-number { padding-inline-end: 0.5em; color: var(--accent); }
 
 /* ── Parallel text ───────────────────────────────────────────────────── */
 
@@ -306,10 +292,22 @@ html { overflow-anchor: none; }
   font: 0.85rem/1.5 system-ui, sans-serif;
 }
 .os-about h2 { font-size: 1rem; color: var(--ink); }
-.os-back-notice { margin-top: 2rem; font-size: 0.85em; }
+.os-back-notice { margin-top: 2rem; }
 
 @media print {
   body { padding: 0; background: none; color: #000; }
   .os-toolbar, .os-dialog, .note-ref { display: none !important; }
   .par { content-visibility: visible; }
+}
+
+/* Recompute from inherited logical values instead of compounding physical em sizes.
+   The separate role family lets an explicit styles.*.font override script defaults. */
+:is(.os-book, .os-about), :is(.os-book, .os-about) :where(*) {
+  text-align: var(--os-role-align, var(--text-align));
+  font-family: var(--os-role-family, var(--os-script-family, var(--font-latin)));
+  font-size: calc(
+    var(--os-absolute-size,
+      calc(var(--os-role-normal, var(--os-script-normal, var(--normal-latin))) * var(--os-size-scale, 1)))
+    * var(--os-rend-scale, 1)
+  );
 }

@@ -549,6 +549,7 @@ def book_json(
     purim_day: int | None = None,
     book_columns: dict[str, dict[str, str]] | None = None,
     start: dict[str, str] | None = None,
+    contents_depth: int = 4,
 ) -> str:
     calendar = calendar_scopes(book)
     words = feature_words(basic_settings)
@@ -578,6 +579,7 @@ def book_json(
         "columns": book_columns,
         # How the book starts, before its reader chooses: the settings file's `electronic`.
         "start": start or ElectronicSettings().model_dump(),
+        "contentsDepth": contents_depth,
     }
     # No "<" at all inside the script element: not only "</script" ends it, "<!--" can change
     # how the parser reads what follows. "\u003c" is the same character to JSON.
@@ -635,7 +637,8 @@ def build_book(
                                 editions),
         "@@BOOK@@": book_json(book, book_id(root, title), defaults, basic_settings,
                                 celebrated_purim(settings), book_columns,
-                                settings.electronic.model_dump(include={"day", "columns"})),
+                                settings.electronic.model_dump(include={"day", "columns"}),
+                                contents_depth=typography.table_of_contents.depth),
         "@@CALENDAR_JS@@": _inline(
             (ASSETS / "calendar.js").read_text(encoding="utf-8"), "</script"),
         "@@CONDITION_JS@@": _inline(
