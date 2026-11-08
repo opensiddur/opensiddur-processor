@@ -267,10 +267,11 @@ def build(source, project_directory, *, draft=False):
                                        (PROJECTS['he'], 'with_translation', True),
                                        (EXPANDED, 'undated', True)]:
         settings = {'description': 'Pilot installment; not a complete first-day service.',
+                    'requires_processor': '>=0.8.0.dev0',
                     'book': {'project': project, 'file_name': 'index.xml', 'title': 'First-day Mahzor — pilot'},
                     'priority': {'transclusion': [project]+[p for p in PROJECTS.values() if p != project],
                                  'instructions': [project]+[p for p in PROJECTS.values() if p != project]},
-                    'typography': {'instructions': {'from': 'both'}}}
+                    'typography': {'instructions': {'from': 'both'}, 'line_numbers': {'enabled': False}}}
         if parallel:
             settings['parallel'] = {'projects': [PROJECTS['en']]}
         destination = settings_directory/project/(variant+'.yaml')
