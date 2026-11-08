@@ -61,8 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`tei:foreign` in English or a transliteration) is no longer italic in the PDF, matching the
   electronic book; Hebrew quoted in English was never italic. A large highlight
   (`rend="large"`) in the electronic book is now the ladder's `x-large`, matching the PDF's
-  `\Large`, rather than 1.2 times the size around it. A small highlight is the ladder's
-  `small` in both, slightly smaller than before in the electronic book.
+  `\Large`, rather than 1.2 times the size around it. Like every role's size it is absolute, so
+  a large highlight inside a first- or second-level heading is smaller than the heading, as it
+  already was in the PDF. A small highlight is the ladder's `small` in both, slightly smaller
+  than before in the electronic book.
 - `validate_urn_references` takes one or more projects, and `validate-projects.yml` checks all
   the changed projects in one run of it. A pull request changing thousands of projects (the
   opensiddur.org bulk import, #186) overflowed the step's environment, and starting a process

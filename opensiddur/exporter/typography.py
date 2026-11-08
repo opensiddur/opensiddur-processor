@@ -693,8 +693,8 @@ class Styles(ForbidExtra):
         default_factory=TextStyle,
         description=(
             "Highlighted text the source raises above the line (`rend` `sup`, "
-            "`superscript`, `raised` or `suspended`). It is always raised; the style "
-            "sets its face and size."
+            "`superscript`, `raised` or `suspended`). It is always raised, and reduced "
+            "unless the style names a size, which is then the raised text's size."
         ),
     )
     highlight_large: TextStyle = Field(

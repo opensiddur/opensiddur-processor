@@ -228,8 +228,19 @@ class TestStructure(unittest.TestCase):
         main = _render('<tei:p><tei:choice><j:option>one</j:option><j:option>two</j:option>'
                        '</tei:choice></tei:p>')
         self.assertEqual(
-            [(o.text, _classes(o)) for o in main.xpath("//h:span[contains(@class, 'option')]", namespaces=NS)],
+            [("".join(o.itertext()), _classes(o))
+             for o in main.xpath("//h:span[contains(@class, 'option')]", namespaces=NS)],
             [("one", ["option"]), ("two", ["option", "option-alt"])])
+
+    def test_a_second_forms_role_styles_its_words_not_its_parentheses(self):
+        """reader.css puts the parentheses on the outer span; css.py styles the inner one."""
+        main = _render('<tei:p><tei:choice><j:option>one</j:option><j:option>two</j:option></tei:choice>'
+                       '<tei:choice><j:read>r</j:read><j:written>w</j:written></tei:choice></tei:p>')
+        self.assertEqual(main.xpath("string(//h:span[contains(@class, 'option-alt')]/h:span[@class='form'])",
+                                    namespaces=NS), "two")
+        self.assertEqual(main.xpath("string(//h:span[contains(@class, 'written-alt')]/h:span[@class='form'])",
+                                    namespaces=NS), "w")
+        self.assertFalse(main.xpath("//h:span[@class='option']/h:span[@class='form']", namespaces=NS))
 
     def test_reading_forms_carry_their_role_classes(self):
         """css.py styles each form by these classes (styles.abbreviation and the rest)."""

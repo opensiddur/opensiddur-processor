@@ -3023,6 +3023,18 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- An inline leaf copied for a rubric inside it keeps the role of the line or list item
+         it stands in, which f:container-macro reads off its ancestors and the copy has none. -->
+    <xsl:template match="tei:hi | tei:emph | tei:foreign | tei:choice | tei:ref" mode="stamp-rubric">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:if test="f:container-macro(.) ne ''">
+                <xsl:attribute name="f:container" select="f:container-macro(.)"/>
+            </xsl:if>
+            <xsl:apply-templates mode="stamp-rubric"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- A note copied with its leaf keeps the serial of the note it was copied from: the copy
          has no ancestors, and f:editorial-note-emissions-before counts from where a note
          stands in the document. -->
@@ -3367,13 +3379,15 @@
          a note is nearer, since a note's words are the apparatus's. Empty when an inline
          element between the two (a highlight, a foreign phrase, a reading, a reference)
          already carries the line's style around the word, so that the line's style is
-         always the outer one and the word's own role overrides it. -->
+         always the outer one and the word's own role overrides it. A leaf copied out of
+         its tree for parallel pairing carries the answer as @f:container. -->
     <xsl:function name="f:container-macro" as="xs:string">
         <xsl:param name="node" as="node()"/>
         <xsl:variable name="container" as="element()?"
                       select="($node/ancestor::*[self::tei:l or self::tei:item or self::tei:note])[last()]"/>
         <xsl:sequence select="
-            if (empty($container) or $container/self::tei:note
+            if ($node/@f:container) then string($node/@f:container)
+            else if (empty($container) or $container/self::tei:note
                 or exists($node/ancestor::*[self::tei:hi or self::tei:emph or self::tei:foreign
                                             or self::tei:choice or self::tei:ref]
                                            [. >> $container]))

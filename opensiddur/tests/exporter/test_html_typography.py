@@ -26,6 +26,27 @@ class TestHtmlTypography(unittest.TestCase):
     def test_every_text_role_has_a_selector_except_print_line_numbers(self):
         self.assertEqual(set(STYLE_SELECTORS), set(Styles.model_fields) - {"line_number"})
 
+    def test_the_highlight_and_qere_looks_reader_css_had_are_the_defaults(self):
+        css = typography_css(self.config({}))
+        for selector, declaration in (
+            (".rend-italic", "font-style: italic;"),
+            (".rend-bold", "font-weight: bold;"),
+            (".rend-small-caps, .rend-smallcaps", "font-variant: small-caps;"),
+            (".read", "font-style: italic;"),
+        ):
+            with self.subTest(selector=selector):
+                rule = next(line for line in css.splitlines()
+                            if line.startswith(f":is(.os-book, .os-about) :is({selector}) {{"))
+                self.assertIn(declaration, rule)
+        self.assertNotIn(":is(.foreign)", css)
+
+    def test_a_superscript_size_is_the_raised_texts_size(self):
+        """As in the PDF: reader.css's reduction is cancelled rather than applied to it."""
+        rule = next(r for r in style_css(self.config({"styles": {"highlight_superscript": {"size": "small"}}}))
+                    if ".rend-sup" in r)
+        self.assertIn("--os-rend-scale: 1;", rule)
+        self.assertFalse([r for r in style_css(self.config({})) if ".rend-sup" in r])
+
     def test_all_style_attributes_are_emitted_for_each_applicable_role(self):
         for role in STYLE_SELECTORS:
             with self.subTest(role=role):

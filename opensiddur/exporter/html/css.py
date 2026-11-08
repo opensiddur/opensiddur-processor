@@ -97,8 +97,9 @@ STYLE_SELECTORS = {
     "printed_error": ".sic",
     "correction": ".corr",
     "qere": ".read",
-    "ketiv": ".written",
-    "alternative_reading": ".option-alt",
+    # The words of the form, not the parentheses reader.css sets around it (html.xslt).
+    "ketiv": ".written > .form",
+    "alternative_reading": ".option-alt > .form",
 }
 
 
@@ -129,6 +130,10 @@ def style_css(typography: TypographyConfig) -> list[str]:
             ]
         if style.size is not None:
             declarations += size_properties(style.size)
+            if role == "highlight_superscript":
+                # A size the role names is the raised text's size, as in the PDF, rather
+                # than the size reader.css then reduces.
+                declarations.append("--os-rend-scale: 1;")
         for field, property_name in (
             ("weight", "font-weight"), ("style", "font-style"),
             ("variant", "font-variant"), ("align", "--os-role-align"),

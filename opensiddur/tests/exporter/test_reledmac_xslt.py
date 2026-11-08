@@ -4882,7 +4882,8 @@ class TestRendAndEscaping(unittest.TestCase):
         """Inside a Hebrew paragraph, a he-Latn run is wrapped left to right, not set bare."""
         out = self._p('שמע <tei:foreign xml:lang="he-Latn">Shema Yisrael</tei:foreign>', lang="he")
         self.assertIn("\\textdir TLT", out.split("\\begin{document}")[1])
-        self.assertNotIn("\\texthebrew{\\OSForeign{Shema Yisrael}", out)
+        self.assertIn("\\OSForeign{{{\\textdir TLT\\foreignlanguage{english}{Shema}}}", out)
+        self.assertNotIn("\\texthebrew{\\OSForeign", out)
 
     def test_align_right_nests_inside_other_styles(self):
         """A paragraph break inside a role's group is a fatal TeX error; align-right has none."""
@@ -5064,6 +5065,27 @@ class TestInlineRoles(unittest.TestCase):
         body = self._body("<tei:lg><tei:l>words<tei:note>a note</tei:note></tei:l></tei:lg>")
         self.assertIn(r"\OSPoetryLine{words}", body)
         self.assertNotIn(r"\OSPoetryLine{a note", body)
+
+    def test_the_nearest_container_wins(self):
+        body = self._body("<tei:list><tei:item><tei:lg><tei:l>in a line</tei:l></tei:lg></tei:item>"
+                          "<tei:item><tei:p>a block item</tei:p></tei:item></tei:list>")
+        self.assertIn(r"\OSPoetryLine{in a line}", body)
+        self.assertNotIn(r"\OSListItem{in a line", body)
+        self.assertIn(r"\OSListItem{a block item}", body)
+
+    def test_a_rubric_inside_a_highlight_keeps_the_line_role_in_a_parallel_column(self):
+        """Pairing copies a leaf holding a rubric out of its tree; the copy still knows its line."""
+        out = _transform("""<?xml version="1.0" encoding="UTF-8"?>
+        <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+                 xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
+          <tei:text><tei:body>
+            <p:parallel column-order="primary_first">
+              <p:parallelItem role="primary" xml:lang="he"><tei:lg><tei:l>שלום</tei:l></tei:lg></p:parallelItem>
+              <p:parallelItem role="parallel" xml:lang="en"><tei:lg><tei:l>Hello <tei:hi rend="italic">x<tei:note type="instruction">say</tei:note></tei:hi> world</tei:l></tei:lg></p:parallelItem>
+            </p:parallel>
+          </tei:body></tei:text>
+        </tei:TEI>""")
+        self.assertIn(r"\OSPoetryLine{\OSHighlightItalic{x", out)
 
     def test_prose_is_not_set_in_a_container_role(self):
         body = self._body("<tei:p>just prose</tei:p>")

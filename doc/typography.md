@@ -224,13 +224,13 @@ as the surrounding text has it.
 | `styles.highlight_italic` | italic | Text the source highlights in italics (`tei:hi` with `rend="italic"`). Each look-changing `rend` token has a role of its own, and a highlight with several tokens nests them in order. Layout and reading tokens (`centered`, `align-right`, `ketiv-only`, `qeri-only`) have none. |
 | `styles.highlight_bold` | bold | Text the source highlights in bold (`rend="bold"`). |
 | `styles.highlight_small_caps` | small-caps | Text the source sets in small capitals (`rend="small-caps"`). |
-| `styles.highlight_superscript` | inherits | Text the source raises above the line (`rend` `sup`, `superscript`, `raised` or `suspended`). It is always raised and reduced; the style sets its face and size. |
+| `styles.highlight_superscript` | inherits | Text the source raises above the line (`rend` `sup`, `superscript`, `raised` or `suspended`). It is always raised, and reduced unless the style names a size, which is then the raised text's size. |
 | `styles.highlight_large` | `x-large` | Text the source sets larger (`rend="large"`). |
 | `styles.highlight_small` | `small` | Text the source sets smaller (`rend="small"`). |
 | `styles.foreign` | inherits | A phrase in another language than the text around it (`tei:foreign`), such as Hebrew quoted in English. Its script's font is selected either way. |
 | `styles.reference` | inherits | The words of a reference or link (`tei:ref`). A page reference's text is generated and does not take it. |
-| `styles.poetry_line` | inherits | A line of poetry (`tei:l`). |
-| `styles.list_item` | inherits | The text of an item in a list. See [`lists`](#lists) for its indent. |
+| `styles.poetry_line` | inherits | The words of a line of poetry (`tei:l`). A highlight, reading or other inline role inside the line takes precedence over it. Rubrics, verse numbers and note marks in the line keep their own roles in the PDF; in the electronic book they also take whatever of the line's style their own role does not set. |
+| `styles.list_item` | inherits | The words of an item in a list, covered as `poetry_line` covers a line. See [`lists`](#lists) for its indent. |
 | `styles.abbreviation` | inherits | An abbreviation, where `readings.abbreviations` reads them as printed. |
 | `styles.expansion` | inherits | An abbreviation's expansion, where `readings.abbreviations` reads them expanded. |
 | `styles.printed_error` | inherits | A misprint as printed, where `readings.errors` reads them so. |

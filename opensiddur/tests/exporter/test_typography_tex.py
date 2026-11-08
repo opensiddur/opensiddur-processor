@@ -297,14 +297,20 @@ class TestStyles(unittest.TestCase):
 
     def test_every_inline_role_has_a_macro_at_its_default(self):
         tex = _tex({})
-        self.assertEqual(r"\newcommand{\OSHighlightItalic}[1]{{\itshape #1}}",
+        self.assertEqual(r"\newcommand{\OSHighlightItalic}[1]{{\itshape #1\/}}",
                          _macro(tex, r"\OSHighlightItalic"))
         self.assertEqual(r"\newcommand{\OSHighlightLarge}[1]{{\Large #1}}",
                          _macro(tex, r"\OSHighlightLarge"))
-        self.assertEqual(r"\newcommand{\OSQere}[1]{{\itshape #1}}", _macro(tex, r"\OSQere"))
+        self.assertEqual(r"\newcommand{\OSQere}[1]{{\itshape #1\/}}", _macro(tex, r"\OSQere"))
         for role, macro in INLINE_ROLE_MACROS.items():
             with self.subTest(role=role):
                 self.assertIn(rf"\newcommand{{{macro}}}[1]", tex)
+
+    def test_an_italic_inline_role_ends_with_the_italic_correction(self):
+        """As \\textit did, so an upright bracket after it does not touch its last letter."""
+        tex = _tex({"styles": {"reference": {"style": "italic"}, "qere": {"style": "normal"}}})
+        self.assertTrue(_macro(tex, r"\OSReference").endswith(r"#1\/}}"))
+        self.assertTrue(_macro(tex, r"\OSQere").endswith(r"\upshape #1}}"))
 
     def test_an_unstyled_inline_role_adds_no_space(self):
         """These can mark one letter of a word: a space after the brace would split it."""

@@ -640,9 +640,12 @@ def _styles_section(config: TypographyConfig) -> list[str]:
     # heading stays bold. The superscript's raise is the stylesheet's, around this.
     # The space only after a command, which absorbs it: these can mark one letter of a
     # word, and a space token after a bare brace would split the word.
+    # An italic role ends with the italic correction \textit would have added, so that an
+    # upright bracket after it does not touch its last letter.
     def inline(style: TextStyle, macro: str) -> str:
         switch = tokens(style)
-        return rf"\newcommand{{{macro}}}[1]{{{{{switch + ' ' if switch else ''}#1}}}}"
+        correction = r"\/" if style.style is FontStyle.ITALIC else ""
+        return rf"\newcommand{{{macro}}}[1]{{{{{switch + ' ' if switch else ''}#1{correction}}}}}"
 
     for role, macro in INLINE_ROLE_MACROS.items():
         define(role, lambda s, macro=macro: inline(s, macro))
