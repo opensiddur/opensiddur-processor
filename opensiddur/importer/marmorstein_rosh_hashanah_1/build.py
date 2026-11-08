@@ -82,11 +82,8 @@ def unit_document(unit, lang, draft):
     root, body = document(lang, project, unit['title'][lang], unit['urn'], draft=draft)
     div = element(body, 'div', **({'corresp': unit['urn']} if unit.get('map_root', True) else {}))
     current_page = None
-    for citation in unit.get('citations', {}).get(lang, []):
-        element(div, 'pb', ed='1965', n=citation['printed_page'],
-                facs=page_image_url(IDENTIFIER, int(citation['scan'][1:])-1, size=''))
-        element(div, 'p', citation['text'])
-        current_page = citation['scan']
+    citations = unit.get('citations', {}).get(lang, [])
+    opening = True
     paragraph = None
     current_paragraph = None
     for segment in unit['languages'][lang]:
@@ -104,6 +101,15 @@ def unit_document(unit, lang, draft):
             if index == 0 and segment.get('corresp'):
                 element(paragraph, 'milestone', unit='verse' if ':bible:' in segment['corresp'] else 'prayer',
                         corresp=segment['corresp'])
+            if opening:
+                # Keep the printed citation with the verse range, as an annotation
+                # rather than prayer words. An unscoped preamble is not transcluded.
+                for citation in citations:
+                    if citation['scan'] != fragment['scan']:
+                        raise ValueError('Citation scan differs from the passage opening')
+                    element(paragraph, 'note', citation['text'], type='description')
+                    append_words(paragraph, ' ')
+                opening = False
             words(paragraph, fragment['text'], lang)
             append_words(paragraph, ' ')
     return root

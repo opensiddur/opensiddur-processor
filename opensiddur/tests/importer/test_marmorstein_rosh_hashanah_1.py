@@ -131,13 +131,16 @@ class EditionWiringTest(unittest.TestCase):
         self.assertTrue(all('/page/n' in p.get('facs') for p in front.findall('.//'+T+'pb')))
 
     def test_printed_citation_precedes_its_prayer_without_a_duplicate_page_break(self):
+        self.readings['units'][0]['languages']['en'][0]['corresp'] = BASE+'invented/1'
         self.readings['units'][0]['citations'] = {'en': [
             {'scan': 's3', 'printed_page': '7', 'text': '(Invented source.)'}]}
         self.save('readings', self.readings)
         self.generate(draft=True)
         root = etree.parse(str(self.projects/PROJECTS['en']/'first.xml'))
         body = root.find('.//'+T+'body')
-        self.assertEqual(body.find(T+'div/'+T+'p').text, '(Invented source.)')
+        citation = body.find('.//'+T+'note[@type="description"]')
+        self.assertEqual(citation.text, '(Invented source.)')
+        self.assertEqual(citation.getprevious().tag, T+'milestone')
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)
 
     def test_download_inventory_does_not_promote_machine_labels(self):
