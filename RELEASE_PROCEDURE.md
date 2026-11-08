@@ -167,7 +167,7 @@ Its `book-log-<book>-<variant>-vYYYYMMDD` artifact has the compiler and LaTeX ou
 `html/` and `pdf/`.
 
 The first code release that can build books is v0.7.0: v0.6.0 and earlier refuse the
-`requires_processor:` key. Until it exists, the monthly run does nothing.
+`requires_processor:` key.
 
 Run it by hand from opensiddur-projects:
 

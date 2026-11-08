@@ -8,191 +8,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Typography roles for text whose look was fixed: each kind of highlight
-  (`styles.highlight_italic`, `highlight_bold`, `highlight_small_caps`, `highlight_superscript`,
-  `highlight_large`, `highlight_small`), `styles.foreign`, `styles.reference`,
-  `styles.poetry_line`, `styles.list_item`, and the forms of a reading (`styles.abbreviation`,
-  `expansion`, `printed_error`, `correction`, `qere`, `ketiv`, `alternative_reading`). Each
-  defaults to the printed book's look as it was, so a book that sets none of them is unchanged,
-  except as noted under Changed. The Builder lists them with the other roles.
-- Each book release lists its downloads in opensiddur-projects' `DOWNLOADS.md` (#275): every
-  book's title and description from its settings file, with links to the electronic and printed
-  books attached to the release. `release-projects.yml` rewrites it after publishing the newest
-  release, through a pull request it merges itself; a change to `DOWNLOADS.md` alone does not
-  make a new release. `python -m opensiddur.release.downloads` writes it.
-- A settings file can require processor versions: `requires_processor: ">=0.7.0"`. A processor
-  that does not meet it refuses the file, in every stage and in `books --check`, instead of
-  building a broken book.
-- Every book carries a distribution notice and a back-page statement (#269). The notice has the
-  Open Siddur logo and "Distributed by The Open Siddur Project", with the project's web and
-  GitHub addresses. It is set on the verso of the title page, or on its own page at the front of
-  a book without one, and after the title page in the electronic book. The statement, on the
-  last page after the colophon, asks readers not to print (in the electronic book) or not to
-  make unnecessary printed copies (in the PDF), and says to take a worn-out copy to a
-  _genizah_. A new `distribution:` settings section changes the logo (or `none`), its width,
-  the notice's position and text, and both versions of the statement. Either part can be set
-  to `none`. Two new typography roles set their type: `styles.distribution_notice` and
-  `styles.back_notice`.
-- A settings file's `formats:` says which forms a release builds the book in, `html` and/or
-  `pdf` (both by default). `books --formats <book>/<variant>` prints them; `release-book.yml`
-  builds only those, and skips installing TeX for a book with no printed form. `books` with no
-  `--format` now builds each book's own formats, not only the PDF.
-- A naming scheme for projects, settings, files and URNs (#266, `specs/NAMING_SCHEME.md`).
-  Projects are to be named `<title>-<author>-<date>-<lang>`, a book's settings to live at
-  `settings/<project>/<variant>.yaml`, and Hebrew words to follow one transliteration table,
-  now completed in `schema/JLPTEI-3.md` (dagesh, final heh, tsere, prefixes). Common spellings
-  that win over the table, and known misspellings, are listed in `specs/naming/spellings.yaml`.
-  `python -m opensiddur.common.validate_names` checks a corpus against all of it; it runs in
-  `validate-projects.yml`, advisory until the corpus is renamed.
-- `electronic.psalm_titles: uniform` gives every whole psalm in an electronic book one
-  bilingual heading in place of its edition's. It was applied to the project named
-  `siddur_expanded` and no other; that book's settings now ask for it, and built without
-  them it keeps its printed titles.
-- Monthly book releases (#216): on the first of each month, opensiddur-projects is tagged with
-  the date (`vYYYYMMDD`) and its books are built with the latest opensiddur-processor release
-  and attached to that release (`release-projects.yml`, called from opensiddur-projects). A
-  month with no new projects commits and no new processor release is skipped.
-- `books --list` leaves out a book whose `requires_processor:` the processor does not meet,
-  so a release builds only the books its processor can (#216). Every file in
-  `opensiddur-projects/settings/` must now declare `requires_processor:`.
+- **Monthly book releases** (#216). On the first of each month opensiddur-projects is tagged
+  with the date (`vYYYYMMDD`). Its books are built, electronic and printed, with the latest
+  opensiddur-processor release and attached to that tag. `DOWNLOADS.md` in
+  opensiddur-projects lists the newest release's books (#275).
+- New settings:
+  - `requires_processor:` (`">=0.7.0"`) says which processor releases can build a book. Every
+    settings file in opensiddur-projects must declare it.
+  - `formats:` chooses the forms a release builds a book in (`html` and/or `pdf`).
+  - `distribution:` sets the Open Siddur distribution notice and the back-page statement that
+    every book now carries (#269).
+  - `electronic.psalm_titles: uniform` gives every whole psalm one bilingual heading.
+- Typography roles for text whose look was fixed: each kind of highlight, foreign text,
+  references, poetry lines, list items and the forms of a reading (qere/ketiv, corrections,
+  abbreviations…), plus `styles.distribution_notice` and `styles.back_notice` (#294).
+- **An importer for opensiddur.org** (#186) converts the site's Prayers & Praxes posts into
+  JLPTEI projects. A monthly updater brings the import up to date with each new site export.
+- The electronic book's colophon cites its sources, as the printed book's does (#250).
+- `python -m opensiddur.common.validate_names` checks a corpus's names against the naming
+  scheme (#266).
 
 ### Changed
-- With the new typography roles, three looks change slightly. A Latin-script foreign phrase
-  (`tei:foreign` in English or a transliteration) is no longer italic in the PDF, matching the
-  electronic book; Hebrew quoted in English was never italic. A large highlight
-  (`rend="large"`) in the electronic book is now the ladder's `x-large`, matching the PDF's
-  `\Large`, rather than 1.2 times the size around it. Like every role's size it is absolute, so
-  a large highlight inside a first- or second-level heading is smaller than the heading, as it
-  already was in the PDF. A small highlight is the ladder's `small` in both, slightly smaller
-  than before in the electronic book.
-- `validate_urn_references` takes one or more projects, and `validate-projects.yml` checks all
-  the changed projects in one run of it. A pull request changing thousands of projects (the
-  opensiddur.org bulk import, #186) overflowed the step's environment, and starting a process
-  per project would have taken hours.
-- **Three names that split a prefix from its word are joined**, as the table writes them:
-  `prayer:birkat_hamazon/zimmun/barukh_she_akhalnu` is `…/barukh_sheakhalnu` (בָּרוּךְ
-  שֶׁאָכַלְנוּ), `prayer:me_ein_sheva` is `prayer:meein_sheva` (מֵעֵין שֶׁבַע), and the Chumash's
-  festival readings say `chol_hamoed`, not `chol_ha_moed` (`bible:reading/sukkot_chol_hamoed_day_1`
-  and its file); a reading's name now joins hebcal's hyphenated article.
-- **No URN aliases before 1.0.** Nothing outside these repositories depends on a URN yet, so the
-  registry's 1,662 aliases are removed, and until the first stable release a renamed URN
-  replaces the old one outright (`specs/NAMING_SCHEME.md`). The Haggadah's shared liturgy now
-  uses its `prayer:` URNs, as the aliases planned (`specs/SIDDUR_URN_SCHEME.md`): the Hallel
-  psalms (`prayer:hallel/psalm_113` … `psalm_118`, `prayer:hallel_hagadol`), Nishmat through
-  Yishtabbach, Birkat Hamazon's paragraphs (`prayer:birkat_hamazon/*`, `prayer:yaaleh_veyavo`),
-  Kiddush's (`prayer:kiddush/*`, `prayer:shehecheyanu`), Al Hagefen and the Omer count. Its
-  Yehalalukha variant is `condition:prayer:hallel/yehalelukha/al`. The examples' Yishtabbach is
-  `prayer:yishtabbach`.
-- **The opensiddur.org imports' names are spelled by the table** (#266): the Hebrew words of
-  the post titles that name their texts. A shva the
-  title elides is written (`avnei_yeqar`, `banu_choshekh_legaresh`, `shenei_zeitim`), a prefix
-  is joined to its word (`ashirah_letzur_nora`, `hakhrazah_limei_hahodayah`), and doubling and
-  a final heh follow the table (`al_hanissim`, `chanukkiyyah`). The importer now joins the
-  prefixes itself when it names a new post's text; a project's title keeps the post's own
-  romanization. English, German, French, Yiddish, Ladino and Judeo-Arabic words are left as
-  the titles give them, and a French post's title is not joined, since French elides the same
-  way ("l’instruction").
-- **The Haggadah's names are spelled by the table** (#266). The seder steps are `qaddesh`, `maggid`, `rachatz`, `korekh` and `shulchan_orekh`; a
-  word is no longer split by `_` (`asher_ge_alanu` is `asher_gealanu`, `u_v_moftim` is
-  `uvemofetim`); and names that were English or glosses are the printed words
-  (`it_happened_at_midnight` is `vayehi_bachatzi_halailah`, `pesach_mitzvah` is `pesach_shehayu`,
-  `mitzrim_ra` is `vayyareu_otanu_hamitzrim`). The table now says a shva after the conjunction
-  וּ is sounded, which also renames a few Birnbaum names (`uvemaqhalot`, `uvedivrei`, `ukhetov`,
-  `uveneh`, `uvenuchoh`); `ha_el_betaatzumot` is `hael_betaatzumot` wherever it is said; and
-  Birnbaum's `qorbanot/ushchat` is `qorbanot/veshachat`, as printed (וְשָׁחַט). The Haggadah's
-  variant conditions are renamed with their sections, so a settings file that chose one needs
-  the new name (`condition:haggadah:maggid/lefikhakh/shirah_chadashah`).
-- **Birnbaum's names are spelled by the table** (#266).
-  Qof is `q` (`qodesh`, `yaaqov`, `qabbalat_shabbat`, `pirqei_avot`), khaf `kh`
-  (`shalom_aleikhem`, `lekhah_dodi`), het `ch`, dagesh hazak is doubled (`kullam`, `yitgaddal`,
-  `yishtabbach`), a final heh is written (`pesuqei_dezimrah`), tsere is `e` and tsere + yod `ei`
-  (`magen_avot`, `eloheinu`), and a sounded shva is written (`berit`, `borei_peri`). Famous names
-  follow the table too: only English words (`kaddish`, `kiddush`) are common spellings. The
-  new spellings also rename the same words in the expanded siddur, the Haggadah (`addir_hu`,
-  `barukh_hamaqom`), the opensiddur.org imports and Asher. The table now says when a shva is
-  sounded; after a long vowel it is (`malkhutekha`, `virtzonekha`), after a short one or a qamatz
-  qatan it is not (`lemaankha`, `zokhrenu`).
-  Shabbat Musaf's printing of וּבְדִבְרֵי, whose translation differs from the weekday Kedushah's,
-  has a local address (`siddur:shabbat/musaf/amidah/qedushah/uvdivrei`); the two had been told
-  apart only by their spelling.
-- **Asher's names are spelled by the table** (#266): 317 registered URNs and 160 files (80 in
-  each language) in the Asher book. Het is `ch` and
-  tzadi `tz` where Asher's reading IDs had `h` and `ts`, dagesh hazak is doubled, and tsere +
-  yod is `ei`. Words that are right for another word (Asher's `selah` is סְלַח, `selach`) are
-  respelled by a list of the Asher importer's own, `asher_selichot/spellings.yaml`, applied to
-  that book alone; it also renames whole names where a word cannot be respelled. Ten names
-  that did not spell the printed words now do (`eleh_behanufat` is `eleh_behagafat`). A few
-  Birnbaum and expanded-siddur names are respelled too (`ana_bekhoach` is `anna_bekhoach`,
-  `el_erekh_apayim` is `el_erekh_appayim`, `veatah_qadosh` is `veattah_qadosh`). The table now
-  says that the yod of the suffix ֶיךָ is not written (`lefanekha`); `eleikha` is `elekha`.
-- **URNs that broke the URN grammar are fixed** (#266), so that every name in the corpus now
-  passes `validate_names`, and the projects check's gate runs it in full:
-  - The Humash's triennial divisions are a path below the parshah:
-    `parsha/chukat/aliyah_triennial_chukat_C_2/c.2.1` is `parsha/chukat/triennial/c/2/1`, and
-    `parsha/miketz/maftir_triennial_1/1.maftir` is `parsha/miketz/triennial/1/maftir`.
-  - Its annual maftir is `maftir_annual/maftir`, not the Hebrew `מפטיר`.
-  - Its readings drop hebcal's punctuation: `reading/chanukah_day_1_(on_shabbat)` is
-    `reading/chanukah_day_1_on_shabbat`, and the files are named the same way.
-  - Miqra al pi ha-Masorah's headers name each file as its body does (`bible:amos`, was
-    `bible:tanakh:amos`), and its index is `bible:tanakh`, as in the other Tanakh projects.
-  - The WLC's notes are `notes:wlc/` followed by the lowercased note code, was `notes:tanakh.wlc.<code>`.
-- **URNs and file names are respelled** by the spelling list, `specs/naming/spellings.yaml` (#266):
-  386 URNs and 383 file names, in every project at once, since many URNs are shared between
-  books (Birnbaum's are transcluded by the expanded siddur, Asher and the opensiddur.org posts).
-  `amidah/kedushah` is now `amidah/qedushah`, `tachanun/shomer_goy_kadosh` is
-  `tachanun/shomer_goy_qadosh`, and so on. A text or settings
-  file that names an old URN must use the new one. The
-  registry's duplicate `amidah/qadosh_atah_venora` and `amidah/kadosh_atah_venora` are merged.
-  Importers that name things from a source's own words respell them as they do
-  (`validate_names.respell` and `respell_urns`): the Humash's reading names from hebcal, and the
-  Asher book, whose readings keep their evidence IDs while the book's names are respelled.
-- **The projects are renamed** by `specs/NAMING_SCHEME.md` (#266), and so are the books built
-  from them, whose release files are now `<project>-<variant>-<tag>.pdf`
-  (`chumash-opensiddur-he-annual-…`, was `humash-annual-…`):
+- **Everything is renamed by a naming scheme** (#266, `specs/NAMING_SCHEME.md`). This breaks
+  existing settings and text files:
+  - Projects are named `<title>-<author>-<date>-<lang>`. A book's settings live at
+    `settings/<project>/<variant>.yaml`, and its release files are named
+    `<project>-<variant>-<tag>`:
 
-  | Was | Is |
-  |---|---|
-  | `asher_selichot_{he,en}_1912` | `selichoth-asher-1912-{he,en}` |
-  | `birnbaum_ashkenaz_{he,en}_1949` | `hasiddur_hashalem-birnbaum-1949-{he,en}` |
-  | `heidenheim_haggadah_1822` | `haggadah_leleil_shimmurim-heidenheim-1822-he` |
-  | `feinstein_haggadah_translation_2009` | `haggadah_leleil_shimmurim-feinstein-2009-en` |
-  | `humash` | `chumash-opensiddur-he` |
-  | `siddur_expanded` | `siddur_expanded-opensiddur-he` |
-  | `jps1917` | `tanakh-jps-1917-en` |
-  | `miqra_al_pi_hamasorah` | `tanakh-miqra_al_pi_hamasorah-he` |
-  | `wlc` | `tanakh-wlc-he` |
-  | `original-example`, `translation-example` | `example_original-he`, `example_translation-en` |
+    | Was | Is |
+    |---|---|
+    | `asher_selichot_{he,en}_1912` | `selichoth-asher-1912-{he,en}` |
+    | `birnbaum_ashkenaz_{he,en}_1949` | `hasiddur_hashalem-birnbaum-1949-{he,en}` |
+    | `heidenheim_haggadah_1822` | `haggadah_leleil_shimmurim-heidenheim-1822-he` |
+    | `feinstein_haggadah_translation_2009` | `haggadah_leleil_shimmurim-feinstein-2009-en` |
+    | `humash` | `chumash-opensiddur-he` |
+    | `siddur_expanded` | `siddur_expanded-opensiddur-he` |
+    | `jps1917` | `tanakh-jps-1917-en` |
+    | `miqra_al_pi_hamasorah` | `tanakh-miqra_al_pi_hamasorah-he` |
+    | `wlc` | `tanakh-wlc-he` |
+    | `original-example`, `translation-example` | `example_original-he`, `example_translation-en` |
 
-  The importers write the new names, and a URN's `@project` suffix follows. A settings file
-  naming a project the old way no longer finds it. An electronic book's saved settings are
-  kept per book, keyed in part by its project, so its readers start from the book's defaults
-  once.
-- An opensiddur-processor release no longer builds books; `release-books.yml` is gone, and
-  `release-book.yml` builds one book for an opensiddur-projects release, from a given projects
-  commit with a given processor release.
-- Between releases, `main` is versioned as the development of the next release: `0.7.0.dev0`
-  now. A release from a development version releases the version it names (`0.7.0`; `--major`
-  jumps past it, and `--patch` fixes the last release tagged, `0.6.1`), and then commits the
-  development of the next (`0.8.0.dev0`, or back to `0.7.0.dev0` after a patch release) on the
-  branch it pushes.
-- The URN registry check reads a URN's `@project` as everything after the last `@`, as the
-  resolver always has; it read from the first.
-- The repository is renamed `opensiddur-processor` (was `opensiddur-ai`), and so is the Python
-  distribution. Download user-agents now say `OpenSiddur-Processor/1.0`. The reusable
-  `validate-projects.yml` workflow's `opensiddur_ai_ref` input is now `opensiddur_processor_ref`,
-  and it checks the validators out into `opensiddur-processor/`. Issue numbers are unchanged, so
-  `opensiddur-ai#N` in older text means `opensiddur-processor#N`.
-- PDFs are right-bound by default (#265). A new `typography.page.binding` (`right` | `left`,
-  default `right`) sets the reading direction a PDF viewer shows its spreads in (Acrobat's
-  "Binding: Right Edge"). A two-sided book opens as a cover page and then spreads ("Two Up
-  (Cover Page)"). On a two-sided page, the inner margin, the `inner`/`outer` line-number
-  margins and the default running head now sit at the right edge of an odd page, so every
-  book's pages are mirrored. Set `binding: left` to keep the old layout.
-- The output stages (TeX, PDF, electronic book) read the settings file one way, with one
-  policy (#251): a file that cannot be read, is not YAML or is not valid settings is an error
-  in every stage. The PDF stage used to fall back to the default typography with a warning.
-  Every section is now validated, not only `typography`; the projects the file names are not
-  checked, since the compiler already has. A settings file's `priority:` may be left out.
+  - URNs and file names spell Hebrew by one transliteration table (`schema/JLPTEI-3.md`). For
+    example, `amidah/kedushah` is now `amidah/qedushah`, and `pesukei_dezimra` is now
+    `pesuqei_dezimrah`. The URNs of the Humash's triennial divisions and readings now follow
+    the URN grammar.
+  - There are no URN aliases before 1.0: a renamed URN replaces the old one outright. A
+    settings or text file that names an old project, URN or condition must use the new name.
+- The repository and Python distribution are renamed **opensiddur-processor** (was
+  opensiddur-ai). `validate-projects.yml`'s input is now `opensiddur_processor_ref`.
+- PDFs are right-bound by default (#265), and their pages are mirrored to match. Set
+  `typography.page.binding: left` to keep the old layout.
+- A processor release no longer builds books. `release-book.yml` builds one book for an
+  opensiddur-projects release.
+- Between releases, `main` is versioned as the development of the next release
+  (`0.8.0.dev0` after this one).
+- Every output stage reads a settings file the same way, and a file that is not valid is an
+  error in every stage (#251). The PDF stage used to fall back to the default typography.
+
+### Fixed
+- HTML books apply the typography settings the same way the PDF does (#293).
+- The last line of a multi-line column heading is no longer set full width under the other
+  column (#291).
+- The URN registry check read a URN's `@project` from the first `@` instead of the last.
 
 ## [0.6.0] - 2026-10-24
 
