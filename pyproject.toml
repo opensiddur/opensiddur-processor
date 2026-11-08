@@ -1,6 +1,6 @@
 [project]
 name = "opensiddur-processor"
-version = "0.7.0"
+version = "0.8.0.dev0"
 description = "AI-aided conversion and compilation pipeline for Open Siddur liturgical texts (JLPTEI v2)"
 authors = [
     {name = "Efraim Feinstein", email = "efraim.feinstein@gmail.com"}
