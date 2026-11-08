@@ -1988,3 +1988,4 @@
 {"urn": "urn:x-opensiddur:text:siddur:expanded/readings_morning_haftarah", "status": "canonical", "label_en": "Morning haftarah selections in the expanded siddur", "parent": "urn:x-opensiddur:text:siddur:expanded"}
 {"urn": "urn:x-opensiddur:text:siddur:expanded/readings_morning_maftir", "status": "canonical", "label_en": "Morning maftir selections in the expanded siddur", "parent": "urn:x-opensiddur:text:siddur:expanded"}
 {"urn": "urn:x-opensiddur:text:siddur:expanded/readings_morning_torah", "status": "canonical", "label_en": "Morning torah selections in the expanded siddur", "parent": "urn:x-opensiddur:text:siddur:expanded"}
+{"urn": "urn:x-opensiddur:text:siddur:machzor_expanded", "status": "canonical", "label_en": "Expanded Ashkenazi mahzor; shared Hebrew-English recitation spine"}

@@ -2748,11 +2748,24 @@
              the first rather than beside it, so that it reads as naming the same section
              again and not as a section of its own. -->
         <xsl:if test="f:alt-head and not($marks-only)">
-            <!-- No direction wrapper here: mode="emit" already wraps each run against the
-                 stream it lands in, and adding one on top nests a second \textdir around
-                 the first for no gain. -->
+            <!-- Per-word wrappers protect letters but not the order of words in the
+                 surrounding stream. Keep the whole translated title in its direction. -->
             <xsl:text>\OSheadTranslation{</xsl:text>
+            <xsl:choose>
+                <xsl:when test="f:is-hebrew-lang(string(@alt-lang))">
+                    <xsl:text>\texthebrew{</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text>{\textdir TLT\foreignlanguage{english}{</xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates select="f:alt-head/node()" mode="emit"/>
+            <xsl:choose>
+                <xsl:when test="f:is-hebrew-lang(string(@alt-lang))">
+                    <xsl:text>}</xsl:text>
+                </xsl:when>
+                <xsl:otherwise><xsl:text>}}</xsl:text></xsl:otherwise>
+            </xsl:choose>
             <xsl:text>}</xsl:text>
         </xsl:if>
 
