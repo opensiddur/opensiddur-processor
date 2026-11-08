@@ -15,13 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New settings:
   - `requires_processor:` (`">=0.7.0"`) says which processor releases can build a book. Every
     settings file in opensiddur-projects must declare it.
-  - `formats:` chooses the forms a release builds a book in (`html` and/or `pdf`).
+  - `formats:` chooses the forms a release builds a book in (`html` and/or `pdf`). `books`
+    with no `--format` builds each book's own formats, no longer only the PDF.
   - `distribution:` sets the Open Siddur distribution notice and the back-page statement that
-    every book now carries (#269).
+    every book now carries, typeset by `styles.distribution_notice` and `styles.back_notice`
+    (#269).
   - `electronic.psalm_titles: uniform` gives every whole psalm one bilingual heading.
-- Typography roles for text whose look was fixed: each kind of highlight, foreign text,
+- Typography roles for text whose look was hard-coded: each kind of highlight, foreign text,
   references, poetry lines, list items and the forms of a reading (qere/ketiv, corrections,
-  abbreviations…), plus `styles.distribution_notice` and `styles.back_notice` (#294).
+  abbreviations…) (#294).
 - **An importer for opensiddur.org** (#186) converts the site's Prayers & Praxes posts into
   JLPTEI projects. A monthly updater brings the import up to date with each new site export.
 - The electronic book's colophon cites its sources, as the printed book's does (#250).
@@ -50,12 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   - URNs and file names spell Hebrew by one transliteration table (`schema/JLPTEI-3.md`). For
     example, `amidah/kedushah` is now `amidah/qedushah`, and `pesukei_dezimra` is now
-    `pesuqei_dezimrah`. The URNs of the Humash's triennial divisions and readings now follow
-    the URN grammar.
+    `pesuqei_dezimrah`. URNs that broke the URN grammar now follow it: the Chumash's triennial
+    divisions, maftir and readings, Miqra al pi ha-Masorah's headers (`bible:amos`, was
+    `bible:tanakh:amos`) and the WLC's notes (`notes:wlc/<code>`).
   - There are no URN aliases before 1.0: a renamed URN replaces the old one outright. A
     settings or text file that names an old project, URN or condition must use the new name.
+  - An electronic book's saved reader settings are kept per project, so its readers start
+    from the book's defaults once.
 - The repository and Python distribution are renamed **opensiddur-processor** (was
-  opensiddur-ai). `validate-projects.yml`'s input is now `opensiddur_processor_ref`.
+  opensiddur-ai). `validate-projects.yml`'s input is now `opensiddur_processor_ref`. Issue
+  numbers are unchanged: `opensiddur-ai#N` means `opensiddur-processor#N`.
 - PDFs are right-bound by default (#265), and their pages are mirrored to match. Set
   `typography.page.binding: left` to keep the old layout.
 - A processor release no longer builds books. `release-book.yml` builds one book for an
@@ -64,12 +70,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`0.8.0.dev0` after this one).
 - Every output stage reads a settings file the same way, and a file that is not valid is an
   error in every stage (#251). The PDF stage used to fall back to the default typography.
+- A Latin-script foreign phrase is no longer italic in the PDF, matching the electronic book,
+  and the electronic book's large and small highlights match the PDF's sizes (#294).
 
 ### Fixed
 - HTML books apply the typography settings the same way the PDF does (#293).
 - The last line of a multi-line column heading is no longer set full width under the other
   column (#291).
-- The URN registry check read a URN's `@project` from the first `@` instead of the last.
+- A book credits the contributors of every file it uses part of. A range transclusion used to
+  drop them: the expanded siddur credited 1 of 12 JPS 1917 transcribers (#250).
+- The URN registry check read a URN's `@project` from the first `@` instead of the last (#274).
 
 ## [0.6.0] - 2026-10-24
 
