@@ -36,6 +36,8 @@
     <!-- Whether the book carries a distribution notice. html.py sets it where the placeholder
          comment is left: after the first title page, or at the head of a book with none. -->
     <xsl:param name="distribution-notice" as="xs:boolean" select="false()"/>
+    <xsl:param name="notes-mark" as="xs:string" select="'numeric'"/>
+    <xsl:param name="notes-visible" as="xs:boolean" select="true()"/>
 
     <!-- The first element to carry a URN gets it as its id, so #urn:x-opensiddur:... links
          to it; the parallel column's copy, and every later one, does not, ids being unique. -->
@@ -51,6 +53,18 @@
             select="$value + 1"/>
     </xsl:accumulator>
     <xsl:mode use-accumulators="note-number" on-no-match="shallow-skip"/>
+
+    <xsl:function name="f:note-mark" as="xs:string">
+        <xsl:param name="serial" as="xs:integer"/>
+        <xsl:variable name="symbols" select="('*', '†', '‡', '§', '‖', '¶')"/>
+        <xsl:sequence select="
+            if ($notes-mark = 'alpha') then format-integer($serial, 'a')
+            else if ($notes-mark = 'roman') then format-integer($serial, 'i')
+            else if ($notes-mark = 'symbol') then string-join(
+                for $repeat in 1 to (($serial - 1) idiv count($symbols) + 1)
+                return $symbols[($serial - 1) mod count($symbols) + 1], '')
+            else string($serial)"/>
+    </xsl:function>
 
     <!-- Whether a language is written right to left. A script subtag decides: he-Latn is a
          transliteration, set left to right. The PDF follows the same rule
@@ -172,8 +186,11 @@
         <xsl:variable name="level"
                       select="max((1, min((6, xs:integer((@p:heading-level, 2)[1])))))"/>
         <xsl:element name="{if (f:in-text(.)) then 'span' else concat('h', $level)}">
+            <xsl:attribute name="data-heading-level" select="$level"/>
             <xsl:call-template name="attributes">
-                <xsl:with-param name="class" select="'head'"/>
+                <xsl:with-param name="class" select="('head',
+                    if (preceding-sibling::tei:head or ancestor::p:parallelItem[@role = 'parallel'])
+                    then 'head-translation' else ())"/>
             </xsl:call-template>
             <!-- Which section it heads, for the contents to know whether any of its text shows
                  (markers.py, _sections). -->
@@ -213,6 +230,9 @@
             <xsl:call-template name="attributes">
                 <xsl:with-param name="class"
                                 select="(if (f:in-text(.)) then 'np' else (),
+                                         if (ancestor::tei:titlePage and
+                                             not(ancestor::tei:titlePart or ancestor::tei:epigraph))
+                                         then 'title-page-block' else (),
                                          @type ! concat('p-', .),
                                          tokenize(@rend) ! concat('rend-', .))"/>
             </xsl:call-template>
@@ -499,6 +519,7 @@
 
     <!-- Every other note opens as a popover from its numbered mark. -->
     <xsl:template match="tei:note">
+        <xsl:if test="$notes-visible">
         <xsl:variable name="number" select="accumulator-before('note-number')"/>
         <xsl:variable name="id" select="concat('note-', $number)"/>
         <span>
@@ -507,14 +528,15 @@
             </xsl:call-template>
             <button type="button" class="note-ref" popovertarget="{$id}"
                     aria-label="Note {$number}">
-                <xsl:value-of select="$number"/>
+                <xsl:value-of select="f:note-mark($number)"/>
             </button>
             <span popover="" id="{$id}" role="note"
                   class="note{@type ! concat(' note-', .)}">
-                <span class="note-number"><xsl:value-of select="$number"/></span>
+                <span class="note-number"><xsl:value-of select="f:note-mark($number)"/></span>
                 <xsl:apply-templates/>
             </span>
         </span>
+        </xsl:if>
     </xsl:template>
 
     <!-- ── Conditional scopes ─────────────────────────────────────────────── -->

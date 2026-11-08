@@ -528,16 +528,35 @@ title page on a recto.
 
 ## How this reaches the renderer
 
-The electronic book (`opensiddur/exporter/html/`) reflows, so most of these settings, which
-are about paper, mean nothing to it. It honours:
+The electronic book (`opensiddur/exporter/html/`) reflows. These settings reach its
+HTML, CSS, and reader controls:
 
-- `fonts.latin` and `fonts.hebrew`, as font stacks (named, not embedded);
-- `paragraphs.line_spacing`, `paragraphs.spacing` and `paragraphs.alignment`;
-- `markers.verse_numbers`, `markers.chapter_numbers` and `markers.section_separator`;
-- `markers.conditional`, and so how an undecided passage is delimited.
+| Setting | HTML behavior |
+|---|---|
+| `fonts` | Latin, Hebrew and custom families become CSS font stacks. Per-face `normal_size` supplies the normal size for that family. The hosted Builder embeds installed faces in both previews and downloaded HTML books, including custom families, and uses the first embedded face's size. A standalone exporter names fonts for the reader's device to supply. |
+| `page.base_font_size` | Supplies the normal size for a family without an explicit `normal_size`. |
+| `styles` | Every text role except `line_number` has an HTML selector. Font, size, weight, italic style, small caps, alignment and applicable vertical spacing are emitted. Named sizes scale with the chosen family's normal size. Absolute sizes remain exact across language changes. |
+| `paragraphs` | Indent, spacing, line spacing and alignment apply to running text. |
+| `lists.item_indent` | Applies to both margins of list items. |
+| `markers` | Verse/chapter visibility, section separators, conditional brackets and rule dimensions apply. |
+| `notes` | Numeric, alphabetic, Roman and symbol marks apply, as do inline, superscript and interlinear anchors. `placement: none` omits notes. Both physical-page placements use accessible popovers on screen. |
+| `parallel` | Wide-screen pairs use the configured column width and position. Interleaved output uses its translation size, indent and spacing. Narrow screens and the reader's one-column choice continue to reflow. Facing-page layout uses responsive columns on screen. |
+| `table_of_contents.depth` | Limits the reader's Contents dialog to the configured heading depth, including level four. |
 
-`html/css.py` does the translation. Everything else is ignored.
+English inside a Hebrew work resets to the Latin family. Hebrew transliteration
+tagged `he-Latn` also uses Latin. Repeated language tags do not multiply font
+sizes. Explicit role font overrides are inherited within that role.
 
+Paper dimensions, binding, margins, page numbering, running heads/feet, marginal
+line numbering and the PDF outline have physical-page meanings. They do not
+change the reflowing book. The printed table-of-contents `enabled` switch does
+not remove the reader's Contents control. `headings.from` and `instructions.from`
+govern print deduplication; the HTML reader retains both streams and lets the
+reader choose which columns to display. Interleaved line numbering likewise
+belongs to print.
+
+`html/css.py` translates visual settings and `html.xslt` renders text roles and
+note marks. The reader applies the contents depth at runtime.
 
 `opensiddur/exporter/typography.py` holds the models above and knows nothing about any
 renderer. `opensiddur/exporter/tex/typography_tex.py` turns a validated settings tree into a

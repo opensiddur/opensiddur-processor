@@ -1094,9 +1094,10 @@
   function contentsDialog() {
     var frame = dialogFrame("os-contents", "Contents", "Close");
     var list = el("ol", { class: "os-contents" });
-    var headings = document.querySelectorAll(".os-book h1, .os-book h2, .os-book h3");
+    var headings = document.querySelectorAll(".os-book :is(h1, h2, h3, h4)");
     var shown = OSCond.sectionsShown(book, resolveAll().states);
     Array.prototype.forEach.call(headings, function (heading, index) {
+      if (Number(heading.tagName.slice(1)) > book.contentsDepth) return;
       // A translated heading repeats its row's, unless the translation is shown alone.
       if (heading.closest(".col-parallel") && shownColumns() !== "parallel") return;
       if (!heading.getClientRects().length) return;  // in a passage the settings hide
