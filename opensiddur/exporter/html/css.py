@@ -80,6 +80,26 @@ STYLE_SELECTORS = {
     "note_mark": ".note-ref, .note-number",
     "section_separator": ".section-separator",
     "list_label": ".list > .label",
+    # html.xslt gives a tei:hi a rend-* class per token; the superscript's raise is
+    # reader.css's, fixed, and the role styles the raised text.
+    "highlight_italic": ".rend-italic",
+    "highlight_bold": ".rend-bold",
+    "highlight_small_caps": ".rend-small-caps, .rend-smallcaps",
+    "highlight_superscript": ".rend-sup, .rend-superscript, .rend-suspended, .rend-raised",
+    "highlight_large": ".rend-large",
+    "highlight_small": ".rend-small",
+    "foreign": ".foreign",
+    "reference": ".ref",
+    "poetry_line": ".l",
+    "list_item": ".list > .item",
+    "abbreviation": ".abbr",
+    "expansion": ".expan",
+    "printed_error": ".sic",
+    "correction": ".corr",
+    "qere": ".read",
+    # The words of the form, not the parentheses reader.css sets around it (html.xslt).
+    "ketiv": ".written > .form",
+    "alternative_reading": ".option-alt > .form",
 }
 
 
@@ -110,6 +130,10 @@ def style_css(typography: TypographyConfig) -> list[str]:
             ]
         if style.size is not None:
             declarations += size_properties(style.size)
+            if role == "highlight_superscript":
+                # A size the role names is the raised text's size, as in the PDF, rather
+                # than the size reader.css then reduces.
+                declarations.append("--os-rend-scale: 1;")
         for field, property_name in (
             ("weight", "font-weight"), ("style", "font-style"),
             ("variant", "font-variant"), ("align", "--os-role-align"),

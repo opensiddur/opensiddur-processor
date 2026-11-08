@@ -635,7 +635,43 @@ def _styles_section(config: TypographyConfig) -> list[str]:
         + _inline_aligned(s, r"{\normalfont" + tokens(s) + " #1}")
         + "}",
     )
+    # Words inside running text: a group around the argument, nothing more. Not
+    # \normalfont, because they inherit the text they sit in -- italic inside a bold
+    # heading stays bold. The superscript's raise is the stylesheet's, around this.
+    # The space only after a command, which absorbs it: these can mark one letter of a
+    # word, and a space token after a bare brace would split the word.
+    # An italic role ends with the italic correction \textit would have added, so that an
+    # upright bracket after it does not touch its last letter.
+    def inline(style: TextStyle, macro: str) -> str:
+        switch = tokens(style)
+        correction = r"\/" if style.style is FontStyle.ITALIC else ""
+        return rf"\newcommand{{{macro}}}[1]{{{{{switch + ' ' if switch else ''}#1{correction}}}}}"
+
+    for role, macro in INLINE_ROLE_MACROS.items():
+        define(role, lambda s, macro=macro: inline(s, macro))
     return lines
+
+
+# The inline roles and the macro each is set with. reledmac.xslt emits these names.
+INLINE_ROLE_MACROS: dict[str, str] = {
+    "highlight_italic": r"\OSHighlightItalic",
+    "highlight_bold": r"\OSHighlightBold",
+    "highlight_small_caps": r"\OSHighlightSmallCaps",
+    "highlight_superscript": r"\OSHighlightSuperscript",
+    "highlight_large": r"\OSHighlightLarge",
+    "highlight_small": r"\OSHighlightSmall",
+    "foreign": r"\OSForeign",
+    "reference": r"\OSReference",
+    "poetry_line": r"\OSPoetryLine",
+    "list_item": r"\OSListItem",
+    "abbreviation": r"\OSAbbreviation",
+    "expansion": r"\OSExpansion",
+    "printed_error": r"\OSPrintedError",
+    "correction": r"\OSCorrection",
+    "qere": r"\OSQere",
+    "ketiv": r"\OSKetiv",
+    "alternative_reading": r"\OSAlternativeReading",
+}
 
 
 def _note_mark_tex(style: TextStyle, anchor: NoteAnchor, spacing: float) -> list[str]:

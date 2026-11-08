@@ -17,6 +17,7 @@ from pydantic import ValidationError
 from opensiddur.exporter import typography as typography_module
 from opensiddur.exporter.typography import NamedSize, TextStyle, TypographyConfig
 from opensiddur.exporter.tex.typography_tex import (
+    INLINE_ROLE_MACROS,
     build_typography_preamble,
     documentclass_options,
     style_tokens,
@@ -293,6 +294,34 @@ class TestStyles(unittest.TestCase):
         centred paragraphs with line breaking."""
         tex = _tex({"styles": {"title_main": {"size": "xxxx-large", "align": "center"}}})
         self.assertIn(r"{\centering\normalfont\Huge #1\par}", tex)
+
+    def test_every_inline_role_has_a_macro_at_its_default(self):
+        tex = _tex({})
+        self.assertEqual(r"\newcommand{\OSHighlightItalic}[1]{{\itshape #1\/}}",
+                         _macro(tex, r"\OSHighlightItalic"))
+        self.assertEqual(r"\newcommand{\OSHighlightLarge}[1]{{\Large #1}}",
+                         _macro(tex, r"\OSHighlightLarge"))
+        self.assertEqual(r"\newcommand{\OSQere}[1]{{\itshape #1\/}}", _macro(tex, r"\OSQere"))
+        for role, macro in INLINE_ROLE_MACROS.items():
+            with self.subTest(role=role):
+                self.assertIn(rf"\newcommand{{{macro}}}[1]", tex)
+
+    def test_an_italic_inline_role_ends_with_the_italic_correction(self):
+        """As \\textit did, so an upright bracket after it does not touch its last letter."""
+        tex = _tex({"styles": {"reference": {"style": "italic"}, "qere": {"style": "normal"}}})
+        self.assertTrue(_macro(tex, r"\OSReference").endswith(r"#1\/}}"))
+        self.assertTrue(_macro(tex, r"\OSQere").endswith(r"\upshape #1}}"))
+
+    def test_an_unstyled_inline_role_adds_no_space(self):
+        """These can mark one letter of a word: a space after the brace would split it."""
+        self.assertEqual(r"\newcommand{\OSAbbreviation}[1]{{#1}}",
+                         _macro(_tex({}), r"\OSAbbreviation"))
+
+    def test_an_inline_role_inherits_rather_than_resetting_the_font(self):
+        """Italic in a bold heading stays bold: no \\normalfont."""
+        tex = _tex({"styles": {"foreign": {"weight": "bold", "font": "hebrew"}}})
+        self.assertEqual(r"\newcommand{\OSForeign}[1]{{\hebrewfont\bfseries #1}}",
+                         _macro(tex, r"\OSForeign"))
 
     def test_space_before_and_after_sit_outside_the_group(self):
         tex = _tex({"styles": {"byline": {"space_before": "3ex", "space_after": "1ex"}}})

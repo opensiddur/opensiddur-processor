@@ -323,6 +323,7 @@
     <!-- ── Words ──────────────────────────────────────────────────────────── -->
 
     <xsl:template match="tei:seg | tei:hi | tei:foreign | tei:label | tei:emph | tei:q
+                         | tei:abbr | tei:expan | tei:sic | tei:corr
                          | tei:docAuthor | tei:docDate | tei:publisher | tei:pubPlace
                          | j:divineName | p:transcludeInline | p:span">
         <span>
@@ -339,7 +340,9 @@
 
     <xsl:template match="tei:ref[matches(@target, '^https?://')]">
         <a href="{@target}">
-            <xsl:call-template name="attributes"/>
+            <xsl:call-template name="attributes">
+                <xsl:with-param name="class" select="'ref'"/>
+            </xsl:call-template>
             <xsl:apply-templates/>
         </a>
     </xsl:template>
@@ -416,7 +419,14 @@
                                 select="if (preceding-sibling::j:option) then ('option', 'option-alt')
                                         else 'option'"/>
             </xsl:call-template>
-            <xsl:apply-templates/>
+            <xsl:choose>
+                <xsl:when test="preceding-sibling::j:option">
+                    <xsl:call-template name="reading-form"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates/>
+                </xsl:otherwise>
+            </xsl:choose>
         </span>
     </xsl:template>
 
@@ -435,6 +445,16 @@
                 <xsl:with-param name="class"
                                 select="if (../j:read) then ('written', 'written-alt') else 'written'"/>
             </xsl:call-template>
+            <xsl:call-template name="reading-form"/>
+        </span>
+    </xsl:template>
+
+    <!-- A second form's words, in a span of their own inside the one reader.css puts the
+         parentheses around: the role (styles.alternative_reading, styles.ketiv) styles the
+         words and not the parentheses, which are the text's, as in print. The parentheses
+         stay on the outer span so that a condition hiding the form hides them too. -->
+    <xsl:template name="reading-form">
+        <span class="form">
             <xsl:apply-templates/>
         </span>
     </xsl:template>

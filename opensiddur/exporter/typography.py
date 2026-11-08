@@ -673,6 +673,92 @@ class Styles(ForbidExtra):
         ),
     )
 
+    # Highlighted text (tei:hi). Each kind of @rend that changes the look of the text
+    # has a role, defaulting to the look its name describes; a hi with several tokens
+    # nests them in order. Layout and reading tokens (centered, align-right, ketiv-only,
+    # qeri-only) have none.
+    highlight_italic: TextStyle = Field(
+        default_factory=lambda: TextStyle(style=FontStyle.ITALIC),
+        description="Highlighted text the source sets in italics (`rend=\"italic\"`).",
+    )
+    highlight_bold: TextStyle = Field(
+        default_factory=lambda: TextStyle(weight=FontWeight.BOLD),
+        description="Highlighted text the source sets in bold (`rend=\"bold\"`).",
+    )
+    highlight_small_caps: TextStyle = Field(
+        default_factory=lambda: TextStyle(variant=FontVariant.SMALL_CAPS),
+        description="Highlighted text the source sets in small capitals (`rend=\"small-caps\"`).",
+    )
+    highlight_superscript: TextStyle = Field(
+        default_factory=TextStyle,
+        description=(
+            "Highlighted text the source raises above the line (`rend` `sup`, "
+            "`superscript`, `raised` or `suspended`). It is always raised, and reduced "
+            "unless the style names a size, which is then the raised text's size."
+        ),
+    )
+    highlight_large: TextStyle = Field(
+        default_factory=lambda: TextStyle(size=NamedSize.X_LARGE),
+        description="Highlighted text the source sets larger (`rend=\"large\"`).",
+    )
+    highlight_small: TextStyle = Field(
+        default_factory=lambda: TextStyle(size=NamedSize.SMALL),
+        description="Highlighted text the source sets smaller (`rend=\"small\"`).",
+    )
+    foreign: TextStyle = Field(
+        default_factory=TextStyle,
+        description=(
+            "A phrase in another language than the text around it, such as Hebrew "
+            "quoted in English. Its script's font is selected either way."
+        ),
+    )
+    reference: TextStyle = Field(
+        default_factory=TextStyle,
+        description="The text of a reference or link to a source or another place.",
+    )
+    poetry_line: TextStyle = Field(
+        default_factory=TextStyle,
+        description="A line of poetry.",
+    )
+    list_item: TextStyle = Field(
+        default_factory=TextStyle,
+        description="The text of an item in a list.",
+    )
+    abbreviation: TextStyle = Field(
+        default_factory=TextStyle,
+        description="An abbreviation, where a book reads abbreviations as printed.",
+    )
+    expansion: TextStyle = Field(
+        default_factory=TextStyle,
+        description="The expansion of an abbreviation, where a book reads them expanded.",
+    )
+    printed_error: TextStyle = Field(
+        default_factory=TextStyle,
+        description="A misprint as the edition printed it, where a book reads errors as printed.",
+    )
+    correction: TextStyle = Field(
+        default_factory=TextStyle,
+        description="The correction of a misprint, where a book reads errors corrected.",
+    )
+    qere: TextStyle = Field(
+        default_factory=lambda: TextStyle(style=FontStyle.ITALIC),
+        description="The qere: a word as it is read, where it differs from how it is written.",
+    )
+    ketiv: TextStyle = Field(
+        default_factory=TextStyle,
+        description=(
+            "The ketiv: a word as it is written, printed in parentheses after the qere "
+            "when both are given."
+        ),
+    )
+    alternative_reading: TextStyle = Field(
+        default_factory=TextStyle,
+        description=(
+            "An alternative wording, printed in parentheses after the first when a text "
+            "gives more than one."
+        ),
+    )
+
     @model_validator(mode="after")
     def validate_block_properties(self) -> "Styles":
         """ Refuse an alignment or vertical space on a role that cannot honour it.

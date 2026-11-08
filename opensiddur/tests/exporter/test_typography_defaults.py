@@ -316,6 +316,23 @@ _ROLES: dict[str, tuple[str, Optional[str]]] = {
     "line_number": (r"\linenumrep", None),
     "section_separator": (r"\OSSectionSeparatorStyle", r"\begin{center}"),
     "list_label": (r"\OSListLabelStyle", None),
+    "highlight_italic": (r"\OSHighlightItalic", None),
+    "highlight_bold": (r"\OSHighlightBold", None),
+    "highlight_small_caps": (r"\OSHighlightSmallCaps", None),
+    "highlight_superscript": (r"\OSHighlightSuperscript", None),
+    "highlight_large": (r"\OSHighlightLarge", None),
+    "highlight_small": (r"\OSHighlightSmall", None),
+    "foreign": (r"\OSForeign", None),
+    "reference": (r"\OSReference", None),
+    "poetry_line": (r"\OSPoetryLine", None),
+    "list_item": (r"\OSListItem", None),
+    "abbreviation": (r"\OSAbbreviation", None),
+    "expansion": (r"\OSExpansion", None),
+    "printed_error": (r"\OSPrintedError", None),
+    "correction": (r"\OSCorrection", None),
+    "qere": (r"\OSQere", None),
+    "ketiv": (r"\OSKetiv", None),
+    "alternative_reading": (r"\OSAlternativeReading", None),
 }
 
 _SIZES = {
@@ -356,6 +373,9 @@ class TestEveryDefaultReachesTheStylesheet(unittest.TestCase):
                         self.assertIn(text, parameter)
                     else:
                         self.assertNotIn(text, parameter)
+
+    def test_every_style_role_has_a_macro_listed_here(self):
+        self.assertEqual(set(_ROLES), set(type(TypographyConfig().styles).model_fields))
 
     def test_every_style_role_is_defined_with_its_default(self):
         """Its size, weight, shape and variant, and its alignment and space."""

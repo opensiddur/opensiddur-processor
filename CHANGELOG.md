@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Typography roles for text whose look was fixed: each kind of highlight
+  (`styles.highlight_italic`, `highlight_bold`, `highlight_small_caps`, `highlight_superscript`,
+  `highlight_large`, `highlight_small`), `styles.foreign`, `styles.reference`,
+  `styles.poetry_line`, `styles.list_item`, and the forms of a reading (`styles.abbreviation`,
+  `expansion`, `printed_error`, `correction`, `qere`, `ketiv`, `alternative_reading`). Each
+  defaults to the printed book's look as it was, so a book that sets none of them is unchanged,
+  except as noted under Changed. The Builder lists them with the other roles.
 - Each book release lists its downloads in opensiddur-projects' `DOWNLOADS.md` (#275): every
   book's title and description from its settings file, with links to the electronic and printed
   books attached to the release. `release-projects.yml` rewrites it after publishing the newest
@@ -50,6 +57,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `opensiddur-projects/settings/` must now declare `requires_processor:`.
 
 ### Changed
+- With the new typography roles, three looks change slightly. A Latin-script foreign phrase
+  (`tei:foreign` in English or a transliteration) is no longer italic in the PDF, matching the
+  electronic book; Hebrew quoted in English was never italic. A large highlight
+  (`rend="large"`) in the electronic book is now the ladder's `x-large`, matching the PDF's
+  `\Large`, rather than 1.2 times the size around it. Like every role's size it is absolute, so
+  a large highlight inside a first- or second-level heading is smaller than the heading, as it
+  already was in the PDF. A small highlight is the ladder's `small` in both, slightly smaller
+  than before in the electronic book.
 - `validate_urn_references` takes one or more projects, and `validate-projects.yml` checks all
   the changed projects in one run of it. A pull request changing thousands of projects (the
   opensiddur.org bulk import, #186) overflowed the step's environment, and starting a process
