@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-08
+
 ### Added
 - **Monthly book releases** (#216). On the first of each month opensiddur-projects is tagged
   with the date (`vYYYYMMDD`). Its books are built, electronic and printed, with the latest
@@ -80,6 +82,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A book credits the contributors of every file it uses part of. A range transclusion used to
   drop them: the expanded siddur credited 1 of 12 JPS 1917 transcribers (#250).
 - The URN registry check read a URN's `@project` from the first `@` instead of the last (#274).
+
+### Pinned sources
+
+- `opensiddur-projects`: c91943dc9ec9b039447bbed358e982cc529ae621
+- `sourcetexts`: dacca4a8e4317c4555e5c849d1a75db8df28e3dd
 
 ## [0.6.0] - 2026-10-24
 
