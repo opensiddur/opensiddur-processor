@@ -37,7 +37,10 @@ references are canonical. A partial chapter witness maps only its actual verses;
 do not advertise an excerpt as the entire chapter. Use milestone boundaries,
 independent of paragraphs and page turns, and terminate scopes before other text.
 
-Preserve English Hebrew cues with explicit language markup. English witnesses
+Omit printed Hebrew linkage cues from accepted English prayer words; shared canonical
+milestones provide the linkage. Preserve the cues in immutable image-reading evidence.
+Encode biblical citations as standoff `tei:note type="citation"` annotations targeting
+the passage, following existing projects, rather than as prayer text or instructions. English witnesses
 exist only for printed English material. Missing English is not an empty file,
 placeholder, or invitation to use another translator automatically.
 

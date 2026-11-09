@@ -83,7 +83,15 @@ def unit_document(unit, lang, draft):
     div = element(body, 'div', **({'corresp': unit['urn']} if unit.get('map_root', True) else {}))
     current_page = None
     citations = unit.get('citations', {}).get(lang, [])
-    opening = True
+    if citations:
+        notes = element(root, 'standOff', type='notes')
+        root.remove(notes)
+        root.insert(list(root).index(body.getparent()), notes)
+        for citation in citations:
+            if citation['scan'] != unit['languages'][lang][0]['fragments'][0]['scan']:
+                raise ValueError('Citation scan differs from the passage opening')
+            note = element(notes, 'note', type='citation', target=unit.get('start', unit['urn']))
+            element(note, 'p', citation['text'])
     paragraph = None
     current_paragraph = None
     for segment in unit['languages'][lang]:
@@ -101,15 +109,6 @@ def unit_document(unit, lang, draft):
             if index == 0 and segment.get('corresp'):
                 element(paragraph, 'milestone', unit='verse' if ':bible:' in segment['corresp'] else 'prayer',
                         corresp=segment['corresp'])
-            if opening:
-                # Keep the printed citation with the verse range, as an annotation
-                # rather than prayer words. An unscoped preamble is not transcluded.
-                for citation in citations:
-                    if citation['scan'] != fragment['scan']:
-                        raise ValueError('Citation scan differs from the passage opening')
-                    element(paragraph, 'note', citation['text'], type='description')
-                    append_words(paragraph, ' ')
-                opening = False
             words(paragraph, fragment['text'], lang)
             append_words(paragraph, ' ')
     return root
@@ -269,6 +268,7 @@ def build(source, project_directory, *, draft=False):
         settings = {'description': 'Pilot installment; not a complete first-day service.',
                     'requires_processor': '>=0.8.0.dev0',
                     'book': {'project': project, 'file_name': 'index.xml', 'title': 'First-day Mahzor — pilot'},
+                    'annotations': list(PROJECTS.values()) if parallel else [PROJECTS['he']],
                     'priority': {'transclusion': [project]+[p for p in PROJECTS.values() if p != project],
                                  'instructions': [project]+[p for p in PROJECTS.values() if p != project]},
                     'typography': {'instructions': {'from': 'both'}, 'line_numbers': {'enabled': False}}}

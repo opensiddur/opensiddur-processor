@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from lxml import etree
+import yaml
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import profile, PROJECTS, EXPANDED
 from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_text
@@ -80,6 +81,8 @@ class EditionWiringTest(unittest.TestCase):
         targets = [e.get('target') for e in expanded.findall('.//'+J+'transclude')]
         self.assertEqual(targets, [BASE+'invented', BASE+'another'])
         self.assertFalse(expanded.findall('.//'+T+'ref[@type="page"]'))
+        settings = yaml.safe_load((self.projects.parent/'settings'/EXPANDED/'undated.yaml').read_text())
+        self.assertEqual(settings['annotations'], list(PROJECTS.values()))
         self.assertIn('Stand.', ''.join(expanded.getroot().itertext()))
         original = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
         reference = original.find('.//'+T+'ref[@type="page"]')
@@ -130,7 +133,7 @@ class EditionWiringTest(unittest.TestCase):
         self.assertIn('Invented preface', ''.join(front.itertext()))
         self.assertTrue(all('/page/n' in p.get('facs') for p in front.findall('.//'+T+'pb')))
 
-    def test_printed_citation_precedes_its_prayer_without_a_duplicate_page_break(self):
+    def test_printed_citation_is_a_standoff_note_targeting_the_passage(self):
         self.readings['units'][0]['languages']['en'][0]['corresp'] = BASE+'invented/1'
         self.readings['units'][0]['citations'] = {'en': [
             {'scan': 's3', 'printed_page': '7', 'text': '(Invented source.)'}]}
@@ -138,9 +141,10 @@ class EditionWiringTest(unittest.TestCase):
         self.generate(draft=True)
         root = etree.parse(str(self.projects/PROJECTS['en']/'first.xml'))
         body = root.find('.//'+T+'body')
-        citation = body.find('.//'+T+'note[@type="description"]')
-        self.assertEqual(citation.text, '(Invented source.)')
-        self.assertEqual(citation.getprevious().tag, T+'milestone')
+        citation = root.find('.//'+T+'standOff/'+T+'note[@type="citation"]')
+        self.assertEqual(citation.find(T+'p').text, '(Invented source.)')
+        self.assertEqual(citation.get('target'), BASE+'invented')
+        self.assertNotIn('(Invented source.)', ''.join(body.itertext()))
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)
 
     def test_download_inventory_does_not_promote_machine_labels(self):
