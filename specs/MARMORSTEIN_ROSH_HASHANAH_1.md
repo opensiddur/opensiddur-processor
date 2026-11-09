@@ -44,6 +44,15 @@ the passage, following existing projects, rather than as prayer text or instruct
 exist only for printed English material. Missing English is not an empty file,
 placeholder, or invitation to use another translator automatically.
 
+Obvious source misprints use `tei:choice` with the printed form in `tei:sic`
+and the correction in `tei:corr`, following the existing authoring convention.
+Keep the accepted scan reading and its review hash unchanged. Record editorial
+corrections separately in `corrections.json`, with unique textual context and
+scan evidence, and apply them through the shared correction utility before
+validation. Normal exports use the repository default `readings.errors: corrected`;
+`printed` remains available. Do not treat archaic usage, translation choices or
+faithful defective Hebrew spellings as obvious typos.
+
 ## Page directions and expanded arrangement
 
 Source readings retain printed page numbers and wording, including misprints.

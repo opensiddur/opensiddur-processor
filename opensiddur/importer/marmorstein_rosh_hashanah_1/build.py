@@ -15,7 +15,7 @@ import yaml
 from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
 from opensiddur.common.urn_registry import load_registry, parse_urn
 from opensiddur.importer.scan.authoring import (
-    TEI, J, XML, element, mixed_words, append_words, write_documents,
+    TEI, J, XML, element, mixed_words, append_words, write_documents, apply_corrections,
 )
 from opensiddur.importer.scan.navigation import append_instruction
 from opensiddur.importer.scan.review import review_is_current
@@ -256,6 +256,10 @@ def build(source, project_directory, *, draft=False):
             unit = by_stem[occurrence['unit']]
             element(div, 'j:transclude', type='external', **reference(unit))
     documents.append((project_directory/EXPANDED/'index.xml', root))
+    corrections = source/'corrections.json'
+    if corrections.exists():
+        by_path = {f'{path.parent.name}/{path.name}': root for path, root in documents}
+        apply_corrections(by_path, json.loads(corrections.read_text())['corrections'])
     # A language witness removed from the readings must not remain discoverable
     # through refdb merely because an earlier build wrote its file.
     obsolete = [project_directory/project/(unit['stem']+'.xml')

@@ -15,6 +15,7 @@ from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_te
 from opensiddur.importer.marmorstein_rosh_hashanah_1.download import download, regenerate
 from opensiddur.importer.marmorstein_rosh_hashanah_1.verify import report
 from opensiddur.importer.scan.review import review, reading_hash
+from opensiddur.importer.scan.authoring import printed_text
 from opensiddur.importer.util.internet_archive import write_if_changed
 
 T = '{http://www.tei-c.org/ns/1.0}'
@@ -131,6 +132,28 @@ class EditionWiringTest(unittest.TestCase):
         spans = root.findall('.//'+T+'seg')
         self.assertEqual([s.get('source') for s in spans], [BASE+'another']*2)
         self.assertEqual(spans[1].getprevious().tag, T+'pb')
+
+    def test_correction_layer_preserves_the_reviewed_printed_reading_and_rejects_stale_context(self):
+        fragment = self.readings['units'][0]['languages']['en'][0]['fragments'][0]
+        fragment['text'] = 'Before wrdos after.'
+        self.save('readings', self.readings)
+        self.save('corrections', {'corrections': [
+            {'id': 'invented_typo', 'file': PROJECTS['en']+'/first.xml',
+             'sic': 'wrdos', 'corr': 'words', 'before': 'Before ', 'after': ' after.'}]})
+        self.generate(draft=True)
+        path = self.projects/PROJECTS['en']/'first.xml'
+        root = etree.parse(str(path))
+        body = root.find('.//'+T+'body')
+        self.assertEqual(' '.join(printed_text(body).split()), fragment['text'])
+        choice = body.find('.//'+T+'choice')
+        self.assertEqual(choice.find(T+'sic').text, 'wrdos')
+        self.assertEqual(choice.find(T+'corr').text, 'words')
+        before = path.read_bytes()
+        fragment['text'] = 'Changed context wrdos after.'
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, '0 places match'):
+            self.generate(draft=True)
+        self.assertEqual(path.read_bytes(), before)
 
     def test_all_schema_checks_finish_before_any_output_is_written(self):
         self.validator.side_effect = [(True, []), (False, ['synthetic schema failure'])]
