@@ -203,7 +203,7 @@ _EXPECTED: dict[str, list[Expect]] = {
     "paragraphs.line_spacing": [_preamble(lambda v: rf"\linespread{{{v:g}}}")],
     # Justified is what TeX does anyway.
     "paragraphs.alignment": [_preamble(lambda v: r"\AtBeginDocument{", present=False)],
-    "line_numbers.enabled": [_preamble(lambda v: r"\numberlinefalse", present=False)],
+    "line_numbers.enabled": [_preamble(lambda v: r"\renewcommand*{\linenumberlist}{-1}", present=False)],
     "line_numbers.unit": [
         _preamble(lambda v: rf"\lineation{{{_v(v)}}}"),
         _parallel(lambda v: rf"\lineationR{{{_v(v)}}}"),

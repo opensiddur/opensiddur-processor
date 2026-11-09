@@ -829,7 +829,8 @@ typography:
         self.assertIn("left=25mm", out)   # one-sided, so inner is the left margin
         self.assertIn(r"\linespread{1.4}", out)
         self.assertIn(r"{\normalfont\small\mdseries #1}", out)
-        self.assertIn(r"\numberlinefalse", out)
+        self.assertIn(r"\renewcommand*{\linenumberlist}{-1}", out)
+        self.assertNotIn(r"\numberlinefalse", out)
         # What it did not name is at its default.
         self.assertIn(r"{\normalfont\Large\bfseries #1}", out)
         self.assertNotIn("bottom=", out)
