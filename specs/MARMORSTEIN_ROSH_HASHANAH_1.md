@@ -87,6 +87,10 @@ sources with recorded provenance. Do not fill English gaps in this installment.
 
 ## Independent reading and completion
 
+Printed Rashi script helps identify instructions and speaker labels. Record
+that observation in the reading evidence, but do not emit `rend` on rubric
+notes: the reader's selected instruction styles control their presentation.
+
 The requested second reader is available: `claude-opus-5-5`, medium effort.
 It reads scan images through read-only tools, without receiving the primary
 reading, OCR, registry text, or another edition. Preserve its raw reading and

@@ -104,8 +104,6 @@ def unit_document(unit, lang, draft):
     for instruction in unit.get('instructions', []):
         note = element(div, 'note', instruction['text'], type=instruction.get('type', 'instruction'))
         note.set(XML+'lang', instruction['language'])
-        if instruction.get('rend'):
-            note.set('rend', instruction['rend'])
     citations = unit.get('citations', {}).get(lang, [])
     if citations:
         notes = element(root, 'standOff', type='notes')
@@ -188,7 +186,7 @@ def unit_document(unit, lang, draft):
             if index == 0 and segment.get('speaker'):
                 role = 'reader' if segment['speaker']['expan'] == 'חזן' else 'congregation'
                 identity = 'urn:x-opensiddur:instruction:role/'+role
-                description = element(paragraph, 'note', type='description', rend='rashi', corresp=identity)
+                description = element(paragraph, 'note', type='description', corresp=identity)
                 description.set(XML+'lang', 'he')
                 choice = element(description, 'choice')
                 element(choice, 'abbr', segment['speaker']['abbr'])
@@ -430,8 +428,6 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                 note = element(div, 'note', type=instruction.get('type', 'instruction'), facs=facs)
                 note.set(XML+'lang', instruction['language'])
                 words(note, instruction['text'], instruction['language'])
-                if instruction.get('rend'):
-                    note.set('rend', instruction['rend'])
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             scan = navigation['scan'][lang]
