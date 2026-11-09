@@ -32,6 +32,13 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual([e.text for e in parent.findall(J+'divineName')], ['יְהוָה', 'ייָ', 'יְהוָה'])
         self.assertEqual(parent.text, 'וְ')
 
+    def test_maqaf_and_sof_pasuq_bound_names_without_consuming_punctuation(self):
+        parent = etree.Element(T+'p')
+        text = 'טוֹב־יְיָ לַייָ־לַייָ׃ חַיֵּינוּ'
+        words(parent, text, 'he')
+        self.assertEqual(''.join(parent.itertext()), text)
+        self.assertEqual([e.text for e in parent.findall(J+'divineName')], ['יְיָ', 'ייָ', 'ייָ'])
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -120,9 +127,31 @@ class EditionWiringTest(unittest.TestCase):
             self.generate()
         self.assertEqual(path.read_bytes(), before)
 
+    def test_preliminary_service_conditions_end_before_the_morning_section(self):
+        self.readings['expanded_order'] = [
+            {'section': 'preliminary', 'heads': {'he': 'הכנה', 'en': 'Preparation'},
+             'conditions': [{'type': 'opensiddur:service-time', 'features': {'minha': True}},
+                            {'type': 'opensiddur:holiday', 'features': {'rosh-hashana': 0}}],
+             'order': [{'unit': 'first'}, {'unit': 'first'}]},
+            {'section': 'morning', 'heads': {'he': 'שחרית', 'en': 'Morning'},
+             'conditions': [{'type': 'opensiddur:service-time', 'features': {'shaharit': True}}],
+             'order': [{'unit': 'second'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        preliminary = root.find('.//'+T+'div[@{http://www.w3.org/XML/1998/namespace}id="section_preliminary"]')
+        morning = preliminary.getnext()
+        self.assertEqual(preliminary[-1].tag, J+'endConditional')
+        self.assertEqual(preliminary[-1].get('target'), '#section_preliminary_condition')
+        self.assertEqual(morning.get('{http://www.w3.org/XML/1998/namespace}id'), 'section_morning')
+        self.assertEqual([t.get('target') for t in preliminary.findall('.//'+J+'transclude')],
+                         [BASE+'invented']*2)
+        self.assertEqual(morning.find('.//'+J+'transclude').get('target'), BASE+'another')
+        self.assertEqual(preliminary.find('.//'+T+'numeric').get('value'), '0')
+
     def test_liturgical_identity_retains_its_scripture_source_and_scan_boundary(self):
         segments = self.readings['units'][0]['languages']['he']
-        segments[0].update(corresp=BASE+'invented', source=BASE+'another')
+        segments[0].update(corresp=BASE+'invented', source=BASE+'another', source_type='adaptation')
         self.save('readings', self.readings)
         self.generate(draft=True)
         root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
@@ -131,6 +160,7 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(marker.get('corresp'), BASE+'invented')
         spans = root.findall('.//'+T+'seg')
         self.assertEqual([s.get('source') for s in spans], [BASE+'another']*2)
+        self.assertEqual([s.get('type') for s in spans], ['adaptation']*2)
         self.assertEqual(spans[1].getprevious().tag, T+'pb')
 
     def test_correction_layer_preserves_the_reviewed_printed_reading_and_rejects_stale_context(self):
@@ -190,6 +220,18 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(citation.get('target'), BASE+'invented')
         self.assertNotIn('(Invented source.)', ''.join(body.itertext()))
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)
+
+    def test_citation_can_target_a_later_verse_in_a_composite_prayer(self):
+        self.readings['units'][0]['languages']['he'].append(
+            {'corresp': BASE+'another', 'fragments': [{'scan': 's1', 'text': 'וז'}]})
+        self.readings['units'][0]['citations'] = {'he': [
+            {'scan': 's1', 'text': '(Psalm number)', 'target': BASE+'another'}]}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        note = root.find('.//'+T+'standOff/'+T+'note[@type="citation"]')
+        self.assertEqual(note.get('target'), BASE+'another')
+        self.assertEqual(note.find(T+'p').text, 'Psalm number')
 
     def test_cover_and_hebrew_title_retain_language_and_distinct_imprint_fields(self):
         self.save('front', {'pages': [

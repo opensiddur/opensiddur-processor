@@ -3,7 +3,11 @@
 Contribution to [issue 214](https://github.com/opensiddur/opensiddur-processor/issues/214).
 The complete project is the 355-leaf Archive item
 `mahzor-lyom-rishon-shel-rosh-hashanah-day-one-jenny-marmorstein-1965`.
-The current installment is a **reviewed pilot with partial front matter**, not a complete mahzor. Its PRs remain draft while the full-volume transcription is unfinished.
+The pilot and six front leaves are complete. Full-volume work has restarted at
+the beginning in scan order, as requested, with first and independent readings
+of s7–s14 (printed pages 1–8). Mah Tovu and Ashrei are accepted excerpts; the
+remaining opening material is still being adjudicated. This is not a complete
+mahzor. Its PRs remain draft while the full-volume transcription is unfinished.
 
 ## Repositories and outputs
 
@@ -123,6 +127,33 @@ volume remain incomplete.
 content independently reviewed. A page with only an excerpt is never complete.
 After the pilot is adjudicated, proceed through the entire volume in printed
 order, including front matter and appendices, maintaining the review ledger.
+
+### Opening service installment
+
+`primary/opening_s7_s14.json` preserves the first image readings, recorded before
+consulting the corresponding independent page transcription.
+`independent/opening_s7_s14.json` records Claude Opus 5.5 with the CLI effort set
+to medium. Enlarged s7–s8 readings, comparison reports, the encoding audit and
+its resolutions are separate evidence. Raw intake does not imply acceptance.
+
+The opening sequence contains entrance prayers, weekday Minchah, eruv
+tavshilin, festival candle lighting, and Kabbalat Shabbat. Hebrew-only pages do
+not acquire English substitutes. English translation cues remain outside
+accepted prayer words, and the marginal Psalm 145 label targets its first verse
+as a citation note after the two introductory Ashrei verses.
+
+Expanded `section` occurrences share one recursive sequence across languages.
+Conditions end locally before the next section. Preparatory weekday Minchah
+requires the existing minha setting and excludes Shabbat and Yom Tov. The
+morning section requires shaharit and Rosh ha-Shanah day one. Supplementary
+Psalm 24 remains in a named appendix. These excerpts do not yet constitute a
+complete service; Kaddish and repetition assembly remain in progress.
+
+Mah Tovu reuses its existing two-part canonical structure. The four-verse
+`mah_tovu/varani` scope is not split merely to follow printed verses; each
+scriptural source is bounded independently, and the first-person Psalm 95:6
+adaptation is typed explicitly. Hebrew punctuation is a word boundary when
+tagging Divine Names, including immediately after maqaf.
 
 ## Commands and acceptance
 

@@ -72,7 +72,11 @@ def words(parent, text, lang):
     else:
         # Preserve the source spelling/pointing, including its abbreviated Name.
         end = 0
-        for match in re.finditer(r'(?<![\u0590-\u05ff])([ובלמכש]?[\u0591-\u05c7]*)(י[\u0591-\u05c7]*(?:י[\u0591-\u05c7]*|ה[\u0591-\u05c7]*ו[\u0591-\u05c7]*ה[\u0591-\u05c7]*))(?![\u0590-\u05ff])', text):
+        # Maqaf and sof pasuq are boundaries, despite sharing the Hebrew block.
+        points = r'[\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7]'
+        letters_and_points = r'[\u05d0-\u05ea\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7]'
+        name = rf'([ובלמכש]?{points}*)(י{points}*(?:י{points}*|ה{points}*ו{points}*ה{points}*))'
+        for match in re.finditer(r'(?<!'+letters_and_points+')'+name+'(?!'+letters_and_points+')', text):
             append_words(parent, text[end:match.start()]+match[1])
             element(parent, 'j:divineName', match[2])
             end = match.end()
@@ -92,7 +96,8 @@ def unit_document(unit, lang, draft):
         for citation in citations:
             if citation['scan'] != unit['languages'][lang][0]['fragments'][0]['scan']:
                 raise ValueError('Citation scan differs from the passage opening')
-            note = element(notes, 'note', type='citation', target=unit.get('start', unit['urn']))
+            note = element(notes, 'note', type='citation',
+                           target=citation.get('target', unit.get('start', unit['urn'])))
             citation_text = citation['text'].strip()
             if citation_text.startswith('(') and citation_text.endswith(')'):
                 citation_text = citation_text[1:-1].strip()
@@ -114,7 +119,12 @@ def unit_document(unit, lang, draft):
             if index == 0 and segment.get('corresp'):
                 element(paragraph, 'milestone', unit='verse' if segment.get('source') or ':bible:' in segment['corresp'] else 'prayer',
                         corresp=segment['corresp'])
-            content = element(paragraph, 'seg', source=segment['source']) if segment.get('source') else paragraph
+            content = paragraph
+            if segment.get('source'):
+                attributes = {'source': segment['source']}
+                if segment.get('source_type'):
+                    attributes['type'] = segment['source_type']
+                content = element(paragraph, 'seg', **attributes)
             words(content, fragment['text'], lang)
             append_words(paragraph, ' ')
     return root
@@ -127,6 +137,46 @@ def unit_text(unit, lang):
 def reference(unit):
     return {'target': unit.get('start', unit['urn']),
             **({'targetEnd': unit['end']} if unit.get('end') else {})}
+
+
+def expanded_order(parent, order, readings, by_stem):
+    """Keep service choices local while sharing one sequence across languages."""
+    for occurrence in order:
+        if 'section' in occurrence:
+            outer = element(parent, 'div')
+            identifier = 'section_'+occurrence['section']
+            outer.set(XML+'id', identifier)
+            conditions = occurrence.get('conditions', [])
+            if conditions:
+                conditional = element(outer, 'j:conditional')
+                conditional.set(XML+'id', identifier+'_condition')
+                all_conditions = element(conditional, 'j:all')
+                for condition in conditions:
+                    features = element(all_conditions, 'fs', type=condition['type'])
+                    for name, value in condition['features'].items():
+                        feature = element(features, 'f')
+                        feature.set('name', name)
+                        if isinstance(value, bool):
+                            element(feature, 'binary', value=str(value).lower())
+                        else:
+                            element(feature, 'numeric', value=str(value))
+            content = element(outer, 'div')
+            for language, heading in occurrence.get('heads', {}).items():
+                element(content, 'head', heading).set(XML+'lang', language)
+            for language, rubric in occurrence.get('rubrics', {}).items():
+                element(content, 'note', rubric, type='instruction').set(XML+'lang', language)
+            expanded_order(content, occurrence['order'], readings, by_stem)
+            if conditions:
+                element(outer, 'j:endConditional', target='#'+identifier+'_condition')
+        elif 'navigation' in occurrence:
+            navigation = readings['navigation'][occurrence['navigation']]
+            clauses = deepcopy(navigation['clauses'])
+            for clause in clauses:
+                if 'target' in clause:
+                    clause['target'] = clause['target'].format(project=PROJECTS['he'])
+            append_instruction(parent, clauses, expanded=True)
+        else:
+            element(parent, 'j:transclude', type='external', **reference(by_stem[occurrence['unit']]))
 
 
 def front_text(page):
@@ -218,6 +268,8 @@ def build(source, project_directory, *, draft=False):
     for unit in readings['units']:
         identities = [unit['urn']] + [s[key] for segments in unit['languages'].values()
                                      for s in segments for key in ('corresp', 'source') if s.get(key)]
+        identities += [citation['target'] for citations in unit.get('citations', {}).values()
+                       for citation in citations if citation.get('target')]
         for urn in identities:
             # Numeric scripture descendants can be implicit in the registered book.
             if registry.resolve(urn) != urn:
@@ -262,17 +314,7 @@ def build(source, project_directory, *, draft=False):
     # The same structural sequence drives Hebrew and any English counterparts.
     order = readings.get('expanded_order', [{'unit': unit['stem']} for unit in readings['units']])
     by_stem = {unit['stem']: unit for unit in readings['units']}
-    for occurrence in order:
-        if 'navigation' in occurrence:
-            navigation = readings['navigation'][occurrence['navigation']]
-            clauses = deepcopy(navigation['clauses'])
-            for clause in clauses:
-                if 'target' in clause:
-                    clause['target'] = clause['target'].format(project=PROJECTS['he'])
-            append_instruction(div, clauses, expanded=True)
-        else:
-            unit = by_stem[occurrence['unit']]
-            element(div, 'j:transclude', type='external', **reference(unit))
+    expanded_order(div, order, readings, by_stem)
     documents.append((project_directory/EXPANDED/'index.xml', root))
     corrections = source/'corrections.json'
     if corrections.exists():
