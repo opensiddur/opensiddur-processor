@@ -97,7 +97,9 @@ Unresolved ambiguity stays pending human review. On 2026-11-08 the user confirme
 unreviewed text. Structural success is not source-fidelity approval.
 
 The pilot includes Torah blessings, Barukh She-amar, I Chronicles 16:8–36 from
-Hodu, a Hebrew-only Psalm 24, and the page-direction example. The English title page, copyright page, translator’s preface and following blank leaf are also independently read. The cover emblem and Hebrew calligraphic arranger credit remain pending. Hodu's remaining
+Hodu, a Hebrew-only Psalm 24, and the page-direction example. The English title page, copyright page, translator’s preface and following blank leaf are also independently read. The cover emblem and Hebrew title-page signature are now human-adjudicated as
+`וואלף ב"ר שמשון ז"ל איש היידנהיים`. The user also confirmed the electronic
+layout and links. Original uncertain readings are retained as evidence. Hodu's remaining
 verses and the rest of the book were not implied by that initial excerpt.
 
 The next reviewed installment completes Hodu with the existing Romemu, Vehu
@@ -111,9 +113,10 @@ Independent blind image readings and separate alignment/order audits cover the
 addition. Enlarged images resolve defective עֹמֶדֶת and the source misprints
 “withold” and “whem”. The audit also corrected an earlier comma adjudication in
 Chronicles 16:35; retain that decision history. Hebrew chapter labels and English
-biblical references are citation notes, not prayer words. Four prayer leaves
-(s62–s65, Hebrew/English printed pages 16–17) are now fully accounted for, in
-addition to the four completed front-matter leaves. Psalm 34 and the rest of the
+biblical references are citation notes, not prayer words. Six prayer leaves
+(s60–s65, Hebrew/English printed pages 15–17) and six front leaves (s1–s6)
+are fully accounted for. The documentary projects include the cover and both
+source title pages; Hebrew subtitles, bylines, place and date retain their roles. Psalm 34 and the rest of the
 volume remain incomplete.
 
 `verify --check` must fail until every leaf is explicitly accounted for and its

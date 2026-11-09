@@ -23,6 +23,8 @@ from opensiddur.importer.util.internet_archive import page_image_url, write_if_c
 from opensiddur.importer.util.validation import validate
 from . import BOOK, IDENTIFIER, PROJECTS, EXPANDED, ROOT_URN, EXPANDED_URN
 
+FRONT_KINDS = ('cover', 'title', 'copyright', 'preface')
+
 
 def document(lang, project, title, urn, *, index=False, draft=False):
     root = etree.Element(f'{{{TEI}}}TEI', nsmap={'tei': TEI, 'j': J}, attrib={XML+'lang': lang})
@@ -144,7 +146,7 @@ def add_front(root, pages, *, expanded=False):
         element(title, 'docEdition', 'An editorial arrangement of the reviewed Heidenheim–Marmorstein passages. Not a complete service.')
         return
     for page in pages:
-        if page['kind'] not in ('title', 'copyright', 'preface'):
+        if page['kind'] not in FRONT_KINDS:
             continue
         facs = page_image_url(IDENTIFIER, int(page['scan'][1:])-1, size='')
         if page['kind'] == 'title':
@@ -152,20 +154,33 @@ def add_front(root, pages, *, expanded=False):
             title = element(front, 'titlePage')
             title.set(XML+'lang', page['language'])
             titles = element(title, 'docTitle')
-            element(titles, 'titlePart', page['paragraphs'][0], type='main')
-            for line in page['paragraphs'][1:3]:
-                element(title, 'byline', line)
+            layout = page.get('title_layout', {'main': 0, 'bylines': [1, 2], 'publisher': 3, 'place': 4})
+            element(titles, 'titlePart', page['paragraphs'][layout['main']], type='main')
+            if 'sub' in layout:
+                element(titles, 'titlePart', page['paragraphs'][layout['sub']], type='sub')
+            for index in layout['bylines']:
+                element(title, 'byline', page['paragraphs'][index])
             imprint = element(title, 'docImprint')
-            element(imprint, 'publisher', page['paragraphs'][3])
-            element(imprint, 'pubPlace', page['paragraphs'][4])
+            element(imprint, 'publisher', page['paragraphs'][layout['publisher']])
+            element(imprint, 'pubPlace', page['paragraphs'][layout['place']])
+            if 'date' in layout:
+                element(imprint, 'docDate', page['paragraphs'][layout['date']])
         else:
             div = element(front, 'div')
             div.set(XML+'lang', page['language'])
             element(div, 'pb', ed='1965', facs=facs)
             if page.get('head'):
                 element(div, 'head', page['head'])
-            for paragraph in page['paragraphs']:
-                element(div, 'p', paragraph)
+            for index, paragraph in enumerate(page['paragraphs']):
+                language = page.get('paragraph_languages', {}).get(str(index), page['language'])
+                node = element(div, 'p')
+                if language != page['language']:
+                    node.set(XML+'lang', language)
+                    # Keep the whole foreign-language line, including abbreviation
+                    # punctuation, in one directional span in the print stream.
+                    node = element(node, 'foreign')
+                    node.set(XML+'lang', language)
+                words(node, paragraph, language)
 
 
 def require_review(readings, reviews):
@@ -194,7 +209,7 @@ def build(source, project_directory, *, draft=False):
     if not draft:
         require_review(readings, reviews)
         for page in front_pages:
-            if page['kind'] in ('title', 'copyright', 'preface'):
+            if page['kind'] in FRONT_KINDS:
                 if not review_is_current(reviews.get('front/'+page['scan'], {}), front_text(page)):
                     raise ValueError('Independent front-matter review pending: '+page['scan'])
     registry, problems = load_registry()

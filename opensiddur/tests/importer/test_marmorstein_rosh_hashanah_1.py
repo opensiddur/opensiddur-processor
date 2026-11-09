@@ -191,6 +191,26 @@ class EditionWiringTest(unittest.TestCase):
         self.assertNotIn('(Invented source.)', ''.join(body.itertext()))
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)
 
+    def test_cover_and_hebrew_title_retain_language_and_distinct_imprint_fields(self):
+        self.save('front', {'pages': [
+            {'scan': 's1', 'kind': 'cover', 'language': 'en', 'head': 'Invented cover',
+             'paragraphs': ['AB', 'שם "מחבר"', 'Invented volume'], 'paragraph_languages': {'1': 'he'}},
+            {'scan': 's2', 'kind': 'title', 'language': 'he',
+             'paragraphs': ['כותרת', 'משנה', 'עורך', 'מתרגם', 'מוציא לאור', 'עיר', 'שנה'],
+             'title_layout': {'main': 0, 'sub': 1, 'bylines': [2, 3], 'publisher': 4, 'place': 5, 'date': 6}}]})
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        front = root.find('.//'+T+'front')
+        signature = front.find(T+'div').findall(T+'p')[1]
+        self.assertEqual(signature.get('{http://www.w3.org/XML/1998/namespace}lang'), 'he')
+        self.assertEqual(signature.find(T+'foreign').text, 'שם "מחבר"')
+        title = front.find(T+'titlePage')
+        self.assertEqual(title.get('{http://www.w3.org/XML/1998/namespace}lang'), 'he')
+        self.assertEqual(title.find('.//'+T+'titlePart[@type="sub"]').text, 'משנה')
+        self.assertEqual(title.find('.//'+T+'pubPlace').text, 'עיר')
+        self.assertEqual(title.find('.//'+T+'docDate').text, 'שנה')
+        self.assertEqual(len(front.findall('.//'+T+'pb')), 2)
+
     def test_download_inventory_does_not_promote_machine_labels(self):
         scan = '<book><pageData><page leafNum="0"><pageNumber>7</pageNumber></page></pageData></book>'
         ocr = '<DOCUMENT><OBJECT><LINE><WORD>Invented</WORD><WORD>OCR</WORD></LINE></OBJECT></DOCUMENT>'
