@@ -123,6 +123,13 @@ select the edition explicitly, while expanded prayer transclusions remain
 edition-independent. Hebrew dependencies precede English projects in source
 priority, with translations selected separately as parallel witnesses.
 
+Following the comparison with Birnbaum, the reusable Kedushah is conditioned
+on both repetition and minyan; its printed description stays inside the scope.
+The expanded repetition declares minyan true locally. Preparatory Minchah is
+restricted to Elul 29 (Hebrew month 6), with its date and ordinary-season context
+declared locally. Keep the printed האל הקדוש; do not insert an unprinted
+Ten Days substitution into this documentary witness.
+
 Compare primary and independent readings using `scan.compare`; record pointing
 separately from words. Settlements require the exact reading hashes and image
 evidence for every disputed reading. Changes invalidate old adjudications.

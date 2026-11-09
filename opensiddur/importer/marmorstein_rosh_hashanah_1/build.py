@@ -94,6 +94,11 @@ def unit_document(unit, lang, draft):
     if opening.get('printed_page') is not None and last.get('printed_page') is not None:
         element(root.find(f'.//{{{TEI}}}sourceDesc/{{{TEI}}}bibl'), 'biblScope',
                 unit='pages', **{'from': opening['printed_page'], 'to': last['printed_page']})
+    conditions = unit.get('conditions', [])
+    if conditions:
+        conditional = element(div, 'j:conditional')
+        conditional.set(XML+'id', unit['stem']+'_condition')
+        feature_structures(element(conditional, 'j:all'), conditions)
     current_page = None
     if unit.get('head', {}).get(lang):
         opening = unit['languages'][lang][0]['fragments'][0]
@@ -219,6 +224,8 @@ def unit_document(unit, lang, draft):
             append_words(paragraph, ' ')
     if paragraph is not None:
         close_references()
+    if conditions:
+        element(div, 'j:endConditional', target='#'+unit['stem']+'_condition')
     return root
 
 

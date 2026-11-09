@@ -18,6 +18,7 @@ from opensiddur.importer.scan.review import review, reading_hash
 from opensiddur.importer.scan.authoring import printed_text
 from opensiddur.importer.util.internet_archive import write_if_changed
 from opensiddur.exporter.refdb import find_end_of_mapping
+from opensiddur.exporter.condition_eval import TriState, evaluate_condition, parse_condition_element
 
 T = '{http://www.tei-c.org/ns/1.0}'
 J = '{http://jewishliturgy.org/ns/jlptei/2}'
@@ -158,6 +159,30 @@ class EditionWiringTest(unittest.TestCase):
         content = preliminary.find(T+'div')
         self.assertEqual(content[-1].tag, J+'endDeclare')
         self.assertEqual(content[-1].get('target'), '#section_preliminary_settings')
+
+    def test_reusable_unit_requires_both_repetition_and_minyan(self):
+        unit = self.readings['units'][0]
+        unit['conditions'] = [
+            {'type': 'opensiddur:recitation', 'features': {'repetition': True}},
+            {'type': 'opensiddur:quorum', 'features': {'minyan': True}}]
+        unit['instructions'] = [{'language': 'he', 'text': 'בחזרת התפלה'}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        div = root.find('.//'+T+'body/'+T+'div')
+        condition = parse_condition_element(div[0])
+        self.assertEqual(div[1].tag, T+'note')
+        self.assertEqual(div[-1].get('target'), '#first_condition')
+        self.assertEqual(div[-1].tag, J+'endConditional')
+        for repetition, minyan, expected in [
+                (True, True, TriState.TRUE), (False, True, TriState.FALSE),
+                (True, False, TriState.FALSE), (None, None, TriState.UNDEFINED)]:
+            with self.subTest(repetition=repetition, minyan=minyan):
+                settings = {('opensiddur:recitation', 'repetition'): repetition,
+                            ('opensiddur:quorum', 'minyan'): minyan}
+                processor = Mock()
+                processor.get_active_setting.side_effect = lambda kind, feature: settings.get((kind, feature))
+                self.assertEqual(evaluate_condition(condition, processor), expected)
 
     def test_scripture_scope_ends_before_liturgy_and_repetition_reuses_the_witness(self):
         bible = 'urn:x-opensiddur:text:bible:psalms/'
