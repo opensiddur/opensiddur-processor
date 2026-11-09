@@ -1989,3 +1989,4 @@
 {"urn": "urn:x-opensiddur:text:siddur:expanded/readings_morning_maftir", "status": "canonical", "label_en": "Morning maftir selections in the expanded siddur", "parent": "urn:x-opensiddur:text:siddur:expanded"}
 {"urn": "urn:x-opensiddur:text:siddur:expanded/readings_morning_torah", "status": "canonical", "label_en": "Morning torah selections in the expanded siddur", "parent": "urn:x-opensiddur:text:siddur:expanded"}
 {"urn": "urn:x-opensiddur:text:siddur:machzor_expanded", "status": "canonical", "label_en": "Expanded Ashkenazi mahzor; shared Hebrew-English recitation spine"}
+{"urn": "urn:x-opensiddur:text:siddur:rosh_hashanah/entering_synagogue", "status": "canonical", "parent": "urn:x-opensiddur:text:siddur:rosh_hashanah", "label_en": "Entering the synagogue: Rosh Hashanah opening collection", "label_he": "תפלה בכניסה לבית הכנסת"}

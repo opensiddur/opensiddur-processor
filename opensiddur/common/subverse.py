@@ -107,6 +107,11 @@ VERSE_PARTS: dict[tuple[str, int, int], tuple[tuple[str, dict[str, str]], ...]] 
         ("venakeh", {"he": "ונקה"}),
         ("lo_yenakeh", {"he": "לא ינקה"}),
     ),
+    # Entrance prayers quote these clauses without the rest of the verse.
+    ("psalms", 39, 13): (
+        ("shimah", {"he": "שמעה תפלתי"}),
+        ("ki_ger", {"he": "כי גר אנכי"}),
+    ),
 }
 
 
@@ -347,6 +352,13 @@ def _verses(xml: str) -> list[_VerseText]:
         name = match.group("name")
         if name is None:
             continue
+
+        if urn and choice is None and (name == "tei:lb" or
+                                      (name == "tei:p" and match.group("close"))):
+            # MAM serializes adjacent lines without literal whitespace. They
+            # remain separate words; this synthetic separator has no output.
+            runs.append(_Run(source=match.end(), offset=length, text=" "))
+            length += 1
 
         if not match.group("close") and not match.group("empty"):
             if name == "tei:text":

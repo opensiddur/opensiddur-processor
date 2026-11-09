@@ -122,6 +122,12 @@ class AuthoringTests(unittest.TestCase):
         self.assertEqual([('oppessors', 'oppressors'), ('vi.', 'lvi.')], self.choices(root))
         self.assertEqual('the oppessors fled; Isaiah vi. 7.firstinner” after(When, &c.(When, &c.)', a.printed_text(root))
 
+    def test_printed_text_excludes_an_abbreviations_editorial_expansion(self):
+        root = etree.fromstring(f'<p xmlns="{a.TEI}">Before <choice>'
+                                '<abbr>ב״א</abbr><expan>ברוך אתה</expan>'
+                                '</choice> after.</p>')
+        self.assertEqual(a.printed_text(root), 'Before ב״א after.')
+
     def test_a_correction_can_follow_an_element_or_match_a_whole_text(self):
         root = self.correctable()
         a.apply_corrections({'x/y.xml': root}, [

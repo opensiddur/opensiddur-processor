@@ -94,6 +94,31 @@ ambiguities, exact model/effort and session identity. Never count its confident
 output alone as image adjudication: the pilot already demonstrates different
 consonant and pointing readings between the two readers.
 
+After the blind image reading, the secondary reader must also audit adherence
+to `schema/JLPTEI-3.md`, `specs/SIDDUR_URN_SCHEME.md`, applicable `AGENTS.md`
+instructions and the authoritative ODD. Record the guideline versions or hashes,
+files reviewed, model and effort, findings, adjudications and follow-up results.
+Check canonical URN reuse, chapter/verse/subverse scopes and terminators,
+paragraph independence, citations as notes, rubric and speaker markup,
+abbreviations and sic/corr, facsimile identifiers, translation omissions,
+local settings and expanded recitation order. Schema validation supplements
+this review; it does not replace it. Keep unresolved findings pending rather
+than counting the corresponding pages as fully reviewed.
+
+Biblical excerpts carry fully qualified verse or subverse correspondences and
+chapter-number context milestones. A whole-chapter correspondence is emitted
+only for a complete chapter, such as Psalm 145 in Ashrei; otherwise a request
+for that chapter could incorrectly resolve to one quoted verse. Partial Psalm
+39:13 uses the shared incipit parts `shimah` and `ki_ger`. Reuse Psalm 55:15/b
+for the printed closing clause rather than inventing a new identity.
+
+The opening page's complete collection has the structural identity
+`urn:x-opensiddur:text:siddur:rosh_hashanah/entering_synagogue`; its component
+prayers and verses retain their existing identities. Documentary transclusions
+select the edition explicitly, while expanded prayer transclusions remain
+edition-independent. Hebrew dependencies precede English projects in source
+priority, with translations selected separately as parallel witnesses.
+
 Compare primary and independent readings using `scan.compare`; record pointing
 separately from words. Settlements require the exact reading hashes and image
 evidence for every disputed reading. Changes invalidate old adjudications.
@@ -119,8 +144,8 @@ addition. Enlarged images resolve defective עֹמֶדֶת and the source mispri
 Chronicles 16:35; retain that decision history. Hebrew chapter labels and English
 biblical references are citation notes, not prayer words. Six prayer leaves
 (s60–s65, Hebrew/English printed pages 15–17) and six front leaves (s1–s6)
-are fully accounted for. The documentary projects include the cover and both
-source title pages; Hebrew subtitles, bylines, place and date retain their roles. Psalm 34 and the rest of the
+are fully accounted for. The documentary projects include the half-title, both
+source title pages and the copyright verso, with title-page gates; Hebrew subtitles, bylines, place and date retain their roles. Psalm 34 and the rest of the
 volume remain incomplete.
 
 `verify --check` must fail until every leaf is explicitly accounted for and its
@@ -146,8 +171,13 @@ Expanded `section` occurrences share one recursive sequence across languages.
 Conditions end locally before the next section. Preparatory weekday Minchah
 requires the existing minha setting and excludes Shabbat and Yom Tov. The
 morning section requires shaharit and Rosh ha-Shanah day one. Supplementary
-Psalm 24 remains in a named appendix. These excerpts do not yet constitute a
-complete service; Kaddish and repetition assembly remain in progress.
+Psalm 24 remains in a named appendix. The complete opening תפלה page and printed
+weekday Minchah through s12 are accepted after independent fidelity, guideline,
+alignment and order review. The expanded Minchah includes Half/Whole Kaddish
+from compatible Birnbaum Hebrew, silent prayer, minyan-gated repetition,
+Kedushah and simultaneous Modim roles. The first-day morning service remains
+incomplete. There are 18 fully reviewed leaves out of 355; continue adjudication
+at s13. The title follows the source rather than describing a pilot installment.
 
 Mah Tovu reuses its existing two-part canonical structure. The four-verse
 `mah_tovu/varani` scope is not split merely to follow printed verses; each

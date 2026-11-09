@@ -36,7 +36,7 @@ def document(lang, project, title, urn, *, index=False, draft=False):
     element(responsibility, 'name', 'Codex', ref='urn:x-opensiddur:contributor:opensiddur.org/codex')
     edition = element(desc, 'editionStmt')
     element(edition, 'edition', ('DRAFT: independent adjudication pending. ' if draft else '')
-            + 'Pilot installment, not the complete volume. Independent image readings and '
+            + 'Digitization in progress. Independent image readings and '
               'adjudications are recorded in sources/marmorstein_rosh_hashanah_1/.')
     publication = element(desc, 'publicationStmt')
     element(element(publication, 'distributor'), 'ref', 'Open Siddur Project', target='https://opensiddur.org')
@@ -86,8 +86,26 @@ def words(parent, text, lang):
 def unit_document(unit, lang, draft):
     project = PROJECTS[lang]
     root, body = document(lang, project, unit['title'][lang], unit['urn'], draft=draft)
-    div = element(body, 'div', **({'corresp': unit['urn']} if unit.get('map_root', True) else {}))
+    biblical_root = ':bible:' in unit['urn']
+    div = element(body, 'div', **({'corresp': unit['urn']} if unit.get('map_root', not biblical_root) else {}))
+    opening = unit['languages'][lang][0]['fragments'][0]
+    div.set('facs', page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
+    last = unit['languages'][lang][-1]['fragments'][-1]
+    if opening.get('printed_page') is not None and last.get('printed_page') is not None:
+        element(root.find(f'.//{{{TEI}}}sourceDesc/{{{TEI}}}bibl'), 'biblScope',
+                unit='pages', **{'from': opening['printed_page'], 'to': last['printed_page']})
     current_page = None
+    if unit.get('head', {}).get(lang):
+        opening = unit['languages'][lang][0]['fragments'][0]
+        element(div, 'pb', ed='1965', n=opening['printed_page'],
+                facs=page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
+        current_page = opening['scan']
+        element(div, 'head', unit['head'][lang]).set(XML+'lang', lang)
+    for instruction in unit.get('instructions', []):
+        note = element(div, 'note', instruction['text'], type=instruction.get('type', 'instruction'))
+        note.set(XML+'lang', instruction['language'])
+        if instruction.get('rend'):
+            note.set('rend', instruction['rend'])
     citations = unit.get('citations', {}).get(lang, [])
     if citations:
         notes = element(root, 'standOff', type='notes')
@@ -101,10 +119,33 @@ def unit_document(unit, lang, draft):
             citation_text = citation['text'].strip()
             if citation_text.startswith('(') and citation_text.endswith(')'):
                 citation_text = citation_text[1:-1].strip()
-            element(note, 'p', citation_text)
+            paragraph = element(note, 'p')
+            if citation.get('reference'):
+                element(paragraph, 'ref', citation_text, target=citation['reference'])
+            else:
+                paragraph.text = citation_text
     paragraph = None
     current_paragraph = None
+    current_chapter = None
+    seen_chapters = set()
+    active_reference = None
+
+    def close_references():
+        nonlocal active_reference, current_chapter
+        if active_reference:
+            element(paragraph, 'milestone', unit=active_reference)
+            active_reference = None
+        if current_chapter:
+            element(paragraph, 'milestone', unit='chapter')
+            current_chapter = None
+
     for segment in unit['languages'][lang]:
+        if segment.get('transclude'):
+            if paragraph is not None:
+                close_references()
+            element(div, 'j:transclude', type='external', target=segment['transclude']+'@'+project)
+            paragraph = current_paragraph = None
+            continue
         identity = segment.get('paragraph', 1)
         if paragraph is None or identity != current_paragraph:
             paragraph = element(div, 'p')
@@ -114,19 +155,72 @@ def unit_document(unit, lang, draft):
                 attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(fragment['scan'][1:])-1, size='')}
                 if fragment.get('printed_page') is not None:
                     attributes['n'] = fragment['printed_page']
-                element(paragraph, 'pb', **attributes)
+                if fragment.get('page_start', True):
+                    element(paragraph, 'pb', **attributes)
                 current_page = fragment['scan']
             if index == 0 and segment.get('corresp'):
-                element(paragraph, 'milestone', unit='verse' if segment.get('source') or ':bible:' in segment['corresp'] else 'prayer',
-                        corresp=segment['corresp'])
+                urn = segment['corresp']
+                biblical = ':bible:' in urn
+                if biblical:
+                    parts = urn.split(':')[-1].split('/')
+                    chapter = urn.rsplit('/', len(parts)-2)[0]
+                    if chapter != current_chapter:
+                        close_references()
+                        attributes = {'unit': 'chapter', 'n': parts[1]}
+                        # Excerpted chapters supply context, not a substitute
+                        # witness for the whole chapter.
+                        if chapter not in seen_chapters and (chapter == unit['urn'] or chapter in unit.get('complete_chapters', [])):
+                            attributes['corresp'] = chapter
+                            seen_chapters.add(chapter)
+                        element(paragraph, 'milestone', **attributes)
+                        current_chapter = chapter
+                    reference_unit = ('verse' if len(parts) == 3 else
+                                      'half-verse' if parts[-1] in ('a', 'b') else 'verse-part')
+                    attributes = {'n': parts[-1]}
+                else:
+                    if current_chapter:
+                        close_references()
+                    reference_unit, attributes = 'prayer-part', {}
+                if active_reference and active_reference != reference_unit:
+                    element(paragraph, 'milestone', unit=active_reference)
+                element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
+                active_reference = reference_unit
+            if index == 0 and segment.get('speaker'):
+                role = 'reader' if segment['speaker']['expan'] == 'חזן' else 'congregation'
+                identity = 'urn:x-opensiddur:instruction:role/'+role
+                description = element(paragraph, 'note', type='description', rend='rashi', corresp=identity)
+                description.set(XML+'lang', 'he')
+                choice = element(description, 'choice')
+                element(choice, 'abbr', segment['speaker']['abbr'])
+                element(choice, 'expan', segment['speaker']['expan'])
+            if segment.get('repeat'):
+                # Repeated recitation reuses the witness; it does not define a
+                # second element with the same canonical identity in one file.
+                close_references()
+                element(paragraph, 'j:transclude', type='inline', target=segment['repeat']+'@'+project)
+                append_words(paragraph, ' ')
+                continue
             content = paragraph
             if segment.get('source'):
                 attributes = {'source': segment['source']}
                 if segment.get('source_type'):
                     attributes['type'] = segment['source_type']
                 content = element(paragraph, 'seg', **attributes)
-            words(content, fragment['text'], lang)
+            if fragment.get('expansion'):
+                choice = element(content, 'choice')
+                abbreviation = element(choice, 'abbr')
+                if fragment.get('divine_name_tail'):
+                    start = fragment['text'].rindex('י')
+                    append_words(abbreviation, fragment['text'][:start])
+                    element(abbreviation, 'j:divineName', fragment['text'][start:])
+                else:
+                    words(abbreviation, fragment['text'], lang)
+                words(element(choice, 'expan'), fragment['expansion'], lang)
+            else:
+                words(content, fragment['text'], lang)
             append_words(paragraph, ' ')
+    if paragraph is not None:
+        close_references()
     return root
 
 
@@ -134,9 +228,25 @@ def unit_text(unit, lang):
     return ' '.join(fragment['text'] for segment in unit['languages'][lang] for fragment in segment['fragments'])
 
 
+def unit_review_text(unit, lang):
+    return ' '.join(([unit['head'][lang]] if unit.get('head', {}).get(lang) else [])
+                    + [instruction['text'] for instruction in unit.get('instructions', [])]
+                    + [unit_text(unit, lang)])
+
+
 def reference(unit):
     return {'target': unit.get('start', unit['urn']),
             **({'targetEnd': unit['end']} if unit.get('end') else {})}
+
+
+def feature_structures(parent, structures):
+    for structure in structures:
+        features = element(parent, 'fs', type=structure['type'])
+        for name, value in structure['features'].items():
+            feature = element(features, 'f')
+            feature.set('name', name)
+            element(feature, 'binary' if isinstance(value, bool) else 'numeric',
+                    value=str(value).lower() if isinstance(value, bool) else str(value))
 
 
 def expanded_order(parent, order, readings, by_stem):
@@ -150,22 +260,31 @@ def expanded_order(parent, order, readings, by_stem):
             if conditions:
                 conditional = element(outer, 'j:conditional')
                 conditional.set(XML+'id', identifier+'_condition')
+                if occurrence.get('condition_rubrics'):
+                    rubric = element(conditional, 'note', type='instruction')
+                    for language, text in occurrence['condition_rubrics'].items():
+                        part = element(rubric, 'foreign')
+                        part.set(XML+'lang', language)
+                        words(part, text, language)
+                        append_words(rubric, ' ')
                 all_conditions = element(conditional, 'j:all')
-                for condition in conditions:
-                    features = element(all_conditions, 'fs', type=condition['type'])
-                    for name, value in condition['features'].items():
-                        feature = element(features, 'f')
-                        feature.set('name', name)
-                        if isinstance(value, bool):
-                            element(feature, 'binary', value=str(value).lower())
-                        else:
-                            element(feature, 'numeric', value=str(value))
+                feature_structures(all_conditions, conditions)
             content = element(outer, 'div')
             for language, heading in occurrence.get('heads', {}).items():
                 element(content, 'head', heading).set(XML+'lang', language)
+            if occurrence.get('role'):
+                role = occurrence['role']
+                element(content, 'note', 'חזן' if role == 'reader' else 'קהל',
+                        type='description', corresp='urn:x-opensiddur:instruction:role/'+role).set(XML+'lang', 'he')
             for language, rubric in occurrence.get('rubrics', {}).items():
-                element(content, 'note', rubric, type='instruction').set(XML+'lang', language)
+                element(content, 'note', rubric, type='description').set(XML+'lang', language)
+            if occurrence.get('declarations'):
+                declaration = element(content, 'j:declare')
+                declaration.set(XML+'id', identifier+'_settings')
+                feature_structures(declaration, occurrence['declarations'])
             expanded_order(content, occurrence['order'], readings, by_stem)
+            if occurrence.get('declarations'):
+                element(content, 'j:endDeclare', target='#'+identifier+'_settings')
             if conditions:
                 element(outer, 'j:endConditional', target='#'+identifier+'_condition')
         elif 'navigation' in occurrence:
@@ -175,6 +294,8 @@ def expanded_order(parent, order, readings, by_stem):
                 if 'target' in clause:
                     clause['target'] = clause['target'].format(project=PROJECTS['he'])
             append_instruction(parent, clauses, expanded=True)
+        elif 'reference' in occurrence:
+            element(parent, 'j:transclude', type='external', **occurrence['reference'])
         else:
             element(parent, 'j:transclude', type='external', **reference(by_stem[occurrence['unit']]))
 
@@ -183,24 +304,41 @@ def front_text(page):
     return ' '.join(([page['head']] if page.get('head') else [])+page['paragraphs'])
 
 
+def paratext_gate(parent, identifier, feature):
+    conditional = element(parent, 'j:conditional')
+    conditional.set(XML+'id', identifier)
+    feature_structures(conditional, [{'type': 'opensiddur:paratext', 'features': {feature: True}}])
+
+
 def add_front(root, pages, *, expanded=False):
     text = root.find(f'{{{TEI}}}text')
     front = etree.Element(f'{{{TEI}}}front')
     text.insert(0, front)
     if expanded:
-        title = element(front, 'titlePage')
+        paratext_gate(front, 'expanded_editorial_front', 'include')
+        title = element(front, 'div')
         title.set(XML+'lang', 'en')
-        titles = element(title, 'docTitle')
-        element(titles, 'titlePart', 'Expanded Ashkenazi Mahzor', type='main')
-        element(titles, 'titlePart', 'First day of Rosh ha-Shanah — pilot installment', type='sub')
-        element(title, 'docEdition', 'An editorial arrangement of the reviewed Heidenheim–Marmorstein passages. Not a complete service.')
+        element(title, 'head', 'Expanded Ashkenazi Mahzor')
+        element(title, 'p', 'First day of Rosh ha-Shanah')
+        element(title, 'note', 'An editorial arrangement of the reviewed Heidenheim–Marmorstein passages. Digitization remains in progress.', type='description')
+        element(front, 'j:endConditional', target='#expanded_editorial_front')
         return
     for page in pages:
         if page['kind'] not in FRONT_KINDS:
             continue
         facs = page_image_url(IDENTIFIER, int(page['scan'][1:])-1, size='')
-        if page['kind'] == 'title':
-            element(front, 'pb', ed='1965', facs=facs)
+        element(front, 'pb', ed='1965', facs=facs)
+        identifier = 'front_'+page['scan']
+        paratext_gate(front, identifier, 'title-page' if page['kind'] in ('title', 'copyright') else 'include')
+        if page['kind'] == 'copyright':
+            title = element(front, 'titlePage')
+            title.set(XML+'lang', page['language'])
+            imprint = element(title, 'docImprint')
+            for index, paragraph in enumerate(page['paragraphs']):
+                if index:
+                    element(imprint, 'lb')
+                words(imprint, paragraph, page['language'])
+        elif page['kind'] == 'title':
             title = element(front, 'titlePage')
             title.set(XML+'lang', page['language'])
             titles = element(title, 'docTitle')
@@ -209,16 +347,21 @@ def add_front(root, pages, *, expanded=False):
             if 'sub' in layout:
                 element(titles, 'titlePart', page['paragraphs'][layout['sub']], type='sub')
             for index in layout['bylines']:
-                element(title, 'byline', page['paragraphs'][index])
-            imprint = element(title, 'docImprint')
-            element(imprint, 'publisher', page['paragraphs'][layout['publisher']])
-            element(imprint, 'pubPlace', page['paragraphs'][layout['place']])
-            if 'date' in layout:
-                element(imprint, 'docDate', page['paragraphs'][layout['date']])
+                byline = element(title, 'byline')
+                language = page.get('paragraph_languages', {}).get(str(index), page['language'])
+                if language != page['language']:
+                    byline.set(XML+'lang', language)
+                    byline = element(byline, 'foreign')
+                    byline.set(XML+'lang', language)
+                words(byline, page['paragraphs'][index], language)
+            if any(key in layout for key in ('publisher', 'place', 'date')):
+                imprint = element(title, 'docImprint')
+                for key, tag in [('publisher', 'publisher'), ('place', 'pubPlace'), ('date', 'docDate')]:
+                    if key in layout:
+                        element(imprint, tag, page['paragraphs'][layout[key]])
         else:
             div = element(front, 'div')
             div.set(XML+'lang', page['language'])
-            element(div, 'pb', ed='1965', facs=facs)
             if page.get('head'):
                 element(div, 'head', page['head'])
             for index, paragraph in enumerate(page['paragraphs']):
@@ -231,23 +374,78 @@ def add_front(root, pages, *, expanded=False):
                     node = element(node, 'foreign')
                     node.set(XML+'lang', language)
                 words(node, paragraph, language)
+        element(front, 'j:endConditional', target='#'+identifier)
 
 
 def require_review(readings, reviews):
     for unit in readings['units']:
         for lang in unit['languages']:
             review = reviews.get(unit['stem']+'/'+lang, {})
-            if not review_is_current(review, unit_text(unit, lang)):
+            if not review_is_current(review, unit_review_text(unit, lang)):
                 raise ValueError(f"Independent review pending or stale: {unit['stem']}/{lang}; use --draft for inspection")
             for index, citation in enumerate(unit.get('citations', {}).get(lang, [])):
                 key = f"citation/{unit['stem']}/{lang}/{index}"
                 if not review_is_current(reviews.get(key, {}), citation['text']):
                     raise ValueError('Independent citation review pending: '+key)
+    by_identity = {unit['urn']: unit for unit in readings['units'] if unit.get('map_root', True)}
+    for unit in readings['units']:
+        for lang, segments in unit['languages'].items():
+            for segment in segments:
+                if segment.get('transclude'):
+                    witness = by_identity.get(segment['transclude'])
+                    text = ' '.join(fragment['text'] for fragment in segment['fragments'])
+                    if not witness or lang not in witness['languages'] or text.split() != unit_text(witness, lang).split():
+                        raise ValueError('Documentary transclusion review is stale: '+segment['transclude'])
     for name, navigation in readings.get('navigation', {}).items():
         for lang in navigation['scan']:
             key = 'navigation/'+name+'/'+lang
             if not review_is_current(reviews.get(key, {}), navigation['raw']):
                 raise ValueError(f'Independent navigation review pending or stale: {key}')
+    for name, instruction in readings.get('documentary_instructions', {}).items():
+        key = 'instruction/'+name
+        if not review_is_current(reviews.get(key, {}), instruction['text']):
+            raise ValueError('Independent instruction review pending or stale: '+key)
+
+
+def documentary_order(div, order, readings, by_stem, lang, project):
+    """Preserve source sections without attaching service headings to reusable prayers."""
+    for occurrence in order:
+        if 'section' in occurrence:
+            section = element(div, 'div')
+            heading = readings['documentary_instructions'][occurrence['heading']]
+            if lang in heading['witnesses']:
+                element(section, 'pb', ed='1965', n=heading['printed_page'],
+                        facs=page_image_url(IDENTIFIER, int(heading['scan'][1:])-1, size=''))
+                element(section, 'head', heading['text']).set(XML+'lang', heading['language'])
+            documentary_order(section, occurrence['order'], readings, by_stem, lang, project)
+            if not len(section):
+                div.remove(section)
+        elif 'instruction' in occurrence:
+            instruction = readings['documentary_instructions'][occurrence['instruction']]
+            if lang in instruction['witnesses']:
+                facs = page_image_url(IDENTIFIER, int(instruction['scan'][1:])-1, size='')
+                page_start = instruction.get('page_start', True)
+                if page_start.get(lang, False) if isinstance(page_start, dict) else page_start:
+                    element(div, 'pb', ed='1965', n=instruction['printed_page'], facs=facs)
+                note = element(div, 'note', type=instruction.get('type', 'instruction'), facs=facs)
+                note.set(XML+'lang', instruction['language'])
+                words(note, instruction['text'], instruction['language'])
+                if instruction.get('rend'):
+                    note.set('rend', instruction['rend'])
+        elif 'navigation' in occurrence:
+            navigation = readings['navigation'][occurrence['navigation']]
+            scan = navigation['scan'][lang]
+            element(div, 'pb', ed='1965', n=navigation['printed_page'],
+                    facs=page_image_url(IDENTIFIER, int(scan[1:])-1, size=''))
+            clauses = deepcopy(navigation['clauses'])
+            for clause in clauses:
+                if 'target' in clause:
+                    clause['target'] = clause['target'].format(project=project)
+            append_instruction(div, clauses)
+        else:
+            unit = by_stem[occurrence['unit']]
+            if lang in unit['languages']:
+                element(div, 'j:transclude', type='external', target=unit['urn']+'@'+project)
 
 
 def build(source, project_directory, *, draft=False):
@@ -267,7 +465,7 @@ def build(source, project_directory, *, draft=False):
         raise ValueError('URN registry cannot be loaded cleanly')
     for unit in readings['units']:
         identities = [unit['urn']] + [s[key] for segments in unit['languages'].values()
-                                     for s in segments for key in ('corresp', 'source') if s.get(key)]
+                                     for s in segments for key in ('corresp', 'source', 'transclude', 'repeat') if s.get(key)]
         identities += [citation['target'] for citations in unit.get('citations', {}).values()
                        for citation in citations if citation.get('target')]
         for urn in identities:
@@ -284,33 +482,23 @@ def build(source, project_directory, *, draft=False):
         if front_pages:
             add_front(root, front_pages)
         div = element(body, 'div', corresp=ROOT_URN)
-        element(div, 'head', 'First-day Rosh ha-Shanah — pilot installment').set(XML+'lang', 'en')
         by_stem = {unit['stem']: unit for unit in readings['units']}
-        for occurrence in readings.get('source_order', [{'unit': unit['stem']} for unit in readings['units']]):
-            if 'navigation' in occurrence:
-                navigation = readings['navigation'][occurrence['navigation']]
-                scan = navigation['scan'][lang]
-                element(div, 'pb', ed='1965', n=navigation['printed_page'],
-                        facs=page_image_url(IDENTIFIER, int(scan[1:])-1, size=''))
-                clauses = deepcopy(navigation['clauses'])
-                for clause in clauses:
-                    if 'target' in clause:
-                        clause['target'] = clause['target'].format(project=project)
-                append_instruction(div, clauses)
-            else:
-                unit = by_stem[occurrence['unit']]
-                if lang in unit['languages']:
-                    element(div, 'j:transclude', type='external', **reference(unit))
+        documentary_order(div, readings.get('source_order', [{'unit': unit['stem']} for unit in readings['units']]),
+                          readings, by_stem, lang, project)
         for unit in readings['units']:
             if lang in unit['languages']:
                 documents.append((project_directory/project/(unit['stem']+'.xml'), unit_document(unit, lang, draft)))
         documents.append((project_directory/project/'index.xml', root))
     root, body = document('he', EXPANDED, 'Expanded Ashkenazi Mahzor', EXPANDED_URN, index=True, draft=draft)
+    for dependency in readings.get('dependencies', []):
+        source_description = root.find(f'.//{{{TEI}}}sourceDesc')
+        bibliography = element(source_description, 'bibl')
+        element(bibliography, 'ptr', target='/'+dependency['project']+'/index#project_source_bibl')
+        element(bibliography, 'note', dependency['reason'])
     add_front(root, [], expanded=True)
     div = element(body, 'div', corresp=EXPANDED_URN)
     element(div, 'head', 'מחזור אשכנז מורחב').set(XML+'lang', 'he')
     element(div, 'head', 'Expanded Ashkenazi Mahzor').set(XML+'lang', 'en')
-    element(div, 'note', 'Pilot passages only. Complete first-day service assembly remains in progress.', type='instruction').set(XML+'lang', 'en')
     # The same structural sequence drives Hebrew and any English counterparts.
     order = readings.get('expanded_order', [{'unit': unit['stem']} for unit in readings['units']])
     by_stem = {unit['stem']: unit for unit in readings['units']}
@@ -330,15 +518,22 @@ def build(source, project_directory, *, draft=False):
     for project, variant, parallel in [(PROJECTS['he'], 'documentary', False),
                                        (PROJECTS['he'], 'with_translation', True),
                                        (EXPANDED, 'undated', True)]:
-        settings = {'description': 'Pilot installment; not a complete first-day service.',
+        settings = {'description': 'First-day Rosh ha-Shanah mahzor; digitization in progress.',
                     'requires_processor': '>=0.8.0.dev0',
-                    'book': {'project': project, 'file_name': 'index.xml', 'title': 'First-day Mahzor — pilot'},
+                    'book': {'project': project, 'file_name': 'index.xml', 'title': 'Prayerbook for the New Year — first day'},
                     'annotations': list(PROJECTS.values()) if parallel else [PROJECTS['he']],
                     'priority': {'transclusion': [project]+[p for p in PROJECTS.values() if p != project],
                                  'instructions': [project]+[p for p in PROJECTS.values() if p != project]},
                     'typography': {'instructions': {'from': 'both'}, 'line_numbers': {'enabled': False}}}
         if parallel:
             settings['parallel'] = {'projects': [PROJECTS['en']]}
+        if project == EXPANDED:
+            settings['readings'] = {'abbreviations': 'expanded'}
+            for dependency in readings.get('dependencies', []):
+                for kind in ('transclusion', 'instructions'):
+                    # Hebrew dependencies precede translations even when a
+                    # future English witness acquires the same prayer URN.
+                    settings['priority'][kind].insert(-1, dependency['project'])
         destination = settings_directory/project/(variant+'.yaml')
         destination.parent.mkdir(parents=True, exist_ok=True)
         write_if_changed(destination, yaml.safe_dump(settings, allow_unicode=True, sort_keys=False))

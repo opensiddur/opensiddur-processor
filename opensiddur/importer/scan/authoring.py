@@ -186,13 +186,13 @@ def conditional_scope(parent, identity, present, *, fs_type, feature):
 
 
 def printed_text(node, separator=''):
-    """The words of `node` as the edition prints them: every misprint's tei:corr left out."""
+    """The printed branches of source choices, excluding corrections and expansions."""
     parts = []
     def walk(current):
         if current.text:
             parts.append(current.text)
         for child in current:
-            if child.tag != f'{{{TEI}}}corr':
+            if child.tag not in (f'{{{TEI}}}corr', f'{{{TEI}}}expan'):
                 walk(child)
             if child.tail:
                 parts.append(child.tail)

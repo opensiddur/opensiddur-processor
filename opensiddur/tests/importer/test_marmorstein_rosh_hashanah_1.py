@@ -11,12 +11,13 @@ from lxml import etree
 import yaml
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import profile, PROJECTS, EXPANDED
-from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_text, words
+from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_text, unit_review_text, words
 from opensiddur.importer.marmorstein_rosh_hashanah_1.download import download, regenerate
 from opensiddur.importer.marmorstein_rosh_hashanah_1.verify import report
 from opensiddur.importer.scan.review import review, reading_hash
 from opensiddur.importer.scan.authoring import printed_text
 from opensiddur.importer.util.internet_archive import write_if_changed
+from opensiddur.exporter.refdb import find_end_of_mapping
 
 T = '{http://www.tei-c.org/ns/1.0}'
 J = '{http://jewishliturgy.org/ns/jlptei/2}'
@@ -132,6 +133,8 @@ class EditionWiringTest(unittest.TestCase):
             {'section': 'preliminary', 'heads': {'he': 'הכנה', 'en': 'Preparation'},
              'conditions': [{'type': 'opensiddur:service-time', 'features': {'minha': True}},
                             {'type': 'opensiddur:holiday', 'features': {'rosh-hashana': 0}}],
+             'condition_rubrics': {'he': 'במניין:', 'en': 'With a minyan:'},
+             'declarations': [{'type': 'opensiddur:recitation', 'features': {'silent': True}}],
              'order': [{'unit': 'first'}, {'unit': 'first'}]},
             {'section': 'morning', 'heads': {'he': 'שחרית', 'en': 'Morning'},
              'conditions': [{'type': 'opensiddur:service-time', 'features': {'shaharit': True}}],
@@ -148,6 +151,51 @@ class EditionWiringTest(unittest.TestCase):
                          [BASE+'invented']*2)
         self.assertEqual(morning.find('.//'+J+'transclude').get('target'), BASE+'another')
         self.assertEqual(preliminary.find('.//'+T+'numeric').get('value'), '0')
+        conditional = preliminary.find(J+'conditional')
+        self.assertEqual(len(conditional.findall(T+'note')), 1)
+        self.assertEqual(conditional[0].tag, T+'note')
+        self.assertEqual(len(conditional[0].findall(T+'foreign')), 2)
+        content = preliminary.find(T+'div')
+        self.assertEqual(content[-1].tag, J+'endDeclare')
+        self.assertEqual(content[-1].get('target'), '#section_preliminary_settings')
+
+    def test_scripture_scope_ends_before_liturgy_and_repetition_reuses_the_witness(self):
+        bible = 'urn:x-opensiddur:text:bible:psalms/'
+        self.readings['units'][0]['languages']['he'] = [
+            {'corresp': bible+'5/8', 'fragments': [{'scan': 's1', 'text': 'first'}]},
+            {'corresp': bible+'39/13/shimah', 'fragments': [{'scan': 's1', 'text': 'clause'}]},
+            {'corresp': BASE+'another', 'fragments': [{'scan': 's1', 'text': 'other liturgy'}]},
+            {'repeat': bible+'5/8', 'fragments': [{'scan': 's1', 'text': 'first'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        chapters = root.findall('.//'+T+'milestone[@unit="chapter"][@corresp]')
+        self.assertEqual(chapters, [])  # An excerpt must not resolve as its entire Psalm.
+        self.assertEqual([x.get('n') for x in root.findall('.//'+T+'milestone[@unit="chapter"]') if x.get('n')], ['5', '39'])
+        clause = root.find('.//'+T+'milestone[@unit="verse-part"]')
+        self.assertEqual(clause.get('n'), 'shimah')
+        end, include_tail = find_end_of_mapping(clause)
+        self.assertIs(root.xpath(end, namespaces={'tei': T[1:-1]})[0], clause)
+        self.assertTrue(include_tail)
+        self.assertEqual(len(root.findall('.//'+T+'milestone[@corresp="'+bible+'5/8"]')), 1)
+        repeat = root.find('.//'+J+'transclude[@type="inline"]')
+        self.assertEqual(repeat.get('target'), bible+'5/8@'+PROJECTS['he'])
+
+    def test_complete_chapter_remains_addressable_inside_a_composite_prayer(self):
+        bible = 'urn:x-opensiddur:text:bible:psalms/'
+        unit = self.readings['units'][0]
+        unit['complete_chapters'] = [bible+'117']
+        unit['languages']['he'] = [
+            {'corresp': bible+'117/1', 'fragments': [{'scan': 's1', 'text': 'first'}]},
+            {'corresp': bible+'117/2', 'fragments': [{'scan': 's1', 'text': 'second'}]},
+            {'corresp': BASE+'another', 'fragments': [{'scan': 's1', 'text': 'other liturgy'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        chapter = root.find('.//'+T+'milestone[@unit="chapter"][@corresp]')
+        self.assertEqual(chapter.get('corresp'), bible+'117')
+        end, _ = find_end_of_mapping(chapter)
+        self.assertIsNone(root.xpath(end, namespaces={'tei': T[1:-1]})[0].get('corresp'))
 
     def test_liturgical_identity_retains_its_scripture_source_and_scan_boundary(self):
         segments = self.readings['units'][0]['languages']['he']
@@ -156,7 +204,7 @@ class EditionWiringTest(unittest.TestCase):
         self.generate(draft=True)
         root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
         marker = root.find('.//'+T+'milestone')
-        self.assertEqual(marker.get('unit'), 'verse')
+        self.assertEqual(marker.get('unit'), 'prayer-part')
         self.assertEqual(marker.get('corresp'), BASE+'invented')
         spans = root.findall('.//'+T+'seg')
         self.assertEqual([s.get('source') for s in spans], [BASE+'another']*2)
@@ -232,6 +280,27 @@ class EditionWiringTest(unittest.TestCase):
         note = root.find('.//'+T+'standOff/'+T+'note[@type="citation"]')
         self.assertEqual(note.get('target'), BASE+'another')
         self.assertEqual(note.find(T+'p').text, 'Psalm number')
+
+    def test_documentary_page_retains_heading_rubric_and_edition_target(self):
+        unit = self.readings['units'][0]
+        unit.update(map_root=False,
+                    head={'he': 'תפלה'},
+                    instructions=[{'language': 'en', 'text': 'Enter here.'}])
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        div = root.find('.//'+T+'body/'+T+'div')
+        self.assertIsNone(div.get('corresp'))
+        self.assertEqual([e.tag for e in list(div)[:3]], [T+'pb', T+'head', T+'note'])
+        self.assertEqual(div.find(T+'head').text, 'תפלה')
+        self.assertEqual(div.find(T+'note').text, 'Enter here.')
+        self.assertIn('תפלה Enter here.', unit_review_text(unit, 'he'))
+        index = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        self.assertEqual(index.find('.//'+J+'transclude').get('target'), unit['urn']+'@'+PROJECTS['he'])
+        self.assertFalse(index.findall('.//'+T+'body/'+T+'div/'+T+'head'))
+        expanded = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        self.assertIsNone(expanded.find('.//'+T+'titlePage'))
+        self.assertNotIn('pilot', ''.join(expanded.find('.//'+T+'front').itertext()).lower())
 
     def test_cover_and_hebrew_title_retain_language_and_distinct_imprint_fields(self):
         self.save('front', {'pages': [

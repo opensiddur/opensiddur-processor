@@ -7,7 +7,7 @@ from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.importer.scan.review import review_is_current
 from opensiddur.importer.util.internet_archive import write_if_changed
 from . import BOOK
-from .build import unit_text, front_text
+from .build import unit_review_text, front_text
 
 
 def report(source):
@@ -23,7 +23,7 @@ def report(source):
         for lang, segments in unit['languages'].items():
             key = unit['stem']+'/'+lang
             entry = reviews.get(key, {})
-            complete = review_is_current(entry, unit_text(unit, lang))
+            complete = review_is_current(entry, unit_review_text(unit, lang))
             if not complete:
                 pending.append(key)
             for segment in segments:
@@ -39,6 +39,11 @@ def report(source):
             key = 'navigation/'+name+'/'+lang
             if not review_is_current(reviews.get(key, {}), navigation['raw']):
                 pending.append(key)
+    for name, instruction in readings.get('documentary_instructions', {}).items():
+        key = 'instruction/'+name
+        fragments.setdefault(instruction['scan'], []).append(key)
+        if not review_is_current(reviews.get(key, {}), instruction['text']):
+            pending.append(key)
     front_path = source/'front.json'
     if front_path.exists():
         for page in json.loads(front_path.read_text())['pages']:

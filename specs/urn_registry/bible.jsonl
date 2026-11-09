@@ -3,3 +3,7 @@
 {"urn": "urn:x-opensiddur:text:bible:psalms/102", "status": "canonical", "label_en": "psalms/102", "parent": "urn:x-opensiddur:text:bible:psalms"}
 {"urn": "urn:x-opensiddur:text:bible:psalms/20", "status": "canonical", "label_en": "psalms/20", "parent": "urn:x-opensiddur:text:bible:psalms"}
 {"urn": "urn:x-opensiddur:text:bible:psalms/8", "status": "canonical", "label_en": "psalms/8", "parent": "urn:x-opensiddur:text:bible:psalms"}
+{"urn": "urn:x-opensiddur:text:bible:psalms/39", "status": "canonical", "label_en": "Psalm 39", "parent": "urn:x-opensiddur:text:bible:psalms"}
+{"urn": "urn:x-opensiddur:text:bible:psalms/39/13", "status": "canonical", "label_en": "Psalms 39:13", "label_he": "תהלים לט יג", "parent": "urn:x-opensiddur:text:bible:psalms/39"}
+{"urn": "urn:x-opensiddur:text:bible:psalms/39/13/shimah", "status": "canonical", "label_en": "Psalms 39:13, from shimah through al techerash", "label_he": "שמעה תפלתי ... אל דמעתי אל תחרש", "parent": "urn:x-opensiddur:text:bible:psalms/39/13"}
+{"urn": "urn:x-opensiddur:text:bible:psalms/39/13/ki_ger", "status": "canonical", "label_en": "Psalms 39:13, from ki ger through the end", "label_he": "כי גר אנכי עמך תושב ככל אבותי", "parent": "urn:x-opensiddur:text:bible:psalms/39/13"}

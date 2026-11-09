@@ -352,6 +352,17 @@ class TestVerseParts(SubverseTestCase):
             self.scope(xml, f"{URN}genesis/1/31/yom_hashishi"), "י֥וֹם הַשִּׁשִּֽׁי׃"
         )
 
+    def test_line_break_without_literal_space_still_separates_words(self):
+        xml = document(
+            f"<tei:p>{verse(f'{URN}genesis/1/31', '31')}"
+            'וַיְהִי־בֹקֶר<tei:lb type="indent"/>יוֹם הַשִּׁשִּׁי׃</tei:p>'
+        )
+        with patch.dict(VERSE_PARTS, self.PARTS, clear=True):
+            result = self.verse_parts(xml)
+        marker = '<tei:milestone unit="verse-part" n="yom_hashishi" corresp="'+URN+'genesis/1/31/yom_hashishi"/>'
+        self.assertEqual(result.replace(marker, ''), xml)
+        self.assertIn('<tei:lb type="indent"/>'+marker+'יוֹם', result)
+
     def test_an_incipit_that_is_not_there_is_reported(self):
         """A declared part that cannot be placed is the caller's problem to fail on."""
         xml = document(

@@ -230,6 +230,11 @@ terminator in rule 3 closes such a scope explicitly:
 A terminator is not indexed, because only elements carrying `corresp` are, so it adds no
 URN mapping and cannot be referenced.
 
+This also applies to `half-verse` and `verse-part`. Their bare terminators have
+neither `corresp` nor `n`; a numbered or named subdivision still requires its
+canonical correspondence. A bare `verse` or `chapter` milestone cannot substitute
+for a subverse terminator, because bare milestones close only their own unit.
+
 **The unit must match exactly.** A bare milestone of some *other* unit does not terminate
 anything, which is what keeps `unit="edition-verse"` — which carries `n` and never
 `corresp` — from closing every verse it follows.
