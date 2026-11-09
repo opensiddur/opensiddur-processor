@@ -85,6 +85,23 @@ def words(parent, text, lang):
         append_words(parent, text[end:])
 
 
+def rubric_words(parent, rubric, lang):
+    """Keep source abbreviations selectable without losing their printed form."""
+    if isinstance(rubric, str):
+        words(parent, rubric, lang)
+        return
+    text = rubric['text']
+    for abbreviation in rubric.get('abbreviations', []):
+        before, found, text = text.partition(abbreviation['abbr'])
+        if not found:
+            raise ValueError('Rubric abbreviation missing from its source text')
+        words(parent, before, lang)
+        choice = element(parent, 'choice')
+        element(choice, 'abbr', abbreviation['abbr'])
+        element(choice, 'expan', abbreviation['expan'])
+    words(parent, text, lang)
+
+
 def unit_document(unit, lang, draft):
     project = PROJECTS[lang]
     root, body = document(lang, project, unit['title'][lang], unit['urn'], draft=draft)
@@ -109,8 +126,9 @@ def unit_document(unit, lang, draft):
         current_page = opening['scan']
         element(div, 'head', unit['head'][lang]).set(XML+'lang', lang)
     for instruction in unit.get('instructions', []):
-        note = element(div, 'note', instruction['text'], type=instruction.get('type', 'instruction'))
+        note = element(div, 'note', type=instruction.get('type', 'instruction'))
         note.set(XML+'lang', instruction['language'])
+        rubric_words(note, instruction, instruction['language'])
     citations = unit.get('citations', {}).get(lang, [])
     if citations:
         notes = element(root, 'standOff', type='notes')
@@ -152,8 +170,11 @@ def unit_document(unit, lang, draft):
             paragraph = current_paragraph = None
             continue
         identity = segment.get('paragraph', 1)
+        text_language = segment.get('language', lang)
         if paragraph is None or identity != current_paragraph:
             paragraph = element(div, 'p')
+            if text_language != lang:
+                paragraph.set(XML+'lang', text_language)
             current_paragraph = identity
         for index, fragment in enumerate(segment['fragments']):
             if fragment['scan'] != current_page:
@@ -185,7 +206,7 @@ def unit_document(unit, lang, draft):
                 else:
                     if current_chapter:
                         close_references()
-                    reference_unit, attributes = 'prayer-part', {}
+                    reference_unit, attributes = segment.get('reference_unit', 'prayer-part'), {}
                 if active_reference and active_reference != reference_unit:
                     element(paragraph, 'milestone', unit=active_reference)
                 element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
@@ -226,8 +247,15 @@ def unit_document(unit, lang, draft):
                     words(abbreviation, fragment['text'], lang)
                 words(element(choice, 'expan'), fragment['expansion'], lang)
             else:
-                words(content, fragment['text'], lang)
-            append_words(paragraph, ' ')
+                words(content, fragment['text'], text_language)
+            if not fragment['text'].rstrip().endswith('־'):
+                append_words(paragraph, ' ')
+        if segment.get('repeat_cue'):
+            close_references()
+            cue = segment['repeat_cue']
+            note = element(paragraph, 'note', type='instruction')
+            note.set(XML+'lang', lang)
+            element(note, 'ref', cue['text'], target=cue['target']+'@'+project)
     if paragraph is not None:
         close_references()
     if conditions:
@@ -244,11 +272,16 @@ def unit_review_text(unit, lang):
     # source abbreviation and its interpretation so either change needs review.
     parts = ([unit['head'][lang]] if unit.get('head', {}).get(lang) else [])
     parts.extend(instruction['text'] for instruction in unit.get('instructions', []))
+    for instruction in unit.get('instructions', []):
+        parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
     for segment in unit['languages'][lang]:
         if segment.get('speaker'):
             speaker = segment['speaker']
             parts.append(speaker['abbr']+' ['+speaker['expan']+']')
         parts.extend(fragment['text'] for fragment in segment['fragments'])
+        if segment.get('repeat_cue'):
+            cue = segment['repeat_cue']
+            parts.append(cue['text']+' ['+cue['target']+']')
     return ' '.join(parts)
 
 
@@ -259,6 +292,11 @@ def reference(unit):
 
 def feature_structures(parent, structures):
     for structure in structures:
+        if 'operator' in structure:
+            if structure['operator'] not in ('all', 'any', 'none', 'one'):
+                raise ValueError('Unknown condition operator')
+            feature_structures(element(parent, 'j:'+structure['operator']), structure['conditions'])
+            continue
         features = element(parent, 'fs', type=structure['type'])
         for name, value in structure['features'].items():
             feature = element(features, 'f')
@@ -299,7 +337,10 @@ def expanded_order(parent, order, readings, by_stem):
                 element(content, 'note', label,
                         type='description', corresp='urn:x-opensiddur:instruction:role/'+role).set(XML+'lang', 'he')
             for language, rubric in occurrence.get('rubrics', {}).items():
-                element(content, 'note', rubric, type='description').set(XML+'lang', language)
+                for text in rubric if isinstance(rubric, list) else [rubric]:
+                    note = element(content, 'note', type='description')
+                    note.set(XML+'lang', language)
+                    rubric_words(note, text, language)
             if occurrence.get('declarations'):
                 declaration = element(content, 'j:declare')
                 declaration.set(XML+'id', identifier+'_settings')
@@ -309,6 +350,11 @@ def expanded_order(parent, order, readings, by_stem):
                 element(content, 'j:endDeclare', target='#'+identifier+'_settings')
             if conditions:
                 element(outer, 'j:endConditional', target='#'+identifier+'_condition')
+        elif 'instruction' in occurrence:
+            instruction = readings['documentary_instructions'][occurrence['instruction']]
+            note = element(parent, 'note', type=instruction.get('type', 'instruction'))
+            note.set(XML+'lang', instruction['language'])
+            words(note, instruction['text'], instruction['language'])
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             clauses = deepcopy(navigation['clauses'])
@@ -436,8 +482,9 @@ def documentary_order(div, order, readings, by_stem, lang, project):
             section = element(div, 'div')
             heading = readings['documentary_instructions'][occurrence['heading']]
             if lang in heading['witnesses']:
-                element(section, 'pb', ed='1965', n=heading['printed_page'],
-                        facs=page_image_url(IDENTIFIER, int(heading['scan'][1:])-1, size=''))
+                if heading.get('page_start', True):
+                    element(section, 'pb', ed='1965', n=heading['printed_page'],
+                            facs=page_image_url(IDENTIFIER, int(heading['scan'][1:])-1, size=''))
                 element(section, 'head', heading['text']).set(XML+'lang', heading['language'])
             documentary_order(section, occurrence['order'], readings, by_stem, lang, project)
             if not len(section):

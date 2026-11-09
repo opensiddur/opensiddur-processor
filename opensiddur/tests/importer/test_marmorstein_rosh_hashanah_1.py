@@ -151,6 +151,50 @@ class EditionWiringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unknown speaker expansion: unknown'):
             self.generate(draft=True)
 
+    def test_rubric_abbreviation_and_expansion_are_both_reviewed(self):
+        unit = self.readings['units'][0]
+        unit['instructions'] = [{'language': 'he', 'text': 'הש״ץ מנגן.',
+                                 'abbreviations': [{'abbr': 'הש״ץ', 'expan': 'השליח ציבור'}]}]
+        original = unit_review_text(unit, 'he')
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertEqual(root.find('.//'+T+'note/'+T+'choice/'+T+'abbr').text, 'הש״ץ')
+        self.assertEqual(root.find('.//'+T+'note/'+T+'choice/'+T+'expan').text, 'השליח ציבור')
+        unit['instructions'][0]['abbreviations'][0]['expan'] = 'אחר'
+        self.assertNotEqual(unit_review_text(unit, 'he'), original)
+
+    def test_page_turn_after_maqaf_does_not_add_a_word_break(self):
+        self.readings['units'][0]['languages']['he'] = [{'fragments': [
+            {'scan': 's1', 'text': 'אב־'}, {'scan': 's2', 'text': 'גד'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        paragraph = root.find('.//'+T+'body/'+T+'div/'+T+'p')
+        self.assertEqual(printed_text(paragraph).strip(), 'אב־גד')
+        self.assertEqual(len(paragraph.findall(T+'pb')), 2)
+
+    def test_refrain_cue_is_outside_the_reusable_stanza_and_language_is_preserved(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [{
+            'corresp': BASE+'invented/1', 'reference_unit': 'stanza',
+            'language': 'arc', 'fragments': [{'scan': 's1', 'text': 'אב'}],
+            'repeat_cue': {'text': 'לכה', 'target': BASE+'invented/1'}}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        paragraph = root.find('.//'+T+'body/'+T+'div/'+T+'p')
+        self.assertEqual(paragraph.get('{http://www.w3.org/XML/1998/namespace}lang'), 'arc')
+        start = paragraph.find(T+'milestone[@corresp]')
+        end, include_tail = find_end_of_mapping(start)
+        self.assertIs(root.xpath(end, namespaces={'tei': T[1:-1]})[0], start)
+        self.assertTrue(include_tail)
+        self.assertIsNone(start.getnext().get('corresp'))
+        cue = paragraph.find(T+'note[@type="instruction"]/'+T+'ref')
+        self.assertEqual(cue.text, 'לכה')
+        self.assertEqual(cue.get('target'), BASE+'invented/1@'+PROJECTS['he'])
+        self.assertIn('לכה ['+BASE+'invented/1]', unit_review_text(unit, 'he'))
+
     def test_expanded_combined_role_is_not_reduced_to_congregation(self):
         self.readings['expanded_order'] = [
             {'section': 'joint_response', 'role': 'reader_and_congregation',

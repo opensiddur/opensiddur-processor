@@ -3,10 +3,10 @@
 Contribution to [issue 214](https://github.com/opensiddur/opensiddur-processor/issues/214).
 The complete project is the 355-leaf Archive item
 `mahzor-lyom-rishon-shel-rosh-hashanah-day-one-jenny-marmorstein-1965`.
-The pilot and six front leaves are complete. Full-volume work has restarted at
-the beginning in scan order, as requested, with first and independent readings
-of s7–s14 (printed pages 1–8). Mah Tovu and Ashrei are accepted excerpts; the
-remaining opening material is still being adjudicated. This is not a complete
+The pilot and six front leaves are complete. Full-volume work proceeds from
+the beginning in scan order, as requested. The opening entrance prayers,
+weekday Minchah, festival preparations and Kabbalat Shabbat through s17
+(printed page 11) have been transcribed and independently reviewed. This is not a complete
 mahzor. Its PRs remain draft while the full-volume transcription is unfinished.
 
 ## Repositories and outputs
@@ -191,14 +191,71 @@ weekday Minchah through s12 are accepted after independent fidelity, guideline,
 alignment and order review. The expanded Minchah includes Half/Whole Kaddish
 from compatible Birnbaum Hebrew, silent prayer, minyan-gated repetition,
 Kedushah and simultaneous Modim roles. The first-day morning service remains
-incomplete. There are 18 fully reviewed leaves out of 355; continue adjudication
-at s13. The title follows the source rather than describing a pilot installment.
+incomplete. The following installment extends this opening sequence through s17;
+continue in scan order at s18 (Archive n17, printed page 12). The title follows the source rather than describing a pilot installment.
 
 Mah Tovu reuses its existing two-part canonical structure. The four-verse
 `mah_tovu/varani` scope is not split merely to follow printed verses; each
 scriptural source is bounded independently, and the first-person Psalm 95:6
 adaptation is typed explicitly. Hebrew punctuation is a word boundary when
 tagging Divine Names, including immediately after maqaf.
+
+### Festival preparations and Kabbalat Shabbat
+
+The s13–s17 batch adds eruv tavshilin and festival lights in their printed
+Hebrew/Aramaic and English, then complete Psalms 95–99, 29, 92 and 93 and
+Lekhah Dodi in Hebrew. Preserve the actual mixed-language declaration, with
+`xml:lang="arc"` on its paragraph. English directions appear once in the common
+documentary spine. No English translation of Kabbalat Shabbat is supplied.
+
+The user confirms that this edition follows a different custom from Birnbaum:
+include both the opening Psalms and Lekhah Dodi when Rosh ha-Shanah is Shabbat.
+Apply inclusion at the expanded structural transclusion level; do not put
+Birnbaum's festival omission inside these reusable source texts. The user also
+confirms that the initial marginal לכה calls for a congregational repetition
+before stanza one. Preserve all ten literal cues as linked instructions outside
+the refrain/stanza correspondence scopes. Expanded recitation has eleven full
+refrains: the initial reader's rendition, the initial congregational response,
+and nine subsequent congregational responses. Give structural occurrences unique
+identities while reusing canonical refrain and stanza identities.
+
+The expanded spine gates preparations and services through existing calendar,
+service, quorum and mourners settings, with declarations closed locally.
+Candle lighting is available on Elul 29 before the incoming festival, including
+the combined blessing on Friday before RH-Shabbat. Its outer gate does not
+require the next Hebrew date or Maariv to have begun. The combined blessing is
+excluded after Shabbat has begun; weekday first-night lighting remains available
+in its Maariv context. The shared heading and lighting instruction have the
+same gate as the union of the blessing branches; they cannot survive alone.
+The combined variant is excluded during Friday twilight as well. Nested all/any/none groups express these choices using
+existing calendar features.
+The source's Kaddish direction is expanded through the compatible Birnbaum
+Mourner's Kaddish, conditional on both minyan and mourners. Separate the poem's
+performance direction from its literary acrostic attribution. Source small
+speaker labels, including combined קו״ח, remain independently reviewable.
+
+Reuse all existing prayer and Psalm identities. The sole new canonical identity
+is `prayer:hadlaqat_ner_yom_tov/shabbat`, a genuine combined Sabbath/festival
+calendar variant. A separate, credited Birnbaum extraction resolves the printed Sabbath insertion
+into the complete combined wording. Its parent source remains unchanged. The
+expanded maḥzor targets the bare canonical variant, which has no English
+counterpart. Do not declare the current day to be Shabbat merely to select
+this wording: kind-of-day declarations intentionally acquire gates against the
+actual day, so that approach suppresses the blessing before sunset on Friday.
+The separate combined witness has no such declaration and supplies exactly the
+already printed source words, with the control rubric resolved. All source
+credits and licences are retained.
+
+Paragraph language and poem reference units are explicit in source segments.
+Page boundaries do not add a space after a source maqaf; continuation tests
+protect the exact word boundary. Secondary review includes enlarged image
+adjudication, alignment, the authoritative ODD and encoding guidelines, and
+expanded order. Preserve superseded readings and first-audit findings as
+history. Complete-page acceptance requires the final frozen-file review, not
+just agreement between two preliminary readings. Eleven compiled settings cases
+check festival/Shabbat selection, eruv calendar applicability, minyan/mourners,
+all eleven expanded refrains, ten documentary cues and missing-English behavior.
+All eight complete Psalm chapters have verified verse counts and order.
 
 ## Commands and acceptance
 
