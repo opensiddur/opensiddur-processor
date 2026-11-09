@@ -368,16 +368,19 @@ class TestParagraphs(unittest.TestCase):
 
 
 class TestLineNumbers(unittest.TestCase):
-    def test_switching_them_off_uses_reledmacs_own_switch(self):
-        """The numbering machinery still runs, so cross-references and the
-        apparatus are unaffected; only the printing stops."""
-        self.assertIn(r"\numberlinefalse", _tex({"line_numbers": {"enabled": False}}))
+    def test_switching_them_off_preserves_apparatus_line_tracking(self):
+        tex = _tex({"line_numbers": {"enabled": False}})
+        self.assertIn(r"\renewcommand*{\linenumberlist}{-1}", tex)
+        self.assertNotIn(r"\numberlinefalse", tex)
+        self.assertNotIn(r"\linenumberlistR", tex)
 
     def test_switching_them_off_still_configures_the_count(self):
         """Only the printing stops; the lines are still counted, and \\lineation still
         decides where the count restarts."""
         tex = _tex({"line_numbers": {"enabled": False, "increment": 2}}, has_parallel=True)
-        self.assertIn(r"\numberlinefalse", tex)
+        self.assertIn(r"\renewcommand*{\linenumberlist}{-1}", tex)
+        self.assertIn(r"\renewcommand*{\linenumberlistR}{-1}", tex)
+        self.assertNotIn(r"\numberlinefalse", tex)
         self.assertIn(r"\linenumincrement{2}", tex)
         self.assertIn(r"\lineation{page}", tex)
         self.assertIn(r"\lineationR{page}", tex)

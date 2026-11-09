@@ -186,7 +186,7 @@ class EditionWiringTest(unittest.TestCase):
         root = etree.parse(str(self.projects/PROJECTS['en']/'first.xml'))
         body = root.find('.//'+T+'body')
         citation = root.find('.//'+T+'standOff/'+T+'note[@type="citation"]')
-        self.assertEqual(citation.find(T+'p').text, '(Invented source.)')
+        self.assertEqual(citation.find(T+'p').text, 'Invented source.')
         self.assertEqual(citation.get('target'), BASE+'invented')
         self.assertNotIn('(Invented source.)', ''.join(body.itertext()))
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)

@@ -91,7 +91,10 @@ def unit_document(unit, lang, draft):
             if citation['scan'] != unit['languages'][lang][0]['fragments'][0]['scan']:
                 raise ValueError('Citation scan differs from the passage opening')
             note = element(notes, 'note', type='citation', target=unit.get('start', unit['urn']))
-            element(note, 'p', citation['text'])
+            citation_text = citation['text'].strip()
+            if citation_text.startswith('(') and citation_text.endswith(')'):
+                citation_text = citation_text[1:-1].strip()
+            element(note, 'p', citation_text)
     paragraph = None
     current_paragraph = None
     for segment in unit['languages'][lang]:

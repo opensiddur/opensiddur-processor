@@ -40,7 +40,9 @@ independent of paragraphs and page turns, and terminate scopes before other text
 Omit printed Hebrew linkage cues from accepted English prayer words; shared canonical
 milestones provide the linkage. Preserve the cues in immutable image-reading evidence.
 Encode biblical citations as standoff `tei:note type="citation"` annotations targeting
-the passage, following existing projects, rather than as prayer text or instructions. English witnesses
+the passage, following existing projects, rather than as prayer text or instructions.
+Omit enclosing parentheses in generated citation notes while retaining them in
+the reviewed source readings and evidence. English witnesses
 exist only for printed English material. Missing English is not an empty file,
 placeholder, or invitation to use another translator automatically.
 
