@@ -70,7 +70,7 @@ def words(parent, text, lang):
     else:
         # Preserve the source spelling/pointing, including its abbreviated Name.
         end = 0
-        for match in re.finditer(r'(?<![\u0590-\u05ff])([ובלמכש]?[\u0591-\u05c7]*)(י[\u0591-\u05c7]*י[\u0591-\u05c7]*)(?![\u0590-\u05ff])', text):
+        for match in re.finditer(r'(?<![\u0590-\u05ff])([ובלמכש]?[\u0591-\u05c7]*)(י[\u0591-\u05c7]*(?:י[\u0591-\u05c7]*|ה[\u0591-\u05c7]*ו[\u0591-\u05c7]*ה[\u0591-\u05c7]*))(?![\u0590-\u05ff])', text):
             append_words(parent, text[end:match.start()]+match[1])
             element(parent, 'j:divineName', match[2])
             end = match.end()
@@ -107,9 +107,10 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'pb', **attributes)
                 current_page = fragment['scan']
             if index == 0 and segment.get('corresp'):
-                element(paragraph, 'milestone', unit='verse' if ':bible:' in segment['corresp'] else 'prayer',
+                element(paragraph, 'milestone', unit='verse' if segment.get('source') or ':bible:' in segment['corresp'] else 'prayer',
                         corresp=segment['corresp'])
-            words(paragraph, fragment['text'], lang)
+            content = element(paragraph, 'seg', source=segment['source']) if segment.get('source') else paragraph
+            words(content, fragment['text'], lang)
             append_words(paragraph, ' ')
     return root
 
@@ -197,8 +198,8 @@ def build(source, project_directory, *, draft=False):
     if problems:
         raise ValueError('URN registry cannot be loaded cleanly')
     for unit in readings['units']:
-        identities = [unit['urn']] + [s['corresp'] for segments in unit['languages'].values()
-                                                   for s in segments if s.get('corresp')]
+        identities = [unit['urn']] + [s[key] for segments in unit['languages'].values()
+                                     for s in segments for key in ('corresp', 'source') if s.get(key)]
         for urn in identities:
             # Numeric scripture descendants can be implicit in the registered book.
             if registry.resolve(urn) != urn:

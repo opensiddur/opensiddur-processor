@@ -87,7 +87,23 @@ unreviewed text. Structural success is not source-fidelity approval.
 
 The pilot includes Torah blessings, Barukh She-amar, I Chronicles 16:8–36 from
 Hodu, a Hebrew-only Psalm 24, and the page-direction example. The English title page, copyright page, translator’s preface and following blank leaf are also independently read. The cover emblem and Hebrew calligraphic arranger credit remain pending. Hodu's remaining
-verses and the rest of the book are not implied by that excerpt.
+verses and the rest of the book were not implied by that initial excerpt.
+
+The next reviewed installment completes Hodu with the existing Romemu, Vehu
+Raḥum and Hoshiah et ammekha modules (22 paired segments), then adds Psalm 19
+(15 paired verses). Existing liturgical excerpt identities retain their biblical
+sources on bounded spans. Both source and expanded sequences reuse these identities;
+no new prayer identity was registered. The encoder preserves both full and
+abbreviated printed Divine Names without changing their pointing.
+
+Independent blind image readings and separate alignment/order audits cover the
+addition. Enlarged images resolve defective עֹמֶדֶת and the source misprints
+“withold” and “whem”. The audit also corrected an earlier comma adjudication in
+Chronicles 16:35; retain that decision history. Hebrew chapter labels and English
+biblical references are citation notes, not prayer words. Four prayer leaves
+(s62–s65, Hebrew/English printed pages 16–17) are now fully accounted for, in
+addition to the four completed front-matter leaves. Psalm 34 and the rest of the
+volume remain incomplete.
 
 `verify --check` must fail until every leaf is explicitly accounted for and its
 content independently reviewed. A page with only an excerpt is never complete.

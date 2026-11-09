@@ -11,7 +11,7 @@ from lxml import etree
 import yaml
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import profile, PROJECTS, EXPANDED
-from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_text
+from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_text, words
 from opensiddur.importer.marmorstein_rosh_hashanah_1.download import download, regenerate
 from opensiddur.importer.marmorstein_rosh_hashanah_1.verify import report
 from opensiddur.importer.scan.review import review, reading_hash
@@ -23,6 +23,14 @@ BASE = 'urn:x-opensiddur:text:prayer:'
 
 
 class EditionWiringTest(unittest.TestCase):
+    def test_full_and_abbreviated_names_preserve_points_and_separate_prefixes(self):
+        parent = etree.Element(T+'p')
+        text = 'וְיְהוָה לַייָ יְהוָה'
+        words(parent, text, 'he')
+        self.assertEqual(''.join(parent.itertext()), text)
+        self.assertEqual([e.text for e in parent.findall(J+'divineName')], ['יְהוָה', 'ייָ', 'יְהוָה'])
+        self.assertEqual(parent.text, 'וְ')
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -110,6 +118,19 @@ class EditionWiringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'stale'):
             self.generate()
         self.assertEqual(path.read_bytes(), before)
+
+    def test_liturgical_identity_retains_its_scripture_source_and_scan_boundary(self):
+        segments = self.readings['units'][0]['languages']['he']
+        segments[0].update(corresp=BASE+'invented', source=BASE+'another')
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        marker = root.find('.//'+T+'milestone')
+        self.assertEqual(marker.get('unit'), 'verse')
+        self.assertEqual(marker.get('corresp'), BASE+'invented')
+        spans = root.findall('.//'+T+'seg')
+        self.assertEqual([s.get('source') for s in spans], [BASE+'another']*2)
+        self.assertEqual(spans[1].getprevious().tag, T+'pb')
 
     def test_all_schema_checks_finish_before_any_output_is_written(self):
         self.validator.side_effect = [(True, []), (False, ['synthetic schema failure'])]
