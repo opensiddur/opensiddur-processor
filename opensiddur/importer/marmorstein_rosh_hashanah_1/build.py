@@ -24,6 +24,8 @@ from opensiddur.importer.util.validation import validate
 from . import BOOK, IDENTIFIER, PROJECTS, EXPANDED, ROOT_URN, EXPANDED_URN
 
 FRONT_KINDS = ('cover', 'title', 'copyright', 'preface')
+ROLE_LABELS = {'reader': 'חזן', 'congregation': 'קהל',
+               'reader_and_congregation': 'קהל וחזן'}
 
 
 def document(lang, project, title, urn, *, index=False, draft=False):
@@ -189,7 +191,11 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
                 active_reference = reference_unit
             if index == 0 and segment.get('speaker'):
-                role = 'reader' if segment['speaker']['expan'] == 'חזן' else 'congregation'
+                expansion = segment['speaker']['expan']
+                try:
+                    role = {label: role for role, label in ROLE_LABELS.items()}[expansion]
+                except KeyError:
+                    raise ValueError(f'Unknown speaker expansion: {expansion}') from None
                 identity = 'urn:x-opensiddur:instruction:role/'+role
                 description = element(paragraph, 'note', type='description', corresp=identity)
                 description.set(XML+'lang', 'he')
@@ -234,9 +240,16 @@ def unit_text(unit, lang):
 
 
 def unit_review_text(unit, lang):
-    return ' '.join(([unit['head'][lang]] if unit.get('head', {}).get(lang) else [])
-                    + [instruction['text'] for instruction in unit.get('instructions', [])]
-                    + [unit_text(unit, lang)])
+    # This is a review payload, not printed prayer text. Include both the
+    # source abbreviation and its interpretation so either change needs review.
+    parts = ([unit['head'][lang]] if unit.get('head', {}).get(lang) else [])
+    parts.extend(instruction['text'] for instruction in unit.get('instructions', []))
+    for segment in unit['languages'][lang]:
+        if segment.get('speaker'):
+            speaker = segment['speaker']
+            parts.append(speaker['abbr']+' ['+speaker['expan']+']')
+        parts.extend(fragment['text'] for fragment in segment['fragments'])
+    return ' '.join(parts)
 
 
 def reference(unit):
@@ -279,7 +292,11 @@ def expanded_order(parent, order, readings, by_stem):
                 element(content, 'head', heading).set(XML+'lang', language)
             if occurrence.get('role'):
                 role = occurrence['role']
-                element(content, 'note', 'חזן' if role == 'reader' else 'קהל',
+                try:
+                    label = ROLE_LABELS[role]
+                except KeyError:
+                    raise ValueError(f'Unknown speaker role: {role}') from None
+                element(content, 'note', label,
                         type='description', corresp='urn:x-opensiddur:instruction:role/'+role).set(XML+'lang', 'he')
             for language, rubric in occurrence.get('rubrics', {}).items():
                 element(content, 'note', rubric, type='description').set(XML+'lang', language)

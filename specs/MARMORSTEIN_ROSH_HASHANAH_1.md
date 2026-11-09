@@ -90,6 +90,10 @@ sources with recorded provenance. Do not fill English gaps in this installment.
 Printed Rashi script helps identify instructions and speaker labels. Record
 that observation in the reading evidence, but do not emit `rend` on rubric
 notes: the reader's selected instruction styles control their presentation.
+Review payloads include each speaker abbreviation and its expansion, so changes
+to either invalidate acceptance. In Kedushah, the shared-response labels mean
+קהל וחזן and use the existing `instruction:role/reader_and_congregation`
+identity; do not reduce these labels to congregation-only ק׳.
 
 The requested second reader is available: `claude-opus-5-5`, medium effort.
 It reads scan images through read-only tools, without receiving the primary

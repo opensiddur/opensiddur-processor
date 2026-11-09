@@ -109,6 +109,9 @@ class EditionWiringTest(unittest.TestCase):
     def test_unreviewed_or_stale_text_cannot_replace_a_reviewed_build(self):
         with self.assertRaisesRegex(ValueError, 'review pending'):
             self.generate()
+        speaker = {'abbr': 'קו״ח', 'expan': 'קהל וחזן'}
+        self.readings['units'][0]['languages']['he'][0]['speaker'] = speaker
+        self.save('readings', self.readings)
         reviews = {}
         def accepted(text):
             entry = review(text, text, primary_model='first-reader', independent_model='second-reader', evidence='scan')
@@ -116,18 +119,47 @@ class EditionWiringTest(unittest.TestCase):
             return entry
         for unit in self.readings['units']:
             for lang in unit['languages']:
-                reviews[unit['stem']+'/'+lang] = accepted(unit_text(unit, lang))
+                reviews[unit['stem']+'/'+lang] = accepted(unit_review_text(unit, lang))
         for lang in ('he', 'en'):
             reviews['navigation/return/'+lang] = accepted('Read page 7.')
         self.save('reviews', reviews)
         self.generate()
         path = self.projects/PROJECTS['he']/'first.xml'
         before = path.read_bytes()
+        note = etree.parse(str(path)).find('.//'+T+'note[@type="description"]')
+        self.assertEqual(note.get('corresp'), 'urn:x-opensiddur:instruction:role/reader_and_congregation')
         self.readings['units'][0]['languages']['he'][0]['fragments'][0]['text'] = 'changed'
         self.save('readings', self.readings)
         with self.assertRaisesRegex(ValueError, 'stale'):
             self.generate()
         self.assertEqual(path.read_bytes(), before)
+        self.readings['units'][0]['languages']['he'][0]['fragments'][0]['text'] = 'אב יי'
+        for field, changed in [('abbr', 'קו׳'), ('expan', 'קהל')]:
+            with self.subTest(field=field):
+                original = speaker[field]
+                speaker[field] = changed
+                self.save('readings', self.readings)
+                with self.assertRaisesRegex(ValueError, 'stale'):
+                    self.generate()
+                self.assertEqual(path.read_bytes(), before)
+                speaker[field] = original
+
+    def test_unknown_speaker_expansion_fails_even_in_draft(self):
+        self.readings['units'][0]['languages']['he'][0]['speaker'] = {
+            'abbr': 'x', 'expan': 'unknown'}
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'Unknown speaker expansion: unknown'):
+            self.generate(draft=True)
+
+    def test_expanded_combined_role_is_not_reduced_to_congregation(self):
+        self.readings['expanded_order'] = [
+            {'section': 'joint_response', 'role': 'reader_and_congregation',
+             'order': [{'unit': 'first'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        note = root.find('.//'+T+'note[@corresp="urn:x-opensiddur:instruction:role/reader_and_congregation"]')
+        self.assertEqual(note.text, 'קהל וחזן')
 
     def test_preliminary_service_conditions_end_before_the_morning_section(self):
         self.readings['expanded_order'] = [
