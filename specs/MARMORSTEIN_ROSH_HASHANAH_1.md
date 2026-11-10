@@ -349,7 +349,10 @@ The reviewer’s final settings finding was fixed in the generator and verified
 locally: documentary electronic variants start with electronic.day=none.
 Regeneration and serialized HTML checks confirm fixed source words remain
 available regardless of the device date; expanded settings retain their behavior.
-No external re-review of that final settings/code change is claimed.
+After explicit user authorization, Claude Opus 5.5 at medium effort independently
+reviewed the final settings, generator and regression test: pass with no required
+changes. Reviewed file hashes stayed unchanged. The source repository retains
+this final review as independent/hashkivenu_documentary_settings_review.json.
 
 The accepted build validates 95 XML files. The focused importer suite passes
 102 tests and 41 subtests. Eight runtime cases protect service/quorum choices,
