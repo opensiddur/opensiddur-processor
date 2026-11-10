@@ -764,11 +764,13 @@ def _line_numbers_section(config: TypographyConfig, uses_reledpar: bool) -> list
     lines.append(rf"\setlength{{\linenumsep}}{{{line_numbers.separation}}}")
     lines.extend(_line_number_format_tex(config, uses_reledpar))
     if not line_numbers.enabled:
-        # reledmac's own switch, the one \skipnumbering sets for a single
-        # paragraph. Setting it in the preamble applies it to all of them: the
-        # numbering machinery still runs, so cross-references and the apparatus
-        # are unaffected, but no number is printed.
-        lines.append(r"\numberlinefalse")
+        # \numberlinefalse also disables the line records that locate apparatus
+        # insertions. Parallel notes then flush at the end, grouped by column,
+        # instead of following their references. Select a nonexistent margin
+        # number so no number prints while both streams keep tracking lines.
+        lines.append(r"\renewcommand*{\linenumberlist}{-1}")
+        if uses_reledpar:
+            lines.append(r"\renewcommand*{\linenumberlistR}{-1}")
     return lines
 
 
