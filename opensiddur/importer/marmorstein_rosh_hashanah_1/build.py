@@ -108,9 +108,24 @@ def instruction_review_text(instruction):
     return ' '.join(parts)
 
 
+def unit_urn(unit):
+    """Name the actual excerpt rather than its containing chapter."""
+    target = unit.get('start', unit['urn'])
+    if unit.get('end'):
+        if target.partition('/')[0] != unit['end'].partition('/')[0]:
+            raise ValueError('A documentary unit cannot span different works')
+        target += '-/'+unit['end'].partition('/')[2]
+    return target
+
+
+def unit_instructions(unit, lang):
+    return [note for note in unit.get('instructions', [])
+            if lang in note.get('witnesses', [lang])]
+
+
 def unit_document(unit, lang, draft):
     project = PROJECTS[lang]
-    root, body = document(lang, project, unit['title'][lang], unit['urn'], draft=draft)
+    root, body = document(lang, project, unit['title'][lang], unit_urn(unit), draft=draft)
     biblical_root = ':bible:' in unit['urn']
     div = element(body, 'div', **({'corresp': unit['urn']} if unit.get('map_root', not biblical_root) else {}))
     opening = unit['languages'][lang][0]['fragments'][0]
@@ -131,8 +146,14 @@ def unit_document(unit, lang, draft):
                 facs=page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
         current_page = opening['scan']
         element(div, 'head', unit['head'][lang]).set(XML+'lang', lang)
-    for instruction in unit.get('instructions', []):
-        note = element(div, 'note', type=instruction.get('type', 'instruction'))
+    for instruction in unit_instructions(unit, lang):
+        if instruction.get('placement') == 'condition' and not conditions:
+            raise ValueError('A condition rubric requires a condition')
+        parent = conditional if instruction.get('placement') == 'condition' else div
+        note = element(parent, 'note', type=instruction.get('type', 'instruction'))
+        if parent is not div:
+            parent.remove(note)
+            parent.insert(len(parent)-1, note)
         note.set(XML+'lang', instruction['language'])
         rubric_words(note, instruction, instruction['language'])
     citations = unit.get('citations', {}).get(lang, [])
@@ -273,7 +294,7 @@ def unit_document(unit, lang, draft):
                     raise ValueError('Each enlarged letter must identify one source character')
                 for part in re.split('(['+re.escape(''.join(letters))+'])', fragment['text']):
                     if part in letters:
-                        element(content, 'hi', part, rend='large')
+                        element(content, 'c', part, rend='large')
                     else:
                         words(content, part, text_language)
             else:
@@ -304,8 +325,8 @@ def unit_review_text(unit, lang):
     # This is a review payload, not printed prayer text. Include both the
     # source abbreviation and its interpretation so either change needs review.
     parts = ([unit['head'][lang]] if unit.get('head', {}).get(lang) else [])
-    parts.extend(instruction['text'] for instruction in unit.get('instructions', []))
-    for instruction in unit.get('instructions', []):
+    parts.extend(instruction['text'] for instruction in unit_instructions(unit, lang))
+    for instruction in unit_instructions(unit, lang):
         parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
     for segment in unit['languages'][lang]:
         if segment.get('speaker'):
@@ -549,14 +570,7 @@ def documentary_order(div, order, readings, by_stem, lang, project):
         else:
             unit = by_stem[occurrence['unit']]
             if lang in unit['languages']:
-                target = unit.get('start', unit['urn'])
-                if unit.get('end'):
-                    # A single qualified range keeps both ends in this edition.
-                    # An absolute end also supports differing reference depths.
-                    if target.partition('/')[0] != unit['end'].partition('/')[0]:
-                        raise ValueError('A documentary unit cannot span different works')
-                    target += '-/'+unit['end'].partition('/')[2]
-                element(div, 'j:transclude', type='external', target=target+'@'+project)
+                element(div, 'j:transclude', type='external', target=unit_urn(unit)+'@'+project)
 
 
 def build(source, project_directory, *, draft=False):

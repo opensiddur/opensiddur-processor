@@ -198,6 +198,8 @@ class EditionWiringTest(unittest.TestCase):
         self.generate(draft=True)
         root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
         self.assertFalse(root.findall('.//'+T+'milestone[@unit="chapter"][@corresp]'))
+        self.assertEqual(root.find('.//'+T+'publicationStmt/'+T+'idno').text,
+                         chapter+'/5-/6/6@'+PROJECTS['he'])
         index = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
         inclusion = index.find('.//'+J+'transclude')
         self.assertEqual(inclusion.get('target'), chapter+'/5-/6/6@'+PROJECTS['he'])
@@ -211,9 +213,27 @@ class EditionWiringTest(unittest.TestCase):
         self.save('readings', self.readings)
         self.generate(draft=True)
         root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
-        self.assertEqual([e.text for e in root.findall('.//'+T+'hi')], ['ע', 'ד'])
+        self.assertEqual([e.text for e in root.findall('.//'+T+'c')], ['ע', 'ד'])
         self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), text)
         self.assertEqual(root.find('.//'+J+'divineName').text, 'יְהוָ֥ה')
+
+    def test_source_rubrics_belong_to_their_condition_or_language_witness(self):
+        unit = self.readings['units'][0]
+        unit['conditions'] = [{'type': 'opensiddur:quorum', 'features': {'minyan': False}}]
+        unit['instructions'] = [
+            {'text': 'יחיד אומר', 'language': 'he', 'type': 'instruction',
+             'placement': 'condition', 'witnesses': ['he']},
+            {'text': 'בלחש', 'language': 'he', 'type': 'description', 'witnesses': ['he']}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        he = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        condition = he.find('.//'+J+'conditional')
+        self.assertEqual(condition[0].tag, T+'note')
+        self.assertEqual(condition[0].text, 'יחיד אומר')
+        self.assertEqual(he.find('.//'+T+'body/'+T+'div/'+T+'note').text, 'בלחש')
+        en = etree.parse(str(self.projects/PROJECTS['en']/'first.xml'))
+        self.assertFalse(en.findall('.//'+T+'body//'+T+'note'))
+        self.assertNotIn('בלחש', unit_review_text(unit, 'en'))
 
     def test_language_specific_headings_keep_their_own_scan_boundary(self):
         self.readings['documentary_instructions'] = {

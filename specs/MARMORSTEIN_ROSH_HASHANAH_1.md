@@ -272,6 +272,11 @@ the expanded spine orders the call, the congregation’s meditation during the
 chant, and the common response, subject to independent order review.
 
 The Shema witness retains its cantillation and enlarged ayin/dalet. Record a
+single enlarged character with `tei:c/@rend`. Conditional when-rubrics belong
+inside `j:conditional`; descriptions of how to recite belong inside the
+passage. Source rubrics may name their language witnesses to avoid supplying
+an absent instruction in the facing translation. Publication URNs, as well as
+documentary transclusions, name the exact verse range of an excerpt. Record a
 single canonical verse boundary across a page continuation. Exact Biblical
 quotations within a prayer part carry their own chapter/verse milestones and
 terminators inside a `source` span, without ending the outer prayer-part scope.
