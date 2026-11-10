@@ -183,7 +183,18 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(root.xpath('//t:milestone[@unit="chapter"]/@n', namespaces=ns), ['15'])
         first = root.find('.//'+T+'milestone[@corresp="'+BASE+'invented/1"]')
         end, _ = find_end_of_mapping(first)
-        self.assertEqual(''.join(root.xpath(end, namespaces=ns)[0].itertext()), 'גד')
+        last = root.xpath(end, namespaces=ns)[0]
+        node, scope = first, ''
+        while True:
+            scope += printed_text(node)+(node.tail or '')
+            if node is last:
+                break
+            node = node.getnext()
+        self.assertEqual(scope.strip(), 'אב־גד')
+        self.assertEqual(last.getnext().get('corresp'), BASE+'invented/2')
+        scripture = root.find('.//'+T+'milestone[@corresp="'+verse+'"]')
+        self.assertEqual(scripture.getnext().tag, T+'seg')
+        self.assertIsNone(scripture.getparent().get('source'))
         self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), 'אב־גד הו')
 
     def test_passage_speaker_stays_outside_both_adjacent_reusable_parts(self):
@@ -283,6 +294,51 @@ class EditionWiringTest(unittest.TestCase):
         self.assertIsNotNone(index.find('.//'+J+'endConditional'))
         verse = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
         self.assertFalse(verse.findall('.//'+J+'conditional'))
+
+    def test_inline_sabbath_insertions_end_before_the_following_words(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [
+            {'fragments': [{'scan': 's1', 'text': 'Before'}]},
+            {'conditions': [{'type': 'opensiddur:holiday-aggregate', 'features': {'shabbat': True}}],
+             'condition_instruction': 'On Sabbath:',
+             'fragments': [{'scan': 's1', 'text': 'Sabbath'}, {'scan': 's2', 'text': 'continuation'}]},
+            {'fragments': [{'scan': 's2', 'text': 'After'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        paragraphs = root.findall('.//'+T+'body//'+T+'p')
+        self.assertEqual(len(paragraphs), 1)
+        paragraph = paragraphs[0]
+        condition = paragraph.find(J+'conditional')
+        end = paragraph.find(J+'endConditional')
+        self.assertEqual(end.get('target'), '#'+condition.get('{http://www.w3.org/XML/1998/namespace}id'))
+        self.assertEqual(condition.find(T+'note').text, 'On Sabbath:')
+        self.assertIn('Before', paragraph[0].tail)
+        self.assertIn('Sabbath', condition.tail)
+        self.assertIn('continuation', paragraph[paragraph.index(end)-1].tail)
+        self.assertIn('After', end.tail)
+        original = unit_review_text(unit, 'he')
+        unit['languages']['he'][1]['condition_instruction'] = 'A different instruction'
+        self.assertNotEqual(unit_review_text(unit, 'he'), original)
+
+    def test_marked_inline_condition_keeps_source_brackets_out_of_prayer_words(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [
+            {'fragments': [{'scan': 's1', 'text': 'Before'}]},
+            {'marked': True,
+             'conditions': [{'type': 'opensiddur:holiday-aggregate', 'features': {'shabbat': True}}],
+             'fragments': [{'scan': 's1', 'text': '(and)', 'join_next': True}]},
+            {'fragments': [{'scan': 's1', 'text': 'after'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertEqual(root.find('.//'+J+'conditional').get('type'), 'marked')
+        self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), 'Before andafter')
+        self.assertEqual(json.loads((self.source/'readings.json').read_text())['units'][0]['languages']['he'][1]['fragments'][0]['text'], '(and)')
+        unit['languages']['he'][1].pop('conditions')
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'Marked source condition'):
+            self.generate(draft=True)
 
     def test_regeneration_keeps_documentary_previews_independent_of_device_day(self):
         self.generate(draft=True)

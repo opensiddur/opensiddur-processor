@@ -189,7 +189,7 @@ def unit_document(unit, lang, draft):
             element(paragraph, 'milestone', unit='chapter')
             current_chapter = None
 
-    for segment in unit['languages'][lang]:
+    for segment_index, segment in enumerate(unit['languages'][lang]):
         if segment.get('transclude'):
             if paragraph is not None:
                 close_references()
@@ -203,7 +203,26 @@ def unit_document(unit, lang, draft):
             if text_language != lang:
                 paragraph.set(XML+'lang', text_language)
             current_paragraph = identity
-        for index, fragment in enumerate(segment['fragments']):
+        segment_conditions = segment.get('conditions', [])
+        if segment_conditions:
+            # Conditions select words within a printed paragraph. Keep the
+            # matching end marker in that paragraph, including continuations.
+            segment_condition_id = unit['stem']+'_segment_'+str(segment_index)
+            condition = element(paragraph, 'j:conditional', **({'type': 'marked'} if segment.get('marked') else {}))
+            condition.set(XML+'id', segment_condition_id)
+            if segment.get('condition_instruction'):
+                note = element(condition, 'note', type='instruction')
+                note.set(XML+'lang', lang)
+                words(note, segment['condition_instruction'], lang)
+            feature_structures(element(condition, 'j:all'), segment_conditions)
+        fragments = segment['fragments']
+        if segment.get('marked'):
+            if not segment_conditions or not fragments[0]['text'].startswith('(') or not fragments[-1]['text'].endswith(')'):
+                raise ValueError('Marked source condition requires paired source parentheses')
+            fragments = deepcopy(fragments)
+            fragments[0]['text'] = fragments[0]['text'][1:]
+            fragments[-1]['text'] = fragments[-1]['text'][:-1]
+        for index, fragment in enumerate(fragments):
             if fragment['scan'] != current_page:
                 attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(fragment['scan'][1:])-1, size='')}
                 if fragment.get('printed_page') is not None:
@@ -274,17 +293,17 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'j:transclude', type='inline', target=segment['repeat']+'@'+project)
                 append_words(paragraph, ' ')
                 continue
+            source_reference = segment.get('source_reference')
+            if source_reference and index == 0:
+                book, chapter, verse = source_reference.rsplit(':', 1)[-1].split('/')
+                element(paragraph, 'milestone', unit='chapter', n=chapter)
+                element(paragraph, 'milestone', unit='verse', n=verse, corresp=source_reference)
             content = paragraph
             if segment.get('source'):
                 attributes = {'source': segment['source']}
                 if segment.get('source_type'):
                     attributes['type'] = segment['source_type']
                 content = element(paragraph, 'seg', **attributes)
-            source_reference = segment.get('source_reference')
-            if source_reference and index == 0:
-                book, chapter, verse = source_reference.rsplit(':', 1)[-1].split('/')
-                element(content, 'milestone', unit='chapter', n=chapter)
-                element(content, 'milestone', unit='verse', n=verse, corresp=source_reference)
             if fragment.get('expansion'):
                 choice = element(content, 'choice')
                 abbreviation = element(choice, 'abbr')
@@ -307,10 +326,12 @@ def unit_document(unit, lang, draft):
             else:
                 words(content, fragment['text'], text_language)
             if source_reference and index == len(segment['fragments']) - 1:
-                element(content, 'milestone', unit='verse')
-                element(content, 'milestone', unit='chapter')
-            if not fragment['text'].rstrip().endswith('־'):
+                element(paragraph, 'milestone', unit='verse')
+                element(paragraph, 'milestone', unit='chapter')
+            if not fragment.get('join_next') and not fragment['text'].rstrip().endswith('־'):
                 append_words(paragraph, ' ')
+        if segment_conditions:
+            element(paragraph, 'j:endConditional', target='#'+segment_condition_id)
         if segment.get('repeat_cue'):
             close_references()
             cue = segment['repeat_cue']
@@ -336,6 +357,8 @@ def unit_review_text(unit, lang):
     for instruction in unit_instructions(unit, lang):
         parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
     for segment in unit['languages'][lang]:
+        if segment.get('condition_instruction'):
+            parts.append(segment['condition_instruction'])
         if segment.get('speaker'):
             speaker = segment['speaker']
             parts.append(speaker['label']+' ['+speaker['role']+']' if 'label' in speaker else

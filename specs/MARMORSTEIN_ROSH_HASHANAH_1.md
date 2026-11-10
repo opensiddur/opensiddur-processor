@@ -14,7 +14,8 @@ printed pages 12–14) covers Barekhu through Ga’al Yisrael in 19 language fil
 Human source adjudications, enlarged readings and two independent guideline,
 alignment and order audits were followed by acceptance of s24–s25 (printed
 p. 15), Hashkivenu through Half Kaddish, bringing the total to 31 leaves.
-The next source page is s26 (Archive n25). PR 297 is merged; character-highlighting
+The evening Amidah on s26–s33 is also accepted, bringing the total to 39
+leaves; the next source page is s34 (Archive n33). PR 297 is merged; character-highlighting
 support for the required `tei:c` encoding is isolated in merged exporter PR 298.
 
 ## Repositories and outputs
@@ -358,3 +359,43 @@ The accepted build validates 95 XML files. The focused importer suite passes
 102 tests and 41 subtests. Eight runtime cases protect service/quorum choices,
 ordinary-day dependencies and missing translations; four Bible scope checks
 confirm excerpts do not claim entire chapters. Whole-volume acceptance remains false.
+
+
+## Evening Amidah (s26–s33, printed 16–19)
+
+The next installment supplies the full silent Amidah in fifteen Hebrew/English
+modules, from Adonai sefatai through the Temple prayer. Existing registered
+festival composite roots distinguish its Avot, Gevurot, day blessing, Avodah,
+Hodaah and peace blessing from the edition’s earlier ordinary Minchah. Reuse
+canonical prayer-part milestones for the words; do not invent new identities
+for service placement. The shared expanded spine declares silence, without
+repetition, locally and includes each module once. No Maariv Kedushah is supplied.
+
+Twelve source-parenthesized Sabbath clauses use j:conditional type=marked.
+Keep parentheses in the raw readings and remove them during generation so
+selected prayer text has no delimiters and undecided conditions use the
+exporter’s standard delimiters. Rashi אם שבת. labels remain condition instruction
+notes without rend. The seal’s optional vav joins Israel directly. Preserve
+the unpointed parenthetical (מלכנו), whose condition is unspecified and whose
+English translation is absent, without inventing a setting or translation.
+
+Full scriptural quotations have chapter context, verse correspondence and
+explicit terminators outside their source spans: Psalms 51:17, 146:10, 60:7,
+19:15; Isaiah 5:16; Malachi 3:4. The generator applies the same placement to
+earlier quoted passages. All 92 earlier language files retain identical printed
+words and correspondence sequences. The existing Psalm 19:15 reference mapping
+remains preferred; both printed occurrences remain present in each documentary
+language witness. No whole-chapter identity is claimed by an excerpt.
+
+Preserve the original English “Thou has created” as has/hast in sic/corr.
+Human adjudication confirms the bet dagesh in באפו, no first-yod sheva in
+the prefixed Divine Name, and dalet dagesh plus holam and first-nun meteg
+in ופקדננו, with no fe/qof dagesh. Raw blind differences, superseded readings
+and actual configured reviewer model/effort remain in the source evidence.
+
+Current checks: 125 schema-valid XML files; 104 focused importer tests and 41
+subtests; names/features/registry/reference checks; seven Amidah runtime cases
+and six bilingual scripture scope checks. Earlier eight Kaddish/runtime cases
+still pass, including ordinary Minchah and missing-English protection. Both frozen-file independent audits passed after marked-conditional corrections
+and human source adjudications. Accepted coverage is 39 of 355 leaves, with
+48 independent image readings. Final PDF/HTML exports accompany this installment.
