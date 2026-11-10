@@ -475,6 +475,49 @@ class EditionWiringTest(unittest.TestCase):
             self.assertEqual(service.find('.//'+T+'body//'+T+'head').text, 'Service heading')
             self.assertEqual(service.find('.//'+J+'transclude').get('target'), BASE+'invented@'+project)
 
+    def test_documentary_occurrence_retains_the_canonical_prayer_identity(self):
+        unit = self.readings['units'][0]
+        unit['publication_context'] = BASE+'another'
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        doc = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        context = doc.find('.//'+T+'body/'+T+'div')
+        self.assertEqual(context.get('corresp'), BASE+'another')
+        self.assertEqual(context.find(T+'div').get('corresp'), BASE+'invented')
+        index = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        self.assertEqual(index.find('.//'+J+'transclude').get('target'), BASE+'another@'+PROJECTS['he'])
+        expanded = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        self.assertEqual(expanded.find('.//'+J+'transclude').get('target'), BASE+'invented')
+
+    def test_reused_occurrence_does_not_declare_the_canonical_prayer_twice(self):
+        unit = self.readings['units'][0]
+        unit['publication_context'] = BASE+'another'
+        unit['reuse'] = {'he': BASE+'invented'}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        doc = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertFalse(doc.findall('.//*[@corresp="'+BASE+'invented"]'))
+        self.assertEqual(doc.find('.//'+J+'transclude').get('target'), BASE+'invented@'+PROJECTS['he'])
+        self.assertEqual(doc.find('.//'+T+'body/'+T+'div').get('corresp'), BASE+'another')
+
+    def test_poetic_lines_are_independent_of_the_translation_paragraph(self):
+        unit = self.readings['units'][0]
+        unit['poetry'] = {'he': True}
+        unit['languages']['he'] = [
+            {'paragraph': n, 'corresp': BASE+'invented/'+str(n), 'reference_unit': 'stanza',
+             'fragments': [{'scan': 's1', 'text': text}]}
+            for n, text in [(1, 'First couplet'), (2, 'Second couplet')]]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        he = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertEqual(len(he.findall('.//'+T+'body//'+T+'lg')), 1)
+        self.assertEqual(len(he.findall('.//'+T+'body//'+T+'l')), 2)
+        self.assertFalse(he.findall('.//'+T+'body//'+T+'p'))
+        self.assertEqual(len(he.findall('.//'+T+'milestone[@corresp]')), 2)
+        en = etree.parse(str(self.projects/PROJECTS['en']/'first.xml'))
+        self.assertFalse(en.findall('.//'+T+'body//'+T+'lg'))
+        self.assertEqual(len(en.findall('.//'+T+'body//'+T+'p')), 1)
+
     def test_regeneration_keeps_documentary_previews_independent_of_device_day(self):
         self.generate(draft=True)
         for variant in ('documentary', 'with_translation'):

@@ -122,6 +122,8 @@ def instruction_review_text(instruction):
 
 def unit_urn(unit):
     """Name the actual excerpt rather than its containing chapter."""
+    if unit.get('publication_context'):
+        return unit['publication_context']
     target = unit.get('start', unit['urn'])
     if unit.get('end'):
         if target.partition('/')[0] != unit['end'].partition('/')[0]:
@@ -138,14 +140,22 @@ def unit_instructions(unit, lang):
 def unit_document(unit, lang, draft):
     project = PROJECTS[lang]
     root, body = document(lang, project, unit['title'][lang], unit_urn(unit), draft=draft)
+    if unit.get('publication_context'):
+        body = element(body, 'div', corresp=unit['publication_context'])
     biblical_root = ':bible:' in unit['urn']
-    div = element(body, 'div', **({'corresp': unit['urn']} if unit.get('map_root', not biblical_root) else {}))
+    reuse = unit.get('reuse', {}).get(lang)
+    div = element(body, 'div', **({'corresp': unit['urn']} if not reuse and unit.get('map_root', not biblical_root) else {}))
     opening = unit['languages'][lang][0]['fragments'][0]
     div.set('facs', page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
     last = unit['languages'][lang][-1]['fragments'][-1]
     if opening.get('printed_page') is not None and last.get('printed_page') is not None:
         element(root.find(f'.//{{{TEI}}}sourceDesc/{{{TEI}}}bibl'), 'biblScope',
                 unit='pages', **{'from': opening['printed_page'], 'to': last['printed_page']})
+    if reuse:
+        # A documentary occurrence can reuse an identical earlier witness
+        # without registering the canonical prayer a second time.
+        element(element(div, 'p'), 'j:transclude', type='inline', target=reuse+'@'+project)
+        return root
     conditions = unit.get('conditions', [])
     if conditions:
         conditional = element(div, 'j:conditional')
@@ -191,6 +201,8 @@ def unit_document(unit, lang, draft):
     current_chapter = None
     seen_chapters = set()
     active_reference = None
+    line_group = None
+    poetry = unit.get('poetry', {}).get(lang, False)
 
     def close_references():
         nonlocal active_reference, current_chapter
@@ -207,11 +219,14 @@ def unit_document(unit, lang, draft):
                 close_references()
             element(div, 'j:transclude', type='external', target=segment['transclude']+'@'+project)
             paragraph = current_paragraph = None
+            line_group = None
             continue
         identity = segment.get('paragraph', 1)
         text_language = segment.get('language', lang)
         if paragraph is None or identity != current_paragraph:
-            paragraph = element(div, 'p')
+            if poetry and line_group is None:
+                line_group = element(div, 'lg')
+            paragraph = element(line_group if poetry else div, 'l' if poetry else 'p')
             if text_language != lang:
                 paragraph.set(XML+'lang', text_language)
             current_paragraph = identity
@@ -682,6 +697,9 @@ def build(source, project_directory, *, draft=False):
     for unit in readings['units']:
         identities = [unit['urn']] + [s[key] for segments in unit['languages'].values()
                                      for s in segments for key in ('corresp', 'source', 'source_reference', 'transclude', 'repeat') if s.get(key)]
+        if unit.get('publication_context'):
+            identities.append(unit['publication_context'])
+        identities.extend(unit.get('reuse', {}).values())
         identities += [citation['target'] for citations in unit.get('citations', {}).values()
                        for citation in citations if citation.get('target')]
         for urn in identities:
@@ -710,7 +728,8 @@ def build(source, project_directory, *, draft=False):
             heading_key = section.get('heading')
             if isinstance(heading_key, dict):
                 heading_key = heading_key.get(lang)
-            title = readings['documentary_instructions'][heading_key]['text']
+            title = (section['titles'][lang] if section.get('titles') else
+                     readings['documentary_instructions'][heading_key]['text'])
             service_root, service_body = document(lang, project, title, section['corresp'], draft=draft)
             inline_section = deepcopy(section)
             inline_section.pop('file')

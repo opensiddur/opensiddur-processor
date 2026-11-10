@@ -462,3 +462,65 @@ All 27 final review targets match the accepted XML after reversing only
 acceptance metadata and the explicitly human-confirmed final שבת pointing.
 All 122 earlier language modules remain unchanged. The guarded accepted build
 validates 148 files and leaves no DRAFT metadata in the generated projects.
+
+## Morning preliminaries (scan pages 39–43)
+
+Transcribe the tallit preparation on printed p.1, entrance/pre-morning prayers
+on pp.2–3, Shaḥar Avaqeshkha and Yigdal. Page39 has actual English blessing
+and Psalm translations below its Hebrew text on the same leaf. Keep its
+untranslated intention and closing petition Hebrew-only. English linkage
+words are evidence, not prayer words; the English ritual instructions retain
+their Hebrew prayer names. All source page boundaries use exact Archive leaves.
+
+Reuse existing tallith, Mah Tovu, Gabirol and Yigdal identities, and Biblical
+verse/subverse identities. Add only five structural context records, not new
+canonical prayer identities. Contexts distinguish the new documentary
+occurrences from earlier printings without forcing one local spelling or
+pointing onto both. The identical Hebrew Mah Tovu reuses the earlier canonical
+witness inline; its context retains the morning facsimile, and the English
+provides its first edition witness. A unique occurrence milestone directly
+in the source paragraph preserves Psalm 17:6's second English rendering,
+“I called” rather than “I call”, without declaring a second canonical verse.
+
+Existing earlier s7 Hebrew Bible witnesses remain the canonical lookup in
+this edition. Expanded recitation deliberately reuses those witnesses and
+repeats the canonical verse where required. Documentary compilation retains
+the actual later readings. Actual paired-output verification checks every
+one of the eighteen morning Psalm occurrences and the complete Mah Tovu
+against their own source words, with no duplicate-alignment warnings or
+parallel compilation failures. This evidence resolves the reviewer's concern
+about possible cross-position pairing; it does not assert that the s40
+pointing replaces the earlier canonical witness.
+
+The generic Gabirol poem root is retained; its four already registered stanza
+identities come from the legacy _39123 root. Likewise the generic Yigdal root
+reuses the existing thirteen yigdal_daniel part identities. These are shared
+text extents, not newly named translations. Hebrew poetic lines use lg/l;
+English printed prose paragraphs keep their own boundaries. Verse milestones
+remain independent of paragraphs and page breaks. The short Numbers15:38
+quotation retains its source annotation without claiming the unprinted ends
+of that verse or inventing a named subverse absent from the shared table.
+
+Two separately transcluded service files per language keep the tallit section
+and following prayer heading anchored around untranslated passages. Source
+headings are printed only where present; service-file metadata may describe
+its contents. The expanded morning sequence starts with this tallit/entrance
+material and continues into the existing morning excerpts. The earlier
+generic entrance sequence is selected only outside Shacharit, preventing a
+double recitation when morning is selected. Existing local service/calendar
+settings and the common bilingual spine remain in use.
+
+The edition now supplies Yigdal in both languages, so canonical transclusion
+replaces the earlier Birnbaum dependency for that poem in Maariv as well.
+Compatible Birnbaum Hebrew still supplies the missing Kaddish/Hamotzi words,
+with credits and licences preserved. No English is invented. The original
+“Lister” and transposed “מסדורים” receive separate sic/corr layers while raw
+image readings preserve the source. Small Rashi-script attribution/metre
+abbreviations have explicit expansions, bound into the review payload.
+
+Human adjudication gives “בקשה לר׳ שלמה בן גבירול. ב׳ תנועות ויתד וב׳ תנועות.”,
+confirms ordinary יְיָ for the heavy Name sort, and identifies the tallit
+heading’s extra ink as a smudge beside hataf-patah, not a meteg. The bet in
+בתורה and both dalet dagesh/vav shuruq in לְאַחְדּוּתוֹ are confirmed.
+Three independent audits and actual paired compiler checks settle the source,
+guidelines, alignment and order. Accepted: 49 of 355 leaves; continue at scan 44.
