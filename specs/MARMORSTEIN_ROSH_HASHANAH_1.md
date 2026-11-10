@@ -9,11 +9,12 @@ weekday Minchah, festival preparations and Kabbalat Shabbat through s17
 (printed page 11) have been transcribed and independently reviewed. This is not a complete
 mahzor. Its PRs remain draft while the full-volume transcription is unfinished.
 
-The next draft installment covers s18–s23 (Archive n17–n22, paired Hebrew and
-English printed pages 12–14): Barekhu through Ga’al Yisrael. Its 19 language
-files are provisional pending source-mark adjudication and independent
-guideline/alignment/order review. They do not advance the accepted-leaf count.
-PR 297 is merged; its exporter changes now come from `main`.
+The accepted installment s18–s23 (Archive n17–n22, paired Hebrew and English
+printed pages 12–14) covers Barekhu through Ga’al Yisrael in 19 language files.
+Human source adjudications, enlarged readings and two independent guideline,
+alignment and order audits bring the accepted total to 29 leaves. Raw blind
+readings of s24–s25 remain unassembled. PR 297 is merged; character-highlighting
+support for the required `tei:c` encoding is isolated in exporter PR 298.
 
 ## Repositories and outputs
 
@@ -287,7 +288,7 @@ There is no English witness for El melekh ne’eman or the meditation’s final
 Psalm 113:2. Preserve those omissions. El melekh ne’eman is conditional on
 praying without a minyan; the expanded Barekhu section requires a minyan.
 All settings remain local to their recitation context. Hashkivenu follows the
-current draft and remains to be digitized.
+current accepted installment and remains to be assembled from the next blind readings.
 
 Enlarged crops supplement the immutable blind readings; crop filenames must
 never count as additional scanned leaves. Draft generation labels pending
