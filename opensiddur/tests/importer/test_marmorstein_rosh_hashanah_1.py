@@ -68,6 +68,7 @@ class EditionWiringTest(unittest.TestCase):
         registry = Mock()
         registry.records = {BASE+'invented': {}, BASE+'another': {}}
         registry.resolve.side_effect = lambda urn: urn
+        self.registry_mock = registry
         self.registry = patch('opensiddur.importer.marmorstein_rosh_hashanah_1.build.load_registry',
                               return_value=(registry, []))
         self.registry.start()
@@ -150,6 +151,84 @@ class EditionWiringTest(unittest.TestCase):
         self.save('readings', self.readings)
         with self.assertRaisesRegex(ValueError, 'Unknown speaker expansion: unknown'):
             self.generate(draft=True)
+
+    def test_a_literal_speaker_label_keeps_its_language_and_reviewed_role(self):
+        unit = self.readings['units'][0]
+        speaker = {'label': 'פֿאָרבעטער:', 'language': 'yi', 'role': 'reader'}
+        unit['languages']['he'][0]['speaker'] = speaker
+        original = unit_review_text(unit, 'he')
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        note = root.find('.//'+T+'note[@type="description"]')
+        self.assertEqual(note.get('{http://www.w3.org/XML/1998/namespace}lang'), 'yi')
+        self.assertEqual(note.text, speaker['label'])
+        self.assertTrue(note.get('corresp').endswith('/reader'))
+        self.assertIsNone(note.find(T+'choice'))
+        speaker['role'] = 'congregation'
+        self.assertNotEqual(unit_review_text(unit, 'he'), original)
+
+    def test_quoted_scripture_keeps_both_scopes_across_a_page_boundary(self):
+        verse = 'urn:x-opensiddur:text:bible:exodus/15/11'
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [{
+            'corresp': BASE+'invented/1', 'source': verse, 'source_reference': verse,
+            'fragments': [{'scan': 's1', 'text': 'אב־'}, {'scan': 's2', 'text': 'גד'}]},
+            {'corresp': BASE+'invented/2', 'fragments': [{'scan': 's2', 'text': 'הו'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        ns = {'t': T[1:-1], 'tei': T[1:-1]}
+        self.assertEqual(len(root.xpath('//t:milestone[@corresp=$urn]', namespaces=ns, urn=verse)), 1)
+        self.assertEqual(root.xpath('//t:milestone[@unit="chapter"]/@n', namespaces=ns), ['15'])
+        first = root.find('.//'+T+'milestone[@corresp="'+BASE+'invented/1"]')
+        end, _ = find_end_of_mapping(first)
+        self.assertEqual(''.join(root.xpath(end, namespaces=ns)[0].itertext()), 'גד')
+        self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), 'אב־גד הו')
+
+    def test_partial_chapter_uses_a_range_in_the_documentary_spine(self):
+        chapter = 'urn:x-opensiddur:text:bible:deuteronomy/6'
+        unit = self.readings['units'][0]
+        unit.update(urn=chapter, map_root=False, start=chapter+'/5', end=chapter+'/6')
+        self.registry_mock.records[chapter.rsplit('/', 1)[0]] = {}
+        unit['languages'] = {'he': [
+            {'corresp': chapter+'/5', 'fragments': [{'scan': 's1', 'text': 'אב'}]},
+            {'corresp': chapter+'/6', 'fragments': [{'scan': 's2', 'text': 'גד'}]}]}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertFalse(root.findall('.//'+T+'milestone[@unit="chapter"][@corresp]'))
+        index = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        inclusion = index.find('.//'+J+'transclude')
+        self.assertEqual(inclusion.get('target'), chapter+'/5-/6/6@'+PROJECTS['he'])
+        self.assertIsNone(inclusion.get('targetEnd'))
+
+    def test_enlarged_source_letters_retain_points_and_divine_names(self):
+        unit = self.readings['units'][0]
+        text = 'שְׁמַ֖ע יִשְׂרָאֵ֑ל יְהוָ֥ה אֶחָֽד:'
+        unit['languages']['he'] = [{'fragments': [
+            {'scan': 's1', 'text': text, 'enlarged_letters': ['ע', 'ד']}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertEqual([e.text for e in root.findall('.//'+T+'hi')], ['ע', 'ד'])
+        self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), text)
+        self.assertEqual(root.find('.//'+J+'divineName').text, 'יְהוָ֥ה')
+
+    def test_language_specific_headings_keep_their_own_scan_boundary(self):
+        self.readings['documentary_instructions'] = {
+            'he_head': {'scan': 's1', 'printed_page': '12', 'language': 'he',
+                        'witnesses': ['he'], 'text': 'מעריב'},
+            'en_head': {'scan': 's2', 'printed_page': '12', 'language': 'en',
+                        'witnesses': ['en'], 'text': 'Evening prayer'}}
+        self.readings['source_order'] = [{'section': 'evening',
+            'heading': {'he': 'he_head', 'en': 'en_head'}, 'order': [{'unit': 'first'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        for lang, scan, heading in [('he', 'n0', 'מעריב'), ('en', 'n1', 'Evening prayer')]:
+            root = etree.parse(str(self.projects/PROJECTS[lang]/'index.xml'))
+            self.assertEqual(root.find('.//'+T+'body//'+T+'head').text, heading)
+            self.assertTrue(root.find('.//'+T+'body//'+T+'pb').get('facs').endswith('/'+scan+'.jpg'))
 
     def test_rubric_abbreviation_and_expansion_are_both_reviewed(self):
         unit = self.readings['units'][0]
@@ -449,3 +528,12 @@ class EditionWiringTest(unittest.TestCase):
         self.assertFalse(result['complete'])
         self.assertEqual(result['leaves_fully_transcribed_and_reviewed'], 0)
         self.assertEqual(result['leaves_with_transcribed_excerpts'], 4)
+
+    def test_crop_names_and_out_of_inventory_reads_do_not_inflate_leaf_count(self):
+        self.save('pages', {'pages': [{'scan_page': n} for n in range(1, 5)]})
+        independent = self.source/'independent'
+        independent.mkdir()
+        (independent/'reader.json').write_text(json.dumps({'reviewer': {'model': 'second'},
+            'pages': [{'scan': s} for s in ['s1.jpg', 's1', 's2', 's1-detail.png', 's5']]}))
+        result = report(self.source)
+        self.assertEqual(result['leaves_independently_read'], 2)

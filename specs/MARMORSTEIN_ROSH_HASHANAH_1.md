@@ -9,6 +9,12 @@ weekday Minchah, festival preparations and Kabbalat Shabbat through s17
 (printed page 11) have been transcribed and independently reviewed. This is not a complete
 mahzor. Its PRs remain draft while the full-volume transcription is unfinished.
 
+The next draft installment covers s18–s23 (Archive n17–n22, paired Hebrew and
+English printed pages 12–14): Barekhu through Ga’al Yisrael. Its 19 language
+files are provisional pending source-mark adjudication and independent
+guideline/alignment/order review. They do not advance the accepted-leaf count.
+PR 297 is merged; its exporter changes now come from `main`.
+
 ## Repositories and outputs
 
 All three repositories use `feat/marmorstein-rosh-hashanah-1`. Their default
@@ -256,6 +262,31 @@ just agreement between two preliminary readings. Eleven compiled settings cases
 check festival/Shabbat selection, eruv calendar applicability, minyan/mourners,
 all eleven expanded refrains, ten documentary cues and missing-English behavior.
 All eight complete Psalm chapters have verified verse counts and order.
+
+### First-night Maariv installment
+
+Keep the reader/congregation column labels as literal Yiddish or English
+description notes with canonical role correspondences. Expand the Hebrew
+`קו״ח` as `קהל וחזן`. The documentary order retains the role columns’ texts;
+the expanded spine orders the call, the congregation’s meditation during the
+chant, and the common response, subject to independent order review.
+
+The Shema witness retains its cantillation and enlarged ayin/dalet. Record a
+single canonical verse boundary across a page continuation. Exact Biblical
+quotations within a prayer part carry their own chapter/verse milestones and
+terminators inside a `source` span, without ending the outer prayer-part scope.
+Incomplete chapters provide numbered chapter context without claiming the
+whole chapter; documentary transclusions select an edition-qualified range.
+
+There is no English witness for El melekh ne’eman or the meditation’s final
+Psalm 113:2. Preserve those omissions. El melekh ne’eman is conditional on
+praying without a minyan; the expanded Barekhu section requires a minyan.
+All settings remain local to their recitation context. Hashkivenu follows the
+current draft and remains to be digitized.
+
+Enlarged crops supplement the immutable blind readings; crop filenames must
+never count as additional scanned leaves. Draft generation labels pending
+modules while retaining the reviewed status of previously accepted modules.
 
 ## Commands and acceptance
 

@@ -7,7 +7,7 @@ from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.importer.scan.review import review_is_current
 from opensiddur.importer.util.internet_archive import write_if_changed
 from . import BOOK
-from .build import unit_review_text, front_text
+from .build import unit_review_text, front_text, instruction_review_text
 
 
 def report(source):
@@ -42,7 +42,7 @@ def report(source):
     for name, instruction in readings.get('documentary_instructions', {}).items():
         key = 'instruction/'+name
         fragments.setdefault(instruction['scan'], []).append(key)
-        if not review_is_current(reviews.get(key, {}), instruction['text']):
+        if not review_is_current(reviews.get(key, {}), instruction_review_text(instruction)):
             pending.append(key)
     front_path = source/'front.json'
     if front_path.exists():
@@ -52,10 +52,12 @@ def report(source):
             if not review_is_current(reviews.get(key, {}), front_text(page)):
                 pending.append(key)
     independently_read = set()
+    inventory_scans = {'s'+str(page['scan_page']) for page in pages}
     for path in (source/'independent').glob('*.json'):
         payload = json.loads(path.read_text())
         if isinstance(payload, dict) and payload.get('reviewer'):
-            independently_read.update(p['scan'].removesuffix('.jpg') for p in payload.get('pages', []))
+            independently_read.update(scan for p in payload.get('pages', [])
+                                      if (scan := p['scan'].removesuffix('.jpg')) in inventory_scans)
     complete_pages = []
     for page in pages:
         scan = 's'+str(page['scan_page'])

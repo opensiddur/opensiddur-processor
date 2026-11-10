@@ -102,6 +102,12 @@ def rubric_words(parent, rubric, lang):
     words(parent, text, lang)
 
 
+def instruction_review_text(instruction):
+    parts = [instruction['text']]
+    parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
+    return ' '.join(parts)
+
+
 def unit_document(unit, lang, draft):
     project = PROJECTS[lang]
     root, body = document(lang, project, unit['title'][lang], unit['urn'], draft=draft)
@@ -195,7 +201,7 @@ def unit_document(unit, lang, draft):
                         attributes = {'unit': 'chapter', 'n': parts[1]}
                         # Excerpted chapters supply context, not a substitute
                         # witness for the whole chapter.
-                        if chapter not in seen_chapters and (chapter == unit['urn'] or chapter in unit.get('complete_chapters', [])):
+                        if chapter not in seen_chapters and ((chapter == unit['urn'] and not unit.get('start')) or chapter in unit.get('complete_chapters', [])):
                             attributes['corresp'] = chapter
                             seen_chapters.add(chapter)
                         element(paragraph, 'milestone', **attributes)
@@ -212,17 +218,27 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
                 active_reference = reference_unit
             if index == 0 and segment.get('speaker'):
-                expansion = segment['speaker']['expan']
-                try:
-                    role = {label: role for role, label in ROLE_LABELS.items()}[expansion]
-                except KeyError:
-                    raise ValueError(f'Unknown speaker expansion: {expansion}') from None
+                speaker = segment['speaker']
+                if 'label' in speaker:
+                    role = speaker['role']
+                    if role not in ROLE_LABELS:
+                        raise ValueError(f'Unknown speaker role: {role}')
+                else:
+                    expansion = speaker['expan']
+                    try:
+                        role = {label: role for role, label in ROLE_LABELS.items()}[expansion]
+                    except KeyError:
+                        raise ValueError(f'Unknown speaker expansion: {expansion}') from None
                 identity = 'urn:x-opensiddur:instruction:role/'+role
                 description = element(paragraph, 'note', type='description', corresp=identity)
-                description.set(XML+'lang', 'he')
-                choice = element(description, 'choice')
-                element(choice, 'abbr', segment['speaker']['abbr'])
-                element(choice, 'expan', segment['speaker']['expan'])
+                description.set(XML+'lang', speaker.get('language', 'he'))
+                if 'label' in speaker:
+                    words(description, speaker['label'], speaker.get('language', 'he'))
+                else:
+                    choice = element(description, 'choice')
+                    element(choice, 'abbr', speaker['abbr'])
+                    element(choice, 'expan', speaker['expan'])
+                append_words(paragraph, ' ')
             if segment.get('repeat'):
                 # Repeated recitation reuses the witness; it does not define a
                 # second element with the same canonical identity in one file.
@@ -236,6 +252,11 @@ def unit_document(unit, lang, draft):
                 if segment.get('source_type'):
                     attributes['type'] = segment['source_type']
                 content = element(paragraph, 'seg', **attributes)
+            source_reference = segment.get('source_reference')
+            if source_reference and index == 0:
+                book, chapter, verse = source_reference.rsplit(':', 1)[-1].split('/')
+                element(content, 'milestone', unit='chapter', n=chapter)
+                element(content, 'milestone', unit='verse', n=verse, corresp=source_reference)
             if fragment.get('expansion'):
                 choice = element(content, 'choice')
                 abbreviation = element(choice, 'abbr')
@@ -246,8 +267,20 @@ def unit_document(unit, lang, draft):
                 else:
                     words(abbreviation, fragment['text'], lang)
                 words(element(choice, 'expan'), fragment['expansion'], lang)
+            elif fragment.get('enlarged_letters'):
+                letters = fragment['enlarged_letters']
+                if any(len(letter) != 1 or fragment['text'].count(letter) != 1 for letter in letters):
+                    raise ValueError('Each enlarged letter must identify one source character')
+                for part in re.split('(['+re.escape(''.join(letters))+'])', fragment['text']):
+                    if part in letters:
+                        element(content, 'hi', part, rend='large')
+                    else:
+                        words(content, part, text_language)
             else:
                 words(content, fragment['text'], text_language)
+            if source_reference and index == len(segment['fragments']) - 1:
+                element(content, 'milestone', unit='verse')
+                element(content, 'milestone', unit='chapter')
             if not fragment['text'].rstrip().endswith('־'):
                 append_words(paragraph, ' ')
         if segment.get('repeat_cue'):
@@ -277,7 +310,8 @@ def unit_review_text(unit, lang):
     for segment in unit['languages'][lang]:
         if segment.get('speaker'):
             speaker = segment['speaker']
-            parts.append(speaker['abbr']+' ['+speaker['expan']+']')
+            parts.append(speaker['label']+' ['+speaker['role']+']' if 'label' in speaker else
+                         speaker['abbr']+' ['+speaker['expan']+']')
         parts.extend(fragment['text'] for fragment in segment['fragments'])
         if segment.get('repeat_cue'):
             cue = segment['repeat_cue']
@@ -354,7 +388,7 @@ def expanded_order(parent, order, readings, by_stem):
             instruction = readings['documentary_instructions'][occurrence['instruction']]
             note = element(parent, 'note', type=instruction.get('type', 'instruction'))
             note.set(XML+'lang', instruction['language'])
-            words(note, instruction['text'], instruction['language'])
+            rubric_words(note, instruction, instruction['language'])
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             clauses = deepcopy(navigation['clauses'])
@@ -471,7 +505,7 @@ def require_review(readings, reviews):
                 raise ValueError(f'Independent navigation review pending or stale: {key}')
     for name, instruction in readings.get('documentary_instructions', {}).items():
         key = 'instruction/'+name
-        if not review_is_current(reviews.get(key, {}), instruction['text']):
+        if not review_is_current(reviews.get(key, {}), instruction_review_text(instruction)):
             raise ValueError('Independent instruction review pending or stale: '+key)
 
 
@@ -480,8 +514,11 @@ def documentary_order(div, order, readings, by_stem, lang, project):
     for occurrence in order:
         if 'section' in occurrence:
             section = element(div, 'div')
-            heading = readings['documentary_instructions'][occurrence['heading']]
-            if lang in heading['witnesses']:
+            key = occurrence['heading']
+            if isinstance(key, dict):
+                key = key.get(lang)
+            heading = readings['documentary_instructions'].get(key)
+            if heading and lang in heading['witnesses']:
                 if heading.get('page_start', True):
                     element(section, 'pb', ed='1965', n=heading['printed_page'],
                             facs=page_image_url(IDENTIFIER, int(heading['scan'][1:])-1, size=''))
@@ -498,7 +535,7 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                     element(div, 'pb', ed='1965', n=instruction['printed_page'], facs=facs)
                 note = element(div, 'note', type=instruction.get('type', 'instruction'), facs=facs)
                 note.set(XML+'lang', instruction['language'])
-                words(note, instruction['text'], instruction['language'])
+                rubric_words(note, instruction, instruction['language'])
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             scan = navigation['scan'][lang]
@@ -512,7 +549,14 @@ def documentary_order(div, order, readings, by_stem, lang, project):
         else:
             unit = by_stem[occurrence['unit']]
             if lang in unit['languages']:
-                element(div, 'j:transclude', type='external', target=unit['urn']+'@'+project)
+                target = unit.get('start', unit['urn'])
+                if unit.get('end'):
+                    # A single qualified range keeps both ends in this edition.
+                    # An absolute end also supports differing reference depths.
+                    if target.partition('/')[0] != unit['end'].partition('/')[0]:
+                        raise ValueError('A documentary unit cannot span different works')
+                    target += '-/'+unit['end'].partition('/')[2]
+                element(div, 'j:transclude', type='external', target=target+'@'+project)
 
 
 def build(source, project_directory, *, draft=False):
@@ -532,7 +576,7 @@ def build(source, project_directory, *, draft=False):
         raise ValueError('URN registry cannot be loaded cleanly')
     for unit in readings['units']:
         identities = [unit['urn']] + [s[key] for segments in unit['languages'].values()
-                                     for s in segments for key in ('corresp', 'source', 'transclude', 'repeat') if s.get(key)]
+                                     for s in segments for key in ('corresp', 'source', 'source_reference', 'transclude', 'repeat') if s.get(key)]
         identities += [citation['target'] for citations in unit.get('citations', {}).values()
                        for citation in citations if citation.get('target')]
         for urn in identities:
@@ -554,7 +598,10 @@ def build(source, project_directory, *, draft=False):
                           readings, by_stem, lang, project)
         for unit in readings['units']:
             if lang in unit['languages']:
-                documents.append((project_directory/project/(unit['stem']+'.xml'), unit_document(unit, lang, draft)))
+                pending = not review_is_current(reviews.get(unit['stem']+'/'+lang, {}),
+                                                unit_review_text(unit, lang))
+                documents.append((project_directory/project/(unit['stem']+'.xml'),
+                                  unit_document(unit, lang, draft and pending)))
         documents.append((project_directory/project/'index.xml', root))
     root, body = document('he', EXPANDED, 'Expanded Ashkenazi Mahzor', EXPANDED_URN, index=True, draft=draft)
     for dependency in readings.get('dependencies', []):
