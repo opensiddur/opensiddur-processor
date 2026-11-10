@@ -14,7 +14,7 @@ printed pages 12–14) covers Barekhu through Ga’al Yisrael in 19 language fil
 Human source adjudications, enlarged readings and two independent guideline,
 alignment and order audits bring the accepted total to 29 leaves. Raw blind
 readings of s24–s25 remain unassembled. PR 297 is merged; character-highlighting
-support for the required `tei:c` encoding is isolated in exporter PR 298.
+support for the required `tei:c` encoding is isolated in merged exporter PR 298.
 
 ## Repositories and outputs
 
