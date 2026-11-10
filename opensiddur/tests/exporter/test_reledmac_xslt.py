@@ -5140,6 +5140,14 @@ class TestInlineRoles(unittest.TestCase):
         self.assertIn(r"\OSForeign{ecce}", body)
         self.assertNotIn(r"\textit", body)
 
+    def test_enlarged_characters_survive_parallel_flattening_and_poetry_styles(self):
+        body = self._body('<tei:p>שְׁמַ<tei:c rend="large">ע</tei:c> '
+                          '<tei:c rend="small superscript">ד</tei:c></tei:p>'
+                          '<tei:lg><tei:l><tei:c rend="large">א</tei:c></tei:l></tei:lg>')
+        self.assertIn(r"\OSHighlightLarge{ע}", body)
+        self.assertIn(r"\OSHighlightSmall{\textsuperscript{\OSHighlightSuperscript{ד}}}", body)
+        self.assertIn(r"\OSPoetryLine{\OSHighlightLarge{א}}", body)
+
     def test_every_styled_rend_token_has_its_role(self):
         for token, macro in (("italic", "OSHighlightItalic"), ("bold", "OSHighlightBold"),
                              ("small-caps", "OSHighlightSmallCaps"), ("smallcaps", "OSHighlightSmallCaps"),

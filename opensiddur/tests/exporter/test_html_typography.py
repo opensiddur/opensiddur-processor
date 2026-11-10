@@ -23,6 +23,15 @@ class TestHtmlTypography(unittest.TestCase):
     def config(self, data):
         return TypographyConfig.model_validate(data, context={"resolve_fonts": False})
 
+    def test_character_highlights_keep_text_and_reader_style_classes(self):
+        root = _render('<tei:p>שְׁמַ<tei:c rend="large">ע</tei:c> '
+                       '<tei:c rend="small superscript">ד</tei:c></tei:p>')
+        ns = {"h": "http://www.w3.org/1999/xhtml"}
+        characters = root.xpath('//h:span[contains(concat(" ", @class, " "), " c ")]', namespaces=ns)
+        self.assertEqual([c.text for c in characters], ['ע', 'ד'])
+        self.assertIn('rend-large', characters[0].get('class').split())
+        self.assertTrue({'rend-small', 'rend-superscript'} <= set(characters[1].get('class').split()))
+
     def test_every_text_role_has_a_selector_except_print_line_numbers(self):
         self.assertEqual(set(STYLE_SELECTORS), set(Styles.model_fields) - {"line_number"})
 

@@ -3078,7 +3078,7 @@ end
 
     <!-- An inline leaf copied for a rubric inside it keeps the role of the line or list item
          it stands in, which f:container-macro reads off its ancestors and the copy has none. -->
-    <xsl:template match="tei:hi | tei:emph | tei:foreign | tei:choice | tei:ref" mode="stamp-rubric">
+    <xsl:template match="tei:hi | tei:c | tei:emph | tei:foreign | tei:choice | tei:ref" mode="stamp-rubric">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:if test="f:container-macro(.) ne ''">
@@ -3152,7 +3152,7 @@ end
         <xsl:apply-templates select="tei:note" mode="leaves"/>
     </xsl:template>
 
-    <xsl:template match="tei:hi | tei:emph | tei:foreign | tei:choice | tei:note | tei:ref | tei:lb | tei:anchor"
+    <xsl:template match="tei:hi | tei:c | tei:emph | tei:foreign | tei:choice | tei:note | tei:ref | tei:lb | tei:anchor"
                   mode="leaves">
         <xsl:sequence select="."/>
     </xsl:template>
@@ -3405,7 +3405,7 @@ end
         <xsl:apply-templates mode="emit"/>
     </xsl:template>
 
-    <!-- tei:hi/@rend is a list of tokens, each wrapped around the content in order: "small
+    <!-- tei:hi/@rend and tei:c/@rend are lists of tokens, each wrapped around the content in order: "small
          superscript" is small and raised. A token that changes the look of the text is set
          with its role's macro (styles.highlight_*, defined in the typography preamble); the
          raise of a superscript is fixed, and the role styles the raised text. A token with
@@ -3441,7 +3441,7 @@ end
         <xsl:sequence select="
             if ($node/@f:container) then string($node/@f:container)
             else if (empty($container) or $container/self::tei:note
-                or exists($node/ancestor::*[self::tei:hi or self::tei:emph or self::tei:foreign
+                or exists($node/ancestor::*[self::tei:hi or self::tei:c or self::tei:emph or self::tei:foreign
                                             or self::tei:choice or self::tei:ref]
                                            [. >> $container]))
             then ''
@@ -3452,7 +3452,7 @@ end
          inline node in the line, above every template that sets one, so that the role
          wraps whatever those emit. Whitespace is left bare: a group around it gains
          nothing, and the stream tests leaves for whitespace by their being text. -->
-    <xsl:template match="(text()[normalize-space(.)] | tei:hi | tei:emph | tei:foreign
+    <xsl:template match="(text()[normalize-space(.)] | tei:hi | tei:c | tei:emph | tei:foreign
                           | tei:choice | tei:ref)[f:container-macro(.) ne '']"
                   mode="emit" priority="30">
         <xsl:value-of select="concat('\', f:container-macro(.), '{')"/>
@@ -3462,7 +3462,7 @@ end
     <xsl:variable name="hi-rend-plain" as="xs:string*"
                   select="('centered', 'centred', 'center', 'ketiv-only', 'qeri-only')"/>
 
-    <xsl:template match="tei:hi" mode="emit">
+    <xsl:template match="tei:hi | tei:c" mode="emit">
         <xsl:call-template name="hi-wrap">
             <xsl:with-param name="tokens" select="tokenize(normalize-space(@rend))"/>
         </xsl:call-template>
@@ -4147,7 +4147,7 @@ end
              j:conditional reaches the leaf stream inside its marker. -->
         <xsl:sequence select="exists($leaves[
             (self::text() and normalize-space(.))
-            or ((self::tei:hi | self::tei:emph | self::tei:foreign | self::tei:choice
+            or ((self::tei:hi | self::tei:c | self::tei:emph | self::tei:foreign | self::tei:choice
                  | self::tei:ref)
                 and normalize-space(string(.)))
             or descendant-or-self::tei:note[@type = ('instruction', 'description')][normalize-space(.)]
