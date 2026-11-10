@@ -95,7 +95,7 @@
         <xsl:param name="node" as="node()"/>
         <xsl:sequence select="exists($node/ancestor::*[
             self::tei:p or self::tei:l or self::tei:ab or self::tei:head or self::tei:seg
-            or self::tei:hi or self::tei:note or self::tei:label or self::tei:item
+            or self::tei:hi or self::tei:c or self::tei:note or self::tei:label or self::tei:item
             or self::tei:foreign or self::tei:titlePart or self::tei:byline
             or self::tei:docAuthor or self::tei:docImprint or self::tei:docEdition
             or self::tei:docDate or self::tei:publisher or self::tei:pubPlace
@@ -322,7 +322,7 @@
 
     <!-- ── Words ──────────────────────────────────────────────────────────── -->
 
-    <xsl:template match="tei:seg | tei:hi | tei:foreign | tei:label | tei:emph | tei:q
+    <xsl:template match="tei:seg | tei:hi | tei:c | tei:foreign | tei:label | tei:emph | tei:q
                          | tei:abbr | tei:expan | tei:sic | tei:corr
                          | tei:docAuthor | tei:docDate | tei:publisher | tei:pubPlace
                          | j:divineName | p:transcludeInline | p:span">
