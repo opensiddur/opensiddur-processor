@@ -340,6 +340,141 @@ class EditionWiringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Marked source condition'):
             self.generate(draft=True)
 
+    def test_recipient_instruction_is_not_part_of_the_reusable_words(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [{'corresp': BASE+'invented/1',
+            'instructions': [{'text': 'To a recipient', 'language': 'en'}],
+            'fragments': [{'scan': 's1', 'text': 'Words'}]}]
+        before = unit_review_text(unit, 'he')
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        note = root.find('.//'+T+'body//'+T+'note')
+        self.assertEqual(note.get('type'), 'instruction')
+        self.assertIsNone(note.get('rend'))
+        self.assertEqual(note.getnext().get('corresp'), BASE+'invented/1')
+        unit['languages']['he'][0]['instructions'][0]['text'] = 'Another recipient'
+        self.assertNotEqual(before, unit_review_text(unit, 'he'))
+
+    def test_abbreviation_interpretations_in_prayer_words_are_hash_bound(self):
+        unit = self.readings['units'][0]
+        fragment = {'scan': 's1', 'text': 'A. words',
+                    'abbreviations': [{'abbr': 'A.', 'expan': 'Expanded'}]}
+        unit['languages']['he'] = [{'fragments': [fragment]}]
+        original = unit_review_text(unit, 'he')
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertEqual(root.find('.//'+T+'body//'+T+'choice/'+T+'expan').text, 'Expanded')
+        fragment['abbreviations'][0]['expan'] = 'Changed'
+        self.assertNotEqual(original, unit_review_text(unit, 'he'))
+        fragment.clear()
+        fragment.update(scan='s1', text='A.', expansion='Expanded')
+        original = unit_review_text(unit, 'he')
+        fragment['expansion'] = 'Changed'
+        self.assertNotEqual(original, unit_review_text(unit, 'he'))
+
+    def test_midverse_performance_direction_retains_its_source_anchor(self):
+        unit = self.readings['units'][0]
+        fragments = [{'scan': 's1', 'text': 'First words',
+                      'instructions': [{'text': 'Quietly', 'language': 'en'}]},
+                     {'scan': 's1', 'text': 'Last words',
+                      'instructions': [{'text': 'Aloud', 'language': 'en'}]}]
+        unit['languages']['he'] = [{'corresp': 'urn:x-opensiddur:text:bible:genesis/1/31/b',
+            'source': 'urn:x-opensiddur:text:bible:genesis/1/31/b', 'fragments': fragments}]
+        before = unit_review_text(unit, 'he')
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        p = root.find('.//'+T+'body//'+T+'p')
+        notes = p.findall(T+'note')
+        self.assertEqual([n.text for n in notes], ['Quietly', 'Aloud'])
+        self.assertTrue(all(n.get('type') == 'description' and n.get('rend') is None for n in notes))
+        self.assertEqual([n.getnext().text for n in notes], [None, 'Last words'])
+        self.assertEqual(len(p.findall(T+'milestone[@corresp]')), 1)
+        fragments[1]['instructions'][0]['text'] = 'In another manner'
+        self.assertNotEqual(before, unit_review_text(unit, 'he'))
+
+    def test_shared_speaker_abbreviations_preserve_both_source_word_orders(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [{'speaker': {'abbr': 'חו״ק', 'expan': 'חזן וקהל'},
+            'fragments': [{'scan': 's1', 'text': 'Words'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        n = root.find('.//'+T+'body//'+T+'note')
+        self.assertEqual(n.get('corresp'), 'urn:x-opensiddur:instruction:role/reader_and_congregation')
+        self.assertEqual(n.find(T+'choice/'+T+'expan').text, 'חזן וקהל')
+
+    def test_edition_numbering_is_outside_both_adjacent_reference_scopes(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [
+            {'corresp': BASE+'invented/1', 'reference_unit': 'mishnah',
+             'fragments': [{'scan': 's1', 'text': 'First'}]},
+            {'corresp': BASE+'invented/2', 'reference_unit': 'mishnah', 'edition_label': 'ב',
+             'fragments': [{'scan': 's1', 'text': 'Second'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        label = root.find('.//'+T+'body//'+T+'label')
+        self.assertEqual(label.text, 'ב')
+        self.assertEqual(label.getprevious().get('unit'), 'mishnah')
+        self.assertIsNone(label.getprevious().get('corresp'))
+        self.assertEqual(label.getnext().get('corresp'), BASE+'invented/2')
+        self.assertEqual(len(root.findall('.//'+T+'body//'+T+'p')), 1)
+
+    def test_missing_language_does_not_leave_an_empty_conditional_section(self):
+        self.readings['documentary_instructions'] = {}
+        self.readings['source_order'] = [{'section': 'only_hebrew', 'heading': None,
+            'conditions': [{'type': 'opensiddur:holiday-aggregate', 'features': {'shabbat': True}}],
+            'order': [{'unit': 'second'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        he = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        en = etree.parse(str(self.projects/PROJECTS['en']/'index.xml'))
+        self.assertEqual(len(he.findall('.//'+J+'conditional')), 1)
+        self.assertFalse(en.findall('.//'+J+'conditional'))
+        self.assertFalse(en.findall('.//'+J+'transclude'))
+
+    def test_prayer_title_keeps_its_language_inside_a_hebrew_script_german_rubric(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
+        rubric = {'text': 'Before תפילה after', 'language': 'de-Hebr',
+                  'language_spans': [{'text': 'תפילה', 'language': 'he'}]}
+        self.readings['documentary_instructions'] = {'custom': dict(rubric,
+            witnesses=['he'], scan='s1', printed_page='1')}
+        self.readings['source_order'] = [{'instruction': 'custom'}]
+        self.readings['expanded_order'] = [{'section': 'custom',
+            'conditions': [{'type': 'opensiddur:holiday-aggregate', 'features': {'shabbat': True}}],
+            'condition_rubrics': {'de-Hebr': rubric}, 'order': [{'unit': 'first'}]}]
+        before = instruction_review_text(rubric)
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        for project in [PROJECTS['he'], EXPANDED]:
+            root = etree.parse(str(self.projects/project/'index.xml'))
+            foreign = root.find('.//'+T+'foreign[@{http://www.w3.org/XML/1998/namespace}lang="he"]')
+            self.assertEqual(foreign.text, 'תפילה')
+        rubric['language_spans'][0]['language'] = 'arc'
+        self.assertNotEqual(before, instruction_review_text(rubric))
+
+    def test_service_file_keeps_bilingual_heading_after_untranslated_material(self):
+        self.readings['documentary_instructions'] = {
+            lang: {'text': 'Service heading', 'kind': 'heading', 'language': lang,
+                   'witnesses': [lang], 'scan': 's1', 'printed_page': '1'}
+            for lang in ['he', 'en']}
+        self.readings['source_order'] = [{'unit': 'second'},
+            {'section': 'service', 'file': 'service', 'corresp': BASE+'another',
+             'heading': {'he': 'he', 'en': 'en'}, 'order': [{'unit': 'first'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        for project in PROJECTS.values():
+            index = etree.parse(str(self.projects/project/'index.xml'))
+            self.assertFalse(index.findall('.//'+T+'body//'+T+'head'))
+            targets = [x.get('target') for x in index.findall('.//'+J+'transclude')]
+            self.assertEqual(targets[-1], BASE+'another@'+project)
+            service = etree.parse(str(self.projects/project/'service.xml'))
+            self.assertEqual(service.find('.//'+T+'body//'+T+'head').text, 'Service heading')
+            self.assertEqual(service.find('.//'+J+'transclude').get('target'), BASE+'invented@'+project)
+
     def test_regeneration_keeps_documentary_previews_independent_of_device_day(self):
         self.generate(draft=True)
         for variant in ('documentary', 'with_translation'):

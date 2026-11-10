@@ -91,6 +91,16 @@ def rubric_words(parent, rubric, lang):
         words(parent, rubric, lang)
         return
     text = rubric['text']
+    if rubric.get('language_spans') and rubric.get('abbreviations'):
+        raise ValueError('Overlapping abbreviation and language-span interpretation is not supported')
+    for span in rubric.get('language_spans', []):
+        before, found, text = text.partition(span['text'])
+        if not found:
+            raise ValueError('Language span missing from its source text')
+        words(parent, before, lang)
+        foreign = element(parent, 'foreign')
+        foreign.set(XML+'lang', span['language'])
+        words(foreign, span['text'], span['language'])
     for abbreviation in rubric.get('abbreviations', []):
         before, found, text = text.partition(abbreviation['abbr'])
         if not found:
@@ -105,6 +115,8 @@ def rubric_words(parent, rubric, lang):
 def instruction_review_text(instruction):
     parts = [instruction['text']]
     parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
+    parts.extend(span['text']+' ['+span['language']+']'
+                 for span in instruction.get('language_spans', []))
     return ' '.join(parts)
 
 
@@ -230,6 +242,19 @@ def unit_document(unit, lang, draft):
                 if fragment.get('page_start', True):
                     element(paragraph, 'pb', **attributes)
                 current_page = fragment['scan']
+            if index == 0 and segment.get('edition_label'):
+                close_references()
+                element(paragraph, 'label', segment['edition_label'])
+                append_words(paragraph, ' ')
+            if index == 0:
+                for instruction in segment.get('instructions', []):
+                    note = element(paragraph, 'note', type=instruction.get('type', 'instruction'))
+                    note.set(XML+'lang', instruction.get('language', lang))
+                    rubric_words(note, instruction, instruction.get('language', lang))
+            for instruction in fragment.get('instructions', []):
+                note = element(paragraph, 'note', type=instruction.get('type', 'description'))
+                note.set(XML+'lang', instruction.get('language', lang))
+                rubric_words(note, instruction, instruction.get('language', lang))
             reference_marker = None
             if index == 0 and segment.get('speaker_before_reference') and segment.get('speaker') and active_reference:
                 element(paragraph, 'milestone', unit=active_reference)
@@ -270,7 +295,9 @@ def unit_document(unit, lang, draft):
                 else:
                     expansion = speaker['expan']
                     try:
-                        role = {label: role for role, label in ROLE_LABELS.items()}[expansion]
+                        roles = {label: role for role, label in ROLE_LABELS.items()}
+                        roles['חזן וקהל'] = 'reader_and_congregation'
+                        role = roles[expansion]
                     except KeyError:
                         raise ValueError(f'Unknown speaker expansion: {expansion}') from None
                 identity = 'urn:x-opensiddur:instruction:role/'+role
@@ -314,6 +341,8 @@ def unit_document(unit, lang, draft):
                 else:
                     words(abbreviation, fragment['text'], lang)
                 words(element(choice, 'expan'), fragment['expansion'], lang)
+            elif fragment.get('abbreviations'):
+                rubric_words(content, fragment, text_language)
             elif fragment.get('enlarged_letters'):
                 letters = fragment['enlarged_letters']
                 if any(len(letter) != 1 or fragment['text'].count(letter) != 1 for letter in letters):
@@ -356,14 +385,26 @@ def unit_review_text(unit, lang):
     parts.extend(instruction['text'] for instruction in unit_instructions(unit, lang))
     for instruction in unit_instructions(unit, lang):
         parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
+        parts.extend(span['text']+' ['+span['language']+']'
+                     for span in instruction.get('language_spans', []))
     for segment in unit['languages'][lang]:
+        if segment.get('edition_label'):
+            parts.append(segment['edition_label'])
+        for instruction in segment.get('instructions', []):
+            parts.append(instruction_review_text(instruction))
         if segment.get('condition_instruction'):
             parts.append(segment['condition_instruction'])
         if segment.get('speaker'):
             speaker = segment['speaker']
             parts.append(speaker['label']+' ['+speaker['role']+']' if 'label' in speaker else
                          speaker['abbr']+' ['+speaker['expan']+']')
-        parts.extend(fragment['text'] for fragment in segment['fragments'])
+        for fragment in segment['fragments']:
+            parts.extend(instruction_review_text(instruction)
+                         for instruction in fragment.get('instructions', []))
+            parts.append(fragment['text'])
+            if fragment.get('expansion'):
+                parts.append('['+fragment['expansion']+']')
+            parts.extend(a['abbr']+' ['+a['expan']+']' for a in fragment.get('abbreviations', []))
         if segment.get('repeat_cue'):
             cue = segment['repeat_cue']
             parts.append(cue['text']+' ['+cue['target']+']')
@@ -406,7 +447,7 @@ def expanded_order(parent, order, readings, by_stem):
                     for language, text in occurrence['condition_rubrics'].items():
                         part = element(rubric, 'foreign')
                         part.set(XML+'lang', language)
-                        words(part, text, language)
+                        rubric_words(part, text, language)
                         append_words(rubric, ' ')
                 all_conditions = element(conditional, 'j:all')
                 feature_structures(all_conditions, conditions)
@@ -564,6 +605,9 @@ def documentary_order(div, order, readings, by_stem, lang, project):
     """Preserve source sections without attaching service headings to reusable prayers."""
     for occurrence in order:
         if 'section' in occurrence:
+            if occurrence.get('file'):
+                element(div, 'j:transclude', type='external', target=occurrence['corresp']+'@'+project)
+                continue
             section = element(div, 'div')
             if occurrence.get('corresp'):
                 section.set('corresp', occurrence['corresp'])
@@ -591,7 +635,8 @@ def documentary_order(div, order, readings, by_stem, lang, project):
             documentary_order(section, occurrence['order'], readings, by_stem, lang, project)
             if conditions:
                 element(section, 'j:endConditional', target='#'+identifier)
-            if not len(section):
+            if not len(section) or all(child.tag in (f'{{{J}}}conditional', f'{{{J}}}endConditional')
+                                       for child in section):
                 div.remove(section)
         elif 'instruction' in occurrence:
             instruction = readings['documentary_instructions'][occurrence['instruction']]
@@ -647,6 +692,13 @@ def build(source, project_directory, *, draft=False):
             if parsed.governed and urn not in registry.records and str(parsed.without_numeric_tail()) not in registry.records:
                 raise ValueError(f'Unregistered identity: {urn}')
     documents = []
+    def service_sections(order):
+        for occurrence in order:
+            if 'section' in occurrence:
+                if occurrence.get('file'):
+                    yield occurrence
+                yield from service_sections(occurrence['order'])
+
     for lang, project in PROJECTS.items():
         root, body = document(lang, project, 'Prayerbook for the New Year — first day', ROOT_URN,
                               index=True, draft=draft)
@@ -654,6 +706,16 @@ def build(source, project_directory, *, draft=False):
             add_front(root, front_pages)
         div = element(body, 'div', corresp=ROOT_URN)
         by_stem = {unit['stem']: unit for unit in readings['units']}
+        for section in service_sections(readings.get('source_order', [])):
+            heading_key = section.get('heading')
+            if isinstance(heading_key, dict):
+                heading_key = heading_key.get(lang)
+            title = readings['documentary_instructions'][heading_key]['text']
+            service_root, service_body = document(lang, project, title, section['corresp'], draft=draft)
+            inline_section = deepcopy(section)
+            inline_section.pop('file')
+            documentary_order(service_body, [inline_section], readings, by_stem, lang, project)
+            documents.append((project_directory/project/(section['file']+'.xml'), service_root))
         documentary_order(div, readings.get('source_order', [{'unit': unit['stem']} for unit in readings['units']]),
                           readings, by_stem, lang, project)
         for unit in readings['units']:

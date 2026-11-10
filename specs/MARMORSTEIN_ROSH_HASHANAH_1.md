@@ -399,3 +399,66 @@ and six bilingual scripture scope checks. Earlier eight Kaddish/runtime cases
 still pass, including ordinary Minchah and missing-English protection. Both frozen-file independent audits passed after marked-conditional corrections
 and human source adjudications. Accepted coverage is 39 of 355 leaves, with
 48 independent image readings. Final PDF/HTML exports accompany this installment.
+
+## Evening conclusion and home customs (s34–s38)
+
+The next installment preserves the printed sequence of Hebrew pages 20–23:
+s35 (printed 20) precedes s34 (printed 21), then s36/s37 (Hebrew/English 22),
+and s38 (Hebrew 23). Do not infer language, sequence or translation pairing
+from scan parity. The original 355-page PDF and its extracted images are the
+independent check on physical scan numbering; cache names and Archive leaves
+remain distinct from printed labels. Preserve full unique Archive leaf URLs.
+
+Reuse the existing synagogue Vayekhulu, Meein Sheva, MishnahShabbat 2,
+Amar Rabbi Elazar, RH Kiddush, wine/fruit/Shehecheyanu, apple prayer, greeting
+and Aleinu identities. One additional Talmud identity names the checking-
+clothing passage from [Shabbat 12a](https://www.sefaria.org/Shabbat.12a), after registry/alias/project searches found
+no identity for it. Preserve this edition’s wording, not another Talmud witness.
+The page 21 study paragraph is unpointed text, not an instruction. Mishnah
+milestones do not create paragraph breaks; keep printed Hebrew section letters.
+
+The synagogue sequence after the silent Amidah is Vayekhulu on Shabbat;
+Meein Sheva on Shabbat with a minyan; full Kaddish with a minyan; Bameh Madlikin and
+its study passages on Shabbat or according to the printed Frankfurt custom;
+Savri, wine blessing, RH Kiddush and Shehecheyanu; Aleinu, Mourner Kaddish
+with a minyan and mourners, and Yigdal. Keep the fixed המלך הקדוש witness scoped
+to the Ten Days. Do not import Birnbaum’s different festival omission custom.
+
+A named home-customs appendix repeats the Kiddush words in their home order,
+adding the printed Sabbath Genesis prefix, Hamotzi, apple blessing/prayer,
+and the four labeled Hebrew greeting alternatives. One generic English greeting
+remains one translation; no gender-specific English is invented. The appendix
+shares first-night/maariv selectors and does not enter the morning selection.
+Birnbaum Hebrew supplies only missing Kaddish, Yigdal and Hamotzi words; retain
+credits/licences and do not manufacture English for absent source passages.
+
+Genesis 1:31b is a half-verse excerpt, not a witness for the whole verse or chapter.
+The source בלחש  and בקול descriptions stay at their actual word boundaries,
+outside semantic quotation spans. Full quotations use chapter/verse milestones
+and explicit terminators. Recipient labels remain descriptions, outside prayer
+words; source abbreviations preserve both printed forms and expansions.
+All instruction/abbreviation interpretations are part of the review-hash payload.
+Source-parenthesized Kiddush insertions use the same marked Shabbat condition
+behavior as the Amidah: absent when false, unmarked when true, marked when unknown.
+
+Draft validation: 148 schema-valid XML files; 112 importer tests and 41 subtests;
+feature, naming and registry checks; eight actual expanded print-compilation cases
+cover weekday/Shabbat, quorum, Frankfurt custom, two Kiddush occurrences, home
+appendix, source continuation and neighboring services. Three independent audits approve the encoding, alignment and expanded order.
+All human source adjudications are complete: 44 of 355 leaves are accepted,
+53 independently read and 51 contain excerpts. Continue at scan page 39.
+Whole-volume acceptance remains false.
+
+The documentary Kiddush arrangement has matching Hebrew/English service files.
+Their headings and introductions stay inside the shared service transclusion,
+after Hebrew-only evening material. This preserves correct heading placement
+in parallel exports. The Hebrew prayer title inside its German instruction is
+a Hebrew foreign span. Human adjudication confirms Frankfurt’s pataḥ-alef,
+the pointed small-type titles and all five disputed dageshes. The printed
+feminine participle after masculine שהוא is preserved as sic עוֹשָׂה beside
+corr עוֹשֶׂה; raw image readings remain unchanged.
+
+All 27 final review targets match the accepted XML after reversing only
+acceptance metadata and the explicitly human-confirmed final שבת pointing.
+All 122 earlier language modules remain unchanged. The guarded accepted build
+validates 148 files and leaves no DRAFT metadata in the generated projects.
