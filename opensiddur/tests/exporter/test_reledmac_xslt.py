@@ -3222,6 +3222,22 @@ class TestParallelHeadings(unittest.TestCase):
     SAME = "KEDUSHAH"
     OTHER = "Sanctification"
 
+    def test_single_spine_translated_heading_keeps_its_whole_direction(self):
+        for primary, secondary, first, second, wrapper in (
+            ('he', 'en', 'כותרת עברית', 'A translated title',
+             r'{\textdir TLT\foreignlanguage{english}{'),
+            ('en', 'he', 'A source title', 'כותרת עברית', r'\texthebrew{'),
+        ):
+            with self.subTest(primary=primary):
+                xml = f'''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="{primary}">
+                  <tei:text><tei:body><tei:div>
+                    <tei:head xml:lang="{primary}">{first}</tei:head>
+                    <tei:head xml:lang="{secondary}">{second}</tei:head>
+                    <tei:p>Body</tei:p>
+                  </tei:div></tei:body></tei:text></tei:TEI>'''
+                argument = self._translation_arg(_transform(xml))
+                self.assertTrue(argument.startswith(wrapper), argument)
+
     def test_columns_that_agree_set_the_heading_once(self):
         """Birnbaum heads his Hebrew and English pages alike, so both columns printed
         KEDUSHAH and the reader saw it twice."""

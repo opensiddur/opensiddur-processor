@@ -565,6 +565,7 @@
         <xsl:call-template name="keep-preamble"/>
         <xsl:if test="$uses-reledpar">
             <xsl:call-template name="column-keep-preamble"/>
+            <xsl:call-template name="column-marks-preamble"/>
         </xsl:if>
 
         <!-- Labelled lists (tei:list, tei:label, tei:item). The label's appearance
@@ -1291,6 +1292,45 @@
 
     <!-- One \Pages (or \Columns) block, optionally preceded by a heading set across the
          whole page rather than inside either column. -->
+    <!-- A mark after a column line prevents reledpar's lastbox from retrieving it.
+         Keep those exact nodes until the assembled row has been placed, then put them
+         back before the page-break check. Moving marks to before a raw line instead
+         only makes the preceding line escape. Queues are separate for facing pages. -->
+    <xsl:template name="column-marks-preamble">
+        <xsl:text>\directlua{
+OScolumnmarks = { L = {}, R = {} }
+function OScolumnmarks.collect(side, boxnum)
+ local box = tex.box[boxnum]
+ if not box then return end
+ local head = box.head
+ local n = head
+ while n do
+  local nextnode = n.next
+  if n.id == node.id("mark") then
+   head = node.remove(head, n)
+   n.next = nil
+   n.prev = nil
+   table.insert(OScolumnmarks[side], n)
+  end
+  n = nextnode
+ end
+ box.head = head
+end
+function OScolumnmarks.flush(side)
+ for _, n in ipairs(OScolumnmarks[side]) do node.write(n) end
+ OScolumnmarks[side] = {}
+end
+}
+\makeatletter
+\patchcmd{\do@lineL}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("L", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect L marks}{}}
+\patchcmd{\do@lineR}{\unvbox\one@lineR}{\directlua{OScolumnmarks.collect("R", \number\one@lineR)}\unvbox\one@lineR}{}{\PackageError{opensiddur}{could not collect R marks}{}}
+\pretocmd{\checkpb@columns}{\directlua{OScolumnmarks.flush("L");OScolumnmarks.flush("R")}}{}{\PackageError{opensiddur}{could not flush column marks}{}}
+\pretocmd{\checkpageL}{\directlua{OScolumnmarks.flush("L")}}{}{\PackageError{opensiddur}{could not flush L marks}{}}
+\pretocmd{\checkpageR}{\directlua{OScolumnmarks.flush("R")}}{}{\PackageError{opensiddur}{could not flush R marks}{}}
+\makeatother
+</xsl:text>
+    </xsl:template>
+
     <xsl:template name="parallel-columns">
         <xsl:param name="usable" as="element(p:parallel)*"/>
         <xsl:param name="spanning" as="xs:string" select="''"/>
@@ -2748,11 +2788,24 @@
              the first rather than beside it, so that it reads as naming the same section
              again and not as a section of its own. -->
         <xsl:if test="f:alt-head and not($marks-only)">
-            <!-- No direction wrapper here: mode="emit" already wraps each run against the
-                 stream it lands in, and adding one on top nests a second \textdir around
-                 the first for no gain. -->
+            <!-- Per-word wrappers protect letters but not the order of words in the
+                 surrounding stream. Keep the whole translated title in its direction. -->
             <xsl:text>\OSheadTranslation{</xsl:text>
+            <xsl:choose>
+                <xsl:when test="f:is-hebrew-lang(string(@alt-lang))">
+                    <xsl:text>\texthebrew{</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text>{\textdir TLT\foreignlanguage{english}{</xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates select="f:alt-head/node()" mode="emit"/>
+            <xsl:choose>
+                <xsl:when test="f:is-hebrew-lang(string(@alt-lang))">
+                    <xsl:text>}</xsl:text>
+                </xsl:when>
+                <xsl:otherwise><xsl:text>}}</xsl:text></xsl:otherwise>
+            </xsl:choose>
             <xsl:text>}</xsl:text>
         </xsl:if>
 
