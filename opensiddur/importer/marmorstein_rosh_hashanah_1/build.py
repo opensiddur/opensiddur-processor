@@ -211,6 +211,10 @@ def unit_document(unit, lang, draft):
                 if fragment.get('page_start', True):
                     element(paragraph, 'pb', **attributes)
                 current_page = fragment['scan']
+            reference_marker = None
+            if index == 0 and segment.get('speaker_before_reference') and segment.get('speaker') and active_reference:
+                element(paragraph, 'milestone', unit=active_reference)
+                active_reference = None
             if index == 0 and segment.get('corresp'):
                 urn = segment['corresp']
                 biblical = ':bible:' in urn
@@ -236,7 +240,7 @@ def unit_document(unit, lang, draft):
                     reference_unit, attributes = segment.get('reference_unit', 'prayer-part'), {}
                 if active_reference and active_reference != reference_unit:
                     element(paragraph, 'milestone', unit=active_reference)
-                element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
+                reference_marker = element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
                 active_reference = reference_unit
             if index == 0 and segment.get('speaker'):
                 speaker = segment['speaker']
@@ -260,6 +264,9 @@ def unit_document(unit, lang, draft):
                     element(choice, 'abbr', speaker['abbr'])
                     element(choice, 'expan', speaker['expan'])
                 append_words(paragraph, ' ')
+                if segment.get('speaker_before_reference') and reference_marker is not None:
+                    paragraph.remove(description)
+                    paragraph.insert(paragraph.index(reference_marker), description)
             if segment.get('repeat'):
                 # Repeated recitation reuses the witness; it does not define a
                 # second element with the same canonical identity in one file.
@@ -535,6 +542,20 @@ def documentary_order(div, order, readings, by_stem, lang, project):
     for occurrence in order:
         if 'section' in occurrence:
             section = element(div, 'div')
+            if occurrence.get('corresp'):
+                section.set('corresp', occurrence['corresp'])
+            conditions = occurrence.get('conditions', [])
+            if conditions:
+                identifier = 'documentary_'+occurrence['section']+'_'+lang
+                condition = element(section, 'j:conditional')
+                condition.set(XML+'id', identifier)
+                rubric_key = occurrence.get('condition_instruction', {}).get(lang)
+                if rubric_key:
+                    rubric = readings['documentary_instructions'][rubric_key]
+                    note = element(condition, 'note', type='instruction')
+                    note.set(XML+'lang', rubric['language'])
+                    rubric_words(note, rubric, rubric['language'])
+                feature_structures(element(condition, 'j:all'), conditions)
             key = occurrence['heading']
             if isinstance(key, dict):
                 key = key.get(lang)
@@ -545,6 +566,8 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                             facs=page_image_url(IDENTIFIER, int(heading['scan'][1:])-1, size=''))
                 element(section, 'head', heading['text']).set(XML+'lang', heading['language'])
             documentary_order(section, occurrence['order'], readings, by_stem, lang, project)
+            if conditions:
+                element(section, 'j:endConditional', target='#'+identifier)
             if not len(section):
                 div.remove(section)
         elif 'instruction' in occurrence:
@@ -655,6 +678,8 @@ def build(source, project_directory, *, draft=False):
                     'typography': {'instructions': {'from': 'both'}, 'line_numbers': {'enabled': False}}}
         if parallel:
             settings['parallel'] = {'projects': [PROJECTS['en']]}
+        if project != EXPANDED:
+            settings['electronic'] = {'day': 'none'}
         if project == EXPANDED:
             settings['readings'] = {'abbreviations': 'expanded'}
             for dependency in readings.get('dependencies', []):

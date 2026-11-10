@@ -186,6 +186,23 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(''.join(root.xpath(end, namespaces=ns)[0].itertext()), 'גד')
         self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), 'אב־גד הו')
 
+    def test_passage_speaker_stays_outside_both_adjacent_reusable_parts(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [
+            {'corresp': BASE+'invented/1', 'fragments': [{'scan': 's1', 'text': 'אב'}]},
+            {'corresp': BASE+'invented/2', 'fragments': [{'scan': 's1', 'text': 'גד'}],
+             'speaker': {'label': 'חזן', 'role': 'reader'}, 'speaker_before_reference': True}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        p = root.find('.//'+T+'body//'+T+'p')
+        note = p.find(T+'note')
+        before, after = note.getprevious(), note.getnext()
+        self.assertEqual(before.tag, T+'milestone')
+        self.assertIsNone(before.get('corresp'))
+        self.assertEqual(after.get('corresp'), BASE+'invented/2')
+        self.assertEqual(after.tail.strip(), 'גד')
+
     def test_partial_chapter_uses_a_range_in_the_documentary_spine(self):
         chapter = 'urn:x-opensiddur:text:bible:deuteronomy/6'
         unit = self.readings['units'][0]
@@ -249,6 +266,30 @@ class EditionWiringTest(unittest.TestCase):
             root = etree.parse(str(self.projects/PROJECTS[lang]/'index.xml'))
             self.assertEqual(root.find('.//'+T+'body//'+T+'head').text, heading)
             self.assertTrue(root.find('.//'+T+'body//'+T+'pb').get('facs').endswith('/'+scan+'.jpg'))
+
+    def test_documentary_condition_does_not_gate_the_reusable_verse(self):
+        self.readings['documentary_instructions'] = {'sabbath': {
+            'text': '(On Sabbath)', 'language': 'en', 'witnesses': ['he'],
+            'scan': 's1', 'printed_page': '7'}}
+        self.readings['source_order'] = [{'section': 'sabbath', 'heading': None,
+            'corresp': BASE+'another',
+            'conditions': [{'type': 'opensiddur:holiday-aggregate', 'features': {'shabbat': True}}],
+            'condition_instruction': {'he': 'sabbath'}, 'order': [{'unit': 'first'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        index = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        condition = index.find('.//'+J+'conditional')
+        self.assertEqual(condition[0].text, '(On Sabbath)')
+        self.assertIsNotNone(index.find('.//'+J+'endConditional'))
+        verse = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertFalse(verse.findall('.//'+J+'conditional'))
+
+    def test_regeneration_keeps_documentary_previews_independent_of_device_day(self):
+        self.generate(draft=True)
+        for variant in ('documentary', 'with_translation'):
+            path = self.projects.parent/'settings'/PROJECTS['he']/(variant+'.yaml')
+            settings = yaml.safe_load(path.read_text())
+            self.assertEqual(settings['electronic']['day'], 'none')
 
     def test_rubric_abbreviation_and_expansion_are_both_reviewed(self):
         unit = self.readings['units'][0]

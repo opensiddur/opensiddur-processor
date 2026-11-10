@@ -12,8 +12,9 @@ mahzor. Its PRs remain draft while the full-volume transcription is unfinished.
 The accepted installment s18–s23 (Archive n17–n22, paired Hebrew and English
 printed pages 12–14) covers Barekhu through Ga’al Yisrael in 19 language files.
 Human source adjudications, enlarged readings and two independent guideline,
-alignment and order audits bring the accepted total to 29 leaves. Raw blind
-readings of s24–s25 remain unassembled. PR 297 is merged; character-highlighting
+alignment and order audits were followed by acceptance of s24–s25 (printed
+p. 15), Hashkivenu through Half Kaddish, bringing the total to 31 leaves.
+The next source page is s26 (Archive n25). PR 297 is merged; character-highlighting
 support for the required `tei:c` encoding is isolated in merged exporter PR 298.
 
 ## Repositories and outputs
@@ -288,7 +289,7 @@ There is no English witness for El melekh ne’eman or the meditation’s final
 Psalm 113:2. Preserve those omissions. El melekh ne’eman is conditional on
 praying without a minyan; the expanded Barekhu section requires a minyan.
 All settings remain local to their recitation context. Hashkivenu follows the
-current accepted installment and remains to be assembled from the next blind readings.
+previous installment; s24–s25 now supplies the following Hashkivenu through Half Kaddish sequence.
 
 Enlarged crops supplement the immutable blind readings; crop filenames must
 never count as additional scanned leaves. Draft generation labels pending
@@ -326,3 +327,31 @@ The pilot exposed reversed word order in the English translation of a Hebrew
 heading on a single structural spine. The accompanying renderer fix wraps the
 whole translated heading in its language direction; synthetic regressions cover
 both Hebrew-to-English and English-to-Hebrew headings.
+
+
+## Hashkivenu through Half Kaddish (s24–s25)
+
+Seven reusable units in both languages preserve the festival Hashkivenu ending,
+Exodus 31:16–17, Psalm 81:4–5, Numbers 14:17, Psalm 25:6 and Half Kaddish.
+The existing Hashkivenu opening and ending extents and Veshamru structural URN
+are reused. Pure Bible excerpts remain free of occurrence conditions. Shabbat
+and minyan guards belong to service order; the printed fixed Ten Days Kaddish
+witness carries its own calendar scope. Preparatory Elul 29 Kaddish remains
+bound to the compatible Birnbaum Hebrew dependency, whose component references
+are now self-qualified. This prevents festival English from filling an absent
+preparatory translation and retains Birnbaum’s calendar-responsive wording.
+
+The literal חזן label lies before the first prayer-part milestone. Instructions
+use semantic types without rend attributes. Partial chapter context does not
+claim a whole chapter. The human-confirmed segol in בכסה and enlarged image
+adjudications are retained with the blind readings and two independent audits.
+The reviewer’s final settings finding was fixed in the generator and verified
+locally: documentary electronic variants start with electronic.day=none.
+Regeneration and serialized HTML checks confirm fixed source words remain
+available regardless of the device date; expanded settings retain their behavior.
+No external re-review of that final settings/code change is claimed.
+
+The accepted build validates 95 XML files. The focused importer suite passes
+102 tests and 41 subtests. Eight runtime cases protect service/quorum choices,
+ordinary-day dependencies and missing translations; four Bible scope checks
+confirm excerpts do not claim entire chapters. Whole-volume acceptance remains false.
