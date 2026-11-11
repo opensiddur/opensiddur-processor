@@ -107,6 +107,16 @@ class EditionWiringTest(unittest.TestCase):
         reference = original.find('.//'+T+'ref[@type="page"]')
         self.assertEqual(reference.get('target'), BASE+'invented@'+PROJECTS['he'])
 
+    def test_mid_page_direction_keeps_its_link_without_an_extra_page_break(self):
+        self.readings['navigation']['return']['page_start'] = False
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        index = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        self.assertFalse(index.findall('.//'+T+'body//'+T+'pb'))
+        link = index.find('.//'+T+'ref[@type="page"]')
+        self.assertEqual(link.get('target'), BASE+'invented@'+PROJECTS['he'])
+        self.assertEqual(link.getparent().get('type'), 'optional-page-reference')
+
     def test_unreviewed_or_stale_text_cannot_replace_a_reviewed_build(self):
         with self.assertRaisesRegex(ValueError, 'review pending'):
             self.generate()

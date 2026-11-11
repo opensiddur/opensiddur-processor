@@ -666,8 +666,9 @@ def documentary_order(div, order, readings, by_stem, lang, project):
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             scan = navigation['scan'][lang]
-            element(div, 'pb', ed='1965', n=navigation['printed_page'],
-                    facs=page_image_url(IDENTIFIER, int(scan[1:])-1, size=''))
+            if navigation.get('page_start', True):
+                element(div, 'pb', ed='1965', n=navigation['printed_page'],
+                        facs=page_image_url(IDENTIFIER, int(scan[1:])-1, size=''))
             clauses = deepcopy(navigation['clauses'])
             for clause in clauses:
                 if 'target' in clause:

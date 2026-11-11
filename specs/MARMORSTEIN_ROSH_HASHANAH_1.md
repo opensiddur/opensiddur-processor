@@ -524,3 +524,40 @@ heading’s extra ink as a smudge beside hataf-patah, not a meteg. The bet in
 בתורה and both dalet dagesh/vav shuruq in לְאַחְדּוּתוֹ are confirmed.
 Three independent audits and actual paired compiler checks settle the source,
 guidelines, alignment and order. Accepted: 49 of 355 leaves; continue at scan 44.
+
+## Opening morning blessings (scan pages 44–47)
+
+Complete both printed pages 4–5, including Adon Olam, washing the hands,
+Asher Yatzar, the existing three Torah blessings, Numbers 6:24–26, Elu Devarim
+and Elohai Neshamah. Reuse the existing prayer roots and the ten incipit
+stanza identities of the canonical Adon Olam. Preserve ten Hebrew couplets
+and twelve English paragraphs, with stanza scopes independent of paragraph
+breaks. Biblical milestones bound the three complete Numbers verses; their
+chapter is excerpt context, not a whole-chapter witness. The study composite
+uses the existing `prayer:ellu_devarim` identity without pretending to quote
+an entire Mishnah or Talmud passage word for word.
+
+Add one structural service context and paired `morning_blessings.xml` files.
+Retain the pilot Torah blessings verbatim, including the confirmed mappiq in
+לשמה and the two different vowels in תורתך. Remove the false opening page
+break from Laasoq now that the complete page opens earlier in the service.
+The actual page-5 boundary before Vehaarev remains. Mid-page directions keep
+their links without creating a new page break. Preserve the exact original
+German-rite direction and printed page number in raw evidence, with an empty
+edition-qualified page reference in the independently removable parenthesis.
+The Hebrew prayer name in that English instruction remains.
+
+The expanded placement must reconcile this direction with the existing
+printed-page-8 Torah-blessing insertion, without accidentally repeating the
+blessings or Elohai Neshamah. Use the existing open `opensiddur:variant`
+setting for the edition's described order; do not equate it with every German
+or Frankfurt practice. Keep both unresolved alternatives labeled. Whether the
+study passages travel with the Torah blessings awaits the user's clarification.
+
+Independent full-page, enlarged and tight-crop readings retain their actual
+hashes, disagreements, model identifiers and effort self-reports. The tight
+images settle the gimel dagesh, final-kaf dagesh and both initial bets in
+בקרבי. The user confirms pataḥ under resh and sheva under alef in
+וְהָרַאְיוֹן; preserve it literally without speculative correction.
+Independent source/guideline/alignment/order audit and export inspection
+remain required before accepting these four leaves.
