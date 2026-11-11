@@ -559,5 +559,8 @@ hashes, disagreements, model identifiers and effort self-reports. The tight
 images settle the gimel dagesh, final-kaf dagesh and both initial bets in
 בקרבי. The user confirms pataḥ under resh and sheva under alef in
 וְהָרַאְיוֹן; preserve it literally without speculative correction.
-Independent source/guideline/alignment/order audit and export inspection
-remain required before accepting these four leaves.
+Two independent documentary source/guideline/alignment/order audits and PDF
+inspection approve these four source leaves (53 of 355 accepted). Expanded
+custom-order implementation and its independent review remain pending the
+user’s study-placement clarification. Source acceptance does not assert that
+the expanded sequence has been updated.
