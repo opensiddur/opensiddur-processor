@@ -607,17 +607,25 @@ separate editorial layer. Omit Hebrew linkage cues from English prayer words.
 Treat the small לעולם introduction ending ויאמר as a semantic directive;
 no instruction `rend` attributes are added.
 
-This installment remains draft pending human source-mark adjudication. Two
-independent guideline/alignment/order audits approve the encoding; source and
-leaf acceptance remain false. Preserve configured CLI effort separately from
-the reader’s self-report, and describe the configuration accurately in credits.
-Keep the expanded bilingual Leolam directive in one note with he/en children.
+All source questions in this installment are resolved by human adjudication
+and a final independent verification. Literal readings include גַּב־, רֹב,
+שֶׁשָּׂמַחְתָּ־בּוֹ, both בן words without bet dagesh, בריתך without bet
+dagesh, לּוֹ, יְּשׁוּעָתֵנוּ, בְּסֵתֶר in both directive copies, מֵעֵינָי
+and בִזָּיוֹן (bet without dagesh, zayin with dagesh). These are direct
+transcription corrections; the original English errors retain sic/corr.
+Independent review limitations about codepoints and stale inline copies are
+resolved by full-document and normalization checks. Actual initial reader
+hashes/disagreements and configured effort/self-report remain separately
+preserved.
 
-Current local checks pass: 222 schema-valid XML files, naming, features, registry,
-reference database, 214 tests and 635 subtests, six compiled audience/rite/service
-cases, all 21 new bilingual alignment rows, and production HTML condition/anchor
-checks. Inspected draft PDFs have 47 documentary and 50 expanded pages. Separate
-exporter PR299 fixes a stranded full-width condition label and passes 436 tests
-plus160 subtests, including real-PDF geometry with a negative control. Draft
-previews use that isolated fix; this feature branch does not include it. Accepted
-exports stay unchanged and accepted coverage remains 53 of 355 leaves.
+Scans48–51 are accepted, bringing source coverage to57of355leaves. Guarded
+build:222schema-valid XML files, no pending unit reviews. Names, features,
+registry and references pass; all21new paired rows, six compiled conditional
+cases and final production HTML condition/anchor checks pass. The final222XML
+text trees match the human-corrected reviewed draft; acceptance metadata is
+the only subsequent change. Inspected accepted exports have47documentary and
+50expanded pages. Separate exporter PR299 supplies the keep-with-next fix,
+verified by436tests and160subtests including real-PDF geometry with a negative
+control; it is not included in this digitization branch. Complete-volume and
+whole-service acceptance remain false. Continue at physical scan52 (Archive
+n51).
