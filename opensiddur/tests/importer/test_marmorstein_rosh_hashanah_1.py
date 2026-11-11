@@ -462,6 +462,23 @@ class EditionWiringTest(unittest.TestCase):
         self.assertFalse(en.findall('.//'+J+'conditional'))
         self.assertFalse(en.findall('.//'+J+'transclude'))
 
+    def test_untranslated_service_file_and_reference_are_absent_in_english(self):
+        self.readings['documentary_instructions'] = {}
+        self.readings['source_order'] = [{'section': 'offerings', 'file': 'offerings',
+            'corresp': BASE+'another', 'heading': None, 'witnesses': ['he'],
+            'titles': {'he': 'קרבנות', 'en': 'Offerings'}, 'order': [{'unit': 'second'}]}]
+        self.save('readings', self.readings)
+        stale = self.projects/PROJECTS['en']/'offerings.xml'
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text('An obsolete English service must not survive.')
+        self.generate(draft=True)
+        self.assertTrue((self.projects/PROJECTS['he']/'offerings.xml').exists())
+        self.assertFalse(stale.exists())
+        he = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        en = etree.parse(str(self.projects/PROJECTS['en']/'index.xml'))
+        self.assertEqual(he.find('.//'+J+'transclude').get('target'), BASE+'another@'+PROJECTS['he'])
+        self.assertFalse(en.findall('.//'+J+'transclude'))
+
     def test_prayer_title_keeps_its_language_inside_a_hebrew_script_german_rubric(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
         rubric = {'text': 'Before תפילה after', 'language': 'de-Hebr',

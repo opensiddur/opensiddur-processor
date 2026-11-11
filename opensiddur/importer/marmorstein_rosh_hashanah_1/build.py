@@ -631,6 +631,8 @@ def documentary_order(div, order, readings, by_stem, lang, project):
     """Preserve source sections without attaching service headings to reusable prayers."""
     for occurrence in order:
         if 'section' in occurrence:
+            if lang not in occurrence.get('witnesses', PROJECTS):
+                continue
             if occurrence.get('file'):
                 element(div, 'j:transclude', type='external', target=occurrence['corresp']+'@'+project)
                 continue
@@ -737,6 +739,8 @@ def build(source, project_directory, *, draft=False):
         div = element(body, 'div', corresp=ROOT_URN)
         by_stem = {unit['stem']: unit for unit in readings['units']}
         for section in service_sections(readings.get('source_order', [])):
+            if lang not in section.get('witnesses', PROJECTS):
+                continue
             heading_key = section.get('heading')
             if isinstance(heading_key, dict):
                 heading_key = heading_key.get(lang)
@@ -783,6 +787,10 @@ def build(source, project_directory, *, draft=False):
     obsolete = [project_directory/project/(unit['stem']+'.xml')
                 for lang, project in PROJECTS.items() for unit in readings['units']
                 if lang not in unit['languages']]
+    obsolete += [project_directory/project/(section['file']+'.xml')
+                 for lang, project in PROJECTS.items()
+                 for section in service_sections(readings.get('source_order', []))
+                 if lang not in section.get('witnesses', PROJECTS)]
     paths = write_documents(documents, validator=validate, obsolete_paths=obsolete)
     settings_directory = project_directory.parent/'settings'
     for project, variant, parallel in [(PROJECTS['he'], 'documentary', False),

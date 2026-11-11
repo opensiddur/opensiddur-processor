@@ -629,3 +629,28 @@ verified by436tests and160subtests including real-PDF geometry with a negative
 control; it is not included in this digitization branch. Complete-volume and
 whole-service acceptance remain false. Continue at physical scan52 (Archive
 n51).
+
+
+### Continuation: physical PDF scans 52–55
+
+Printed p8 adds five bilingual source units; pp9–10 add six Hebrew-only
+offerings units. Existing canonical prayer and Bible URNs are reused. Four
+structural occurrence/service contexts distinguish morning occurrences without
+inventing new prayer identities. Expanded morning Shema targets its occurrence
+context to avoid selecting the earlier evening verse witness.
+
+The shared spine places the p8 continuation before the German rite’s later
+Torah/study block and offerings after it. No absent English is supplied.
+Hebrew-only service witnesses omit obsolete English files and service references.
+A regression test covers this behavior. Verse boundaries survive the source
+page break within Numbers28:4; citations are notes and the original English
+“Thou has” uses sic/corr. Documentary page navigation stays edition-qualified.
+
+Primary, blind, enlarged, accent and tight-image readings retain their actual
+differences. Independent Claude Opus5.5 review (configured medium) approves
+guidelines, alignment and order. Human answers confirm the four Numbers marks
+and both p8 dageshes; accepted words exactly match the reviewed draft.
+Four service/rite cases and eight paired rows pass, including identical-word
+BarukhShem reuse and no English fallback for offerings. Coverage is61of355
+leaves; the next physical PDF scan is56 (Archive n55). Whole-volume and complete
+service acceptance remain false.
