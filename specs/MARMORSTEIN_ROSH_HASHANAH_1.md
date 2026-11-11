@@ -572,3 +572,52 @@ Two independent documentary source/guideline/alignment/order audits and PDF
 inspection approve these four source leaves (53 of 355 accepted). The user has clarified the whole-block relocation and the explicit rite
 condition. Expanded-order implementation is now verified separately; its
 independent review and exports are recorded with the source evidence.
+
+### Continued morning blessings: physical scans 48–51
+
+Transcribe complete printed pages 6–7 in both languages, through Aval
+Anachnu. Reuse the existing `birkhot_hashachar` child identities, including
+`shelo_asani_goy` for this edition's נכרי wording, and the existing
+`ribbon_kol_haolamim` and `aval_anachnu` roots. The superficially similar
+`ribbon_haolamim` identifies another prayer and must not be substituted.
+
+Keep the source's continuous cross-page paragraph independent of canonical
+boundaries: `shetargilenu` ends after להשתעבד לך; `gomel_chasadim` begins
+ותננו היום. Use two `prayer-part` milestones and their terminator within
+one paragraph, with the actual page boundary before להשתעבד. Transclude
+the range of both existing identities in the documentary and expanded spines.
+
+Use the existing `opensiddur:person/gender` symbol values `male` and
+`female`, as Birnbaum does, to select the mutually exclusive blessings in
+service order. Reusable word modules stay ungated. Preserve the original
+English women’s instruction on both documentary pages as the conditional’s
+own note; expanded alternatives have bilingual condition labels. Known
+settings suppress obsolete labels and the other alternative; undefined
+settings retain both. Keep this choice independent of German rite and
+Shabbat. Insert all continued material before the established later German
+Torah-study anchor, preserving the accepted whole-block relocation.
+
+The English source duplicates the women’s blessing in a second full-size
+paragraph. Retain its exact paragraph as `choice/sic` with empty `corr`,
+using an explicit occurrence selector so an identical first paragraph cannot
+be corrected accidentally. Preserve the original `everyday` in the later
+English petition as `sic`, correcting only its spacing in `corr`. Raw primary
+and independent transcriptions remain unchanged; correction markup is a
+separate editorial layer. Omit Hebrew linkage cues from English prayer words.
+Treat the small לעולם introduction ending ויאמר as a semantic directive;
+no instruction `rend` attributes are added.
+
+This installment remains draft pending human source-mark adjudication. Two
+independent guideline/alignment/order audits approve the encoding; source and
+leaf acceptance remain false. Preserve configured CLI effort separately from
+the reader’s self-report, and describe the configuration accurately in credits.
+Keep the expanded bilingual Leolam directive in one note with he/en children.
+
+Current local checks pass: 222 schema-valid XML files, naming, features, registry,
+reference database, 214 tests and 635 subtests, six compiled audience/rite/service
+cases, all 21 new bilingual alignment rows, and production HTML condition/anchor
+checks. Inspected draft PDFs have 47 documentary and 50 expanded pages. Separate
+exporter PR299 fixes a stranded full-width condition label and passes 436 tests
+plus160 subtests, including real-PDF geometry with a negative control. Draft
+previews use that isolated fix; this feature branch does not include it. Accepted
+exports stay unchanged and accepted coverage remains 53 of 355 leaves.

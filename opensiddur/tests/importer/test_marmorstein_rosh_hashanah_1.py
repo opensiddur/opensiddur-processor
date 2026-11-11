@@ -107,6 +107,22 @@ class EditionWiringTest(unittest.TestCase):
         reference = original.find('.//'+T+'ref[@type="page"]')
         self.assertEqual(reference.get('target'), BASE+'invented@'+PROJECTS['he'])
 
+    def test_expanded_bilingual_directive_is_one_note_with_two_languages(self):
+        self.readings['documentary_instructions'] = {
+            'he': {'text': 'עמוד', 'language': 'he', 'scan': 's1', 'printed_page': '7'},
+            'en': {'text': 'Stand.', 'language': 'en', 'scan': 's3', 'printed_page': '7'}}
+        self.readings['expanded_order'] = [
+            {'instruction': ['he', 'en']}, {'unit': 'first'}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        notes = root.findall('.//'+T+'body//'+T+'note[@type="instruction"]')
+        self.assertEqual(len(notes), 1)
+        self.assertEqual([part.get('{http://www.w3.org/XML/1998/namespace}lang')
+                          for part in notes[0]], ['he', 'en'])
+        self.assertEqual([''.join(part.itertext()) for part in notes[0]], ['עמוד', 'Stand.'])
+        self.assertEqual(notes[0].getnext().get('target'), BASE+'invented')
+
     def test_mid_page_direction_keeps_its_link_without_an_extra_page_break(self):
         self.readings['navigation']['return']['page_start'] = False
         self.save('readings', self.readings)
@@ -642,6 +658,25 @@ class EditionWiringTest(unittest.TestCase):
                             ('opensiddur:quorum', 'minyan'): minyan}
                 processor = Mock()
                 processor.get_active_setting.side_effect = lambda kind, feature: settings.get((kind, feature))
+                self.assertEqual(evaluate_condition(condition, processor), expected)
+
+    def test_person_gender_uses_registered_symbol_and_selects_one_alternative(self):
+        self.readings['units'][0]['conditions'] = [
+            {'type': 'opensiddur:person', 'features': {'gender': 'female'}}]
+        self.readings['units'][0]['instructions'] = [
+            {'language': 'en', 'placement': 'condition', 'text': 'Women say:'}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        scope = root.find('.//'+J+'conditional')
+        self.assertEqual(scope.find('.//'+T+'symbol').get('value'), 'female')
+        self.assertIsNone(scope.find('.//'+T+'numeric'))
+        condition = parse_condition_element(scope)
+        for gender, expected in [('female', TriState.TRUE), ('male', TriState.FALSE),
+                                 (None, TriState.UNDEFINED)]:
+            processor = Mock()
+            processor.get_active_setting.return_value = gender
+            with self.subTest(gender=gender):
                 self.assertEqual(evaluate_condition(condition, processor), expected)
 
     def test_scripture_scope_ends_before_liturgy_and_repetition_reuses_the_witness(self):

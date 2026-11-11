@@ -143,6 +143,21 @@ class AuthoringTests(unittest.TestCase):
             with self.subTest(correction=correction['id']), self.assertRaises(ValueError):
                 a.apply_corrections({'x/y.xml': self.correctable()}, [correction])
 
+    def test_duplicate_passage_can_be_corrected_at_one_explicit_occurrence(self):
+        root = etree.fromstring(f'<div xmlns="{a.TEI}"><p>same words</p><p>same words</p></div>')
+        spec = {'id': 'duplicate', 'file': 'x/y.xml', 'sic': 'same words', 'corr': '',
+                'xpath': './tei:p[2]', 'exact': True}
+        a.apply_corrections({'x/y.xml': root}, [spec])
+        self.assertEqual(root[0].text, 'same words')
+        self.assertEqual(self.choices(root), [('same words', None)])
+        self.assertEqual(a.printed_text(root), 'same wordssame words')
+        for selector in ['./tei:p', './tei:missing', 'string(.)', 'true()']:
+            with self.subTest(selector=selector), self.assertRaises(ValueError):
+                a.apply_corrections({'x/y.xml': root}, [dict(spec, xpath=selector)])
+        root[1].tail = 'outside'
+        with self.assertRaises(ValueError):
+            a.apply_corrections({'x/y.xml': root}, [dict(spec, sic='outside')])
+
     def test_a_misspelt_note_emphasis_phrase_is_refused(self):
         with self.assertRaisesRegex(ValueError, 'Missing printed emphasis'):
             a.words_with_notes(self.parent(), 'word', [{'anchor': 'word', 'text': 'one\ntwo', 'italic': ['three']}], 'en')

@@ -61,7 +61,7 @@ def document(lang, project, title, urn, *, index=False, draft=False):
         element(bibl, 'ref', 'Open Siddur source record', target='https://opensiddur.org/?p=69112')
         element(bibl, 'note', 'Digital imaging and document preparation: Aharon N. Varady; '
                 'copy held by the HUC-JIR Klau Library, Cincinnati. The scan is the source. '
-                'Independent reader: Claude Opus 5.5, medium reasoning. '
+                'Independent reader: Claude Opus 5.5; CLI configured for medium reasoning. '
                 'No translations have been supplied for passages absent from the English edition.')
     else:
         element(element(source, 'bibl'), 'ptr', target=f'/{project}/index#project_source_bibl')
@@ -442,7 +442,9 @@ def feature_structures(parent, structures):
         for name, value in structure['features'].items():
             feature = element(features, 'f')
             feature.set('name', name)
-            element(feature, 'binary' if isinstance(value, bool) else 'numeric',
+            kind = ('binary' if isinstance(value, bool) else
+                    'symbol' if isinstance(value, str) else 'numeric')
+            element(feature, kind,
                     value=str(value).lower() if isinstance(value, bool) else str(value))
 
 
@@ -492,10 +494,19 @@ def expanded_order(parent, order, readings, by_stem):
             if conditions:
                 element(outer, 'j:endConditional', target='#'+identifier+'_condition')
         elif 'instruction' in occurrence:
-            instruction = readings['documentary_instructions'][occurrence['instruction']]
-            note = element(parent, 'note', type=instruction.get('type', 'instruction'))
-            note.set(XML+'lang', instruction['language'])
-            rubric_words(note, instruction, instruction['language'])
+            keys = occurrence['instruction']
+            keys = keys if isinstance(keys, list) else [keys]
+            instructions = [readings['documentary_instructions'][key] for key in keys]
+            kinds = {instruction.get('type', 'instruction') for instruction in instructions}
+            if len(kinds) != 1:
+                raise ValueError('A shared bilingual rubric must have one semantic kind')
+            note = element(parent, 'note', type=kinds.pop())
+            for instruction in instructions:
+                content = element(note, 'foreign') if len(instructions) > 1 else note
+                content.set(XML+'lang', instruction['language'])
+                rubric_words(content, instruction, instruction['language'])
+                if content is not note:
+                    append_words(note, ' ')
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             clauses = deepcopy(navigation['clauses'])
