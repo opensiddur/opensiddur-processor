@@ -1783,7 +1783,12 @@ kept with their rubrics.
 
 The feature set is open — a rite that is not listed below is still valid. Known rite names:
 `ashkenaz`, `sepharad`, `edot_hamizrach`, `teimani_baladi`, `teimani_shami`, `italiani`,
-`romaniote`, `nusach_ari`.
+`romaniote`, `nusach_ari`, `german`.
+
+`german` selects the German regional rite independently of the broader `ashkenaz`
+feature. For an edition's German/non-German ordering, test `german=true` and
+`german=false` respectively; leave it undefined to retain both labeled alternatives.
+Do not infer this regional choice from `ashkenaz` or from a different local custom.
 
 A book also prints matter that is neither prayer nor commentary on it: a dedication, a
 preface, acknowledgements, an introduction, an epilogue or afterword, and any other prose

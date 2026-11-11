@@ -547,12 +547,21 @@ German-rite direction and printed page number in raw evidence, with an empty
 edition-qualified page reference in the independently removable parenthesis.
 The Hebrew prayer name in that English instruction remains.
 
-The expanded placement must reconcile this direction with the existing
-printed-page-8 Torah-blessing insertion, without accidentally repeating the
-blessings or Elohai Neshamah. Use the existing open `opensiddur:variant`
-setting for the edition's described order; do not equate it with every German
-or Frankfurt practice. Keep both unresolved alternatives labeled. Whether the
-study passages travel with the Torah blessings awaits the user's clarification.
+The expanded sequence uses the explicit `opensiddur:rite/german` binary.
+For German rite, Elohai Neshamah follows Asher Yatzar immediately, and the
+complete five-unit block (three Torah blessings, Numbers 6:24–26 and Elu
+Devarim) moves to the later printed-page-8 insertion. For non-German rite,
+the whole block remains between Asher Yatzar and Elohai Neshamah. Keep the
+block intact through the end of Elu Devarim, and include each block and
+Elohai Neshamah exactly once when the rite is known. Unknown rite retains
+both explicitly labeled alternatives. This is a rite condition, not a generic
+variant switch; broad Ashkenaz and other regional custom flags do not
+implicitly decide the German feature. Both languages share one spine.
+
+The later position retains the source's existing p.8 structural anchor before
+Barukh She-amar. Scans 48–53 remain partial/untranscribed; subsequent
+installments fill the intervening material without moving this anchor or
+claiming complete service coverage.
 
 Independent full-page, enlarged and tight-crop readings retain their actual
 hashes, disagreements, model identifiers and effort self-reports. The tight
@@ -560,7 +569,6 @@ images settle the gimel dagesh, final-kaf dagesh and both initial bets in
 בקרבי. The user confirms pataḥ under resh and sheva under alef in
 וְהָרַאְיוֹן; preserve it literally without speculative correction.
 Two independent documentary source/guideline/alignment/order audits and PDF
-inspection approve these four source leaves (53 of 355 accepted). Expanded
-custom-order implementation and its independent review remain pending the
-user’s study-placement clarification. Source acceptance does not assert that
-the expanded sequence has been updated.
+inspection approve these four source leaves (53 of 355 accepted). The user has clarified the whole-block relocation and the explicit rite
+condition. Expanded-order implementation is now verified separately; its
+independent review and exports are recorded with the source evidence.

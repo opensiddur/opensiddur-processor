@@ -751,6 +751,9 @@ def build(source, project_directory, *, draft=False):
         bibliography = element(source_description, 'bibl')
         element(bibliography, 'ptr', target='/'+dependency['project']+'/index#project_source_bibl')
         element(bibliography, 'note', dependency['reason'])
+    if readings.get('expanded_coverage_note'):
+        bibliography = root.find(f'.//{{{TEI}}}sourceDesc/{{{TEI}}}bibl')
+        element(bibliography, 'note', readings['expanded_coverage_note'])
     add_front(root, [], expanded=True)
     div = element(body, 'div', corresp=EXPANDED_URN)
     element(div, 'head', 'מחזור אשכנז מורחב').set(XML+'lang', 'he')
