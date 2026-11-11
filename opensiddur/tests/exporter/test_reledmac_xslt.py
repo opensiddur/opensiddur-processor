@@ -1764,6 +1764,24 @@ class TestConditionalRendering(unittest.TestCase):
         self.assertEqual(body.count("During the Ten Days, add:"), 1)
         self.assertLess(body.index("During the Ten Days"), body.index(r"\OSCondStartInline{}"))
 
+    def test_full_width_condition_rubric_uses_keep_with_next_block(self):
+        xml = f"""<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+            xmlns:j="http://jewishliturgy.org/ns/jlptei/2"
+            xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en">
+          <tei:text><tei:body><j:conditional xml:id="c">
+            <tei:note type="instruction" xml:lang="en">Women say:</tei:note>
+            {self.CONDITION}</j:conditional>
+            <p:parallel><p:parallelItem role="primary" xml:lang="en">
+              <tei:p>Primary blessing</tei:p></p:parallelItem>
+            <p:parallelItem role="parallel" xml:lang="en">
+              <tei:p>Translated blessing</tei:p></p:parallelItem></p:parallel>
+            <j:endConditional target="#c"/>
+          </tei:body></tei:text></tei:TEI>"""
+        body = _transform(xml).split(r"\begin{document}")[1]
+        self.assertIn(r"\OSInstructionBlock{", body.split(r"\begin{pairs}")[0])
+        self.assertNotIn(r"\instructionnote{", body.split(r"\begin{pairs}")[0])
+        self.assertLess(body.index("Women say:"), body.index("Primary blessing"))
+
     def test_conditional_macros_are_defined(self):
         out = self._transform_body(
             """<tei:p><tei:milestone unit="verse" n="1"/>x</tei:p>"""

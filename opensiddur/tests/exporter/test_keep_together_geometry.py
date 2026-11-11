@@ -381,3 +381,42 @@ class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@_NEEDS_TEX
+class TestFullWidthConditionalRubrics(unittest.TestCase):
+    """A condition's own label precedes a fresh pairs block, not a column line."""
+
+    def test_labels_stay_on_the_page_with_their_first_parallel_row(self):
+        count = 64
+        blocks = []
+        for n in range(count):
+            length = _LENGTHS[n % len(_LENGTHS)] + 10
+            blocks.append(f"""<j:conditional xml:id="c{n}">
+              <tei:note type="instruction" xml:lang="en">LABEL{n}</tei:note>
+              <tei:fs type="opensiddur:person"><tei:f name="gender">
+                <tei:symbol value="female"/></tei:f></tei:fs></j:conditional>
+              <p:parallel><p:parallelItem role="primary" xml:lang="en">
+                <tei:p>{_words(f'LEFT{n}', length)}</tei:p></p:parallelItem>
+              <p:parallelItem role="parallel" xml:lang="en">
+                <tei:p>{_words(f'RIGHT{n}', length + 5)}</tei:p></p:parallelItem></p:parallel>
+              <j:endConditional target="#c{n}"/>""")
+        doc = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" '
+               'xmlns:j="http://jewishliturgy.org/ns/jlptei/2" '
+               'xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en">'
+               '<tei:text><tei:body>' + ''.join(blocks) + '</tei:body></tei:text></tei:TEI>')
+        typography = {"parallel": {"layout": "pairs"}}
+        protected, _ = _typeset(True, typography, document=doc)
+        unprotected, _ = _typeset(True, typography, protected=False, document=doc)
+        def stranded(where):
+            result = []
+            for n in range(count):
+                self.assertIn(f'LABEL{n}', where)
+                for side in ['LEFT', 'RIGHT']:
+                    first = f'{side}{n}w0'
+                    self.assertIn(first, where)
+                    if where[f'LABEL{n}'][0] != where[first][0]:
+                        result.append((n, side))
+            return result
+        self.assertEqual(stranded(protected), [])
+        self.assertTrue(stranded(unprotected), 'The negative control never reached a page edge')

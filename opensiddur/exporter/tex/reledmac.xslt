@@ -3877,7 +3877,13 @@ end
                       select="f:is-rtl-lang($note-lang) ne f:is-rtl-lang($text-lang)"/>
         <xsl:variable name="within" select="exists(ancestor::tei:p | ancestor::tei:l)"/>
         <xsl:text>\</xsl:text>
-        <xsl:value-of select="if (@f:parallel-block = 'true') then 'OSInstructionBlock'
+        <!-- A block condition can introduce columns from a full-width stream.
+             Its own rubric still needs the keep-with-next line attributes,
+             even when its language matches that stream. Inline conditions
+             keep their existing inline rubric behavior. -->
+        <xsl:value-of select="if (@f:parallel-block = 'true'
+                                 or parent::j:conditional[not(f:is-inline-conditional(.))])
+                              then 'OSInstructionBlock'
                               else if (not($crosses)) then 'instructionnote'
                               else if ($within) then 'OSInstructionLine'
                               else 'OSInstructionBlock'"/>
