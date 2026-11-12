@@ -760,7 +760,7 @@ to 72/355. Only Psalm 136 continuation is accepted on 74/75; Psalm 33 is next.
 The earlier scan 57 German glyph remains separately low-certainty. Prayer
 words and the previously inspected draft exports are unchanged.
 
-### Draft continuation: Psalm 33 on physical scans 74–77
+### Continuation: Psalm 33 on physical scans 74–77
 
 Add Hebrew and English witnesses for all 22 verses, reusing existing canonical
 Bible chapter/verse identities from the Tanakh and Birnbaum projects. Preserve
@@ -778,19 +778,21 @@ final-he loop and Yismach chet knob as printing shapes rather than extra signs.
 Keep every raw reading and follow-up, corrected crop box and actual reviewer
 model/effort in the source evidence.
 
-Independent final review approves guidelines, alignment, recitation order,
-English and other Hebrew readings. Explicit displayed human questions remain:
-Rannenu first-nun vowel/dagesh; Heitivu/Maasehu/Vayehi meteg placement;
-Ohev/Kones/Noten holams and Kones kaf dagesh; Ledor/Vador plene or defective
-spelling; Zamru-lo maqaf. Do not accept Hebrew or the new full pages until
-adjudication. Coverage remains 72/355. Combined with the accepted Psalm 136
-continuation, the new text accounts for full scans 74/75; only Psalm 33's
-continuation is transcribed on 76/77. The later Psalms 92/93 are next. Earlier
-scan 57 retains its separate low-certainty German glyph. The complete volume
-and service remain draft.
+Human adjudications settle every displayed question: Rannenu has first-nun
+hataf-pataḥ without dagesh; Heitivu's meteg is on tet, Maasehu's on shin, and
+Vayehi's on yod beside its segol (none on he). The Ohev/Kones/Noten holams,
+Kones kaf dagesh, defective Ledor/Vador spelling and Zamru-lo maqaf are
+confirmed. Independent final XML review and exact codepoint checks verify
+these hosts. Actual committed pre/post source comparison verifies only four
+Hebrew word changes; English, all other words and structure are unchanged.
+
+Full scans 74/75 are now accepted, bringing coverage to 74/355. Only Psalm 33's
+continuation is accepted on 76/77; later Psalms 92/93 are next. The earlier
+scan 57 German glyph remains separately low-certainty. Complete-volume and
+service acceptance remain false.
 
 Validate the 265 XML files, feature/name/registry/reference checks, exact words
 and 22 shared verse identities in both compiled books, and the four internal
-verse-17 page breaks. Inspect the new PDF pages and electronic links. No new
-exporter changes are needed; use the separately tracked PR 300 range fix and
+verse-17 page breaks. Inspect refreshed PDF pages and electronic links after
+the human corrections. No new exporter changes are needed; use the separately tracked PR 300 range fix and
 PR 299 PDF rubric fix for previews.
