@@ -695,7 +695,8 @@ coverage to64of355. Scan57 remains source-glyph-uncertain. Refreshed draft expor
 retain that status; stable accepted exports are not replaced. Prior pilot leaves
 60–65 already cover the continuation; resume new primary reading at66 while
 tracking the unresolved instruction separately. Whole-volume acceptance is false.
-The refreshed documentary PDF passes visual inspection. The expanded HTML passes
-the production condition checks, but its PDF places Ana Be-khoaḥ in the top margin
-on output page45. That PDF is retained only as a diagnostic pending a separate
-exporter correction; it is not a validated deliverable.
+The refreshed documentary PDF and expanded HTML pass their checks. A reported
+top-margin defect in the expanded PDF was a preview-reading mistake: a fresh
+render and PDF coordinates show Ana Be-khoaḥ correctly below the running head
+(prayer words at102.507pt; header bottom76.849pt). The unchanged expanded PDF
+passes reinspection; no exporter correction was needed.
