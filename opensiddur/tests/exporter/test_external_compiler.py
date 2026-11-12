@@ -1723,6 +1723,49 @@ class TestExternalCompilerProcessor(unittest.TestCase):
         self.assertIn("Verse one text.", result_str)
         self.assertNotIn("Verse two text.", result_str)
 
+    def test_marker_mode_poetry_range_drops_preceding_block_shells(self):
+        """Out-of-range lines must not become blank lines before the selected verse."""
+        xml_bytes = f'''<tei:TEI xmlns:tei="{TEI_NS}" xml:lang="en">
+          <tei:text><tei:body><tei:div>
+            <tei:p>Earlier prose.</tei:p>
+            <tei:lg>
+              <tei:l><tei:milestone unit="verse" corresp="urn:x-opensiddur:text:bible:book/1/1"/>Earlier verse.</tei:l>
+              <tei:l><tei:milestone unit="verse" corresp="urn:x-opensiddur:text:bible:book/1/2"/>Selected lead.</tei:l>
+              <tei:l/>
+              <tei:l><tei:seg type="refrain">Selected response.</tei:seg><tei:milestone unit="verse"/></tei:l>
+              <tei:l>Later verse.</tei:l>
+            </tei:lg>
+          </tei:div></tei:body></tei:text>
+        </tei:TEI>'''.encode()
+        project, name = self._create_test_file("poetry_range_shells.xml", xml_bytes)
+        root = etree.fromstring(xml_bytes)
+        start = root.xpath("//*[@corresp='urn:x-opensiddur:text:bible:book/1/2']")[0]
+        end, include_tail = find_end_of_mapping(start)
+        for marker_mode in (False, True):
+            with self.subTest(marker_mode=marker_mode):
+                processor = ExternalCompilerProcessor(
+                    project, name, root.getroottree().getpath(start), end,
+                    include_tail_after_end=include_tail)
+                if marker_mode:
+                    processor.marker_stack = []
+                result = processor.process()
+                text = ''.join(etree.tostring(n, encoding="unicode") for n in result)
+                self.assertIn("Selected lead.", text)
+                self.assertIn("Selected response.", text)
+                self.assertNotIn("Earlier", text)
+                self.assertNotIn("Later", text)
+                blocks = [n for item in result for n in item.iter()
+                          if n.tag in {f"{{{TEI_NS}}}l", f"{{{TEI_NS}}}p"}]
+                if marker_mode:
+                    starts = [n for n in blocks if n.get(f"{{{P_NS}}}start")]
+                    ends = [n for n in blocks if n.get(f"{{{P_NS}}}end")]
+                    self.assertEqual(len(starts), 3)
+                    self.assertEqual(len(ends), 3)
+                    self.assertTrue(all(n.tag == f"{{{TEI_NS}}}l" for n in starts))
+                else:
+                    self.assertEqual(len(blocks), 3)
+                # The deliberately blank line INSIDE the range is retained.
+
     def test_range_keeps_declarations_made_before_the_start(self):
         """A j:declare preceding the range inside the DCA is still in scope in the range."""
         xml_bytes = '''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="he">
