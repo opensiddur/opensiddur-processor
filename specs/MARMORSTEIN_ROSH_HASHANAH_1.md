@@ -700,3 +700,25 @@ top-margin defect in the expanded PDF was a preview-reading mistake: a fresh
 render and PDF coordinates show Ana Be-khoaḥ correctly below the running head
 (prayer words at102.507pt; header bottom76.849pt). The unchanged expanded PDF
 passes reinspection; no exporter correction was needed.
+
+### Continuation: physical PDF scans66–69
+
+Add bilingual Psalms34,90,91 after Psalm19; include only the Psalm91 continuation
+from scans70–71, leaving their Psalm135 text for the next installment. Preserve
+Hebrew34's verse-line layout and the other printed running paragraphs. Chapter
+and verse milestones remain independent of page/paragraph boundaries, including
+English34:18 and both witnesses of91:2 across different source page breaks.
+
+The Hebrew-only second91:16 is a structural occurrence of the existing canonical
+verse, without an invented English repetition or a new prayer identity. Human
+point-for-point confirmation authorizes its reuse. Raw primary, blind, enlarged
+and isolated readings retain actual disagreements and explicit retractions.
+Human answers settle the two resh hataf-pataḥ vowels, pe/ayin of פעלך, bet of בהם,
+lamed of לנו and meteg on the shin of יושיע. Independent final review verifies
+their exact placement and approves guidelines, alignment and order.
+
+The259-file draft validates;12whole-psalm word comparisons and6cross-page verse
+checks pass. Scans66–69 are accepted, bringing coverage to68/355. Only Psalm91’s
+continuation is reviewed on70–71; resume primary work with their Psalm135 text.
+The earlier scan57 German glyph remains low-certainty, and whole-volume/service
+acceptance remains false. Final previews retain that overall draft status.
