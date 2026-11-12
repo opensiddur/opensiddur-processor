@@ -842,10 +842,13 @@ room beneath it; verify the requested word is actually present before showing
 the crop. Prefer direct message image embeds if tool images fail to display.
 
 Final independent review approves the batch's encoding, alignment, order,
-English readings, and inherited documentary context routing. Six new full
-leaves (76, 77, 79, 81, 83, 85) are accepted, bringing the total to 80/355.
-Displayed questions 1–10 keep the affected Hebrew units pending; 11–12 are
-resolved. The old scan-57 ambiguity remains separate. Validate all 292 XML
+English readings, and inherited documentary context routing. All twelve
+displayed questions are resolved. Human adjudication changes exactly seven
+Hebrew words, with no change to English, page boundaries or reference scopes.
+In Psalm 72:19, כל keeps qamatz and its following maqaf; הארץ has a meteg
+on alef beside qamatz. Independent follow-up verifies the precise hosts.
+All ten full leaves 76–85 are accepted, bringing the total to 84/355.
+The old scan-57 ambiguity remains separate. Validate all 292 XML
 files, names/features/registry/references, and 40 exact bilingual unit
 comparisons in the compiled books. Keep the separate exporter dependencies
 in PRs 299 and 300; this branch changes importer authoring support only.
