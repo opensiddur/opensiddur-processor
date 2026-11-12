@@ -722,3 +722,37 @@ checks pass. Scans66–69 are accepted, bringing coverage to68/355. Only Psalm91
 continuation is reviewed on70–71; resume primary work with their Psalm135 text.
 The earlier scan57 German glyph remains low-certainty, and whole-volume/service
 acceptance remains false. Final previews retain that overall draft status.
+
+### Draft continuation: physical PDF scans 70–73, with Psalm 136 continuation 74–75
+
+Add bilingual Psalms 135 and 136 after the Hebrew-only Psalm 91 closing repeat.
+Use existing canonical chapter/verse identities, with page boundaries inside
+135:12 and before 136:17. Psalm 135 retains running paragraphs; Psalm 136 uses
+verse lines and semantic refrain spans. English 136:2, 3, 8, 17, 18 prints lead
+and refrain on one line. Raw first readings retain the initial missed line-8
+layout, with its later independent correction recorded separately.
+
+English 136:25 is absent in the edition. Both documentary and expanded spines
+use ranges 1–24 / Hebrew-only 25 / bilingual 26, preventing alignment drift or
+invented translation. Documentary range starts are edition-qualified; the end
+inherits the start's project. The expanded spine remains edition independent.
+Each response stays inside its verse scope, including two-line English 26.
+
+The full Divine Name audit individually inspects 89 enlarged occurrences across
+14 pages: restore 88 printed holams, preserve the distinct Elohim-type form in
+Deuteronomy 11:17 on scan 20. Retain prefixes, all other points and accents.
+Original primary/blind hashes, superseded full-page judgments, actual reviewer
+provenance and the rejected הודע locator match remain in the evidence. Generated
+XML changes are independently verified. Three earlier Halleluyah forms also
+have first-lamed hataf-pataḥ. A newly displayed question about an additional tiny
+mark below that vowel remains pending; affected earlier units are reopened,
+rather than silently retaining their prior acceptance. Jerusalem 135:21 uses
+lamed + qamats + CGJ + hiriq, verified by codepoint.
+
+The range also exposed empty pre-range poetry shells in marker compilation:
+24 earlier lines became blank lines before Hebrew verse 25. Exporter correction
+and regression tests are isolated in processor PR 300, outside this content
+branch. The existing rubric export dependency remains PR 299. Validate actual
+compiled range order, all 26 Hebrew / 25 English refrains, exact whole-psalm
+words and both electronic/PDF books. No full-page acceptance while the displayed
+pointing question remains unresolved; Psalm 33 on 74/75 is the next new text.

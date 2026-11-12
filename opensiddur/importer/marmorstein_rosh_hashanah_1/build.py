@@ -376,6 +376,8 @@ def unit_document(unit, lang, draft):
                 if segment.get('source_type'):
                     attributes['type'] = segment['source_type']
                 content = element(paragraph, 'seg', **attributes)
+            if fragment.get('text_type'):
+                content = element(content, 'seg', type=fragment['text_type'])
             if fragment.get('expansion'):
                 choice = element(content, 'choice')
                 abbreviation = element(choice, 'abbr')
@@ -447,6 +449,8 @@ def unit_review_text(unit, lang):
             parts.extend(instruction_review_text(instruction)
                          for instruction in fragment.get('instructions', []))
             parts.append(fragment['text'])
+            if fragment.get('text_type'):
+                parts.append('['+fragment['text_type']+']')
             if fragment.get('expansion'):
                 parts.append('['+fragment['expansion']+']')
             parts.extend(a['abbr']+' ['+a['expan']+']' for a in fragment.get('abbreviations', []))
@@ -717,6 +721,16 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                 if 'target' in clause:
                     clause['target'] = clause['target'].format(project=project)
             append_instruction(div, clauses)
+        elif 'reference' in occurrence:
+            # A partial translation may need separate ranges around an absent
+            # verse while its source file retains the printed chapter structure.
+            if lang not in occurrence.get('witnesses', PROJECTS):
+                continue
+            attributes = dict(occurrence['reference'])
+            # The end point inherits the start point's project.
+            if '@' not in attributes['target']:
+                attributes['target'] += '@'+project
+            element(div, 'j:transclude', type='external', **attributes)
         else:
             unit = by_stem[occurrence['unit']]
             if lang in unit['languages']:

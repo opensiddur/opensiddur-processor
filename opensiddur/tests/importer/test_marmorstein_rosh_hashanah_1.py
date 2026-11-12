@@ -511,6 +511,47 @@ class EditionWiringTest(unittest.TestCase):
         self.assertNotEqual(reading_hash(instruction_review_text(rubric)),
                             reading_hash(instruction_review_text(plain)))
 
+    def test_documentary_ranges_preserve_a_missing_translation_between_neighbors(self):
+        self.readings['source_order'] = [
+            {'reference': {'target': BASE+'invented/1', 'targetEnd': BASE+'invented/2'}},
+            {'reference': {'target': BASE+'invented/3'}, 'witnesses': ['he']},
+            {'reference': {'target': BASE+'invented/4'}}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        for lang, project in PROJECTS.items():
+            root = etree.parse(str(self.projects/project/'index.xml'))
+            transclusions = root.findall('.//'+J+'transclude')
+            expected = ['1', '3', '4'] if lang == 'he' else ['1', '4']
+            self.assertEqual([node.get('target') for node in transclusions],
+                             [BASE+'invented/'+verse+'@'+project for verse in expected])
+            self.assertEqual(transclusions[0].get('targetEnd'),
+                             BASE+'invented/2')
+        # Edition qualification belongs to the generated witnesses, not the
+        # shared canonical assembly data.
+        self.assertNotIn('@', self.readings['source_order'][0]['reference']['target'])
+
+    def test_verse_range_includes_a_refrain_on_its_continuation_line(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
+        bible = 'urn:x-opensiddur:text:bible:psalms/136'
+        unit = {'stem': 'example', 'urn': bible, 'title': {'en': 'Example'},
+                'poetry': {'en': True}, 'languages': {'en': [
+                    {'corresp': bible+'/26', 'paragraph': 1,
+                     'fragments': [{'scan': 's1', 'text': 'Lead'}]},
+                    {'paragraph': 2, 'fragments': [
+                        {'scan': 's1', 'text': 'Response', 'text_type': 'refrain'}]}]}}
+        root = unit_document(unit, 'en', draft=True)
+        lines = root.findall('.//'+T+'l')
+        marker = lines[0].find(T+'milestone[@unit="verse"]')
+        response = lines[1].find(T+'seg[@type="refrain"]')
+        self.assertEqual(''.join(response.itertext()).strip(), 'Response')
+        end, include_tail = find_end_of_mapping(marker)
+        self.assertIs(root.xpath(end, namespaces={'tei': T[1:-1]})[0], response)
+        self.assertTrue(include_tail)
+        self.assertEqual(lines[1].find(T+'milestone').get('unit'), 'verse')
+        reviewed = reading_hash(unit_review_text(unit, 'en'))
+        unit['languages']['en'][1]['fragments'][0].pop('text_type')
+        self.assertNotEqual(reviewed, reading_hash(unit_review_text(unit, 'en')))
+
     def test_prayer_title_keeps_its_language_inside_a_hebrew_script_german_rubric(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
         rubric = {'text': 'Before תפילה after', 'language': 'de-Hebr',
