@@ -744,9 +744,9 @@ Deuteronomy 11:17 on scan 20. Retain prefixes, all other points and accents.
 Original primary/blind hashes, superseded full-page judgments, actual reviewer
 provenance and the rejected הודע locator match remain in the evidence. Generated
 XML changes are independently verified. Three earlier Halleluyah forms also
-have first-lamed hataf-pataḥ. A newly displayed question about an additional tiny
-mark below that vowel remains pending; affected earlier units are reopened,
-rather than silently retaining their prior acceptance. Jerusalem 135:21 uses
+have first-lamed hataf-pataḥ. The human confirms that the additional tiny mark is not a meteg. All six
+Halleluyah occurrences retain first-lamed hataf-pataḥ without meteg; the
+three earlier reviews are restored after independent final verification. Jerusalem 135:21 uses
 lamed + qamats + CGJ + hiriq, verified by codepoint.
 
 The range also exposed empty pre-range poetry shells in marker compilation:
@@ -754,5 +754,8 @@ The range also exposed empty pre-range poetry shells in marker compilation:
 and regression tests are isolated in processor PR 300, outside this content
 branch. The existing rubric export dependency remains PR 299. Validate actual
 compiled range order, all 26 Hebrew / 25 English refrains, exact whole-psalm
-words and both electronic/PDF books. No full-page acceptance while the displayed
-pointing question remains unresolved; Psalm 33 on 74/75 is the next new text.
+words and both electronic/PDF books. The 2026-11-12 no-meteg adjudication
+completes this installment: full scans 70–73 are accepted, bringing coverage
+to 72/355. Only Psalm 136 continuation is accepted on 74/75; Psalm 33 is next.
+The earlier scan 57 German glyph remains separately low-certainty. Prayer
+words and the previously inspected draft exports are unchanged.
