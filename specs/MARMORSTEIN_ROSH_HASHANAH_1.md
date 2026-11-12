@@ -759,3 +759,38 @@ completes this installment: full scans 70–73 are accepted, bringing coverage
 to 72/355. Only Psalm 136 continuation is accepted on 74/75; Psalm 33 is next.
 The earlier scan 57 German glyph remains separately low-certainty. Prayer
 words and the previously inspected draft exports are unchanged.
+
+### Draft continuation: Psalm 33 on physical scans 74–77
+
+Add Hebrew and English witnesses for all 22 verses, reusing existing canonical
+Bible chapter/verse identities from the Tanakh and Birnbaum projects. Preserve
+both source running paragraphs. Verse 17 crosses each language's page boundary
+without a duplicate milestone: Hebrew וּבְרֹב / חֵילוֹ, English “its might” /
+“it will not save.” Source chapter citations are linked notes. The expanded
+morning spine transcludes the chapter after 136:26, using one bilingual sequence
+and edition-independent URNs; documentary references qualify their editions.
+
+Primary and blind English readings match exactly. Enlarged individual crops
+confirm all 13 Divine Name holams, superseding the blind full-page omissions.
+Preserve the actual count rather than the reader's mistaken prose count of 15.
+The shin meteg in Shiru 33:3 is independently settled. Record the attached
+final-he loop and Yismach chet knob as printing shapes rather than extra signs.
+Keep every raw reading and follow-up, corrected crop box and actual reviewer
+model/effort in the source evidence.
+
+Independent final review approves guidelines, alignment, recitation order,
+English and other Hebrew readings. Explicit displayed human questions remain:
+Rannenu first-nun vowel/dagesh; Heitivu/Maasehu/Vayehi meteg placement;
+Ohev/Kones/Noten holams and Kones kaf dagesh; Ledor/Vador plene or defective
+spelling; Zamru-lo maqaf. Do not accept Hebrew or the new full pages until
+adjudication. Coverage remains 72/355. Combined with the accepted Psalm 136
+continuation, the new text accounts for full scans 74/75; only Psalm 33's
+continuation is transcribed on 76/77. The later Psalms 92/93 are next. Earlier
+scan 57 retains its separate low-certainty German glyph. The complete volume
+and service remain draft.
+
+Validate the 265 XML files, feature/name/registry/reference checks, exact words
+and 22 shared verse identities in both compiled books, and the four internal
+verse-17 page breaks. Inspect the new PDF pages and electronic links. No new
+exporter changes are needed; use the separately tracked PR 300 range fix and
+PR 299 PDF rubric fix for previews.
