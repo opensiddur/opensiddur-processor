@@ -205,9 +205,11 @@ def unit_document(unit, lang, draft):
         notes = element(root, 'standOff', type='notes')
         root.remove(notes)
         root.insert(list(root).index(body.getparent()), notes)
+        passage_scans = {fragment['scan'] for segment in unit['languages'][lang]
+                         for fragment in segment['fragments']}
         for citation in citations:
-            if citation['scan'] != unit['languages'][lang][0]['fragments'][0]['scan']:
-                raise ValueError('Citation scan differs from the passage opening')
+            if citation['scan'] not in passage_scans:
+                raise ValueError('Citation scan is outside the passage')
             note = element(notes, 'note', type=citation.get('note_type', 'citation'),
                            target=citation.get('target', unit.get('start', unit['urn'])))
             citation_text = citation['text'].strip()
@@ -319,9 +321,18 @@ def unit_document(unit, lang, draft):
                                       'half-verse' if parts[-1] in ('a', 'b') else 'verse-part')
                     attributes = {'n': parts[-1]}
                 else:
-                    if current_chapter:
-                        close_references()
                     reference_unit, attributes = segment.get('reference_unit', 'prayer-part'), {}
+                    quoted_source = segment.get('source', '')
+                    if reference_unit == 'verse' and ':bible:' in quoted_source:
+                        parts = quoted_source.rsplit(':', 1)[-1].split('/')
+                        chapter = quoted_source.rsplit('/', 1)[0]
+                        if chapter != current_chapter:
+                            close_references()
+                            element(paragraph, 'milestone', unit='chapter', n=parts[1])
+                            current_chapter = chapter
+                        attributes = {'n': parts[-1]}
+                    elif current_chapter:
+                        close_references()
                 if active_reference and active_reference != reference_unit:
                     element(paragraph, 'milestone', unit=active_reference)
                 reference_marker = element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)

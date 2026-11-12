@@ -223,6 +223,43 @@ class EditionWiringTest(unittest.TestCase):
         self.assertIsNone(scripture.getparent().get('source'))
         self.assertEqual(printed_text(root.find('.//'+T+'body')).strip(), 'אב־גד הו')
 
+    def test_reprinted_verses_keep_context_without_redefining_scripture(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [
+            {'corresp': BASE+'invented/'+str(i), 'reference_unit': 'verse',
+             'source': 'urn:x-opensiddur:text:bible:psalms/92/'+str(i),
+             'fragments': [{'scan': 's1', 'text': word}]}
+            for i, word in [(1, 'אב'), (2, 'גד')]] + [
+            {'corresp': BASE+'invented/3', 'fragments': [{'scan': 's2', 'text': 'הו'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        ns = {'t': T[1:-1]}
+        self.assertEqual(root.xpath('//t:milestone[@unit="chapter"]/@n', namespaces=ns), ['92'])
+        self.assertFalse(root.xpath('//t:milestone[starts-with(@corresp,"urn:x-opensiddur:text:bible:")]', namespaces=ns))
+        self.assertEqual(root.xpath('//t:milestone[@unit="verse"]/@n', namespaces=ns), ['1', '2'])
+        marker = root.find('.//'+T+'milestone[@corresp="'+BASE+'invented/3"]')
+        self.assertEqual(marker.getprevious().get('unit'), 'chapter')
+        self.assertIsNone(marker.getprevious().get('corresp'))
+        self.assertEqual(root.xpath('//t:seg/@source', namespaces=ns), [
+            'urn:x-opensiddur:text:bible:psalms/92/1', 'urn:x-opensiddur:text:bible:psalms/92/2'])
+
+    def test_citation_on_a_later_leaf_targets_its_passage(self):
+        unit = self.readings['units'][0]
+        unit['citations'] = {'he': [{'scan': 's2', 'text': '(Example 2.)',
+                                    'target': BASE+'invented',
+                                    'reference': 'urn:x-opensiddur:text:bible:psalms/115/18'}]}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        note = root.find('.//'+T+'standOff/'+T+'note')
+        self.assertEqual(note.get('target'), BASE+'invented')
+        self.assertEqual(note.find('.//'+T+'ref').text, 'Example 2.')
+        unit['citations']['he'][0]['scan'] = 's4'
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'Citation scan is outside the passage'):
+            self.generate(draft=True)
+
     def test_passage_speaker_stays_outside_both_adjacent_reusable_parts(self):
         unit = self.readings['units'][0]
         unit['languages']['he'] = [

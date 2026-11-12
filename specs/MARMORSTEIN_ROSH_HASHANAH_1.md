@@ -796,3 +796,56 @@ and 22 shared verse identities in both compiled books, and the four internal
 verse-17 page breaks. Inspect refreshed PDF pages and electronic links after
 the human corrections. No new exporter changes are needed; use the separately tracked PR 300 range fix and
 PR 299 PDF rubric fix for previews.
+
+### Larger continuation: physical scans 76–87
+
+Work in coherent batches of roughly 10–12 leaves where the service boundaries
+permit. This batch adds the morning printings of Psalms 92–93, Yehi Khevod,
+Ashrei, Psalms 146–150, the Hebrew repetition of 150:6, and the closing Barukh
+verses. It stops before the standing rubric and Vayvarekh David on 86/87.
+Scans 76–85 have full transcription scope; 86/87 remain partial. Unanswered
+source questions prevent acceptance of the affected Hebrew readings.
+
+Keep the first canonical Hebrew witnesses of 92/93/Ashrei and add the English
+translations actually printed in the morning section. Preserve the native
+morning Hebrew variants with structural occurrence milestones and canonical
+quotation sources. Earlier Hebrew-only documentary positions need their own
+occurrence roots: omitting a reference from the English index alone does not
+prevent the parallel compiler from finding the new canonical translation.
+Verify the compiled English slots are empty. Expanded recitation may reuse a
+translation printed elsewhere in this volume, through canonical prayer URNs.
+
+Reuse Birnbaum's Yehi Khevod and Barukh compilation/quotation identities. For
+verses already mapped in Hoshiah et Ammekha, Emet veemunah, or Vetimlokh,
+use occurrence correspondences and canonical `source` links. Whole Psalm 146
+must still include its contextual last verse. Preserve bare chapter context
+and numbered verse milestones for quoted occurrences without registering a
+second canonical Bible definition. Compare duplicate counts with the baseline;
+do not claim the whole earlier project is free of preexisting duplicates.
+
+Keep the printed Hebrew 150:6 repetition without inventing a documentary
+English counterpart. Expanded order repeats the existing canonical verse in
+both languages. Preserve the unpointed printed כל. Encode the English misprint
+“nur” as `sic` with `corr` “nor”. Retain the printed קטו יח citation on scan 80
+as a note attached to the final Ashrei verse; citations may occur on later
+leaves of a passage. The earlier scan-8 printing has no such citation.
+
+Independent enlarged review supplies the first-lamed ḥataf-pataḥ in the new
+Halleluyah forms and in morning Ashrei's יהללוך and ואהללה. The user settles
+both Jerusalem occurrences in Psalm 147:2 and 147:12 as
+lamed + pataḥ + meteg + CGJ + ḥiriq. Preserve the old primary/blind readings and the actual reviewer
+model, configured effort, self-reported effort, and adjudication evidence.
+
+Every pointing question must show its enlarged source snippet with a readable
+number and description directly beside it. Include the complete vowel row and
+room beneath it; verify the requested word is actually present before showing
+the crop. Prefer direct message image embeds if tool images fail to display.
+
+Final independent review approves the batch's encoding, alignment, order,
+English readings, and inherited documentary context routing. Six new full
+leaves (76, 77, 79, 81, 83, 85) are accepted, bringing the total to 80/355.
+Displayed questions 1–10 keep the affected Hebrew units pending; 11–12 are
+resolved. The old scan-57 ambiguity remains separate. Validate all 292 XML
+files, names/features/registry/references, and 40 exact bilingual unit
+comparisons in the compiled books. Keep the separate exporter dependencies
+in PRs 299 and 300; this branch changes importer authoring support only.
