@@ -654,3 +654,48 @@ Four service/rite cases and eight paired rows pass, including identical-word
 BarukhShem reuse and no English fallback for offerings. Coverage is61of355
 leaves; the next physical PDF scan is56 (Archive n55). Whole-volume and complete
 service acceptance remain false.
+
+
+### Draft continuation: physical PDF scans56–59
+
+Thirteen Hebrew-only modules continue the offerings/study order through the
+Temple-restoration prayer on printed p14. Existing canonical identities cover
+the incense passages, Biblical verses, AnaBe-khoaḥ stanzas, eight mishnayot and
+thirteen rules. One BarukhShem occurrence context prevents the earlier evening
+בלחש direction from leaking into this printing. No English is supplied.
+
+The documentary Shabbat condition retains the source Hebrew-script German
+rubric; the expanded condition uses bilingual editorial labels and locally
+declares Shabbat. Reusable Biblical words remain ungated. All true/false/unknown
+branches are verified in compiled output and production electronic CSS.
+
+Side-column acrostics and the poem attribution are source commentary, outside
+recited words. The generic annotation output preserves note kind and semantic
+acrostic markup. New Mishnah labels follow their own milestones so a range
+transclusion retains the first א. Earlier reviewed label conventions are
+unchanged. All thirteen compiled units match the draft words exactly; eight
+labels, seven acrostic notes and missing-English behavior are checked.
+
+Human snippet adjudications settle the Hebrew readings. Actual
+blind disagreements and later erroneous deletion proposals remain archived;
+correctly located isolated crops confirm all printed repetitions. The original
+אֶחָת pointing typo is preserved in sic with intended אַחַת in corr. The partial
+Lev2:11 quotation identifies half-verse b. Independent guideline/order review
+covers the actual generated XML and includes enlarged punctuation evidence.
+
+The German instruction retains the human-confirmed samekh in איינגעסאַלטעט.
+Its preceding word's final glyph remains unreadable: ז is tentative and encoded
+as tei:c with cert="low", not a silent normalization to modern German. Independent
+review verifies all human corrections and the uncertainty markup. Only this
+instruction remains unaccepted; all thirteen prayer/study modules are reviewed.
+
+Draft build:252schema-valid XML files; naming/features/registry/URN references
+pass;218targeted tests and636subtests pass. Scans56,58,59 are accepted, bringing
+coverage to64of355. Scan57 remains source-glyph-uncertain. Refreshed draft exports
+retain that status; stable accepted exports are not replaced. Prior pilot leaves
+60–65 already cover the continuation; resume new primary reading at66 while
+tracking the unresolved instruction separately. Whole-volume acceptance is false.
+The refreshed documentary PDF passes visual inspection. The expanded HTML passes
+the production condition checks, but its PDF places Ana Be-khoaḥ in the top margin
+on output page45. That PDF is retained only as a diagnostic pending a separate
+exporter correction; it is not a validated deliverable.

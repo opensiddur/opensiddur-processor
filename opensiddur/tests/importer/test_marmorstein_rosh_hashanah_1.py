@@ -449,6 +449,20 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(label.getnext().get('corresp'), BASE+'invented/2')
         self.assertEqual(len(root.findall('.//'+T+'body//'+T+'p')), 1)
 
+    def test_referenced_numbering_travels_with_its_own_mishnah(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = [
+            {'corresp': BASE+'invented/'+str(i), 'reference_unit': 'mishnah',
+             'edition_label': label, 'edition_label_in_reference': True,
+             'fragments': [{'scan': 's1', 'text': word}]}
+            for i, label, word in [(1, 'א', 'First'), (2, 'ב', 'Second')]]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        for i, label in enumerate(root.findall('.//'+T+'body//'+T+'label'), 1):
+            self.assertEqual(label.getprevious().get('corresp'), BASE+'invented/'+str(i))
+        self.assertEqual(len(root.findall('.//'+T+'body//'+T+'p')), 1)
+
     def test_missing_language_does_not_leave_an_empty_conditional_section(self):
         self.readings['documentary_instructions'] = {}
         self.readings['source_order'] = [{'section': 'only_hebrew', 'heading': None,
@@ -478,6 +492,24 @@ class EditionWiringTest(unittest.TestCase):
         en = etree.parse(str(self.projects/PROJECTS['en']/'index.xml'))
         self.assertEqual(he.find('.//'+J+'transclude').get('target'), BASE+'another@'+PROJECTS['he'])
         self.assertFalse(en.findall('.//'+J+'transclude'))
+
+    def test_uncertain_character_keeps_exact_words_and_the_language_span(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import rubric_words, instruction_review_text
+        rubric = {'text': 'ז שבת wordז ז', 'language_spans': [
+            {'text': 'שבת', 'language': 'he'}],
+            'uncertain_characters': [{'word': 'wordז', 'character': 'ז'}]}
+        note = etree.Element(T+'note')
+        rubric_words(note, rubric, 'de-Hebr')
+        self.assertEqual(''.join(note.itertext()), rubric['text'])
+        self.assertEqual(note.find(T+'foreign').get('{http://www.w3.org/XML/1998/namespace}lang'), 'he')
+        marked = note.findall(T+'c')
+        self.assertEqual(len(marked), 1)
+        self.assertEqual(marked[0].text, 'ז')
+        self.assertEqual(marked[0].get('cert'), 'low')
+        plain = dict(rubric)
+        plain.pop('uncertain_characters')
+        self.assertNotEqual(reading_hash(instruction_review_text(rubric)),
+                            reading_hash(instruction_review_text(plain)))
 
     def test_prayer_title_keeps_its_language_inside_a_hebrew_script_german_rubric(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
@@ -817,6 +849,17 @@ class EditionWiringTest(unittest.TestCase):
         note = root.find('.//'+T+'standOff/'+T+'note[@type="citation"]')
         self.assertEqual(note.get('target'), BASE+'another')
         self.assertEqual(note.find(T+'p').text, 'Psalm number')
+
+    def test_source_acrostic_is_commentary_outside_recited_words(self):
+        self.readings['units'][0]['citations'] = {'he': [
+            {'scan': 's1', 'text': 'אבג״יתץ', 'note_type': 'commentary',
+             'text_type': 'acrostic', 'target': BASE+'invented'}]}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        note = root.find('.//'+T+'standOff/'+T+'note[@type="commentary"]')
+        self.assertEqual(note.find(T+'p/'+T+'seg[@type="acrostic"]').text, 'אבג״יתץ')
+        self.assertNotIn('אבג״יתץ', ''.join(root.find('.//'+T+'body').itertext()))
 
     def test_documentary_page_retains_heading_rubric_and_edition_target(self):
         unit = self.readings['units'][0]

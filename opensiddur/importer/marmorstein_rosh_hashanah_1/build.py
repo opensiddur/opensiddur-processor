@@ -110,6 +110,26 @@ def rubric_words(parent, rubric, lang):
         element(choice, 'abbr', abbreviation['abbr'])
         element(choice, 'expan', abbreviation['expan'])
     words(parent, text, lang)
+    for uncertain in rubric.get('uncertain_characters', []):
+        word, character = uncertain['word'], uncertain['character']
+        if len(character) != 1 or word.count(character) != 1:
+            raise ValueError('An uncertain character must occur once in its source word')
+        matches = [(node, field, value)
+                   for node in parent.iter() for field in ('text', 'tail')
+                   if (node is not parent or field == 'text')
+                   and (value := getattr(node, field)) and word in value]
+        if len(matches) != 1 or matches[0][2].count(word) != 1:
+            raise ValueError('Uncertain source word is missing or ambiguous')
+        node, field, value = matches[0]
+        offset = value.index(word) + word.index(character)
+        glyph = etree.Element('{'+TEI+'}c', cert='low')
+        glyph.text, glyph.tail = character, value[offset+1:]
+        setattr(node, field, value[:offset])
+        if field == 'text':
+            node.insert(0, glyph)
+        else:
+            container = node.getparent()
+            container.insert(container.index(node)+1, glyph)
 
 
 def instruction_review_text(instruction):
@@ -117,6 +137,8 @@ def instruction_review_text(instruction):
     parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
     parts.extend(span['text']+' ['+span['language']+']'
                  for span in instruction.get('language_spans', []))
+    parts.extend(item['word']+' [uncertain '+item['character']+'; cert=low]'
+                 for item in instruction.get('uncertain_characters', []))
     return ' '.join(parts)
 
 
@@ -186,7 +208,7 @@ def unit_document(unit, lang, draft):
         for citation in citations:
             if citation['scan'] != unit['languages'][lang][0]['fragments'][0]['scan']:
                 raise ValueError('Citation scan differs from the passage opening')
-            note = element(notes, 'note', type='citation',
+            note = element(notes, 'note', type=citation.get('note_type', 'citation'),
                            target=citation.get('target', unit.get('start', unit['urn'])))
             citation_text = citation['text'].strip()
             if citation_text.startswith('(') and citation_text.endswith(')'):
@@ -194,6 +216,8 @@ def unit_document(unit, lang, draft):
             paragraph = element(note, 'p')
             if citation.get('reference'):
                 element(paragraph, 'ref', citation_text, target=citation['reference'])
+            elif citation.get('text_type'):
+                element(paragraph, 'seg', citation_text, type=citation['text_type'])
             else:
                 paragraph.text = citation_text
     paragraph = None
@@ -259,8 +283,9 @@ def unit_document(unit, lang, draft):
                 current_page = fragment['scan']
             if index == 0 and segment.get('edition_label'):
                 close_references()
-                element(paragraph, 'label', segment['edition_label'])
-                append_words(paragraph, ' ')
+                if not segment.get('edition_label_in_reference'):
+                    element(paragraph, 'label', segment['edition_label'])
+                    append_words(paragraph, ' ')
             if index == 0:
                 for instruction in segment.get('instructions', []):
                     note = element(paragraph, 'note', type=instruction.get('type', 'instruction'))
@@ -301,6 +326,11 @@ def unit_document(unit, lang, draft):
                     element(paragraph, 'milestone', unit=active_reference)
                 reference_marker = element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
                 active_reference = reference_unit
+            if index == 0 and segment.get('edition_label_in_reference'):
+                if not segment.get('edition_label') or not segment.get('corresp'):
+                    raise ValueError('A referenced edition label needs its text and correspondence')
+                element(paragraph, 'label', segment['edition_label'])
+                append_words(paragraph, ' ')
             if index == 0 and segment.get('speaker'):
                 speaker = segment['speaker']
                 if 'label' in speaker:
