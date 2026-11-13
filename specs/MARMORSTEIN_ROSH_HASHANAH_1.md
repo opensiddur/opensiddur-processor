@@ -936,3 +936,35 @@ comparisons and both calendar paths. The importer tests pass 61 cases and
 the expanded new section has a bilingual Shema-blessings heading. These checks
 do not certify the source readings. The five human snippet questions, other
 faint marks and the provisional Ofan opening identity remain pending.
+
+## Continuation: physical PDF scans 108–125
+
+The next larger batch starts at Ahavah Rabbah and ends with the silent Amidah,
+before the reader's repetition below the rule on scans 124/125. Seventeen new
+bilingual modules share one expanded sequence. Reuse the existing Hebrew-only
+El Melekh Ne'eman with its no-minyan condition; supply no English counterpart.
+The earlier human Ofan questions are resolved, including the opening אִהֵל;
+other earlier source uncertainties remain separately recorded.
+
+Repeated Biblical passages use existing canonical identities in bounded source
+spans and registered occurrence correspondences on chapter/verse milestones.
+The importer accepts `chapter_corresp` and `source_reference_corresp` for these
+contexts. A quote inside an active prayer-part must use explicit contexts deeper
+than that part, so refdb's component-depth fallback cannot truncate its scope.
+The existing canonical correspondence default remains valid for first mappings.
+Local editorial commentary may target an explicit segment `anchor`; the מלכנו
+note uses this mechanism without inventing a condition for the source variant.
+The source instruction joining אלהיכם to אמת remains in the expanded sequence;
+its exact transcription is pending human adjudication.
+
+English review covers 2,835 words across all seventeen units and three citations.
+Seven full English leaves are newly accepted, bringing acceptance to 100/355.
+Hebrew remains draft, with seven numbered human questions and additional fine
+marks awaiting adjudication. The source repository retains actual blind readings,
+frozen primary readings, nonblind follow-ups, structural review and resolutions.
+Structural approval and exporter checks never imply source acceptance.
+
+Final checks cover 391 XML files, 68 compiled unit/language word comparisons,
+eight Shabbat/quorum/recitation combinations, names, features, URNs and reference
+resolution. The importer suite passes 67 tests and 12 subtests. The documentary
+96-page and expanded 101-page draft previews were rendered and visually checked.

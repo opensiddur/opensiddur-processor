@@ -230,14 +230,16 @@ def unit_document(unit, lang, draft):
     current_chapter = None
     seen_chapters = set()
     active_reference = None
+    active_reference_urn = None
     line_group = None
     poetry = unit.get('poetry', {}).get(lang, False)
 
     def close_references():
-        nonlocal active_reference, current_chapter
+        nonlocal active_reference, active_reference_urn, current_chapter
         if active_reference:
             element(paragraph, 'milestone', unit=active_reference)
             active_reference = None
+            active_reference_urn = None
         if current_chapter:
             element(paragraph, 'milestone', unit='chapter')
             current_chapter = None
@@ -313,6 +315,7 @@ def unit_document(unit, lang, draft):
             if index == 0 and segment.get('speaker_before_reference') and segment.get('speaker') and active_reference:
                 element(paragraph, 'milestone', unit=active_reference)
                 active_reference = None
+                active_reference_urn = None
             if index == 0 and segment.get('corresp'):
                 urn = segment['corresp']
                 biblical = ':bible:' in urn
@@ -340,7 +343,10 @@ def unit_document(unit, lang, draft):
                         chapter = quoted_source.rsplit('/', 1)[0]
                         if chapter != current_chapter:
                             close_references()
-                            element(paragraph, 'milestone', unit='chapter', n=parts[1])
+                            chapter_attributes = {'unit': 'chapter', 'n': parts[1]}
+                            if segment.get('chapter_corresp'):
+                                chapter_attributes['corresp'] = segment['chapter_corresp']
+                            element(paragraph, 'milestone', **chapter_attributes)
                             current_chapter = chapter
                         attributes = {'n': parts[-1]}
                     elif current_chapter:
@@ -349,6 +355,7 @@ def unit_document(unit, lang, draft):
                     element(paragraph, 'milestone', unit=active_reference)
                 reference_marker = element(paragraph, 'milestone', unit=reference_unit, corresp=urn, **attributes)
                 active_reference = reference_unit
+                active_reference_urn = urn
             if index == 0 and segment.get('edition_label_in_reference'):
                 if not segment.get('edition_label') or not segment.get('corresp'):
                     raise ValueError('A referenced edition label needs its text and correspondence')
@@ -390,9 +397,21 @@ def unit_document(unit, lang, draft):
                 continue
             source_reference = segment.get('source_reference')
             if source_reference and index == 0:
+                if active_reference == 'prayer-part' and active_reference_urn:
+                    enclosing_depth = active_reference_urn.rsplit(':', 1)[-1].count('/')
+                    for key in ('chapter_corresp', 'source_reference_corresp'):
+                        context = segment.get(key)
+                        if context and context.rsplit(':', 1)[-1].count('/') <= enclosing_depth:
+                            raise ValueError('Quote context must be deeper than its enclosing prayer-part: '+context)
                 book, chapter, verse = source_reference.rsplit(':', 1)[-1].split('/')
-                element(paragraph, 'milestone', unit='chapter', n=chapter)
-                element(paragraph, 'milestone', unit='verse', n=verse, corresp=source_reference)
+                chapter_attributes = {'unit': 'chapter', 'n': chapter}
+                if segment.get('chapter_corresp'):
+                    chapter_attributes['corresp'] = segment['chapter_corresp']
+                element(paragraph, 'milestone', **chapter_attributes)
+                element(paragraph, 'milestone', unit='verse', n=verse,
+                        corresp=segment.get('source_reference_corresp', source_reference))
+            if index == 0 and segment.get('anchor'):
+                element(paragraph, 'anchor').set(XML+'id', segment['anchor'])
             content = paragraph
             if segment.get('source'):
                 attributes = {'source': segment['source']}
@@ -785,12 +804,13 @@ def build(source, project_directory, *, draft=False):
         raise ValueError('URN registry cannot be loaded cleanly')
     for unit in readings['units']:
         identities = [unit['urn']] + [s[key] for segments in unit['languages'].values()
-                                     for s in segments for key in ('corresp', 'source', 'source_reference', 'transclude', 'repeat') if s.get(key)]
+                                     for s in segments for key in ('corresp', 'source', 'source_reference',
+                                         'source_reference_corresp', 'chapter_corresp', 'transclude', 'repeat') if s.get(key)]
         if unit.get('publication_context'):
             identities.append(unit['publication_context'])
         identities.extend(unit.get('reuse', {}).values())
         identities += [citation['target'] for citations in unit.get('citations', {}).values()
-                       for citation in citations if citation.get('target')]
+                       for citation in citations if citation.get('target', '').startswith('urn:x-opensiddur:')]
         for urn in identities:
             # Numeric scripture descendants can be implicit in the registered book.
             if registry.resolve(urn) != urn:

@@ -907,6 +907,79 @@ class EditionWiringTest(unittest.TestCase):
         repeat = root.find('.//'+J+'transclude[@type="inline"]')
         self.assertEqual(repeat.get('target'), bible+'5/8@'+PROJECTS['he'])
 
+    def test_repeated_scripture_has_addressable_chapter_and_verse_context(self):
+        chapter = BASE+'another/quoted_isaiah_6'
+        verse = chapter+'/3'
+        self.registry_mock.records.update({chapter: {}, verse: {}})
+        self.readings['units'][0]['languages']['he'] = [{
+            'corresp': verse, 'source': 'urn:x-opensiddur:text:bible:isaiah/6/3',
+            'reference_unit': 'verse', 'chapter_corresp': chapter,
+            'fragments': [{'scan': 's1', 'text': 'quotation'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        self.assertEqual(root.find('.//'+T+'milestone[@unit="chapter"][@n]').get('corresp'), chapter)
+        self.assertEqual(root.find('.//'+T+'milestone[@unit="verse"][@n]').get('corresp'), verse)
+        self.assertFalse(root.findall('.//*[@corresp="urn:x-opensiddur:text:bible:isaiah/6"]'))
+
+    def test_bounded_scripture_context_does_not_end_its_enclosing_prayer_part(self):
+        chapter = BASE+'another/quoted_isaiah_6'
+        verse = chapter+'/3'
+        self.registry_mock.records.update({chapter: {}, verse: {}})
+        self.readings['units'][0]['languages']['he'] = [
+            {'corresp': BASE+'another', 'fragments': [{'scan': 's1', 'text': 'prefix'}]},
+            {'source_reference': 'urn:x-opensiddur:text:bible:isaiah/6/3',
+             'source_reference_corresp': verse, 'chapter_corresp': chapter,
+             'source': 'urn:x-opensiddur:text:bible:isaiah/6/3',
+             'fragments': [{'scan': 's1', 'text': 'quotation'}]},
+            {'fragments': [{'scan': 's1', 'text': 'suffix'}], 'end_reference': True},
+            {'fragments': [{'scan': 's1', 'text': 'unrelated'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        prayer = root.find('.//'+T+'milestone[@corresp="'+BASE+'another"]')
+        quote = root.find('.//'+T+'milestone[@corresp="'+verse+'"]')
+        quote_end = quote.getnext().getnext()
+        self.assertEqual(quote_end.get('unit'), 'verse')
+        self.assertIsNone(quote_end.get('corresp'))
+        end, include_tail = find_end_of_mapping(prayer)
+        endpoint = root.xpath(end, namespaces={'tei': T[1:-1]})[0]
+        self.assertTrue(include_tail)
+        self.assertEqual(endpoint.get('unit'), 'chapter')
+        self.assertIsNone(endpoint.get('corresp'))
+        self.assertEqual(endpoint.tail.strip(), 'suffix')
+        self.assertEqual(endpoint.getnext().get('unit'), 'prayer-part')
+        self.assertEqual(endpoint.getnext().tail.strip(), 'unrelated')
+
+    def test_quote_context_cannot_truncate_its_enclosing_prayer_part(self):
+        chapter = BASE+'another/quoted_isaiah_6'
+        self.registry_mock.records.update({chapter: {}, chapter+'/3': {}, BASE+'invented/part': {}})
+        self.readings['units'][0]['languages']['he'] = [
+            {'corresp': BASE+'invented/part', 'fragments': [{'scan': 's1', 'text': 'prefix'}]},
+            {'source_reference': 'urn:x-opensiddur:text:bible:isaiah/6/3',
+             'source_reference_corresp': chapter+'/3', 'chapter_corresp': chapter,
+             'fragments': [{'scan': 's1', 'text': 'quotation'}]}]
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'deeper than its enclosing prayer-part'):
+            self.generate(draft=True)
+
+    def test_editorial_commentary_can_target_a_local_variant_anchor(self):
+        unit = self.readings['units'][0]
+        unit['citations'] = {'he': [{'scan': 's1', 'text': 'Editorial variant note.',
+                                    'note_type': 'commentary', 'target': '#variant_here'}]}
+        unit['languages']['he'] = [
+            {'fragments': [{'scan': 's1', 'text': 'prefix'}]},
+            {'anchor': 'variant_here', 'fragments': [{'scan': 's1', 'text': '(variant)'}]},
+            {'fragments': [{'scan': 's1', 'text': 'suffix'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        anchor = root.find('.//'+T+'anchor')
+        self.assertEqual(anchor.get('{http://www.w3.org/XML/1998/namespace}id'), 'variant_here')
+        self.assertIn('(variant)', anchor.tail)
+        note = root.find('.//'+T+'standOff/'+T+'note')
+        self.assertEqual(note.get('target'), '#variant_here')
+
     def test_complete_chapter_remains_addressable_inside_a_composite_prayer(self):
         bible = 'urn:x-opensiddur:text:bible:psalms/'
         unit = self.readings['units'][0]
