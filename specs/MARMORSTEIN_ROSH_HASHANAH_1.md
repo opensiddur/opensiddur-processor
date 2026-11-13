@@ -887,3 +887,11 @@ The older scan-57 ambiguity remains pending separately. Scans 96–97 remain
 partial; continue there with half Kaddish. Raw primary readings, actual model
 responses and unresolved marks remain separate from accepted readings.
 Images and generated exports stay outside Git.
+
+Final PDF QA found that starting a range at the outer Az Yashir division
+collapsed its parallel verse groups. Start at the source-linked
+quoted_exodus_15_1 verse milestone instead, retaining the canonical Bible 15:1
+source. The ranged URI ends at quoted_exodus_15_18. Runtime verification must
+find eighteen separate verse groups in each language, as well as checking
+word content, followed by the explicit canonical repeat. This adds one
+occurrence context and changes no prayer words.
