@@ -247,7 +247,7 @@ def unit_document(unit, lang, draft):
             paragraph = current_paragraph = None
             line_group = None
             continue
-        identity = segment.get('paragraph', 1)
+        identity = segment['fragments'][0].get('line', segment.get('paragraph', 1))
         text_language = segment.get('language', lang)
         if paragraph is None or identity != current_paragraph:
             if poetry and line_group is None:
@@ -276,6 +276,14 @@ def unit_document(unit, lang, draft):
             fragments[0]['text'] = fragments[0]['text'][1:]
             fragments[-1]['text'] = fragments[-1]['text'][:-1]
         for index, fragment in enumerate(fragments):
+            if 'line' in fragment:
+                if not poetry or segment_conditions:
+                    raise ValueError('Fragment lines require unconditional poetry')
+                if fragment['line'] != current_paragraph:
+                    paragraph = element(line_group, 'l')
+                    if text_language != lang:
+                        paragraph.set(XML+'lang', text_language)
+                    current_paragraph = fragment['line']
             if fragment['scan'] != current_page:
                 attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(fragment['scan'][1:])-1, size='')}
                 if fragment.get('printed_page') is not None:
@@ -399,7 +407,7 @@ def unit_document(unit, lang, draft):
                 else:
                     words(abbreviation, fragment['text'], lang)
                 words(element(choice, 'expan'), fragment['expansion'], lang)
-            elif fragment.get('abbreviations'):
+            elif fragment.get('abbreviations') or fragment.get('uncertain_characters'):
                 rubric_words(content, fragment, text_language)
             elif fragment.get('enlarged_letters'):
                 letters = fragment['enlarged_letters']
@@ -417,6 +425,8 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'milestone', unit='chapter')
             if not fragment.get('join_next') and not fragment['text'].rstrip().endswith('־'):
                 append_words(paragraph, ' ')
+        if segment.get('end_reference'):
+            close_references()
         if segment_conditions:
             element(paragraph, 'j:endConditional', target='#'+segment_condition_id)
         if segment.get('repeat_cue'):
@@ -465,6 +475,8 @@ def unit_review_text(unit, lang):
             if fragment.get('expansion'):
                 parts.append('['+fragment['expansion']+']')
             parts.extend(a['abbr']+' ['+a['expan']+']' for a in fragment.get('abbreviations', []))
+            parts.extend(item['word']+' [uncertain '+item['character']+'; cert=low]'
+                         for item in fragment.get('uncertain_characters', []))
         if segment.get('repeat_cue'):
             cue = segment['repeat_cue']
             parts.append(cue['text']+' ['+cue['target']+']')

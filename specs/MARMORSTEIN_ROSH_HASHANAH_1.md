@@ -852,3 +852,38 @@ The old scan-57 ambiguity remains separate. Validate all 292 XML
 files, names/features/registry/references, and 40 exact bilingual unit
 comparisons in the compiled books. Keep the separate exporter dependencies
 in PRs 299 and 300; this branch changes importer authoring support only.
+
+## Continuation from physical PDF scan 86
+
+The next larger batch covers Vayevarekh David on scan 86 through Yishtabbach
+at the top of scans 96–97. Scans 86–95 are its full-page scope; 96–97 remain
+partial, stopping before the half-Kaddish rubric. The standing instruction on
+86 extends through Barekhu beyond this installment and remains a ritual rubric.
+
+The source modules reuse the existing Vayevarekh David, Attah Hu, Vayyosha,
+Az Yashir, Ki Ladonai, Nishmat and subsequent blessing identities. Biblical
+quotations use chapter/verse milestones independently of printed paragraphs,
+poetry lines and page breaks. The importer now supports fragments of a verse
+on successive printed poetry lines, including lines shared by adjacent verses.
+A regression case checks shared lines, continuation lines and a page boundary.
+
+Scans 94 and 95 each have Hebrew and English on the same leaf: printed pages
+32 and 33 respectively. They are not a facing-page pair. Nishmat continues
+from Hebrew 92 and English 93 into the corresponding columns on 94. Missing
+English Exodus 15:19 stays absent, in a separate Hebrew-only source module.
+The documentary Song retains its two different printed forms of Exodus 15:18;
+the expanded spine assembles the first occurrence and an explicit repeat
+through edition-independent URN transclusions. Already mapped biblical verses
+use source-linked occurrence correspondences, without new canonical identities.
+
+Independent reviews approve the encoding, alignment, recitation order and the
+canonical ranged transclusion of Az Yashir through its first Exodus 15:18,
+followed by an explicit canonical repeat. Runtime comparisons verify both
+languages, the omitted English verse and sixteen continued page boundaries.
+Nine full leaves are accepted, bringing the total to 93/355. Scan 90 remains
+partial: the probable meteg in הָֽלְכ֥וּ is encoded with low certainty after the
+human reader could not settle it. The original PDF offers no higher resolution.
+The older scan-57 ambiguity remains pending separately. Scans 96–97 remain
+partial; continue there with half Kaddish. Raw primary readings, actual model
+responses and unresolved marks remain separate from accepted readings.
+Images and generated exports stay outside Git.

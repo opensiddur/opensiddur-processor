@@ -589,6 +589,60 @@ class EditionWiringTest(unittest.TestCase):
         unit['languages']['en'][1]['fragments'][0].pop('text_type')
         self.assertNotEqual(reviewed, reading_hash(unit_review_text(unit, 'en')))
 
+    def test_verses_can_cross_and_share_printed_poetry_lines(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
+        bible = 'urn:x-opensiddur:text:bible:exodus/15'
+        unit = {'stem': 'example', 'urn': bible, 'title': {'en': 'Example'},
+                'poetry': {'en': True}, 'languages': {'en': [
+                    {'corresp': bible+'/1', 'fragments': [
+                        {'scan': 's1', 'line': 1, 'text': 'First'},
+                        {'scan': 's1', 'line': 2, 'text': 'continuation'}]},
+                    {'corresp': bible+'/2', 'fragments': [
+                        {'scan': 's1', 'line': 2, 'text': 'Second'},
+                        {'scan': 's2', 'line': 3, 'text': 'ending'}]}]}}
+        root = unit_document(unit, 'en', draft=True)
+        lines = root.findall('.//'+T+'l')
+        self.assertEqual([' '.join(''.join(n.itertext()).split()) for n in lines],
+                         ['First', 'continuation Second', 'ending'])
+        self.assertEqual(len(lines[0].findall(T+'milestone[@unit="verse"]')), 1)
+        self.assertEqual(lines[1].find(T+'milestone').get('corresp'), bible+'/2')
+        self.assertTrue(lines[2].find(T+'pb').get('facs').endswith('/page/n1.jpg'))
+        self.assertIsNone(lines[2].find(T+'milestone').get('corresp'))
+
+    def test_biblical_quote_scope_ends_before_unmapped_prayer_words(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
+        verse = 'urn:x-opensiddur:text:bible:psalms/35/10'
+        unit = {'stem': 'example', 'urn': BASE+'example', 'title': {'en': 'Example'},
+                'languages': {'en': [
+                    {'corresp': verse, 'end_reference': True,
+                     'fragments': [{'scan': 's1', 'text': 'Quoted verse.'}]},
+                    {'fragments': [{'scan': 's1', 'text': 'Unrelated prayer words.'}]}]}}
+        root = unit_document(unit, 'en', draft=True)
+        marker = root.find('.//'+T+'milestone[@corresp="'+verse+'"]')
+        terminator = marker.getnext()
+        self.assertEqual(terminator.get('unit'), 'verse')
+        self.assertIsNone(terminator.get('corresp'))
+        self.assertEqual(marker.tail.strip(), 'Quoted verse.')
+        chapter_end = terminator.getnext()
+        self.assertEqual(chapter_end.get('unit'), 'chapter')
+        self.assertEqual(chapter_end.tail.strip(), 'Unrelated prayer words.')
+
+    def test_uncertain_combining_point_stays_bound_to_the_reviewed_prayer_reading(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
+        word = 'הָֽלְכוּ'
+        fragment = {'scan': 's1', 'text': word,
+                    'uncertain_characters': [{'word': word, 'character': 'ֽ'}]}
+        unit = {'stem': 'example', 'urn': BASE+'example', 'title': {'he': 'Example'},
+                'languages': {'he': [{'fragments': [fragment]}]}}
+        root = unit_document(unit, 'he', draft=True)
+        point = root.find('.//'+T+'body//'+T+'c')
+        self.assertEqual(point.text, 'ֽ')
+        self.assertEqual(point.get('cert'), 'low')
+        self.assertEqual(''.join(root.find('.//'+T+'body').itertext()).strip(), word)
+        reviewed = reading_hash(unit_review_text(unit, 'he'))
+        fragment.pop('uncertain_characters')
+        self.assertNotEqual(reviewed, reading_hash(unit_review_text(unit, 'he')))
+
     def test_prayer_title_keeps_its_language_inside_a_hebrew_script_german_rubric(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
         rubric = {'text': 'Before תפילה after', 'language': 'de-Hebr',
