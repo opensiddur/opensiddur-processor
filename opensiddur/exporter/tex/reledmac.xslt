@@ -3710,6 +3710,13 @@ end
 
     <!-- A reference's words are set in its role (styles.reference); a page reference's are
          generated, and are not. -->
+    <xsl:template match="tei:ref[@p:local-target]" mode="emit" priority="10">
+        <xsl:text>\hyperref[</xsl:text><xsl:value-of select="@p:local-target"/>
+        <xsl:text>]{\OSReference{</xsl:text>
+        <xsl:apply-templates mode="emit"/>
+        <xsl:text>}}</xsl:text>
+    </xsl:template>
+
     <xsl:template match="tei:ref[@target]" mode="emit">
         <xsl:text>\href{</xsl:text>
         <xsl:value-of select="f:escape-url(@target)"/>

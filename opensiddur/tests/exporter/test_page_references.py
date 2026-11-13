@@ -11,6 +11,59 @@ class TestPageReferences(unittest.TestCase):
             xmlns:p="http://jewishliturgy.org/ns/processing" p:project="he">
             <tei:text><tei:body>{body}</tei:body></tei:text></tei:TEI>''')
 
+    def test_literal_urn_keeps_words_and_links_to_the_requested_edition(self):
+        urn = "urn:x-opensiddur:text:prayer:refrain"
+        root = self.document(f'''<tei:p><tei:ref target="{urn}@en">Resume
+            <tei:emph>here</tei:emph></tei:ref></tei:p>
+            <tei:div corresp="{urn}"><tei:p>Hebrew</tei:p></tei:div>
+            <p:transclude p:project="en"><tei:div corresp="{urn}">
+            <tei:p>English</tei:p></tei:div></p:transclude>''')
+        resolve_page_references(root)
+        ref = root.xpath('//*[local-name()="ref"]')[0]
+        label = ref.get('{http://jewishliturgy.org/ns/processing}local-target')
+        self.assertEqual(ref.get('target'), urn+'@en')
+        self.assertEqual(' '.join(''.join(ref.itertext()).split()), 'Resume here')
+        anchor, = root.xpath('//*[local-name()="anchor"]')
+        self.assertEqual(anchor.get('n'), label)
+        self.assertEqual(anchor.getparent().getparent().get(
+            '{http://jewishliturgy.org/ns/processing}project'), 'en')
+        tex = _transform(etree.tostring(root, encoding='unicode'))
+        self.assertIn('\\hyperref['+label+']', tex)
+        self.assertNotIn('\\pageref{'+label+'}', tex)
+        self.assertIn('Resume', tex)
+        self.assertIn('here', tex)
+
+    def test_literal_and_page_reference_share_one_destination_label(self):
+        urn = "urn:x-opensiddur:text:prayer:refrain"
+        root = self.document(f'''<tei:p><tei:ref target="{urn}@he">Refrain</tei:ref>
+            <tei:ref type="page" target="{urn}@he"/></tei:p>
+            <tei:p><tei:milestone unit="prayer-part" corresp="{urn}"/>Words</tei:p>''')
+        resolve_page_references(root, every_occurrence=True)
+        refs = root.xpath('//*[local-name()="ref"]')
+        self.assertEqual(refs[0].get('{http://jewishliturgy.org/ns/processing}local-target'),
+                         refs[1].get('target'))
+        self.assertEqual(len(root.xpath('//*[local-name()="anchor"]')), 1)
+
+    def test_removed_optional_clause_does_not_label_its_literal_destination(self):
+        urn = "urn:x-opensiddur:text:prayer:refrain"
+        root = self.document(f'''<tei:note type="instruction">
+            <tei:seg type="optional-page-reference">Missing page
+            <tei:ref type="page" target="urn:missing@he"/> and
+            <tei:ref target="{urn}@he">Resume here</tei:ref></tei:seg></tei:note>
+            <tei:p corresp="{urn}">Prayer</tei:p>''')
+        resolve_page_references(root)
+        self.assertEqual(root.xpath('//*[local-name()="note"]'), [])
+        self.assertEqual(root.xpath('//*[local-name()="anchor"]'), [])
+
+    def test_absent_literal_citation_is_unchanged(self):
+        urn = "urn:x-opensiddur:text:prayer:elsewhere@other"
+        root = self.document(f'<tei:p><tei:ref target="{urn}">Elsewhere</tei:ref></tei:p>')
+        resolve_page_references(root)
+        ref = root.xpath('//*[local-name()="ref"]')[0]
+        self.assertEqual(dict(ref.attrib), {'target': urn})
+        self.assertEqual(ref.text, 'Elsewhere')
+        self.assertEqual(root.xpath('//*[local-name()="anchor"]'), [])
+
     def test_edition_and_first_occurrence(self):
         root = self.document('''<tei:note type="instruction">See page
             <tei:ref type="page" target="urn:prayer@en"/></tei:note>
