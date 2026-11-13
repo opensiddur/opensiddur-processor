@@ -963,6 +963,31 @@ class EditionWiringTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'deeper than its enclosing prayer-part'):
             self.generate(draft=True)
 
+    def test_resume_cue_is_addressable_outside_the_prayer_scope(self):
+        cue = BASE+'source_cue'
+        self.registry_mock.records[cue] = {}
+        self.readings['units'][0]['languages']['he'] = [
+            {'corresp': BASE+'another',
+             'fragments': [{'scan': 's1', 'text': 'prayer words'}],
+             'repeat_cue': {'corresp': cue, 'text': 'resume here',
+                            'target': BASE+'another'}},
+            {'fragments': [{'scan': 's1', 'text': 'unrelated words'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        prayer = root.find('.//'+T+'milestone[@corresp="'+BASE+'another"]')
+        marker = root.find('.//'+T+'milestone[@corresp="'+cue+'"]')
+        prayer_end, _ = find_end_of_mapping(prayer)
+        self.assertIs(root.xpath(prayer_end, namespaces={'tei': T[1:-1]})[0], prayer)
+        self.assertEqual(marker.getprevious().get('unit'), 'prayer-part')
+        cue_end, _ = find_end_of_mapping(marker)
+        note = root.xpath(cue_end, namespaces={'tei': T[1:-1]})[0]
+        self.assertEqual(note.tag, T+'note')
+        self.assertEqual(note.find(T+'ref').get('target'), BASE+'another@'+PROJECTS['he'])
+        self.assertEqual(''.join(note.itertext()), 'resume here')
+        self.assertEqual(note.getnext().get('unit'), 'navigation')
+        self.assertEqual(note.getnext().tail.strip(), 'unrelated words')
+
     def test_editorial_commentary_can_target_a_local_variant_anchor(self):
         unit = self.readings['units'][0]
         unit['citations'] = {'he': [{'scan': 's1', 'text': 'Editorial variant note.',

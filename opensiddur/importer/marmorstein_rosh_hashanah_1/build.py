@@ -455,9 +455,13 @@ def unit_document(unit, lang, draft):
         if segment.get('repeat_cue'):
             close_references()
             cue = segment['repeat_cue']
+            if cue.get('corresp'):
+                element(paragraph, 'milestone', unit='navigation', corresp=cue['corresp'])
             note = element(paragraph, 'note', type='instruction')
             note.set(XML+'lang', lang)
             element(note, 'ref', cue['text'], target=cue['target']+'@'+project)
+            if cue.get('corresp'):
+                element(paragraph, 'milestone', unit='navigation')
     if paragraph is not None:
         close_references()
     if conditions:
@@ -811,6 +815,9 @@ def build(source, project_directory, *, draft=False):
         identities.extend(unit.get('reuse', {}).values())
         identities += [citation['target'] for citations in unit.get('citations', {}).values()
                        for citation in citations if citation.get('target', '').startswith('urn:x-opensiddur:')]
+        identities += [segment['repeat_cue']['corresp']
+                       for segments in unit['languages'].values() for segment in segments
+                       if segment.get('repeat_cue', {}).get('corresp')]
         for urn in identities:
             # Numeric scripture descendants can be implicit in the registered book.
             if registry.resolve(urn) != urn:

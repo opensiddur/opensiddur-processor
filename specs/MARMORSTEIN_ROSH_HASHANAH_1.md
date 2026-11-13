@@ -976,3 +976,60 @@ dagesh confirmations are recorded in the source evidence. Both documentary and
 expanded Emet junction instructions use the corrected wording. Additional Hebrew
 fine-mark adjudication and review reconciliation remain pending; acceptance
 stays at 100/355.
+
+## Continuation: physical PDF scans 124–145
+
+The next larger batch covers the reader's repetition, starting below the rule
+on 124/125 and ending with the complete Adirei Ayummah hymn on 144/145. It stops
+before ובכן דיין אמת אתה / Lael Orekh Din. Twenty-eight new bilingual source
+modules preserve the interleaved weekday and Shabbat print layout. The expanded
+spine assembles one exclusive route and repeats the canonical refrains where
+the printed incipit cues require them. Etten Lefoali reuses its existing identity,
+`urn:x-opensiddur:text:poem:eten_lefoali_tsedeq_shimon`.
+
+Long reusable poems expose source-layout occurrence boundaries. Documentary
+partial transclusions retain their relevant descriptions and local variant-note
+anchors. Five abbreviated resume directions have separate navigation contexts,
+using optional `repeat_cue/corresp`, so the documentary index can include each
+cue exactly once without extending a canonical prayer's scope over it. The
+expanded sequence transcludes the canonical prayer words instead. All stanza
+scopes are explicitly terminated before unrelated text or navigation.
+
+The human source readings resolve the Frankfurt direction: Attah Hu is omitted
+in Frankfurt am Main, and recitation begins directly with Tair Vetaria. Both
+structural arrangements use `opensiddur:rite/frankfurt_am_main=false` around
+Attah Hu and its ark actions. Metz excludes both recitations of Tair and both
+parenthetical Kol Yoshvei passages with `opensiddur:rite/metz=false`. The second
+Kol omission is inferred from its matching parentheses, as the user judged
+likely; it is not represented as a second explicit printed instruction. These
+local features use the existing open rite registry and do not imply other
+communities inherit either custom.
+
+Canonical poems remain reusable independently of structural placement. Each Kol
+stanza's correspondence begins before its conditional and ends after the
+matching end marker. Source parentheses are marked only where printed (the
+first English occurrence is unparenthesized). The native Metz omission direction
+stays in the documentary index, outside the reusable refrain, so expanded
+repetitions do not duplicate it. The expanded order replaces source omission
+directions with actual selections. Eight regional/calendar combinations verify
+Frankfurt, Metz, and Shabbat separately, in addition to the eight quorum and
+recitation combinations.
+
+All four human answers and subsequent independent source adjudication are
+retained. The German transcription slip גזייך is corrected to גלייך against
+the image; the printed דאַ: is preserved. The explicit human opening
+אַאֽפִּיר נֶֽזֶר אָיוֹם is retained over a conflicting later model proposal.
+Remaining Hebrew consonant/pointing review and per-line speaker sigla are
+explicitly incomplete. All new modules remain draft and acceptance stays 100/355.
+Actual blind readings for eleven facing pairs, the frozen primary, comparisons,
+and successive structural reviews/resolutions are retained separately.
+
+The repetition requires both a minyan and repetition selection, with declarations
+scoped locally. Ark-opening and closing directions are ritual actions, retained
+as such. A local melody description has no generic Reader correspondence and
+cannot replace unrelated role labels. Schema coverage reaches 447 XML files;
+182 compiled unit/stanza language comparisons and eight setting combinations
+verify the new order and scopes. The importer suite has 68 tests and 12 subtests.
+
+Literal edition-qualified URN links exposed a separate exporter issue. Its fix
+is isolated in processor PR #301, not included in this digitization branch.
