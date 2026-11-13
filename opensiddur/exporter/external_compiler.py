@@ -1232,8 +1232,12 @@ class ExternalCompilerProcessor(CompilerProcessor):
         else:
             annotations, annotation_command = [], _AnnotationCommand.NONE
 
-        # In marker mode, all structural blocks use start/end marker pairs
-        if self.marker_stack is not None and element.tag in STRUCTURAL_BLOCKS:
+        # Marker mode retains the start's ancestor chain for suspend/resume,
+        # but pre-range siblings must not leave empty paragraph or line markers.
+        # Those reconstruct as visible blank lines in poetry exports.
+        if (self.marker_stack is not None and element.tag in STRUCTURAL_BLOCKS
+                and (context["command"] != _ProcessingCommand.RECURSE
+                     or element in self.start_ancestors)):
             result = self._process_element_as_marker(
                 element,
                 root,
