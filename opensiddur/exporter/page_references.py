@@ -1,4 +1,4 @@
-"""Resolve page pointers against content surviving compilation, before typesetting or rendering."""
+"""Resolve page and literal text pointers against surviving compiled content."""
 import hashlib
 from lxml import etree
 from opensiddur.exporter.constants import RUBRIC_NOTE_TYPES
@@ -37,13 +37,20 @@ def _insert_label(node, label, repeat=False):
 def resolve_page_references(root, every_occurrence=False):
     """Replace edition-qualified text URNs with labels in the compiled edition.
 
+    Literal edition-qualified references keep their words and receive local links
+    when their destination survives; absent external citations remain unchanged.
     Optional spans disappear when any of their destinations is absent. Repeated
     content uses the first surviving occurrence in the requested source edition.
     With every_occurrence, as for an electronic book, whose reader may hide the first, the
     later occurrences are labelled too, with subtype="repeat".
     """
     ns = {"tei": TEI}
-    if not root.xpath(".//tei:ref[@type='page']", namespaces=ns):
+    page_refs = root.xpath(".//tei:ref[@type='page']", namespaces=ns)
+    text_refs = [ref for ref in root.xpath(".//tei:ref[@target]", namespaces=ns)
+                 if ref.get("type") != "page"
+                 and ref.get("target", "").startswith("urn:x-opensiddur:text:")
+                 and "@" in ref.get("target", "")]
+    if not page_refs and not text_refs:
         return
     destinations = {}
     for node in root.iter():
@@ -61,13 +68,22 @@ def resolve_page_references(root, every_occurrence=False):
                     and not len(note) and not (note.text or "").strip()):
                 _remove_preserving_tail(note)
     labelled = set()
-    for ref in root.xpath(".//tei:ref[@type='page']", namespaces=ns):
+    surviving_pages = root.xpath(".//tei:ref[@type='page']", namespaces=ns)
+    text_refs = [ref for ref in text_refs if root in ref.iterancestors()]
+    for ref in [*surviving_pages, *text_refs]:
         target = ref.get("target")
         nodes = destinations.get(target)
         if nodes is None:
-            raise ValueError(f"Page reference destination absent: {target}")
+            if ref.get("type") == "page":
+                raise ValueError(f"Page reference destination absent: {target}")
+            # A literal citation may intentionally point outside this compilation.
+            continue
         label = "os-page-" + hashlib.sha256(target.encode()).hexdigest()[:20]
-        ref.set("target", label)
+        if ref.get("type") == "page":
+            ref.set("target", label)
+        else:
+            # Keep the source URI and printed words; renderers use this local label.
+            ref.set("{" + P + "}local-target", label)
         if target not in labelled:
             _insert_label(nodes[0], label)
             if every_occurrence:

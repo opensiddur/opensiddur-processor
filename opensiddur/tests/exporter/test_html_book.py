@@ -274,6 +274,21 @@ PAGE_REF = f'<tei:ref type="page" target="{URN}@proj"/>'
 class TestPageReferences(unittest.TestCase):
     """Where print gives a page number, the electronic book links to the passage."""
 
+    def test_literal_reference_preserves_its_words_and_all_visible_destinations(self):
+        urn = "urn:x-opensiddur:text:prayer:refrain"
+        main = _render(f'<tei:p><tei:ref target="{urn}@proj">Return '
+                       '<tei:emph>here</tei:emph></tei:ref></tei:p>'
+                       f'<tei:div corresp="{urn}"><tei:p>First</tei:p></tei:div>'
+                       f'<tei:div corresp="{urn}"><tei:p>Repeated</tei:p></tei:div>')
+        link, = main.xpath('//h:a', namespaces=NS)
+        self.assertEqual(_classes(link), ['ref'])
+        self.assertEqual(''.join(link.itertext()), 'Return here')
+        label = link.get('href')[1:]
+        self.assertTrue(label.startswith('os-page-'))
+        copies = main.xpath('//*[@data-page-label=$label]', label=label)
+        self.assertEqual(len(copies), 2)
+        self.assertEqual(sum(node.get('id') == label for node in copies), 1)
+
     def test_reference_links_to_an_anchor_in_its_destination(self):
         main = _render(f'<tei:p>Grace continues on page {PAGE_REF}.</tei:p>'
                        f'<tei:div corresp="{URN}"><tei:p>Blessed</tei:p></tei:div>')

@@ -69,6 +69,16 @@ def _resolvable(
     return resolve_file_fragment_ref(project_directory, file_ref)
 
 
+def _optional_page_reference(element: etree._Element) -> bool:
+    """A missing destination removes this navigation clause at export time."""
+    tei = "{http://www.tei-c.org/ns/1.0}"
+    return (element.tag == tei + "ref" and element.get("type") == "page"
+            and "@" in element.get("target", "")
+            and any(parent.tag == tei + "seg"
+                    and parent.get("type") == "optional-page-reference"
+                    for parent in element.iterancestors()))
+
+
 def validate_project_urn_references(
     project: str,
     *,
@@ -94,6 +104,11 @@ def validate_project_urn_references(
       cross-project state required, so this check always runs.
     - ``http://``/``https://`` and a same-file ``#id`` (e.g. ``j:endConditional/@target``, a
       standoff note's anchor) are out of scope.
+
+    A missing edition-qualified destination on ``tei:ref[@type="page"]`` inside
+    ``tei:seg[@type="optional-page-reference"]`` is allowed: the exporters suppress
+    that optional navigation clause. Malformed ranges, required page references and
+    transclusions still fail.
 
     When both ``@target`` and ``@targetEnd`` are URNs, they're treated as a range: ``@targetEnd``
     must resolve within the project ``@target`` did (this is how ``j:transclude`` uses the pair,
@@ -128,7 +143,8 @@ def validate_project_urn_references(
                         except ValueError as malformed:
                             # A malformed range, or one whose ends are in different files.
                             start_candidates, reason = [], str(malformed)
-                        if not start_candidates:
+                        if not start_candidates and not (
+                                reason is None and _optional_page_reference(el)):
                             failures.append(
                                 UnresolvableUrnReference(
                                     project=project,
@@ -139,7 +155,7 @@ def validate_project_urn_references(
                                     reason=reason,
                                 )
                             )
-                        else:
+                        elif start_candidates:
                             # Prefer resolving within the current project when possible, since
                             # that's the common compilation expectation.
                             start = (

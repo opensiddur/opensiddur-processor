@@ -369,6 +369,15 @@
         <xsl:apply-templates/>
     </xsl:template>
 
+    <xsl:template match="tei:ref[@p:local-target]" priority="2">
+        <a href="#{@p:local-target}">
+            <xsl:call-template name="attributes">
+                <xsl:with-param name="class" select="'ref'"/>
+            </xsl:call-template>
+            <xsl:apply-templates/>
+        </a>
+    </xsl:template>
+
     <xsl:template match="tei:ref">
         <span>
             <xsl:call-template name="attributes">
