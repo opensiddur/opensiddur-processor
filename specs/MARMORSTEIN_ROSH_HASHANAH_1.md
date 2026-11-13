@@ -968,3 +968,11 @@ Final checks cover 391 XML files, 68 compiled unit/language word comparisons,
 eight Shabbat/quorum/recitation combinations, names, features, URNs and reference
 resolution. The importer suite passes 67 tests and 12 subtests. The documentary
 96-page and expanded 101-page draft previews were rendered and visually checked.
+
+
+The seven numbered human questions for scans 108–125 were resolved and applied
+on 2026-11-13. Their original answers, exact Unicode choices and unchanged
+dagesh confirmations are recorded in the source evidence. Both documentary and
+expanded Emet junction instructions use the corrected wording. Additional Hebrew
+fine-mark adjudication and review reconciliation remain pending; acceptance
+stays at 100/355.
