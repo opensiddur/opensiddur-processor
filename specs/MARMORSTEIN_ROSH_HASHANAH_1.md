@@ -982,16 +982,22 @@ stays at 100/355.
 The next larger batch covers the reader's repetition, starting below the rule
 on 124/125 and ending with the complete Adirei Ayummah hymn on 144/145. It stops
 before ובכן דיין אמת אתה / Lael Orekh Din. Twenty-eight new bilingual source
-modules preserve the interleaved weekday and Shabbat print layout. The expanded
+modules preserve the printed words and page-source boundaries. The documentary
+edition presents complete weekday and Shabbat alternatives, with one file per
+piyyut; bottom-of-page continuation blocks are joined to their own works rather
+than interleaved with the other day's text. The expanded
 spine assembles one exclusive route and repeats the canonical refrains where
 the printed incipit cues require them. Etten Lefoali reuses its existing identity,
 `urn:x-opensiddur:text:poem:eten_lefoali_tsedeq_shimon`.
 
-Long reusable poems expose source-layout occurrence boundaries. Documentary
-partial transclusions retain their relevant descriptions and local variant-note
-anchors. Five abbreviated resume directions have separate navigation contexts,
-using optional `repeat_cue/corresp`, so the documentary index can include each
-cue exactly once without extending a canonical prayer's scope over it. The
+Long reusable poems retain source-layout occurrence boundaries for provenance,
+independently of whole-work transclusion. Adderet Mamlakhah, Aafir Nezer, and
+Shemo Mefoarim are each reached once as complete works in each language's
+documentary index. Printed page boundaries and unique Archive facsimile URLs
+remain inside their files. Five abbreviated resume directions have separate
+navigation contexts, using optional `repeat_cue/corresp`, so the complete
+documentary work includes each cue exactly once without extending a canonical
+prayer's scope over it. The
 expanded sequence transcludes the canonical prayer words instead. All stanza
 scopes are explicitly terminated before unrelated text or navigation.
 
@@ -1009,8 +1015,9 @@ Canonical poems remain reusable independently of structural placement. Each Kol
 stanza's correspondence begins before its conditional and ends after the
 matching end marker. Source parentheses are marked only where printed (the
 first English occurrence is unparenthesized). The native Metz omission direction
-stays in the documentary index, outside the reusable refrain, so expanded
-repetitions do not duplicate it. The expanded order replaces source omission
+stays with the first conditional Kol stanza inside the complete documentary
+work. Transcluding that canonical stanza again can repeat its relevant native
+label when the rite is undefined; a known setting resolves the condition. The expanded order replaces source omission
 directions with actual selections. Eight regional/calendar combinations verify
 Frankfurt, Metz, and Shabbat separately, in addition to the eight quorum and
 recitation combinations.
@@ -1033,3 +1040,81 @@ verify the new order and scopes. The importer suite has 68 tests and 12 subtests
 
 Literal edition-qualified URN links exposed a separate exporter issue. Its fix
 is isolated in processor PR #301, not included in this digitization branch.
+
+## Continuation: physical PDF scans 144–183
+
+The repetition continues from Uvekhen Dayyan Emet Attah and Lael Orekh Din
+through the Silluq, repeated Amidah, Avinu Malkenu, Full Kaddish and Torah
+prelude (144–161). Eighteen new modules supply 27 language witnesses. Scans
+150–155 are six consecutive Hebrew pages: their missing English is not filled.
+The source English Silluq stops before the mystical continuation; its printed
+incomplete notice is preserved. Modim remains one cross-page paragraph, while
+the documentary spine interposes Modim Derabbanan at its printed position.
+
+The human readings of Dayyan Emet Attah, Vekhaalot / Middallei and Veyuqdash
+are preserved. Shemo Mefoarim's earlier German direction uses the corrected
+שְׁמוֹ מְפָאֲרִים. The unreadable Fürth abbreviation remains uncertain. The
+expanded Avinu Malkenu retains all 38 existing petition identities and selects
+the printed order or the independently checked Fürth order through the existing
+open rite feature. No petition is omitted on the strength of that abbreviation.
+
+The next larger installment covers 22 leaves, scans 162–183, from taking out
+the Torah through the haftarah blessings. Twenty-two bilingual modules add
+44 language witnesses. Reuse existing prayer identities and existing service
+contexts, including Berikh Shemeh, the Ribbono Malle Mishalot family, Torah
+blessings, and haftarah blessings. Scripture uses Genesis 21:1–34, Numbers
+29:1–6, and 1 Samuel 1:1–2:10; do not create replacement canonical identities.
+The documentary first-scroll and haftarah headings are emitted before their
+verse-range transclusions so that range extraction cannot discard them.
+
+The expanded Torah service requires a minyan and continues under the morning
+selection. It uses five weekday aliyot (1–4, 5–12, 13–21, 22–27, 28–34) or
+seven on Shabbat (1–4, 5–8, 9–12, 13–17, 18–21, 22–27, 28–34). Each aliyah,
+including Maftir, has Barekhu, the congregation's response, the caller's repeated
+response, and the before/after blessings. Split a selected range at source-only
+aliyah labels to keep those labels out of expanded recitation without skipping
+any verse. Repeat the Thirteen Attributes and Vaani three times, transcluding
+their prayer-word scopes so the documentary ג״פ directions are excluded.
+
+Gate Berikh Shemeh, Shema and Echad on the source's Frankfurt exclusion and a
+local inclusion variant, preserving the reader-aloud direction. Keep Shabbat
+insertions in both languages' final haftarah blessing conditional; known settings
+remove the printed parentheses, and the Hebrew conjunction joins Israel without
+an intervening space. Preserve ritual scroll actions. Vezot haTorah remains at
+its explicit printed location after Maftir; the general lifting rubric's possible
+application at the first lifting remains an open custom question. The bare
+Half-Kaddish URN resolves to this maḥzor's Ten Days witness.
+
+New importer source fields are `qere_ketiv` on fragments (exact printed `written`
+span and selectable `read`), and `end_reference_before_instructions` on segments
+(close a verse before its aliyah rubric while retaining the enclosing chapter).
+Both interpretations enter review payloads so changing them invalidates review.
+An ambiguous or missing printed qere/ketiv span fails generation. Quoted clauses
+use existing half-verses or named parts; the exact Qedushah call/response in
+Isaiah 6:3, the Numbers 9:23 closing formula, and the Exodus 34:7 prefix before
+Venakeh have named boundaries in both supporting Hebrew Bible projects. Preserve
+all Bible characters when placing these boundaries.
+
+Every source page boundary retains its original printed label and unique Archive
+facsimile. Optional navigation to printed page 85 remains documentary and loses
+only its removable clause while its destination is untranscribed. Clearly mark
+the unfinished source span before the separate daily-psalm appendix. Expanded
+coverage stops after scan 183; the next installment begins with the Shofar service
+on 184. Source acceptance remains 100/355. Blind readings, the frozen primary,
+the primary's initially missed faint accents, fresh image-only accent candidates,
+source disputes and subsequent structural reviews are recorded separately. Draft
+structural approval does not accept unsettled pointing or source wording.
+
+The draft progress note belongs to the documentary index (`documentary_notes`),
+never a reusable prayer module. Move its anchor after the last main-service
+section as coverage advances. Distinguish the oleh's role from the congregation
+when repeating Barekhu; reuse the registered instruction role. Review discovery
+includes nested independent-reader reports without accepting draft readings.
+
+Current verification covers 518 book XML files and six supporting Bible files,
+107 tests plus 22 subtests, 250 compiled word comparisons, 16 conditional
+combinations, two Fürth orders, and 50 exact quotation decisions. Documentary
+and expanded previews contain 139 and 158 pages. Both electronic exports have
+unique IDs and resolved internal links. Exporter reference corrections remain
+in separate PR 301; optional absent destinations must suppress their navigation
+clauses while required unresolved references still fail validation.

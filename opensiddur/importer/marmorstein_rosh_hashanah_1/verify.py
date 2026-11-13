@@ -53,7 +53,7 @@ def report(source):
                 pending.append(key)
     independently_read = set()
     inventory_scans = {'s'+str(page['scan_page']) for page in pages}
-    for path in (source/'independent').glob('*.json'):
+    for path in (source/'independent').rglob('*.json'):
         payload = json.loads(path.read_text())
         if isinstance(payload, dict) and payload.get('reviewer'):
             independently_read.update(scan for p in payload.get('pages', [])

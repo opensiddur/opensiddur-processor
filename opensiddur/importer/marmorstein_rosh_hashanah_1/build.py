@@ -25,7 +25,7 @@ from . import BOOK, IDENTIFIER, PROJECTS, EXPANDED, ROOT_URN, EXPANDED_URN
 
 FRONT_KINDS = ('cover', 'title', 'copyright', 'preface')
 ROLE_LABELS = {'reader': 'חזן', 'congregation': 'קהל',
-               'reader_and_congregation': 'קהל וחזן'}
+               'reader_and_congregation': 'קהל וחזן', 'oleh': 'העולה לתורה'}
 
 
 def document(lang, project, title, urn, *, index=False, draft=False):
@@ -90,6 +90,8 @@ def rubric_words(parent, rubric, lang):
     if isinstance(rubric, str):
         words(parent, rubric, lang)
         return
+    if rubric.get('resp'):
+        parent.set('resp', rubric['resp'])
     text = rubric['text']
     if rubric.get('language_spans') and rubric.get('abbreviations'):
         raise ValueError('Overlapping abbreviation and language-span interpretation is not supported')
@@ -212,6 +214,10 @@ def unit_document(unit, lang, draft):
                 raise ValueError('Citation scan is outside the passage')
             note = element(notes, 'note', type=citation.get('note_type', 'citation'),
                            target=citation.get('target', unit.get('start', unit['urn'])))
+            if citation.get('language'):
+                note.set(XML+'lang', citation['language'])
+            if citation.get('resp'):
+                note.set('resp', citation['resp'])
             if citation.get('conditions'):
                 condition = element(note, 'j:condition')
                 feature_structures(element(condition, 'j:all'), citation['conditions'])
@@ -223,6 +229,8 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'ref', citation_text, target=citation['reference'])
             elif citation.get('text_type'):
                 element(paragraph, 'seg', citation_text, type=citation['text_type'])
+            elif citation.get('uncertain_characters'):
+                rubric_words(paragraph, dict(citation, text=citation_text), lang)
             else:
                 paragraph.text = citation_text
     paragraph = None
@@ -303,6 +311,15 @@ def unit_document(unit, lang, draft):
                     element(paragraph, 'label', segment['edition_label'])
                     append_words(paragraph, ' ')
             if index == 0:
+                if segment.get('end_reference_before_instructions'):
+                    if not segment.get('instructions'):
+                        raise ValueError('A rubric boundary requires an instruction')
+                    if not re.fullmatch(r'urn:x-opensiddur:text:bible:[^/]+/\d+/\d+',
+                                        segment.get('corresp', '')):
+                        raise ValueError('A rubric boundary requires a verse correspondence')
+                    if active_reference:
+                        element(paragraph, 'milestone', unit=active_reference)
+                        active_reference = active_reference_urn = None
                 for instruction in segment.get('instructions', []):
                     note = element(paragraph, 'note', type=instruction.get('type', 'instruction'))
                     note.set(XML+'lang', instruction.get('language', lang))
@@ -377,6 +394,8 @@ def unit_document(unit, lang, draft):
                         raise ValueError(f'Unknown speaker expansion: {expansion}') from None
                 identity = 'urn:x-opensiddur:instruction:role/'+role
                 description = element(paragraph, 'note', type='description', corresp=identity)
+                if speaker.get('resp'):
+                    description.set('resp', speaker['resp'])
                 description.set(XML+'lang', speaker.get('language', 'he'))
                 if 'label' in speaker:
                     words(description, speaker['label'], speaker.get('language', 'he'))
@@ -410,6 +429,14 @@ def unit_document(unit, lang, draft):
                 element(paragraph, 'milestone', **chapter_attributes)
                 element(paragraph, 'milestone', unit='verse', n=verse,
                         corresp=segment.get('source_reference_corresp', source_reference))
+                if part := segment.get('source_reference_part'):
+                    if (part['unit'] not in ('half-verse', 'verse-part') or
+                            (part['unit'] == 'half-verse' and part['n'] not in ('a', 'b'))):
+                        raise ValueError('Invalid quotation subverse boundary')
+                    parent_verse = segment.get('source_reference_corresp', source_reference)
+                    if part['corresp'] != parent_verse+'/'+part['n']:
+                        raise ValueError('Quotation subverse must belong to its verse context')
+                    element(paragraph, 'milestone', **part)
             if index == 0 and segment.get('anchor'):
                 element(paragraph, 'anchor').set(XML+'id', segment['anchor'])
             content = paragraph
@@ -420,7 +447,26 @@ def unit_document(unit, lang, draft):
                 content = element(paragraph, 'seg', **attributes)
             if fragment.get('text_type'):
                 content = element(content, 'seg', type=fragment['text_type'])
-            if fragment.get('expansion'):
+            if fragment.get('qere_ketiv'):
+                if any(fragment.get(key) for key in ('expansion', 'abbreviations',
+                                                     'uncertain_characters', 'enlarged_letters')):
+                    raise ValueError('Qere/ketiv cannot be combined with other fragment readings')
+                text = fragment['text']
+                for reading in fragment['qere_ketiv']:
+                    written = reading['written']
+                    word_character = r'[א-ת\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u034f\u200c\u200d]'
+                    matches = list(re.finditer(r'(?<!'+word_character+')'+re.escape(written)+
+                                               r'(?!'+word_character+')', text)) if written else []
+                    if len(matches) != 1:
+                        raise ValueError('Qere/ketiv must identify one printed span')
+                    match = matches[0]
+                    before, text = text[:match.start()], text[match.end():]
+                    words(content, before, text_language)
+                    choice = element(content, 'choice')
+                    words(element(choice, 'j:read'), reading['read'], text_language)
+                    words(element(choice, 'j:written'), written, text_language)
+                words(content, text, text_language)
+            elif fragment.get('expansion'):
                 choice = element(content, 'choice')
                 abbreviation = element(choice, 'abbr')
                 if fragment.get('divine_name_tail'):
@@ -444,6 +490,8 @@ def unit_document(unit, lang, draft):
             else:
                 words(content, fragment['text'], text_language)
             if source_reference and index == len(segment['fragments']) - 1:
+                if part := segment.get('source_reference_part'):
+                    element(paragraph, 'milestone', unit=part['unit'])
                 element(paragraph, 'milestone', unit='verse')
                 element(paragraph, 'milestone', unit='chapter')
             if not fragment.get('join_next') and not fragment['text'].rstrip().endswith('־'):
@@ -487,8 +535,13 @@ def unit_review_text(unit, lang):
             parts.append(segment['edition_label'])
         for instruction in segment.get('instructions', []):
             parts.append(instruction_review_text(instruction))
+        if segment.get('end_reference_before_instructions'):
+            parts.append('[reference ends before rubric; chapter continues]')
         if segment.get('condition_instruction'):
             parts.append(segment['condition_instruction'])
+        if segment.get('source_reference_part'):
+            parts.append('[quotation '+segment['source']+'; '+
+                         segment['source_reference_part']['corresp']+']')
         if segment.get('speaker'):
             speaker = segment['speaker']
             parts.append(speaker['label']+' ['+speaker['role']+']' if 'label' in speaker else
@@ -501,6 +554,8 @@ def unit_review_text(unit, lang):
                 parts.append('['+fragment['text_type']+']')
             if fragment.get('expansion'):
                 parts.append('['+fragment['expansion']+']')
+            parts.extend('[written '+reading['written']+'; read '+reading['read']+']'
+                         for reading in fragment.get('qere_ketiv', []))
             parts.extend(a['abbr']+' ['+a['expan']+']' for a in fragment.get('abbreviations', []))
             parts.extend(item['word']+' [uncertain '+item['character']+'; cert=low]'
                          for item in fragment.get('uncertain_characters', []))
@@ -754,6 +809,16 @@ def documentary_order(div, order, readings, by_stem, lang, project):
             if not len(section) or all(child.tag in (f'{{{J}}}conditional', f'{{{J}}}endConditional')
                                        for child in section):
                 div.remove(section)
+            for editorial in readings.get('documentary_notes', []):
+                if (editorial['after_section'] == occurrence['section'] and
+                        editorial['language'] == lang):
+                    anchor = element(div, 'anchor')
+                    anchor.set(XML+'id', editorial['anchor'])
+                    notes = element(div.getroottree().getroot(), 'standOff', type='notes')
+                    note = element(notes, 'note', type='commentary',
+                                   target='#'+editorial['anchor'], resp=editorial['resp'])
+                    note.set(XML+'lang', lang)
+                    words(element(note, 'p'), editorial['text'], lang)
         elif 'instruction' in occurrence:
             instruction = readings['documentary_instructions'][occurrence['instruction']]
             if lang in instruction['witnesses']:
@@ -774,7 +839,12 @@ def documentary_order(div, order, readings, by_stem, lang, project):
             for clause in clauses:
                 if 'target' in clause:
                     clause['target'] = clause['target'].format(project=project)
+            first_new_child = len(div)
             append_instruction(div, clauses)
+            for child in list(div)[first_new_child:]:
+                if child.tag == f'{{{TEI}}}note':
+                    child.set('facs', page_image_url(
+                        IDENTIFIER, int(scan[1:])-1, size=''))
         elif 'reference' in occurrence:
             # A partial translation may need separate ranges around an absent
             # verse while its source file retains the printed chapter structure.
@@ -818,6 +888,9 @@ def build(source, project_directory, *, draft=False):
         identities += [segment['repeat_cue']['corresp']
                        for segments in unit['languages'].values() for segment in segments
                        if segment.get('repeat_cue', {}).get('corresp')]
+        identities += [segment['source_reference_part']['corresp']
+                       for segments in unit['languages'].values() for segment in segments
+                       if segment.get('source_reference_part')]
         for urn in identities:
             # Numeric scripture descendants can be implicit in the registered book.
             if registry.resolve(urn) != urn:

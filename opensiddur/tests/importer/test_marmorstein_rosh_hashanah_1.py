@@ -652,6 +652,30 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(chapter_end.get('unit'), 'chapter')
         self.assertEqual(chapter_end.tail.strip(), 'Unrelated prayer words.')
 
+    def test_partial_quotation_closes_subverse_before_unrelated_prayer_words(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
+        verse = 'urn:x-opensiddur:text:bible:psalms/8/10'
+        fragment = {'source': verse+'/b', 'source_reference': verse,
+                    'source_reference_corresp': BASE+'quote/10',
+                    'source_reference_part': {'unit': 'half-verse', 'n': 'b',
+                                              'corresp': BASE+'quote/10/b'},
+                    'fragments': [{'scan': 's1', 'text': 'Quoted clause.'}]}
+        unit = {'stem': 'example', 'urn': BASE+'example', 'title': {'en': 'Example'},
+                'languages': {'en': [fragment, {
+                    'fragments': [{'scan': 's1', 'text': 'Unrelated prayer.'}]}]}}
+        root = unit_document(unit, 'en', draft=True)
+        marker = root.find('.//'+T+'milestone[@unit="half-verse"]')
+        self.assertEqual(marker.get('corresp'), BASE+'quote/10/b')
+        self.assertEqual(marker.getnext().tag, T+'seg')
+        end = marker.getnext().getnext()
+        self.assertEqual(end.get('unit'), 'half-verse')
+        self.assertIsNone(end.get('corresp'))
+        self.assertEqual(end.getnext().get('unit'), 'verse')
+        self.assertEqual(end.getnext().getnext().get('unit'), 'chapter')
+        reviewed = unit_review_text(unit, 'en')
+        fragment['source_reference_part']['corresp'] = BASE+'other/10/b'
+        self.assertNotEqual(reviewed, unit_review_text(unit, 'en'))
+
     def test_uncertain_combining_point_stays_bound_to_the_reviewed_prayer_reading(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
         word = 'הָֽלְכוּ'
@@ -810,6 +834,16 @@ class EditionWiringTest(unittest.TestCase):
         root = etree.parse(str(self.projects/EXPANDED/'index.xml'))
         note = root.find('.//'+T+'note[@corresp="urn:x-opensiddur:instruction:role/reader_and_congregation"]')
         self.assertEqual(note.text, 'קהל וחזן')
+
+    def test_expanded_oleh_is_distinct_from_the_reader(self):
+        self.readings['expanded_order'] = [
+            {'section': 'called_up', 'role': 'oleh', 'order': [{'unit': 'first'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        note = root.find('.//'+T+'note[@corresp="urn:x-opensiddur:instruction:role/oleh"]')
+        self.assertEqual(note.text, 'העולה לתורה')
+        self.assertIsNone(root.find('.//'+T+'note[@corresp="urn:x-opensiddur:instruction:role/reader"]'))
 
     def test_preliminary_service_conditions_end_before_the_morning_section(self):
         self.readings['expanded_order'] = [
@@ -1093,6 +1127,20 @@ class EditionWiringTest(unittest.TestCase):
         self.assertNotIn('(Invented source.)', ''.join(body.itertext()))
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)
 
+    def test_uncertain_footnote_letters_preserve_the_reading_outside_prayer_text(self):
+        self.readings['units'][0]['citations'] = {'he': [{
+            'scan': 's1', 'text': '(Before א״ז״וו after.)', 'note_type': 'commentary',
+            'uncertain_characters': [{'word': 'א״ז״וו', 'character': 'ז'}]}]}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        paragraph = root.find('.//'+T+'standOff/'+T+'note/'+T+'p')
+        self.assertEqual(''.join(paragraph.itertext()), 'Before א״ז״וו after.')
+        character = paragraph.find(T+'c')
+        self.assertEqual(character.text, 'ז')
+        self.assertEqual(character.get('cert'), 'low')
+        self.assertNotIn('א״ז״וו', ''.join(root.find('.//'+T+'body').itertext()))
+
     def test_variant_note_follows_its_calendar_context(self):
         self.readings['units'][0]['citations'] = {'he': [{
             'scan': 's1', 'text': 'Alternate wording', 'note_type': 'commentary',
@@ -1195,6 +1243,133 @@ class EditionWiringTest(unittest.TestCase):
             self.assertEqual(before, {p: p.stat().st_mtime_ns for p in before})
         self.assertEqual(regenerate(self.book), result)
 
+    def test_qere_ketiv_preserves_printed_form_and_invalidates_review(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = unit['languages']['he'][:1]
+        unit['languages']['he'][0]['fragments'] = unit['languages']['he'][0]['fragments'][:1]
+        fragment = unit['languages']['he'][0]['fragments'][0]
+        fragment['text'] = 'ראש וְלֹא סוף'
+        baseline = unit_review_text(unit, 'he')
+        fragment['qere_ketiv'] = [{'written': 'וְלֹא', 'read': 'וְלוֹ'}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        choice = root.find('.//'+T+'choice')
+        self.assertEqual(choice.find(J+'read').text, 'וְלוֹ')
+        self.assertEqual(choice.find(J+'written').text, 'וְלֹא')
+        paragraph = root.find('.//'+T+'body/'+T+'div/'+T+'p')
+        choice.remove(choice.find(J+'read'))
+        self.assertEqual(''.join(paragraph.itertext()).strip(), fragment['text'])
+        self.assertNotEqual(baseline, unit_review_text(unit, 'he'))
+        fragment['qere_ketiv'][0]['read'] = 'ולו'
+        self.assertIn('[written וְלֹא; read ולו]', unit_review_text(unit, 'he'))
+        fragment['text'] = 'וְלֹא וְלֹא'
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'one printed span'):
+            self.generate(draft=True)
+
+    def test_qere_ketiv_rejects_partial_words_and_combined_readings(self):
+        fragment = self.readings['units'][0]['languages']['he'][0]['fragments'][0]
+        fragment.update(text='וְלֹא', qere_ketiv=[{'written': 'לֹא', 'read': 'לוֹ'}])
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'one printed span'):
+            self.generate(draft=True)
+        for joiner in ['', '\u034f', '\u200c', '\u200d']:
+            with self.subTest(joiner=joiner):
+                fragment['text'] = 'וְלֹ'+joiner+'א'
+                fragment['qere_ketiv'][0]['written'] = 'וְלֹ'
+                self.save('readings', self.readings)
+                with self.assertRaisesRegex(ValueError, 'one printed span'):
+                    self.generate(draft=True)
+        fragment['text'] = 'וְלֹא'
+        fragment['qere_ketiv'][0]['written'] = 'וְלֹא'
+        for key, value in [('expansion', 'expansion'),
+                           ('abbreviations', [{'abbr': 'א', 'expan': 'word'}]),
+                           ('uncertain_characters', [{'word': 'וְלֹא', 'character': 'א'}]),
+                           ('enlarged_letters', ['א'])]:
+            with self.subTest(key=key):
+                fragment[key] = value
+                self.save('readings', self.readings)
+                with self.assertRaisesRegex(ValueError, 'cannot be combined'):
+                    self.generate(draft=True)
+                fragment.pop(key)
+
+    def test_multiple_qere_ketiv_preserves_order_and_source_words(self):
+        unit = self.readings['units'][0]
+        unit['languages']['he'] = unit['languages']['he'][:1]
+        unit['languages']['he'][0]['fragments'] = unit['languages']['he'][0]['fragments'][:1]
+        fragment = self.readings['units'][0]['languages']['he'][0]['fragments'][0]
+        fragment.update(text='מְרִיבָו עָלָו', qere_ketiv=[
+            {'written': 'מְרִיבָו', 'read': 'מְרִיבָיו'},
+            {'written': 'עָלָו', 'read': 'עָלָיו'}])
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        paragraph = root.find('.//'+T+'body/'+T+'div/'+T+'p')
+        choices = paragraph.findall(T+'choice')
+        self.assertEqual([c.find(J+'read').text for c in choices], ['מְרִיבָיו', 'עָלָיו'])
+        for choice in choices:
+            choice.remove(choice.find(J+'read'))
+        self.assertEqual(''.join(paragraph.itertext()).strip(), fragment['text'])
+
+    def test_aliyah_rubric_ends_verse_without_cutting_chapter(self):
+        unit = self.readings['units'][0]
+        chapter = 'urn:x-opensiddur:text:bible:genesis/21'
+        unit['urn'] = chapter
+        unit['languages']['he'] = [
+            {'paragraph': 1, 'corresp': chapter+'/1',
+             'fragments': [{'scan': 's1', 'printed_page': '1', 'text': 'ראשון'}]},
+            {'paragraph': 1, 'corresp': chapter+'/2',
+             'instructions': [{'text': 'לוי.', 'language': 'he'}],
+             'end_reference_before_instructions': True,
+             'fragments': [{'scan': 's1', 'printed_page': '1', 'text': 'שני'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        paragraph = root.find('.//'+T+'body/'+T+'div/'+T+'p')
+        rubric = paragraph.find(T+'note')
+        self.assertEqual(rubric.getprevious().get('unit'), 'verse')
+        self.assertIsNone(rubric.getprevious().get('corresp'))
+        self.assertEqual(rubric.getnext().get('corresp'), chapter+'/2')
+        self.assertEqual(len(paragraph.findall(T+'milestone[@unit="chapter"]')), 2)
+        self.assertEqual(paragraph.find(T+'milestone[@unit="chapter"]').get('corresp'), chapter)
+        verse = paragraph.find(T+'milestone[@unit="verse"][@corresp]')
+        end, include_tail = find_end_of_mapping(verse)
+        terminator = root.xpath(end, namespaces={'tei': T[1:-1]})[0]
+        self.assertIs(terminator.getnext(), rubric.getprevious())
+        self.assertEqual(terminator.get('corresp'), chapter+'/1')
+        self.assertTrue(include_tail)
+        segment = unit['languages']['he'][1]
+        segment.pop('corresp')
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'requires a verse correspondence'):
+            self.generate(draft=True)
+        segment.pop('instructions')
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'requires an instruction'):
+            self.generate(draft=True)
+
+    def test_documentary_progress_note_stays_at_its_local_index_anchor(self):
+        self.readings['documentary_instructions'] = {}
+        self.readings['source_order'] = [
+            {'section': 'draft_end', 'heading': {}, 'order': [{'unit': 'first'}]}]
+        self.readings['documentary_notes'] = [
+            {'after_section': 'draft_end', 'language': 'he', 'anchor': 'draft_gap',
+             'resp': 'urn:x-opensiddur:contributor:opensiddur.org/codex',
+             'text': 'Following source pages have not yet been transcribed.'}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        anchor = root.find('.//'+T+'anchor')
+        self.assertEqual(anchor.get('{http://www.w3.org/XML/1998/namespace}id'), 'draft_gap')
+        self.assertEqual(anchor.getprevious().tag, T+'div')
+        note = root.find('.//'+T+'standOff/'+T+'note')
+        self.assertEqual(note.get('target'), '#draft_gap')
+        self.assertIsNone(note.get('facs'))
+        for project, file in [(PROJECTS['he'], 'first.xml'), (EXPANDED, 'index.xml')]:
+            other = etree.parse(str(self.projects/project/file))
+            self.assertIsNone(other.find('.//'+T+'note[@target="#draft_gap"]'))
+
     def test_excerpt_coverage_cannot_certify_a_full_leaf(self):
         self.save('pages', {'pages': [{'scan_page': n, 'evidence': 'image'} for n in range(1, 5)]})
         self.save('page_completion', {'s1': {'status': 'complete', 'evidence': 'image', 'independent_model': 'second'}})
@@ -1202,6 +1377,17 @@ class EditionWiringTest(unittest.TestCase):
         self.assertFalse(result['complete'])
         self.assertEqual(result['leaves_fully_transcribed_and_reviewed'], 0)
         self.assertEqual(result['leaves_with_transcribed_excerpts'], 4)
+
+    def test_nested_blind_reports_count_once_without_accepting_draft(self):
+        self.save('pages', {'pages': [{'scan_page': 1}, {'scan_page': 2}]})
+        independent = self.source/'independent'/'batch'
+        independent.mkdir(parents=True)
+        payload = {'reviewer': {'model': 'second'}, 'pages': [{'scan': 's1'}]}
+        for name in ['first.json', 'duplicate.json']:
+            (independent/name).write_text(json.dumps(payload))
+        result = report(self.source)
+        self.assertEqual(result['leaves_independently_read'], 1)
+        self.assertEqual(result['leaves_fully_transcribed_and_reviewed'], 0)
 
     def test_crop_names_and_out_of_inventory_reads_do_not_inflate_leaf_count(self):
         self.save('pages', {'pages': [{'scan_page': n} for n in range(1, 5)]})
