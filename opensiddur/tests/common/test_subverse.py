@@ -352,6 +352,17 @@ class TestVerseParts(SubverseTestCase):
             self.scope(xml, f"{URN}genesis/1/31/yom_hashishi"), "י֥וֹם הַשִּׁשִּֽׁי׃"
         )
 
+    def test_line_break_without_literal_space_still_separates_words(self):
+        xml = document(
+            f"<tei:p>{verse(f'{URN}genesis/1/31', '31')}"
+            'וַיְהִי־בֹקֶר<tei:lb type="indent"/>יוֹם הַשִּׁשִּׁי׃</tei:p>'
+        )
+        with patch.dict(VERSE_PARTS, self.PARTS, clear=True):
+            result = self.verse_parts(xml)
+        marker = '<tei:milestone unit="verse-part" n="yom_hashishi" corresp="'+URN+'genesis/1/31/yom_hashishi"/>'
+        self.assertEqual(result.replace(marker, ''), xml)
+        self.assertIn('<tei:lb type="indent"/>'+marker+'יוֹם', result)
+
     def test_an_incipit_that_is_not_there_is_reported(self):
         """A declared part that cannot be placed is the caller's problem to fail on."""
         xml = document(
@@ -420,7 +431,23 @@ class TestVerseParts(SubverseTestCase):
 
 
 class TestDeclaredVerseParts(SubverseTestCase):
-    """The parts VERSE_PARTS actually declares, against hand-written text for those verses."""
+    """The parts VERSE_PARTS actually declares, against hand-written verse texts."""
+
+    def test_scroll_lifting_uses_last_al_pi_not_the_earlier_occurrences(self):
+        text = 'עַל פִּי יְהוָה יַחֲנוּ וְעַל פִּי יְהוָה יִסָּעוּ אֶת מִשְׁמֶרֶת יְהוָה שָׁמָרוּ עַל פִּי יְהוָה בְּיַד מֹשֶׁה׃'
+        xml = self.verse_parts(document(f'<tei:p>{verse(URN+"numbers/9/23", "23")}{text}</tei:p>'))
+        self.assertEqual(self.scope(xml, URN+'numbers/9/23/al_pi'), 'עַל פִּי יְהוָה בְּיַד מֹשֶׁה׃')
+        self.assertTextUnchanged(xml, text)
+
+    def test_qedushah_call_and_response_remain_distinct_inside_one_verse(self):
+        call = 'וְקָרָא זֶה אֶל־זֶה וְאָמַר '
+        response = 'קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ יְהוָה צְבָאוֹת מְלֹא כָל־הָאָרֶץ כְּבוֹדוֹ׃'
+        xml = document(f'<tei:p>{verse(URN+"isaiah/6/3", "3")}{call}{response}</tei:p>')
+        before = call + response
+        xml = self.verse_parts(xml)
+        self.assertEqual(self.scope(xml, URN+'isaiah/6/3/veqara'), call.strip())
+        self.assertEqual(self.scope(xml, URN+'isaiah/6/3/qadosh'), response)
+        self.assertTextUnchanged(xml, before)
 
     def test_the_thirteen_attributes(self):
         """They open at the second יהוה and close at ונקה, neither of them an accent."""
@@ -441,6 +468,8 @@ class TestDeclaredVerseParts(SubverseTestCase):
             self.scope(xml, f"{URN}exodus/34/6/adonai_adonai").startswith("יְהֹוָה׀יְהֹוָה אֵל")
         )
         # ... and closes here, one word past the etnachta of 34:7.
+        self.assertEqual(self.scope(xml, f"{URN}exodus/34/7/notzer_chesed"),
+                         'נֹצֵר חֶסֶד לָאֲלָפִים נֹשֵׂא עָוֺן וָפֶשַׁע וְחַטָּאָ֑ה')
         self.assertEqual(self.scope(xml, f"{URN}exodus/34/7/venakeh"), "וְנַקֵּה")
         self.assertTrue(
             self.scope(xml, f"{URN}exodus/34/7/lo_yenakeh").startswith("לֹא יְנַקֶּה")

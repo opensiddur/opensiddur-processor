@@ -230,6 +230,11 @@ terminator in rule 3 closes such a scope explicitly:
 A terminator is not indexed, because only elements carrying `corresp` are, so it adds no
 URN mapping and cannot be referenced.
 
+This also applies to `half-verse` and `verse-part`. Their bare terminators have
+neither `corresp` nor `n`; a numbered or named subdivision still requires its
+canonical correspondence. A bare `verse` or `chapter` milestone cannot substitute
+for a subverse terminator, because bare milestones close only their own unit.
+
 **The unit must match exactly.** A bare milestone of some *other* unit does not terminate
 anything, which is what keeps `unit="edition-verse"` — which carries `n` and never
 `corresp` — from closing every verse it follows.
@@ -1778,7 +1783,12 @@ kept with their rubrics.
 
 The feature set is open — a rite that is not listed below is still valid. Known rite names:
 `ashkenaz`, `sepharad`, `edot_hamizrach`, `teimani_baladi`, `teimani_shami`, `italiani`,
-`romaniote`, `nusach_ari`.
+`romaniote`, `nusach_ari`, `german`.
+
+`german` selects the German regional rite independently of the broader `ashkenaz`
+feature. For an edition's German/non-German ordering, test `german=true` and
+`german=false` respectively; leave it undefined to retain both labeled alternatives.
+Do not infer this regional choice from `ashkenaz` or from a different local custom.
 
 A book also prints matter that is neither prayer nor commentary on it: a dedication, a
 preface, acknowledgements, an introduction, an epilogue or afterword, and any other prose

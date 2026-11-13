@@ -100,12 +100,29 @@ VERSE_PARTS: dict[tuple[str, int, int], tuple[tuple[str, dict[str, str]], ...]] 
     # The Thirteen Attributes. They begin at the second יהוה — the first belongs to
     # "and the LORD passed by before him and proclaimed" — and end at ונקה, since
     # "he will by no means clear the guilty" is not among the attributes recited.
+    # notzer_chesed bounds the prefix before venakeh, so an edition quoting both
+    # clauses can mark each precisely rather than claiming the complete verse.
     ("exodus", 34, 6): (
         ("adonai_adonai", {"he": "יהוה יהוה אל"}),
     ),
     ("exodus", 34, 7): (
+        ("notzer_chesed", {"he": "נצר חסד"}),
         ("venakeh", {"he": "ונקה"}),
         ("lo_yenakeh", {"he": "לא ינקה"}),
+    ),
+    # The scroll-lifting formula appends only the closing words of this verse.
+    ("numbers", 9, 23): (
+        ("al_pi", {"he": "על פי יהוה ביד משה"}),
+    ),
+    # Entrance prayers quote these clauses without the rest of the verse.
+    ("psalms", 39, 13): (
+        ("shimah", {"he": "שמעה תפלתי"}),
+        ("ki_ger", {"he": "כי גר אנכי"}),
+    ),
+    # The qedushah divides the introductory call from the angels' response.
+    ("isaiah", 6, 3): (
+        ("veqara", {"he": "וקרא זה אל זה ואמר"}),
+        ("qadosh", {"he": "קדוש קדוש קדוש"}),
     ),
 }
 
@@ -347,6 +364,13 @@ def _verses(xml: str) -> list[_VerseText]:
         name = match.group("name")
         if name is None:
             continue
+
+        if urn and choice is None and (name == "tei:lb" or
+                                      (name == "tei:p" and match.group("close"))):
+            # MAM serializes adjacent lines without literal whitespace. They
+            # remain separate words; this synthetic separator has no output.
+            runs.append(_Run(source=match.end(), offset=length, text=" "))
+            length += 1
 
         if not match.group("close") and not match.group("empty"):
             if name == "tei:text":

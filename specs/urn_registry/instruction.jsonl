@@ -99,3 +99,4 @@
 {"urn": "urn:x-opensiddur:instruction:role/reader", "parent": "urn:x-opensiddur:instruction:role", "status": "canonical", "label_en": "Reader"}
 {"urn": "urn:x-opensiddur:instruction:role/reader_and_congregation", "parent": "urn:x-opensiddur:instruction:role", "status": "canonical", "label_en": "Reader and congregation"}
 {"urn": "urn:x-opensiddur:instruction:role/reader_then_congregation", "parent": "urn:x-opensiddur:instruction:role", "status": "canonical", "label_en": "Reader then congregation"}
+{"urn": "urn:x-opensiddur:instruction:role/oleh", "parent": "urn:x-opensiddur:instruction:role", "status": "canonical", "label_he": "העולה לתורה", "label_en": "Person called up to the Torah"}

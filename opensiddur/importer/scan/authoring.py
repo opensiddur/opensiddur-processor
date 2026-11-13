@@ -186,13 +186,13 @@ def conditional_scope(parent, identity, present, *, fs_type, feature):
 
 
 def printed_text(node, separator=''):
-    """The words of `node` as the edition prints them: every misprint's tei:corr left out."""
+    """The printed branches of source choices, excluding corrections and expansions."""
     parts = []
     def walk(current):
         if current.text:
             parts.append(current.text)
         for child in current:
-            if child.tag != f'{{{TEI}}}corr':
+            if child.tag not in (f'{{{TEI}}}corr', f'{{{TEI}}}expan'):
                 walk(child)
             if child.tail:
                 parts.append(child.tail)
@@ -206,6 +206,8 @@ def _locate(documents, spec, span, kind):
     A spec names its `file` (``project/file.xml``) and the `before`/`after` text around `span`
     in one text node (the whole of it, with `exact`), or `follows`: the end of the string value
     of the element whose tail it begins. Text inside an earlier correction is never matched.
+    Optional `xpath` narrows the search to a single TEI element (including its
+    descendants), for identical printed passages whose occurrence matters.
     It must match exactly once, so an entry never lands twice or goes stale silently.
     """
     root = documents.get(spec['file'])
@@ -215,11 +217,20 @@ def _locate(documents, spec, span, kind):
     target = before + span + after
     matches = []
     corrected = {f'{{{TEI}}}sic', f'{{{TEI}}}corr'}
-    for node in root.iter():
+    scope = root
+    if 'xpath' in spec:
+        selected = root.xpath(spec['xpath'], namespaces={'tei': TEI, 'j': J})
+        if (not isinstance(selected, list) or len(selected) != 1
+                or not isinstance(selected[0], etree._Element)):
+            raise ValueError(f"{kind} {spec['id']}: xpath must select one element")
+        scope = selected[0]
+    for node in scope.iter():
         if not isinstance(node.tag, str):
             continue
         inside = node.tag in corrected or any(a.tag in corrected for a in node.iterancestors())
         for attribute in ('text', 'tail'):
+            if 'xpath' in spec and node is scope and attribute == 'tail':
+                continue  # The selected element's tail belongs outside its scope.
             if inside and (attribute == 'text' or node.tag not in corrected):
                 continue
             value = getattr(node, attribute)
