@@ -9623,10 +9623,10 @@
 {"urn": "urn:x-opensiddur:text:poem:melekh_azur_gevurah/24", "status": "canonical", "label_en": "Melekh azur gevurah / 24", "parent": "urn:x-opensiddur:text:poem:melekh_azur_gevurah"}
 {"urn": "urn:x-opensiddur:text:poem:melekh_azur_gevurah/25", "status": "canonical", "label_en": "Melekh azur gevurah / 25", "parent": "urn:x-opensiddur:text:poem:melekh_azur_gevurah"}
 {"urn": "urn:x-opensiddur:text:poem:melekh_azur_gevurah/26", "status": "canonical", "label_en": "Melekh azur gevurah / 26", "parent": "urn:x-opensiddur:text:poem:melekh_azur_gevurah"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel", "status": "canonical", "label_en": "Khevodo ahel — Rosh ha-Shanah Ofan; provisional pointing"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel/1", "status": "canonical", "label_en": "Khevodo ahel / 1", "parent": "urn:x-opensiddur:text:poem:khevodo_ahel"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel/2", "status": "canonical", "label_en": "Khevodo ahel / 2", "parent": "urn:x-opensiddur:text:poem:khevodo_ahel"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel/3", "status": "canonical", "label_en": "Khevodo ahel / 3", "parent": "urn:x-opensiddur:text:poem:khevodo_ahel"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel/4", "status": "canonical", "label_en": "Khevodo ahel / 4", "parent": "urn:x-opensiddur:text:poem:khevodo_ahel"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel/5", "status": "canonical", "label_en": "Khevodo ahel / 5", "parent": "urn:x-opensiddur:text:poem:khevodo_ahel"}
-{"urn": "urn:x-opensiddur:text:poem:khevodo_ahel/6", "status": "canonical", "label_en": "Khevodo ahel / 6", "parent": "urn:x-opensiddur:text:poem:khevodo_ahel"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel", "status": "canonical", "label_en": "Khevodo ihel — Rosh ha-Shanah Ofan"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel/1", "status": "canonical", "label_en": "Khevodo ihel / 1", "parent": "urn:x-opensiddur:text:poem:khevodo_ihel"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel/2", "status": "canonical", "label_en": "Khevodo ihel / 2", "parent": "urn:x-opensiddur:text:poem:khevodo_ihel"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel/3", "status": "canonical", "label_en": "Khevodo ihel / 3", "parent": "urn:x-opensiddur:text:poem:khevodo_ihel"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel/4", "status": "canonical", "label_en": "Khevodo ihel / 4", "parent": "urn:x-opensiddur:text:poem:khevodo_ihel"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel/5", "status": "canonical", "label_en": "Khevodo ihel / 5", "parent": "urn:x-opensiddur:text:poem:khevodo_ihel"}
+{"urn": "urn:x-opensiddur:text:poem:khevodo_ihel/6", "status": "canonical", "label_en": "Khevodo ihel / 6", "parent": "urn:x-opensiddur:text:poem:khevodo_ihel"}
