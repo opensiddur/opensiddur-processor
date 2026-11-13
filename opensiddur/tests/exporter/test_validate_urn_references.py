@@ -94,6 +94,55 @@ class TestValidateUrnReferences(unittest.TestCase):
             self.assertEqual(failures[0].file_name, "a.xml")
             self.assertEqual(failures[0].attribute_name, "target")
 
+    def test_missing_optional_page_destination_does_not_hide_required_references(self):
+        with TemporaryDirectory() as td:
+            base = Path(td)
+            root = etree.Element(f"{{{TEI_NS}}}TEI", nsmap=NSMAP)
+            optional = etree.SubElement(root, f"{{{TEI_NS}}}seg", type="optional-page-reference")
+            foreign = etree.SubElement(optional, f"{{{TEI_NS}}}foreign")
+            prefix = "urn:x-opensiddur:text:prayer:"
+            etree.SubElement(foreign, f"{{{TEI_NS}}}ref", type="page", target=prefix+"optional@proj1")
+            etree.SubElement(optional, f"{{{TEI_NS}}}ref", target=prefix+"ordinary@proj1")
+            etree.SubElement(optional, f"{{{JLPTEI_NS}}}transclude", target=prefix+"prayer@proj1")
+            etree.SubElement(root, f"{{{TEI_NS}}}ref", type="page", target=prefix+"required@proj1")
+            _write_project_xml(base, "proj1", "a.xml", root)
+            db_path = base / "ref.db"
+            ReferenceDatabase(db_path).close()
+            failures = validate_project_urn_references(
+                "proj1", project_directory=base, reference_db_path=db_path)
+            self.assertEqual([f.urn for f in failures], [
+                prefix+"ordinary@proj1", prefix+"prayer@proj1", prefix+"required@proj1"])
+
+    def test_optional_page_reference_still_reports_a_malformed_range(self):
+        with TemporaryDirectory() as td:
+            base = Path(td)
+            root = etree.Element(f"{{{TEI_NS}}}TEI", nsmap=NSMAP)
+            optional = etree.SubElement(root, f"{{{TEI_NS}}}seg", type="optional-page-reference")
+            etree.SubElement(optional, f"{{{TEI_NS}}}ref", type="page",
+                             target="urn:x-opensiddur:text:prayer:bad@proj1")
+            _write_project_xml(base, "proj1", "a.xml", root)
+            db_path = base / "ref.db"
+            ReferenceDatabase(db_path).close()
+            with patch("opensiddur.exporter.validate_urn_references.UrnResolver.resolve_range",
+                       side_effect=ValueError("malformed range")):
+                failures = validate_project_urn_references(
+                    "proj1", project_directory=base, reference_db_path=db_path)
+            self.assertEqual(len(failures), 1)
+            self.assertEqual(failures[0].reason, "malformed range")
+
+    def test_optional_page_reference_with_existing_destination_is_valid(self):
+        with TemporaryDirectory() as td:
+            base = Path(td)
+            root = etree.Element(f"{{{TEI_NS}}}TEI", nsmap=NSMAP)
+            optional = etree.SubElement(root, f"{{{TEI_NS}}}seg", type="optional-page-reference")
+            target = "urn:x-opensiddur:text:prayer:existing"
+            etree.SubElement(optional, f"{{{TEI_NS}}}ref", type="page", target=target+"@proj1")
+            _write_project_xml(base, "proj1", "a.xml", root)
+            db_path = base / "ref.db"
+            _add_urn_mapping(db_path, "proj1", "a.xml", target)
+            self.assertEqual(validate_project_urn_references(
+                "proj1", project_directory=base, reference_db_path=db_path), [])
+
     def test_raises_when_project_directory_missing(self):
         with TemporaryDirectory() as td:
             base = Path(td)
