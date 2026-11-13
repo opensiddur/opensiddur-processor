@@ -718,8 +718,12 @@ def documentary_order(div, order, readings, by_stem, lang, project):
             heading = readings['documentary_instructions'].get(key)
             if heading and lang in heading['witnesses']:
                 if heading.get('page_start', True):
-                    element(section, 'pb', ed='1965', n=heading['printed_page'],
-                            facs=page_image_url(IDENTIFIER, int(heading['scan'][1:])-1, size=''))
+                    attributes = {'ed': '1965'}
+                    if heading.get('printed_page') is not None:
+                        attributes['n'] = heading['printed_page']
+                    attributes['facs'] = page_image_url(
+                        IDENTIFIER, int(heading['scan'][1:])-1, size='')
+                    element(section, 'pb', **attributes)
                 element(section, 'head', heading['text']).set(XML+'lang', heading['language'])
             documentary_order(section, occurrence['order'], readings, by_stem, lang, project)
             if conditions:
@@ -839,7 +843,7 @@ def build(source, project_directory, *, draft=False):
         element(bibliography, 'note', dependency['reason'])
     if readings.get('expanded_coverage_note'):
         bibliography = root.find(f'.//{{{TEI}}}sourceDesc/{{{TEI}}}bibl')
-        element(bibliography, 'note', readings['expanded_coverage_note'])
+        element(bibliography, 'note', readings['expanded_coverage_note'], type='encoding')
     add_front(root, [], expanded=True)
     div = element(body, 'div', corresp=EXPANDED_URN)
     element(div, 'head', 'מחזור אשכנז מורחב').set(XML+'lang', 'he')

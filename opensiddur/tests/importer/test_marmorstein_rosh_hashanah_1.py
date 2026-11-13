@@ -341,6 +341,29 @@ class EditionWiringTest(unittest.TestCase):
             self.assertEqual(root.find('.//'+T+'body//'+T+'head').text, heading)
             self.assertTrue(root.find('.//'+T+'body//'+T+'pb').get('facs').endswith('/'+scan+'.jpg'))
 
+    def test_unnumbered_appendix_heading_starts_its_scan_before_the_heading(self):
+        self.readings['documentary_instructions'] = {'appendix': {
+            'scan': 's4', 'language': 'he', 'witnesses': ['he'], 'text': 'שיר של יום.'}}
+        self.readings['source_order'] = [{'section': 'appendix', 'heading': 'appendix',
+            'witnesses': ['he'], 'order': [{'unit': 'second'}]}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        heading = root.find('.//'+T+'body//'+T+'head')
+        boundary = heading.getprevious()
+        self.assertEqual(boundary.tag, T+'pb')
+        self.assertTrue(boundary.get('facs').endswith('/n3.jpg'))
+        self.assertIsNone(boundary.get('n'))
+
+    def test_expanded_coverage_note_is_encoding_metadata(self):
+        self.readings['expanded_coverage_note'] = 'Daily psalm placement remains unassembled.'
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/EXPANDED/'index.xml'))
+        notes = root.findall('.//'+T+'sourceDesc/'+T+'bibl/'+T+'note')
+        note = next(n for n in notes if n.text == self.readings['expanded_coverage_note'])
+        self.assertEqual(note.get('type'), 'encoding')
+
     def test_documentary_condition_does_not_gate_the_reusable_verse(self):
         self.readings['documentary_instructions'] = {'sabbath': {
             'text': '(On Sabbath)', 'language': 'en', 'witnesses': ['he'],
