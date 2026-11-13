@@ -212,6 +212,9 @@ def unit_document(unit, lang, draft):
                 raise ValueError('Citation scan is outside the passage')
             note = element(notes, 'note', type=citation.get('note_type', 'citation'),
                            target=citation.get('target', unit.get('start', unit['urn'])))
+            if citation.get('conditions'):
+                condition = element(note, 'j:condition')
+                feature_structures(element(condition, 'j:all'), citation['conditions'])
             citation_text = citation['text'].strip()
             if citation_text.startswith('(') and citation_text.endswith(')'):
                 citation_text = citation_text[1:-1].strip()
@@ -265,8 +268,9 @@ def unit_document(unit, lang, draft):
             condition.set(XML+'id', segment_condition_id)
             if segment.get('condition_instruction'):
                 note = element(condition, 'note', type='instruction')
-                note.set(XML+'lang', lang)
-                words(note, segment['condition_instruction'], lang)
+                rubric_language = segment.get('condition_instruction_language', lang)
+                note.set(XML+'lang', rubric_language)
+                words(note, segment['condition_instruction'], rubric_language)
             feature_structures(element(condition, 'j:all'), segment_conditions)
         fragments = segment['fragments']
         if segment.get('marked'):

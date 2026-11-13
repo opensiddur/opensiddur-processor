@@ -364,6 +364,7 @@ class EditionWiringTest(unittest.TestCase):
             {'fragments': [{'scan': 's1', 'text': 'Before'}]},
             {'conditions': [{'type': 'opensiddur:holiday-aggregate', 'features': {'shabbat': True}}],
              'condition_instruction': 'On Sabbath:',
+             'condition_instruction_language': 'en',
              'fragments': [{'scan': 's1', 'text': 'Sabbath'}, {'scan': 's2', 'text': 'continuation'}]},
             {'fragments': [{'scan': 's2', 'text': 'After'}]}]
         self.save('readings', self.readings)
@@ -376,6 +377,7 @@ class EditionWiringTest(unittest.TestCase):
         end = paragraph.find(J+'endConditional')
         self.assertEqual(end.get('target'), '#'+condition.get('{http://www.w3.org/XML/1998/namespace}id'))
         self.assertEqual(condition.find(T+'note').text, 'On Sabbath:')
+        self.assertEqual(condition.find(T+'note').get('{http://www.w3.org/XML/1998/namespace}lang'), 'en')
         self.assertIn('Before', paragraph[0].tail)
         self.assertIn('Sabbath', condition.tail)
         self.assertIn('continuation', paragraph[paragraph.index(end)-1].tail)
@@ -969,6 +971,25 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(citation.get('target'), BASE+'invented')
         self.assertNotIn('(Invented source.)', ''.join(body.itertext()))
         self.assertEqual(len(body.findall('.//'+T+'pb')), 1)
+
+    def test_variant_note_follows_its_calendar_context(self):
+        self.readings['units'][0]['citations'] = {'he': [{
+            'scan': 's1', 'text': 'Alternate wording', 'note_type': 'commentary',
+            'conditions': [{'type': 'opensiddur:holiday-aggregate',
+                            'features': {'shabbat': True}}]}]}
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        root = etree.parse(str(self.projects/PROJECTS['he']/'first.xml'))
+        note = root.find('.//'+T+'standOff/'+T+'note')
+        self.assertEqual(note[0].tag, J+'condition')
+        self.assertEqual(note.find(T+'p').text, 'Alternate wording')
+        condition = parse_condition_element(note[0])
+        for shabbat, expected in [(True, TriState.TRUE), (False, TriState.FALSE),
+                                   (None, TriState.UNDEFINED)]:
+            with self.subTest(shabbat=shabbat):
+                processor = Mock()
+                processor.get_active_setting.return_value = shabbat
+                self.assertEqual(evaluate_condition(condition, processor), expected)
 
     def test_citation_can_target_a_later_verse_in_a_composite_prayer(self):
         self.readings['units'][0]['languages']['he'].append(

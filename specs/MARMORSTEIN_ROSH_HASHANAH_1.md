@@ -895,3 +895,44 @@ source. The ranged URI ends at quoted_exodus_15_18. Runtime verification must
 find eighteen separate verse groups in each language, as well as checking
 word content, followed by the explicit canonical repeat. This adds one
 occurrence context and changes no prayer words.
+
+## Draft continuation from physical PDF scan 96
+
+The next larger batch spans scans 96–109, starting with the half-Kaddish
+rubric after Yishtabbach and ending with Yotzer ha-Meorot before Ahavah
+Rabbah. Twenty new bilingual source modules preserve both festival poems,
+the weekday/Shabbat opening alternatives, the angelic Qedushah and Ofan.
+The three newly identified insertions were searched against the registry,
+aliases and current project XML; the Ofan opening vowels and its identity
+spelling remain provisional pending human snippet 3.
+
+All new modules remain explicitly draft. The accepted total stays 93/355.
+Raw primary readings are frozen separately from actual independent image
+readings and subsequent patches. Five numbered source questions are open;
+other faint marks remain in the independent reports for adjudication. No
+source acceptance may be inferred from schema validation or compilation.
+
+The expanded weekday opening has an editorial condition rubric. Source
+Shabbat headings remain condition rubrics, disappearing when Shabbat is
+known true. The parenthetic Ofan wording selects exactly one branch; its
+printed 'some say' alternative is a labeled, Shabbat-only standoff note.
+The importer now supports j:condition on source commentary/citation notes,
+with a regression checking true, false and undecided calendar contexts.
+Six Ofan stanza groups keep the shared boundary outside the alternatives.
+Actual compiled weekday/Shabbat checks verify both languages, the retained
+stanza scope and conditional-note suppression.
+
+Retain documentary routing instructions in the documentary index; omit
+the obsolete below-page direction from the expanded spine. Quoted biblical
+passages keep chapter context, verse milestones, bounded source spans and
+explicit termination. El Adon reuses its six canonical stanza extents.
+Two obvious English typos retain their source readings in sic/corr.
+Source lexical adjudication and final visual export review remain required
+before this batch can be accepted.
+
+Draft export verification passes for 357 XML files, 80 compiled prayer-word
+comparisons and both calendar paths. The importer tests pass 61 cases and
+12 subtests. Documentary and expanded PDF previews were rendered and inspected;
+the expanded new section has a bilingual Shema-blessings heading. These checks
+do not certify the source readings. The five human snippet questions, other
+faint marks and the provisional Ofan opening identity remain pending.
