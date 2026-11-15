@@ -240,3 +240,90 @@ class TestPreparation(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStayingInItsOwnText(unittest.TestCase):
+    """Review findings: a break never moves into another text, or inside inline markup."""
+
+    def test_a_break_does_not_leave_its_transclusion(self):
+        root = _tree(
+            _transclude("urn:a", "<tei:p>jps words" + _pb("1") + "</tei:p>")
+            + _transclude("urn:b", "<tei:p>other book</tei:p>"))
+        mark_scan_links(root)
+        self.assertEqual([], _linked(root))
+        self.assertEqual("other book", root.findall(f".//{TEI}p")[1].text)
+
+    def test_a_break_may_move_into_a_nested_transclusion(self):
+        root = _tree(_transclude(
+            "urn:a", _pb("1") + _transclude("urn:b", "<tei:p>words</tei:p>")))
+        mark_scan_links(root)
+        self.assertEqual(["1"], _linked(root))
+        self.assertIsNotNone(root.find(f".//{TEI}p/{TEI}pb"))
+
+    def test_a_break_does_not_move_into_another_texts_parallel_block(self):
+        block = ('<p:parallel><p:parallelItem role="primary" xml:lang="he">{he}'
+                 '</p:parallelItem><p:parallelItem role="parallel" xml:lang="en">'
+                 "<tei:p>en</tei:p></p:parallelItem></p:parallel>")
+        root = _tree(
+            _transclude("urn:a", block.format(he="<tei:p>first</tei:p>" + _pb("1")))
+            + _transclude("urn:b", block.format(he="<tei:p>second</tei:p>")))
+        mark_scan_links(root)
+        self.assertEqual([], _linked(root))
+
+    def test_a_break_before_a_parallel_block_enters_its_own_projects_column(self):
+        root = _tree(
+            '<p:transclude target="urn:a" p:project="en-proj">' + _pb("1")
+            + '<p:parallel><p:parallelItem role="primary" xml:lang="he" p:project="he-proj">'
+            "<tei:p>עברית</tei:p></p:parallelItem>"
+            '<p:parallelItem role="parallel" xml:lang="en" p:project="en-proj">'
+            "<tei:p>English</tei:p></p:parallelItem></p:parallel></p:transclude>")
+        mark_scan_links(root)
+        self.assertEqual("English", root.find(f".//{TEI}pb").tail)
+
+    def test_a_break_does_not_move_inside_a_link(self):
+        root = _tree(_pb("1") + '<tei:p><tei:ref target="https://x.example">link</tei:ref>'
+                     " words</tei:p>")
+        mark_scan_links(root)
+        pb = root.find(f".//{TEI}pb")
+        self.assertEqual(f"{TEI}p", pb.getparent().tag)
+        self.assertEqual(f"{TEI}ref", pb.getnext().tag)
+
+    def test_a_break_does_not_move_inside_a_highlight(self):
+        root = _tree(_pb("1") + '<tei:p><tei:hi rend="sup">raised</tei:hi> words</tei:p>')
+        mark_scan_links(root)
+        self.assertEqual(f"{TEI}p", root.find(f".//{TEI}pb").getparent().tag)
+
+    def test_a_break_opening_a_paragraph_takes_none_of_its_layout_space(self):
+        root = _tree(_pb("1") + "<tei:p>\n        words</tei:p>")
+        mark_scan_links(root)
+        self.assertEqual("words", root.find(f".//{TEI}pb").tail)
+
+    def test_a_printing_named_in_words_is_one_printing(self):
+        # "sukkot rites" is one printing; split, "rites" alone could match no context and
+        # "sukkot" could match siddur:sukkot by itself.
+        shared = _transclude(
+            "urn:x-opensiddur:text:prayer:x",
+            "<tei:p>" + _pb("703", "1949 sukkot rites") + _pb("90", "1949 sukkot/arvit")
+            + "words</tei:p>")
+        self.assertEqual(["90"], _marked(_transclude(SIDDUR + "sukkot/arvit", shared)))
+
+
+class TestAPageThatBeginsAtTheEndOfAText(unittest.TestCase):
+    @staticmethod
+    def _book(outer_project: str) -> etree.ElementBase:
+        return _tree(
+            f'<p:transclude target="urn:unit" p:project="{outer_project}">'
+            '<p:transclude target="urn:text" p:project="birnbaum">'
+            "<tei:p>words" + _pb("1") + "</tei:p></p:transclude>"
+            "<tei:p>next text</tei:p></p:transclude>")
+
+    def test_its_words_are_in_the_editions_next_text(self):
+        root = self._book("birnbaum")
+        mark_scan_links(root)
+        self.assertEqual(["1"], _linked(root))
+        self.assertEqual("next text", root.find(f".//{TEI}pb").tail)
+
+    def test_never_in_another_books(self):
+        root = self._book("jps")
+        mark_scan_links(root)
+        self.assertEqual([], _linked(root))

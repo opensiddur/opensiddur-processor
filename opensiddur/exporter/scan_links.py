@@ -18,8 +18,9 @@ not where it is being used, so it is read only above the text's wrapper too.
 The rule, for the breaks of one edition directly inside one transclusion (their *group*):
 
 1. A break with no printing token, or a group whose breaks all name the same printings, is
-   marked outright. A multi-word printing with no slash (``"1949 sukkot rites"``) is compared
-   whole, so it counts as one printing.
+   marked outright -- so a text carrying one printing's breaks only links them wherever it
+   is used. A multi-word printing with no slash (``"1949 sukkot rites"``) is read whole, as
+   one printing.
 2. Otherwise the context is read nearest first: the ``siddur:`` paths of the enclosing
    transclusions and divisions, then the printing of the nearest earlier page break in an
    enclosing group. The first level at which some printing equals a context, or one is a
@@ -55,6 +56,7 @@ _TRANSCLUDE = f"{{{PROCESSING_NAMESPACE}}}transclude"
 _EXCLUDED = frozenset({f"{{{TEI_NS}}}note", f"{{{TEI_NS}}}standOff", f"{{{TEI_NS}}}teiHeader"})
 _SIDDUR = "urn:x-opensiddur:text:siddur:"
 _PARALLEL_ITEM = f"{{{PROCESSING_NAMESPACE}}}parallelItem"
+_PROJECT = f"{{{PROCESSING_NAMESPACE}}}project"
 #: Words inside these are not the running text a page break can be moved up to.
 _NOT_RUNNING = _EXCLUDED | {f"{{{TEI_NS}}}head", f"{{{TEI_NS}}}label"}
 #: Elements that are set as blocks: a break before one goes inside, to its first words.
@@ -65,8 +67,6 @@ _BLOCKS = frozenset(
         "epigraph", "imprimatur", "front", "body", "back", "table", "row", "cell")]
     + [f"{{{PROCESSING_NAMESPACE}}}{name}" for name in (
         "parallel", "parallelItem", "transclude")])
-#: Words inside these may not be set (one reading of a choice is): the break goes before.
-_WRAPPERS = frozenset({f"{{{TEI_NS}}}choice"})
 
 
 @dataclass(frozen=True)
@@ -78,7 +78,11 @@ class _Break:
 
 def _parse(pb: etree.ElementBase) -> _Break:
     tokens = (pb.get("ed") or "").split()
-    return _Break(pb, tokens[0] if tokens else "", frozenset(tokens[1:]))
+    printings = tokens[1:]
+    if printings and not any("/" in token for token in printings):
+        # A sigil in words ("sukkot rites") names one printing, not one per word.
+        printings = [" ".join(printings)]
+    return _Break(pb, tokens[0] if tokens else "", frozenset(printings))
 
 
 def _candidates(root: etree.ElementBase) -> list[_Break]:
@@ -261,20 +265,49 @@ def _in_line(pb: etree.ElementBase, element: etree.ElementBase, where: str) -> b
 
 
 def _next_words(pb: etree.ElementBase, columns: _Columns):
-    """Where the next running words after a page break begin, in its column.
+    """Where the next running words after a page break begin, in its own book.
 
     (element, "text") is the element's text, (element, "tail") its tail; None when no
-    words follow. A parallel text is cut into blocks at its alignment points, and a page
-    often begins at a cut: its words are then in the column's next block.
+    words follow. The search starts in the text the break belongs to -- its nearest
+    transclusion, and its column -- and goes on into an enclosing text only while that is
+    of the same project: a page that begins at the end of one of an edition's texts has
+    its words in the edition's next one, but never in another book's. A parallel text is
+    cut into blocks at its alignment points, and a page often begins at a cut: its words
+    are then in the column's next block. A break outside the columns enters only the
+    column of its own project.
     """
     column = next(pb.iterancestors(_PARALLEL_ITEM), None)
-    found = _first_words(_positions_after(pb, column))
-    if found is None and column is not None:
+    text = _group(pb)
+    text_project = text.get(_PROJECT) if text is not None else None
+    # The break's own project: its column's, in a parallel text, whose wrapper names the
+    # primary text's project for both columns.
+    project = (column.get(_PROJECT) if column is not None else None) or text_project
+    while True:
+        found = _words_within(pb, column, text, project, columns)
+        if found is not None or text is None:
+            return found
+        enclosing = _group(text)
+        if enclosing is None or enclosing.get(_PROJECT) != text_project:
+            return None
+        text = enclosing
+
+
+def _words_within(pb, column, text, project, columns):
+    """The next words after a break that are inside `text` (None: the whole document)."""
+    inside_text = column is not None and (text is None or _is_inside(column, text))
+    found = _first_words(_positions_after(pb, column if inside_text else text, project))
+    if found is None and inside_text:
         for later in columns.following(column):
-            found = _first_words(_positions_within(later))
+            if text is not None and not _is_inside(later, text):
+                break
+            found = _first_words(_positions_within(later, project))
             if found is not None:
                 break
     return found
+
+
+def _is_inside(element: etree.ElementBase, ancestor: etree.ElementBase) -> bool:
+    return any(a is ancestor for a in element.iterancestors())
 
 
 def _first_words(positions):
@@ -290,23 +323,29 @@ def _first_words(positions):
     return None
 
 
-def _positions_after(node: etree.ElementBase, scope: etree.ElementBase | None):
+def _positions_after(node: etree.ElementBase, scope: etree.ElementBase | None,
+                     project: str | None = None):
     """Each place text can be, in document order, after a node and within `scope`."""
     current = node
     while current is not None and current is not scope:
         yield current, "tail"
         following = current.getnext()
         if following is not None:
-            yield from _positions_within(following)
+            yield from _positions_within(following, project)
             current = following
         else:
             current = current.getparent()
 
 
-def _positions_within(element: etree.ElementBase):
+def _positions_within(element: etree.ElementBase, project: str | None = None):
+    """Each place text can be, in document order, within an element. A column of another
+    project than `project` is passed over: its words are another text's."""
+    if (element.tag == _PARALLEL_ITEM and project is not None
+            and element.get(_PROJECT) not in (None, project)):
+        return
     yield element, "text"
     for child in element:
-        yield from _positions_within(child)
+        yield from _positions_within(child, project)
         yield child, "tail"
 
 
@@ -326,16 +365,28 @@ def _remove(pb: etree.ElementBase) -> None:
 
 
 def _move(pb: etree.ElementBase, element: etree.ElementBase, where: str) -> None:
-    wrapper = next((a for a in (element, *element.iterancestors()) if a.tag in _WRAPPERS),
-                   None)
+    """Put a break just before the words at (element, where).
+
+    Words inside inline elements (a link, a highlight, a divine name, one reading of a
+    choice) take the break before the outermost of them, never inside: a link would nest
+    in a link, a superscript would raise the symbol. Words opening a block take it as the
+    block's first content, without the block's leading layout space, which the break would
+    otherwise turn into a space at the start of the line.
+    """
+    host = element if where == "text" else element.getparent()
+    outermost_inline = None
+    for candidate in (host, *host.iterancestors()):
+        if candidate.tag in _BLOCKS:
+            break
+        outermost_inline = candidate
     _remove(pb)
     if where == "tail" and element.tag == _PB:
         # Moved up to a break moved there before it: the earlier page goes first.
         element.addprevious(pb)
-    elif wrapper is not None:
-        wrapper.addprevious(pb)
+    elif outermost_inline is not None:
+        outermost_inline.addprevious(pb)
     elif where == "text":
-        pb.tail, element.text = element.text, None
+        pb.tail, element.text = (element.text or "").lstrip(), None
         element.insert(0, pb)
     else:
         pb.tail, element.tail = element.tail, None

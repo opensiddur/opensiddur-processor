@@ -223,16 +223,18 @@ def typography_css(typography: TypographyConfig) -> str:
     return "\n".join(rules) + "\n"
 
 
-#: The width of the margin a scan link is set in, beside the column it belongs to.
-SCAN_LINK_GUTTER = "1.6em"
+#: The width of the margin a scan link is set in, beside the column it belongs to. In rem:
+#: the offset is resolved on the link, whose size is styles.scan_link's, and has to agree
+#: with the padding that makes room for it.
+SCAN_LINK_GUTTER = "1.6rem"
 
 
 def _scan_link_css(scan_links) -> list[str]:
     """The symbol of a link to the scan of a page, and where it stands.
 
     In the margin, it stands at the start of its line's column -- the right of a Hebrew
-    column, the left of an English one: in a parallel row each is that column's outer
-    edge. A row lays out only its own box (``content-visibility`` in reader.css), so the
+    column, the left of an English one: in a parallel row of a Hebrew book, where the
+    Hebrew column is on the right, each is that column's outer edge. A row lays out only its own box (``content-visibility`` in reader.css), so the
     margin is kept inside the row. A narrow screen has no margin to spare: the symbol
     stands in the line.
     """

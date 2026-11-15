@@ -761,7 +761,7 @@ class TestScanLinks(unittest.TestCase):
 
     def test_margin_saves_the_place_and_moves_out_to_the_edge(self):
         tex = self._scan("margin")
-        self.assertIn(r"\usepackage{zref-savepos,zref-abspage}", tex)
+        self.assertIn(r"\usepackage{zref-savepos}", tex)
         self.assertIn(r"\zsavepos{\OSScanLink@label}", tex)
         self.assertIn(r"\hbox dir TLT to \z@{\kern\dimexpr\OSScanLink@edge"
                       r"-\zposx{\OSScanLink@label}sp\relax", tex)

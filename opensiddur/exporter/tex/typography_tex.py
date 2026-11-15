@@ -971,10 +971,13 @@ def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[s
     separation = (r"\dimexpr\linenumsep+2em\relax" if config.line_numbers.enabled
                   else "1em")
     lines += [
-        r"\usepackage{zref-savepos,zref-abspage}",
+        r"\usepackage{zref-savepos}",
         r"\makeatletter",
-        # The page a place is on, to tell inner from outer and odd margins from even.
-        r"\zref@addprop{savepos}{abspage}",
+        # The number of the page a place is on, as the output routine reads it to choose
+        # the odd or even margins (and reledmac, inner from outer): the page counter at
+        # shipout, not the absolute page, since a title page restarts the counter.
+        r"\zref@newprop{OSScanLinkPage}[1]{\number\c@page}",
+        r"\zref@addprop{savepos}{OSScanLinkPage}",
         r"\newcount\OSScanLink@serial",
         r"\newdimen\OSScanLink@edge",
         rf"\newcommand{{\OSScanLinkSep}}{{{separation}}}",
@@ -995,7 +998,7 @@ def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[s
         r"  \global\advance\OSScanLink@serial\@ne",
         r"  \edef\OSScanLink@label{OSScanLink\the\OSScanLink@serial}%",
         r"  \zsavepos{\OSScanLink@label}\zref@refused{\OSScanLink@label}%",
-        r"  \edef\OSScanLink@page{\zref@extractdefault{\OSScanLink@label}{abspage}{1}}%",
+        r"  \edef\OSScanLink@page{\zref@extractdefault{\OSScanLink@label}{OSScanLinkPage}{1}}%",
         "  " + side + "%",
         # The edge of the text block on that page, from the page's left edge.
         r"  \OSScanLink@edge=\dimexpr1in+\hoffset\relax",
