@@ -362,3 +362,24 @@ class TestTheContextTheEditionPrints(unittest.TestCase):
                              "<tei:p>" + _pb("83", "1949 chol/shacharit/amidah")
                              + "Atah gibor</tei:p>")
         self.assertEqual(["83"], _marked(_transclude(SIDDUR + "chol/maariv_nusach_x", shared)))
+
+    def test_an_earlier_break_never_takes_a_texts_links_away(self):
+        # The book arranges the text its own way (the edition never prints expanded/morning);
+        # an earlier break of another printing must not leave the text without links.
+        body = _transclude(
+            SIDDUR + "expanded/morning",
+            "<tei:p>" + _pb("320", "1949 shabbat/shacharit/pesukei_dezimra") + "Before</tei:p>"
+            + _transclude("urn:x-opensiddur:text:prayer:yehi_khevod",
+                          "<tei:p>" + _pb("53", "1949 chol/shacharit/pesukei_dezimra")
+                          + "Yehi khevod</tei:p>"))
+        self.assertEqual(["320", "53"], _marked(body))
+
+    def test_printings_in_words_link_where_a_one_word_printing_matches_the_unit(self):
+        # "regalim" is a printing in words, not the path of siddur:regalim/musaf; the
+        # festival musaf's own breaks, in words too, keep their links.
+        body = (
+            _transclude(SIDDUR + "regalim/hallel",
+                        "<tei:p>" + _pb("600", "1949 regalim") + "Hallel</tei:p>")
+            + _transclude(SIDDUR + "regalim/musaf",
+                          "<tei:p>" + _pb("615", "1949 festival musaf") + "Musaf</tei:p>"))
+        self.assertEqual(["600", "615"], _marked(body))

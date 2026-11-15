@@ -1316,33 +1316,37 @@
 
     function showLayout() {
       var page = document.body;
+      var shown = effectiveLayout();
+      shownLayout = viewer.hidden ? null : shown;
       viewerLayouts.forEach(function (name) {
-        page.classList.toggle("os-viewing-" + name, !viewer.hidden && effectiveLayout() === name);
-        layoutButtons[name].setAttribute("aria-pressed", String(name === layout));
+        page.classList.toggle("os-viewing-" + name, !viewer.hidden && shown === name);
+        // The layout in force is the one pressed; beside the text is not offered where the
+        // screen is too narrow for it.
+        layoutButtons[name].setAttribute("aria-pressed", String(name === shown));
       });
+      layoutButtons.vertical.disabled = !!(narrow && narrow.matches);
     }
 
     // A change of layout moves the text. While the viewer is open, the reader's place is the
     // link it was opened from: keep that where it was, or, if the viewer now covers it, a
     // third of the way down the text left visible. Closed, keep the passage that was on screen.
     function relayout(change) {
-      var visible = link && !viewer.hidden;
-      var opening = link && viewer.hidden;
+      var wasOpen = !viewer.hidden;
       var before = link ? link.getBoundingClientRect().top : 0;
-      var candidates = (visible || opening) ? null : anchor();
+      var area = textArea();
+      var linkInView = link && (!wasOpen || effectiveLayout() !== "full") &&
+                       before >= area.top && before <= area.bottom;
+      // The link, where the reader can see it; otherwise the passage on screen.
+      var candidates = linkInView ? [{ element: link, top: before }] : anchor();
       var near = holdNearRows();
       change();
       showLayout();
-      if (link && !viewer.hidden) {
-        var area = textArea();
-        var top = before;
-        if (effectiveLayout() === "full") top = before;
-        else if (top < area.top || top > area.bottom - 40) {
-          top = area.top + (area.bottom - area.top) / 3;
-        }
+      if (link && !viewer.hidden && effectiveLayout() !== "full") {
+        // Open beside or below: the link in the text left visible, where it was if it can be.
+        var now = textArea();
+        var top = linkInView ? before : now.top + (now.bottom - now.top) / 3;
+        if (top < now.top || top > now.bottom - 40) top = now.top + (now.bottom - now.top) / 3;
         candidates = [{ element: link, top: top }];
-        // keepInPlace moves the link back to `top` once the layout has settled.
-        link.scrollIntoView({ block: "nearest" });
       }
       keepInPlace(candidates, near);
       if (kind === "image") requestAnimationFrame(fitImage);
@@ -1373,6 +1377,7 @@
     }
 
     function render() {
+      lastStage = stageSize();
       image.style.transform = "translate(" + x + "px, " + y + "px) scale(" + scale + ")";
       zoomOut.disabled = scale <= fit * MIN_SCALE_FACTOR + 1e-9;
       zoomIn.disabled = scale >= fit * MAX_SCALE_FACTOR - 1e-9;
@@ -1382,6 +1387,7 @@
     function fitImage() {
       if (kind !== "image" || !image.naturalWidth) return;
       var w = stage.clientWidth, h = stage.clientHeight;
+      if (!w || !h) return;
       fit = Math.min(w / image.naturalWidth, h / image.naturalHeight) || 1;
       scale = fit;
       x = (w - image.naturalWidth * scale) / 2;
@@ -1424,6 +1430,12 @@
         image.removeAttribute("src");
         frame.hidden = false;
         frame.src = address + "#view=FitH";
+        // Phones' browsers do not show a PDF in a frame: say where else it can be read.
+        message.textContent = "If the page does not appear, ";
+        message.appendChild(el("a", { href: from.href, target: "_blank", rel: "noopener",
+                                      text: "open it in a new tab" }));
+        message.appendChild(document.createTextNode("."));
+        message.hidden = false;
       } else {
         frame.hidden = true;
         frame.removeAttribute("src");
@@ -1444,8 +1456,8 @@
       relayout(function () { viewer.hidden = true; });
       image.removeAttribute("src");
       frame.removeAttribute("src");
-      link = null;
-      if (from) from.focus({ preventScroll: true });
+      // After the layout has settled, where the link has been kept.
+      if (from) requestAnimationFrame(function () { from.focus({ preventScroll: true }); });
     }
 
     image.addEventListener("load", function () {
@@ -1478,6 +1490,7 @@
     }
     stage.addEventListener("pointerdown", function (event) {
       if (kind !== "image" || event.button) return;
+      if (event.target.closest && event.target.closest("a, button")) return;
       stage.setPointerCapture(event.pointerId);
       pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
       pinch = Object.keys(pointers).length === 2 ? pinchState() : null;
@@ -1492,7 +1505,7 @@
       last.y = event.clientY;
       if (count === 2 && pinch) {
         var now = pinchState();
-        zoomBy(now.distance / pinch.distance, now.cx, now.cy);
+        zoomBy(now.distance / pinch.distance, pinch.cx, pinch.cy);
         panBy(now.cx - pinch.cx, now.cy - pinch.cy);
         pinch = now;
       }
@@ -1511,6 +1524,11 @@
       else zoomBy(2, event.clientX - box.left, event.clientY - box.top);
     });
 
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape" || viewer.hidden || viewer.contains(event.target)) return;
+      if (event.target.closest && event.target.closest("dialog[open], input, select, textarea")) return;
+      closeViewer();
+    });
     viewer.addEventListener("keydown", function (event) {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       var step = 40;
@@ -1529,10 +1547,28 @@
       if (handled) event.preventDefault();
     });
 
+    // A resize keeps the reader's zoom, relative to the page fitted, about the middle; a
+    // change of layout it brings (crossing the narrow-screen width) keeps their place.
+    var shownLayout = null;
+    function stageSize() { return { w: stage.clientWidth, h: stage.clientHeight }; }
+    var lastStage = null;
     window.addEventListener("resize", function () {
       if (viewer.hidden) return;
-      showLayout();
-      if (kind === "image") fitImage();
+      if (effectiveLayout() !== shownLayout) {
+        relayout(function () {});
+        return;
+      }
+      if (kind !== "image" || !image.naturalWidth || !lastStage) return;
+      var size = stageSize();
+      if (!size.w || !size.h) return;
+      var relative = scale / fit;
+      var cx = (lastStage.w / 2 - x) / scale, cy = (lastStage.h / 2 - y) / scale;
+      fit = Math.min(size.w / image.naturalWidth, size.h / image.naturalHeight) || 1;
+      scale = fit * relative;
+      x = size.w / 2 - cx * scale;
+      y = size.h / 2 - cy * scale;
+      lastStage = size;
+      render();
     });
 
     // Before the book's own link handling: a scan link is not a place in the book.

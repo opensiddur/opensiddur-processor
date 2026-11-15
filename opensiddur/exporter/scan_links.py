@@ -20,11 +20,12 @@ The rule, for the breaks of one edition directly inside one transclusion (their 
 1. A break with no printing token is marked outright. A multi-word printing with no slash
    (``"1949 sukkot rites"``) is read whole, as one printing.
 2. Otherwise the context is read nearest first: the ``siddur:`` paths of the enclosing
-   transclusions and divisions, then the printing of the nearest earlier page break in an
-   enclosing group. The nearest level the edition prints anywhere in the book (a printing
-   equal to it, or one a path prefix of the other) decides: the group's breaks of that
-   printing are linked (the closest match, then the first in document order), and if it has
-   none -- no page of that printing begins inside this text -- none are.
+   transclusions and divisions. The nearest unit the edition prints anywhere in the book (a
+   printing equal to it, or one a path prefix of the other) decides: the group's breaks of
+   that printing are linked (the closest match, then the first in document order), and if it
+   has none -- no page of that printing begins inside this text -- none are. Failing a unit,
+   the printing of the nearest earlier page break in an enclosing group chooses among the
+   group's own. Printings named in words are compared with nothing, and link outright.
 3. If the edition prints none of the context, the printing sharing the longest leading path
    with it is chosen: the book arranges the text as the edition does not, and the scan of
    the nearest printing shows the same words.
@@ -132,31 +133,54 @@ def _matches(printing: str, context: str) -> bool:
             or context.startswith(printing + "/"))
 
 
-def _choose(printings: list[str], levels: Iterable[set[str]],
+def _is_path(printing: str) -> bool:
+    """A printing named by a `siddur:` path, not in words (`sukkot rites`, `regalim`)."""
+    return "/" in printing
+
+
+def _best(printings: list[str], contexts: set[str]) -> str | None:
+    """The printing matching a context most closely, the first in document order on a tie."""
+    matched = [(max(_shared(p, c) for c in contexts if _matches(p, c)), -i, p)
+               for i, p in enumerate(printings) if any(_matches(p, c) for c in contexts)]
+    return max(matched)[2] if matched else None
+
+
+def _choose(printings: list[str], units: Iterable[set[str]], earlier: set[str] = frozenset(),
             edition: set[str] = frozenset()) -> set[str] | None:
     """The printings the context chooses (possibly none), or None when it cannot tell.
 
-    `printings` are the group's, in document order; `levels` is the context, nearest first;
-    `edition` is every printing the edition's breaks name anywhere in the book.
+    `printings` are the group's, in document order. `units` are the ``siddur:`` paths of the
+    units around the group, nearest first; `earlier` the printings of the nearest earlier
+    break in an enclosing group; `edition` every printing the edition's breaks name anywhere
+    in the book.
 
-    The nearest context that the edition prints decides. Its own printing is the group's
+    The nearest unit that the edition prints decides. Its own printing is the group's
     choice, and if the group has no break of it -- no page of that printing begins inside
     this text -- the group links none: a break of another printing would be a page of some
-    other place in the book, among the pages of this one.
+    other place in the book, among the pages of this one. Only a unit decides that; an
+    earlier break says which of the group's printings is meant, never that none is.
+
+    Printings named in words are not paths and are compared with nothing: a group of them
+    cannot be told apart by its context, and links them all.
     """
-    levels = [level for level in levels if level]
-    for level in levels:
-        if edition and not any(_matches(p, c) for p in edition for c in level):
+    paths = [p for p in printings if _is_path(p)]
+    if not paths:
+        return None
+    printed = {p for p in edition if _is_path(p)}
+    units = [level for level in units if level]
+    for level in units:
+        if not any(_matches(p, c) for p in printed for c in level):
             continue
-        matched = [(max(_shared(p, c) for c in level if _matches(p, c)), -i, p)
-                   for i, p in enumerate(printings) if any(_matches(p, c) for c in level)]
-        if matched:
-            return {max(matched)[2]}
-        if edition:
-            return set()
-    contexts = set().union(*levels) if levels else set()
+        best = _best(paths, level)
+        return {best} if best else set()
+    best = _best(paths, set(earlier))
+    if best:
+        return {best}
+    # The edition prints none of the context: the book arranges the text its own way, and
+    # the scan of the nearest printing shows the same words.
+    contexts = set().union(*units, earlier)
     scored = [(max((_shared(p, c) for c in contexts), default=0), -i, p)
-              for i, p in enumerate(printings)]
+              for i, p in enumerate(paths)]
     best = max(scored, default=None)
     if best is not None and best[0] > 0:
         return {best[2]}
@@ -164,21 +188,21 @@ def _choose(printings: list[str], levels: Iterable[set[str]],
 
 
 def _context(group: etree.ElementBase | None,
-             earlier: Iterable[_Break]) -> list[set[str]]:
-    """The context of a group, nearest first: enclosing units, then an earlier break."""
-    levels: list[set[str]] = []
+             earlier: Iterable[_Break]) -> tuple[list[set[str]], set[str]]:
+    """The context of a group: the enclosing units, nearest first; and an earlier break's
+    printings."""
+    units: list[set[str]] = []
     if group is not None:
         for ancestor in group.iterancestors():
             path = _siddur_path(ancestor)
             if path:
-                levels.append({path})
+                units.append({path})
     enclosing = set(group.iterancestors()) if group is not None else set()
     for brk in earlier:
         brk_group = _group(brk.element)
         if brk.printings and (brk_group is None or brk_group in enclosing):
-            levels.append(set(brk.printings))
-            break
-    return levels
+            return units, set(brk.printings)
+    return units, set()
 
 
 def mark_scan_links(root: etree.ElementBase) -> None:
@@ -203,9 +227,8 @@ def mark_scan_links(root: etree.ElementBase) -> None:
         else:
             printings = list(dict.fromkeys(p for brk in breaks for p in sorted(brk.printings)))
             first = position[id(breaks[0].element)]
-            chosen = _choose(printings, _context(group_elements[group_id],
-                                                 reversed(candidates[:first])),
-                             editions[edition])
+            units, earlier = _context(group_elements[group_id], reversed(candidates[:first]))
+            chosen = _choose(printings, units, earlier, editions[edition])
         for brk in breaks:
             if chosen is None or not brk.printings or brk.printings & chosen:
                 brk.element.set(SCAN_LINK, "true")

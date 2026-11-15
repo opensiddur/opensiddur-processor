@@ -304,7 +304,8 @@ with no break of that printing links none there, since none of that printing's p
 inside it; a break of another printing would be the page of some other place in the book.
 Only where the edition never prints the unit around the text is the printing sharing the
 longest path with it linked, whose scan shows the same words; and where nothing around the
-text says, every printing's breaks are linked. A break is set at the first words of its
+text says, every printing's breaks are linked, as are printings named in words rather than
+paths (`ed="1949 sukkot rites"`). A break is set at the first words of its
 page, so one between paragraphs or before a heading stands at the start of the next
 paragraph.
 

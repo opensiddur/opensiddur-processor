@@ -377,6 +377,8 @@ body.os-viewing-horizontal { padding-bottom: calc(50vh + 1rem); }
   body { padding: 0; background: none; color: #000; }
   .os-toolbar, .os-dialog, .note-ref, .os-viewer { display: none !important; }
   body.os-viewing-vertical { margin-right: 0; }
+  body.os-viewing-horizontal { padding-bottom: 0; }
+  .os-viewing-vertical .par { grid-template-columns: 1fr 1fr; }
   .par { content-visibility: visible; }
 }
 
