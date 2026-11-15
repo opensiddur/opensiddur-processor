@@ -290,9 +290,93 @@ html { overflow-anchor: none; }
 .os-about h2 { font-size: 1rem; color: var(--ink); }
 .os-back-notice { margin-top: 2rem; }
 
+/* ── The scan viewer (electronic.scan_viewer; reader.js, scanViewer) ─────
+
+   Not a modal dialog: the text stays readable beside it. The window keeps scrolling -- the
+   reader's place, the links within the book and the sticky toolbar all depend on it -- and the
+   viewer is fixed over a side of it, which the body leaves free. */
+
+.os-viewer {
+  position: fixed;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  color: var(--ink);
+  border: 0 solid var(--line);
+  font-family: system-ui, sans-serif;
+}
+.os-viewer[hidden] { display: none; }
+.os-viewing-full .os-viewer { inset: 0; }
+.os-viewing-vertical .os-viewer { top: 0; bottom: 0; right: 0; width: 50vw; border-left-width: 1px; }
+.os-viewing-horizontal .os-viewer { left: 0; right: 0; bottom: 0; height: 50vh; border-top-width: 1px; }
+body.os-viewing-vertical { margin-right: 50vw; }
+body.os-viewing-horizontal { padding-bottom: calc(50vh + 1rem); }
+/* Half a window is too narrow for two columns of parallel text: one above the other. */
+.os-viewing-vertical .par { grid-template-columns: 1fr; }
+
+.os-viewer-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.os-viewer-title { flex: 1; margin: 0; font-size: 1rem; font-weight: 600; }
+.os-viewer-zoom, .os-viewer-layouts { display: inline-flex; gap: 0.2rem; }
+.os-viewer-zoom[hidden] { display: none; }
+.os-viewer-bar button, .os-viewer-new-tab {
+  min-width: 2rem;
+  padding: 0.3rem 0.5rem;
+  font: 0.95rem system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.os-viewer-bar button:disabled { opacity: 0.4; cursor: default; }
+.os-viewer-layout[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.os-viewer-close { font-size: 1.2rem; line-height: 1; }
+
+.os-viewer-stage {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: var(--paper);
+  touch-action: none;
+  cursor: grab;
+}
+.os-viewer-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.os-viewer-dragging { cursor: grabbing; }
+.os-viewer-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.os-viewer-pdf { width: 100%; height: 100%; border: 0; }
+.os-viewer-is-pdf .os-viewer-stage { cursor: default; touch-action: auto; }
+.os-viewer-image[hidden], .os-viewer-pdf[hidden], .os-viewer-message[hidden] { display: none; }
+.os-viewer-message {
+  position: absolute;
+  inset: auto 0 0 0;
+  margin: 0;
+  padding: 0.6rem;
+  text-align: center;
+  color: var(--muted);
+  background: var(--panel);
+}
+
 @media print {
   body { padding: 0; background: none; color: #000; }
-  .os-toolbar, .os-dialog, .note-ref { display: none !important; }
+  .os-toolbar, .os-dialog, .note-ref, .os-viewer { display: none !important; }
+  body.os-viewing-vertical { margin-right: 0; }
   .par { content-visibility: visible; }
 }
 

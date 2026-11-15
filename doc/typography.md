@@ -299,12 +299,17 @@ it; it is off by default, since a link does nothing on paper.
 Where an edition prints one text in several places — Birnbaum prints Ashrei at Shacharit and
 again at Minchah — the text keeps a page break for each printing, told apart by the tokens of
 `@ed` after the edition (`ed="1949 chol/minchah/opening"`). Only the breaks of the printing
-the book is using are linked: the one named by the `siddur:` unit around the text, or failing
-that the printing sharing the longest path with it, whose scan shows the same words. Where
-nothing around the text says, every printing's breaks are linked; and a text that carries the
-breaks of one printing only links them wherever it is used. A break is set at the first
-words of its page, so one between paragraphs or before a heading stands at the start of the
-next paragraph.
+the book is using are linked: the one named by the `siddur:` unit around the text. A text
+with no break of that printing links none there, since none of that printing's pages begins
+inside it; a break of another printing would be the page of some other place in the book.
+Only where the edition never prints the unit around the text is the printing sharing the
+longest path with it linked, whose scan shows the same words; and where nothing around the
+text says, every printing's breaks are linked. A break is set at the first words of its
+page, so one between paragraphs or before a heading stands at the start of the next
+paragraph.
+
+In the electronic book, [`electronic.scan_viewer`](exporter-settings.example.yaml) opens
+the scans inside the book instead of in a new tab.
 
 | Key | Type | Default | Effect |
 | --- | --- | --- | --- |

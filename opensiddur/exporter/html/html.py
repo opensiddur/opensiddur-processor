@@ -56,6 +56,8 @@ from opensiddur.exporter.html.css import css_length, typography_css, xslt_parame
 from opensiddur.exporter.html.markers import BookConditions, prepare
 from opensiddur.exporter.html.psalms import normalize as normalize_psalm_titles
 from opensiddur.exporter.metadata import ISBN_TYPES, Colophon, SourceRecord, build_colophon
+from opensiddur.exporter.scan_links import SCAN_LINK
+from opensiddur.exporter.scan_view import scan_view
 from opensiddur.exporter import notices
 from opensiddur.exporter.notices import RunKind
 from opensiddur.exporter.settings import (
@@ -587,6 +589,25 @@ def book_json(
     return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 
 
+def mark_scan_views(root: etree.ElementBase) -> None:
+    """What the scan viewer shows for each linked page break (scan_view.py), in place.
+
+    A link the viewer cannot show gets nothing, and opens its page in a new tab.
+    """
+    for pb in root.iter(f"{{{TEI_NS}}}pb"):
+        if pb.get(SCAN_LINK) != "true":
+            continue
+        view = scan_view(pb.get("facs") or "")
+        if view is not None:
+            pb.set(SCAN_KIND, view[0])
+            pb.set(SCAN_VIEW, view[1])
+
+
+#: Set by mark_scan_views on a page break the viewer can show: what it shows, and its kind.
+SCAN_VIEW = f"{{{PROCESSING_NAMESPACE}}}scan-view"
+SCAN_KIND = f"{{{PROCESSING_NAMESPACE}}}scan-kind"
+
+
 def build_book(
     compiled_file: Path,
     settings_file: Path | None = None,
@@ -610,6 +631,8 @@ def build_book(
     # The reader's settings can hide the first occurrence of a destination: label them all.
     prepare_compiled_tree(root, every_occurrence=True,
                           scan_links=scan_links_wanted(typography))
+    if settings.electronic.scan_viewer != "off":
+        mark_scan_views(root)
     book_columns = columns(root)
     book = prepare(root)
     notice = notices.distribution_notice(settings.distribution)
@@ -639,7 +662,7 @@ def build_book(
                                 editions),
         "@@BOOK@@": book_json(book, book_id(root, title), defaults, basic_settings,
                                 celebrated_purim(settings), book_columns,
-                                settings.electronic.model_dump(include={"day", "columns"}),
+                                settings.electronic.model_dump(include={"day", "columns", "scan_viewer"}),
                                 contents_depth=typography.table_of_contents.depth),
         "@@CALENDAR_JS@@": _inline(
             (ASSETS / "calendar.js").read_text(encoding="utf-8"), "</script"),

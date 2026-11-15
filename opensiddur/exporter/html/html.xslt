@@ -391,6 +391,12 @@
                 <xsl:with-param name="class"
                                 select="'pb', 'scan-link', concat('scan-link-', $scan-links)"/>
             </xsl:call-template>
+            <!-- What the scan viewer shows, when the book has one (html.py, scan_view.py):
+                 an image or a PDF. Without it the link opens in a new tab. -->
+            <xsl:if test="@p:scan-view">
+                <xsl:attribute name="data-scan-view" select="@p:scan-view"/>
+                <xsl:attribute name="data-scan-kind" select="@p:scan-kind"/>
+            </xsl:if>
         </a>
     </xsl:template>
 

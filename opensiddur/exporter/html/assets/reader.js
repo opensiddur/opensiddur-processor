@@ -9,8 +9,9 @@
  * the day goes on -- at nightfall the book moves to the next day. Without it -- no scripting, as
  * in most EPUB readers -- the page is the printed book.
  *
- * Nothing leaves the device: no network access, no tracking. The device's location is asked for
- * only when the reader asks the settings panel to use it.
+ * Nothing leaves the device: no tracking, and no network access but one -- a book with the scan
+ * viewer (electronic.scan_viewer) loads the scan of a page when the reader opens it. The
+ * device's location is asked for only when the reader asks the settings panel to use it.
  */
 (function () {
   "use strict";
@@ -267,7 +268,10 @@
   // screen, the first first: a change can hide the one at the top.
   function anchor() {
     if (!document.elementsFromPoint) return null;
-    var x = window.innerWidth / 2;
+    // The middle of the text, which the scan viewer may have moved off the window's middle.
+    var text = document.querySelector(".os-book");
+    var box = text && text.getBoundingClientRect();
+    var x = box && box.width ? box.left + box.width / 2 : window.innerWidth / 2;
     var top = (toolbar ? toolbar.offsetHeight : 0) + 8;
     var candidates = [];
     for (var y = top; y < window.innerHeight; y += 60) {
@@ -1228,4 +1232,328 @@
 
   // Passages shown or hidden above may have moved a linked one: go to it again.
   if (location.hash) settleOn(location.hash);
+
+  // ── The scan viewer ────────────────────────────────────────────────
+
+  // A link to the scan of a page (typography.markers.scan_links) opens the scan here, beside
+  // or below the text or over it, when the book has the viewer (electronic.scan_viewer). The
+  // build gave each link it can show data-scan-view, an image or a PDF (scan_view.py); any
+  // other link opens its page in a new tab, as a link with a modifier key does.
+  var viewerLayouts = ["full", "vertical", "horizontal"];
+  var viewerStart = book.start && book.start.scan_viewer;
+  if (viewerLayouts.indexOf(viewerStart) >= 0) scanViewer(viewerStart);
+
+  function scanViewer(startLayout) {
+    var viewerKey = "opensiddur:" + book.id + ":viewer";
+    var MIN_SCALE_FACTOR = 1, MAX_SCALE_FACTOR = 8, STEP = 1.25;
+    var narrow = window.matchMedia ? window.matchMedia("(max-width: 40rem)") : null;
+
+    function loadLayout() {
+      try {
+        var stored = JSON.parse(window.localStorage.getItem(viewerKey));
+        if (stored && viewerLayouts.indexOf(stored.layout) >= 0) return stored.layout;
+      } catch (e) { /* the book's own */ }
+      return startLayout;
+    }
+    function saveLayout() {
+      try {
+        window.localStorage.setItem(viewerKey, JSON.stringify({ layout: layout }));
+      } catch (e) { /* not remembered */ }
+    }
+
+    var layout = loadLayout();
+    var link = null;        // the link the viewer was opened from
+    var kind = null;        // "image" | "pdf"
+    var fit = 1, scale = 1, x = 0, y = 0;
+    var pointers = {}, pinch = null;
+
+    var title = el("h2", { class: "os-viewer-title", id: "os-viewer-title" });
+    var zoomOut = button("−", "os-viewer-zoom-out", function () { zoomBy(1 / STEP); });
+    var zoomIn = button("+", "os-viewer-zoom-in", function () { zoomBy(STEP); });
+    var fitButton = button("Fit", "os-viewer-fit", function () { fitImage(); });
+    zoomOut.setAttribute("aria-label", "Zoom out");
+    zoomIn.setAttribute("aria-label", "Zoom in");
+    fitButton.setAttribute("aria-label", "Fit the page to the viewer");
+    var layoutButtons = {};
+    var layoutNames = { full: "Full screen", vertical: "Beside the text",
+                        horizontal: "Below the text" };
+    var layoutGlyphs = { full: "▣", vertical: "◫", horizontal: "⊟" };
+    viewerLayouts.forEach(function (name) {
+      var b = button(layoutGlyphs[name], "os-viewer-layout os-viewer-layout-" + name,
+                     function () { setLayout(name, true); });
+      b.setAttribute("aria-label", layoutNames[name]);
+      b.title = layoutNames[name];
+      layoutButtons[name] = b;
+    });
+    var newTab = el("a", { class: "os-viewer-new-tab", target: "_blank", rel: "noopener",
+                           text: "↗", title: "Open in a new tab",
+                           "aria-label": "Open in a new tab" });
+    var close = button("×", "os-x os-viewer-close", function () { closeViewer(); });
+    close.setAttribute("aria-label", "Close the scan");
+    var zoomControls = el("span", { class: "os-viewer-zoom" }, [zoomOut, fitButton, zoomIn]);
+    var image = el("img", { class: "os-viewer-image", alt: "", draggable: "false" });
+    var frame = el("iframe", { class: "os-viewer-pdf", title: "Scan" });
+    var message = el("p", { class: "os-viewer-message", role: "status" });
+    var stage = el("div", { class: "os-viewer-stage", tabindex: "0" }, [image, frame, message]);
+    var viewer = el("section", {
+      class: "os-viewer", role: "dialog", "aria-labelledby": "os-viewer-title", hidden: ""
+    }, [
+      el("div", { class: "os-viewer-bar" }, [
+        title, zoomControls,
+        el("span", { class: "os-viewer-layouts" }, viewerLayouts.map(function (name) {
+          return layoutButtons[name];
+        })),
+        newTab, close
+      ]),
+      stage
+    ]);
+    document.body.appendChild(viewer);
+
+    // The layout in force: beside the text needs room for both.
+    function effectiveLayout() {
+      return layout === "vertical" && narrow && narrow.matches ? "horizontal" : layout;
+    }
+
+    function showLayout() {
+      var page = document.body;
+      viewerLayouts.forEach(function (name) {
+        page.classList.toggle("os-viewing-" + name, !viewer.hidden && effectiveLayout() === name);
+        layoutButtons[name].setAttribute("aria-pressed", String(name === layout));
+      });
+    }
+
+    // A change of layout moves the text. While the viewer is open, the reader's place is the
+    // link it was opened from: keep that where it was, or, if the viewer now covers it, a
+    // third of the way down the text left visible. Closed, keep the passage that was on screen.
+    function relayout(change) {
+      var visible = link && !viewer.hidden;
+      var opening = link && viewer.hidden;
+      var before = link ? link.getBoundingClientRect().top : 0;
+      var candidates = (visible || opening) ? null : anchor();
+      var near = holdNearRows();
+      change();
+      showLayout();
+      if (link && !viewer.hidden) {
+        var area = textArea();
+        var top = before;
+        if (effectiveLayout() === "full") top = before;
+        else if (top < area.top || top > area.bottom - 40) {
+          top = area.top + (area.bottom - area.top) / 3;
+        }
+        candidates = [{ element: link, top: top }];
+        // keepInPlace moves the link back to `top` once the layout has settled.
+        link.scrollIntoView({ block: "nearest" });
+      }
+      keepInPlace(candidates, near);
+      if (kind === "image") requestAnimationFrame(fitImage);
+    }
+
+    function setLayout(name, remember) {
+      if (name === layout && !viewer.hidden) return;
+      relayout(function () { layout = name; });
+      if (remember) saveLayout();
+    }
+
+    // The text left visible beside the viewer.
+    function textArea() {
+      var top = toolbar ? toolbar.offsetHeight : 0;
+      var bottom = window.innerHeight;
+      if (!viewer.hidden && effectiveLayout() === "horizontal") {
+        bottom = viewer.getBoundingClientRect().top;
+      }
+      return { top: top, bottom: bottom };
+    }
+
+    function revealLink() {
+      if (!link || viewer.hidden || effectiveLayout() === "full") return;
+      var area = textArea(), box = link.getBoundingClientRect();
+      if (box.top < area.top || box.bottom > area.bottom) {
+        window.scrollBy(0, box.top - (area.top + (area.bottom - area.top) / 3));
+      }
+    }
+
+    function render() {
+      image.style.transform = "translate(" + x + "px, " + y + "px) scale(" + scale + ")";
+      zoomOut.disabled = scale <= fit * MIN_SCALE_FACTOR + 1e-9;
+      zoomIn.disabled = scale >= fit * MAX_SCALE_FACTOR - 1e-9;
+    }
+
+    // The whole page in the stage, centred.
+    function fitImage() {
+      if (kind !== "image" || !image.naturalWidth) return;
+      var w = stage.clientWidth, h = stage.clientHeight;
+      fit = Math.min(w / image.naturalWidth, h / image.naturalHeight) || 1;
+      scale = fit;
+      x = (w - image.naturalWidth * scale) / 2;
+      y = (h - image.naturalHeight * scale) / 2;
+      render();
+    }
+
+    // Zoom by a factor about a point of the stage (its middle by default), which stays put.
+    function zoomBy(factor, cx, cy) {
+      if (kind !== "image") return;
+      if (cx === undefined) { cx = stage.clientWidth / 2; cy = stage.clientHeight / 2; }
+      var next = Math.min(fit * MAX_SCALE_FACTOR, Math.max(fit * MIN_SCALE_FACTOR, scale * factor));
+      var applied = next / scale;
+      x = cx - (cx - x) * applied;
+      y = cy - (cy - y) * applied;
+      scale = next;
+      render();
+    }
+
+    function panBy(dx, dy) {
+      if (kind !== "image") return;
+      x += dx;
+      y += dy;
+      render();
+    }
+
+    function openViewer(from) {
+      var wasHidden = viewer.hidden;
+      link = from;
+      kind = from.getAttribute("data-scan-kind") === "pdf" ? "pdf" : "image";
+      var address = from.getAttribute("data-scan-view");
+      var page = from.getAttribute("data-n") || "";
+      say(title, page ? "Page " + page : "Scan");
+      newTab.href = from.href;
+      viewer.classList.toggle("os-viewer-is-pdf", kind === "pdf");
+      zoomControls.hidden = kind === "pdf";
+      message.hidden = true;
+      if (kind === "pdf") {
+        image.hidden = true;
+        image.removeAttribute("src");
+        frame.hidden = false;
+        frame.src = address + "#view=FitH";
+      } else {
+        frame.hidden = true;
+        frame.removeAttribute("src");
+        image.hidden = false;
+        image.style.transform = "";
+        message.textContent = "Loading the scan…";
+        message.hidden = false;
+        image.src = address;
+      }
+      if (wasHidden) relayout(function () { viewer.hidden = false; });
+      else revealLink();
+      stage.focus({ preventScroll: true });
+    }
+
+    function closeViewer() {
+      if (viewer.hidden) return;
+      var from = link;
+      relayout(function () { viewer.hidden = true; });
+      image.removeAttribute("src");
+      frame.removeAttribute("src");
+      link = null;
+      if (from) from.focus({ preventScroll: true });
+    }
+
+    image.addEventListener("load", function () {
+      message.hidden = true;
+      fitImage();
+    });
+    image.addEventListener("error", function () {
+      if (!image.getAttribute("src")) return;
+      message.textContent = "The scan could not be loaded. ";
+      message.appendChild(el("a", { href: newTab.href, target: "_blank", rel: "noopener",
+                                    text: "Open it in a new tab" }));
+      message.hidden = false;
+    });
+
+    // Wheel: zoom about the pointer.
+    stage.addEventListener("wheel", function (event) {
+      if (kind !== "image") return;
+      event.preventDefault();
+      var box = stage.getBoundingClientRect();
+      zoomBy(event.deltaY < 0 ? STEP : 1 / STEP, event.clientX - box.left, event.clientY - box.top);
+    }, { passive: false });
+
+    // One pointer pans; two pinch.
+    function pinchState() {
+      var ids = Object.keys(pointers);
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      var box = stage.getBoundingClientRect();
+      return { distance: Math.hypot(a.x - b.x, a.y - b.y),
+               cx: (a.x + b.x) / 2 - box.left, cy: (a.y + b.y) / 2 - box.top };
+    }
+    stage.addEventListener("pointerdown", function (event) {
+      if (kind !== "image" || event.button) return;
+      stage.setPointerCapture(event.pointerId);
+      pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+      pinch = Object.keys(pointers).length === 2 ? pinchState() : null;
+      stage.classList.add("os-viewer-dragging");
+    });
+    stage.addEventListener("pointermove", function (event) {
+      var last = pointers[event.pointerId];
+      if (!last) return;
+      var count = Object.keys(pointers).length;
+      if (count === 1) panBy(event.clientX - last.x, event.clientY - last.y);
+      last.x = event.clientX;
+      last.y = event.clientY;
+      if (count === 2 && pinch) {
+        var now = pinchState();
+        zoomBy(now.distance / pinch.distance, now.cx, now.cy);
+        panBy(now.cx - pinch.cx, now.cy - pinch.cy);
+        pinch = now;
+      }
+    });
+    function lift(event) {
+      delete pointers[event.pointerId];
+      pinch = Object.keys(pointers).length === 2 ? pinchState() : null;
+      if (!Object.keys(pointers).length) stage.classList.remove("os-viewer-dragging");
+    }
+    stage.addEventListener("pointerup", lift);
+    stage.addEventListener("pointercancel", lift);
+    stage.addEventListener("dblclick", function (event) {
+      if (kind !== "image") return;
+      var box = stage.getBoundingClientRect();
+      if (scale > fit * 1.01) fitImage();
+      else zoomBy(2, event.clientX - box.left, event.clientY - box.top);
+    });
+
+    viewer.addEventListener("keydown", function (event) {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      var step = 40;
+      var handled = true;
+      switch (event.key) {
+        case "Escape": closeViewer(); break;
+        case "+": case "=": zoomBy(STEP); break;
+        case "-": case "_": zoomBy(1 / STEP); break;
+        case "0": fitImage(); break;
+        case "ArrowLeft": panBy(step, 0); break;
+        case "ArrowRight": panBy(-step, 0); break;
+        case "ArrowUp": panBy(0, step); break;
+        case "ArrowDown": panBy(0, -step); break;
+        default: handled = false;
+      }
+      if (handled) event.preventDefault();
+    });
+
+    window.addEventListener("resize", function () {
+      if (viewer.hidden) return;
+      showLayout();
+      if (kind === "image") fitImage();
+    });
+
+    // Before the book's own link handling: a scan link is not a place in the book.
+    document.addEventListener("click", function (event) {
+      if (event.defaultPrevented || event.button || event.ctrlKey || event.metaKey
+          || event.shiftKey || event.altKey) return;
+      var from = event.target.closest && event.target.closest("a.scan-link[data-scan-view]");
+      if (!from) return;
+      event.preventDefault();
+      openViewer(from);
+    });
+
+    showLayout();
+    // For the tests and the console: what the viewer is showing.
+    window.OSScanViewer = {
+      state: function () {
+        return { open: !viewer.hidden, layout: layout, shown: effectiveLayout(), kind: kind,
+                 src: kind === "pdf" ? frame.getAttribute("src") : image.getAttribute("src"),
+                 scale: scale, fit: fit, x: x, y: y };
+      },
+      zoomBy: zoomBy, panBy: panBy, fit: fitImage, setLayout: setLayout, close: closeViewer
+    };
+  }
 })();

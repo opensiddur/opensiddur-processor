@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from typing import Literal, Optional, Union
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 import yaml
 
 from opensiddur.exporter.linear import (
@@ -19,7 +19,12 @@ from opensiddur.exporter.client_settings import is_reader_supplied
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter import feature_registry
 from opensiddur.exporter.derived_settings import SettingChangeTrigger, recalculate_derived_settings
-from opensiddur.exporter.typography import RESOLVE_FONTS, NonNegativeLength, TypographyConfig
+from opensiddur.exporter.typography import (
+    RESOLVE_FONTS,
+    NonNegativeLength,
+    ScanLinkPlacement,
+    TypographyConfig,
+)
 from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.common.version import parse_requirement, processor_version, satisfies
 
@@ -167,6 +172,22 @@ class ElectronicSettings(BaseModel):
     #: "Psalm 23" / "תהלים כג" heading per psalm, replacing the edition's own -- for a book
     #: compiled from editions that title their psalms differently.
     psalm_titles: Literal["printed", "uniform"] = "printed"
+    scan_viewer: Literal["off", "full", "vertical", "horizontal"] = Field(
+        default="off",
+        description=(
+            "off | full | vertical | horizontal — whether a link to the scan of a page "
+            "(typography.markers.scan_links) opens the scan inside the book, where it can be "
+            "zoomed and panned, rather than in a new tab; and how the viewer starts: over the "
+            "whole screen, beside the text, or below it. The reader can change the layout, "
+            "and the book remembers it. Needs a network connection to show the scan."
+        ),
+    )
+
+    @field_validator("scan_viewer", mode="before")
+    @classmethod
+    def read_off_as_written(cls, v):
+        # YAML reads a bare `off` as false.
+        return "off" if v is False else v
 
 
 #: `logo` names the Open Siddur Project's logo, which the exporter carries with it.
@@ -329,6 +350,16 @@ class SettingsYaml(BaseModel):
                 "Build it with a later processor (in a checkout of main, `uv sync` updates "
                 "the version installed)")
         return v
+
+    @model_validator(mode="after")
+    def validate_scan_viewer_has_links(self) -> "SettingsYaml":
+        if (self.electronic.scan_viewer != "off"
+                and self.typography.markers.scan_links.placement is ScanLinkPlacement.NONE):
+            raise ValueError(
+                "electronic.scan_viewer opens the links to the scans, and "
+                "typography.markers.scan_links.placement is `none`, so there are none to "
+                "open. Set a placement (inline or margin), or leave the viewer off.")
+        return self
 
     @field_validator("formats")
     @classmethod

@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import tzfpy
+import yaml
 from lxml import etree
 from pydantic import ValidationError
 
@@ -710,14 +711,19 @@ class TestElectronicSettings(unittest.TestCase):
 
     def test_defaults(self):
         self.assertEqual(ElectronicSettings().model_dump(),
-                         {"day": "now", "columns": "both", "psalm_titles": "printed"})
+                         {"day": "now", "columns": "both", "psalm_titles": "printed",
+                          "scan_viewer": "off"})
+
+    def test_a_bare_off_in_yaml_is_off(self):
+        self.assertEqual("off", ElectronicSettings.model_validate(
+            yaml.safe_load("scan_viewer: off")).scan_viewer)
 
     def test_values(self):
         self.assertEqual(ElectronicSettings.model_validate({"day": "none"}).day, "none")
         self.assertEqual(
             ElectronicSettings.model_validate({"psalm_titles": "uniform"}).psalm_titles, "uniform")
         for bad in ({"day": "tomorrow"}, {"columns": "hebrew"}, {"days": "now"},
-                    {"psalm_titles": "numbered"}):
+                    {"psalm_titles": "numbered"}, {"scan_viewer": "sideways"}):
             with self.subTest(bad=bad), self.assertRaises(ValidationError):
                 ElectronicSettings.model_validate(bad)
 
@@ -901,11 +907,51 @@ class TestBuildBook(unittest.TestCase):
         self.assertNotIn("data-columns", re.search(r"<html[^>]*>", page).group(0))
 
     def test_the_book_starts_as_its_settings_file_says(self):
-        self.assertEqual(self._book(self._build())["start"], {"day": "now", "columns": "both"})
+        self.assertEqual(self._book(self._build())["start"], {"day": "now", "columns": "both", "scan_viewer": "off"})
         self.settings.write_text(SETTINGS + "electronic:\n  day: none\n  columns: primary\n",
                                  encoding="utf-8")
         self.assertEqual(self._book(self._build())["start"],
-                         {"day": "none", "columns": "primary"})
+                         {"day": "none", "columns": "primary", "scan_viewer": "off"})
+
+    _SCAN_BODY = ('<tei:p><tei:pb n="3" ed="1" '
+                  'facs="https://archive.org/download/book/page/n9_medium.jpg"/>words '
+                  '<tei:pb n="4" ed="1" facs="https://scan.example/viewer?page=4"/>more</tei:p>')
+
+    def _scan_book(self, viewer: str) -> str:
+        self.settings.write_text(
+            SETTINGS.replace("typography:\n  markers:\n",
+                             "typography:\n  markers:\n    scan_links:\n      placement: inline\n")
+            + f"electronic:\n  scan_viewer: {viewer}\n", encoding="utf-8")
+        self.compiled.write_bytes(_compiled(self._SCAN_BODY))
+        return build_book(self.compiled, self.settings, self.base)
+
+    @staticmethod
+    def _link(page: str, n: str) -> str:
+        return re.search(r'<a [^>]*data-n="%s"[^>]*>' % n, page).group(0)
+
+    def test_a_scan_viewer_book_says_what_each_link_shows(self):
+        page = self._scan_book("vertical")
+        self.assertEqual("vertical", self._book(page)["start"]["scan_viewer"])
+        archive = self._link(page, "3")
+        self.assertIn('data-scan-view="https://archive.org/download/book/page/n9.jpg"', archive)
+        self.assertIn('data-scan-kind="image"', archive)
+        # A web page the viewer cannot show keeps opening in a new tab.
+        other = self._link(page, "4")
+        self.assertNotIn("data-scan-view", other)
+        self.assertIn('target="_blank"', other)
+
+    def test_without_the_viewer_links_carry_no_view(self):
+        page = self._scan_book("off")
+        self.assertEqual("off", self._book(page)["start"]["scan_viewer"])
+        self.assertNotIn('data-scan-view="', page)
+        self.assertIn("scan-link-inline", self._link(page, "3"))
+
+    def test_the_viewer_needs_scan_links(self):
+        self.settings.write_text(SETTINGS + "electronic:\n  scan_viewer: full\n",
+                                 encoding="utf-8")
+        with self.assertRaises((SettingsError, ValidationError)) as caught:
+            self._build()
+        self.assertIn("scan_links", str(caught.exception))
 
     def test_psalms_are_retitled_only_when_the_settings_ask(self):
         with patch("opensiddur.exporter.html.html.normalize_psalm_titles") as normalize:
@@ -915,7 +961,7 @@ class TestBuildBook(unittest.TestCase):
                                      encoding="utf-8")
             book = self._book(self._build())
             normalize.assert_called_once()
-        self.assertEqual(book["start"], {"day": "now", "columns": "both"})
+        self.assertEqual(book["start"], {"day": "now", "columns": "both", "scan_viewer": "off"})
 
     def test_places_only_where_the_day_matters(self):
         self.assertEqual(self._book(self._build())["places"], [])

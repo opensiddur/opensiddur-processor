@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **A scan viewer in the electronic book.** With `electronic.scan_viewer`
+  (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
+  book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
+  panned (drag, arrow keys). The reader can switch layouts, and the book remembers the choice.
+  Archive.org and Wikisource scans are shown as images; HebrewBooks pages as their one-page PDF.
+
+### Fixed
+- Scan links no longer link pages of another printing among the pages of the one the book
+  uses. In a Minchah Amidah, a blessing printed at Minchah with no page break inside it had
+  been given the Shacharit page's link. Where the edition prints the unit around a text, only
+  that printing's breaks are linked.
+
+### Added
 - **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)
   at each page break of a scanned source edition. The symbol links to the scan of that page.
   It goes in the line or in the margin, in the PDF and in the electronic book. Where an edition

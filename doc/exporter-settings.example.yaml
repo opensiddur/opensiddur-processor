@@ -121,6 +121,11 @@ electronic:
   psalm_titles: printed  # printed: as the edition titles them | uniform: one "Psalm 23" /
                         # "תהלים כג" heading per whole psalm, for a book compiled from
                         # editions that title their psalms differently
+  scan_viewer: off       # off | full | vertical | horizontal: a link to the scan of a page
+                         # (typography.markers.scan_links) opens the scan inside the book --
+                         # over the text, beside it or below it -- to zoom and pan, rather
+                         # than in a new tab. The reader can change the layout; the book
+                         # remembers it. The scan is loaded from its site when opened.
 
 # Who distributes the book, and how to treat it once read. Every book carries the Open Siddur
 # Project's notice and statement unless its settings say otherwise; either part is `none` to
