@@ -10,6 +10,7 @@ from unittest.mock import patch
 from lxml import etree
 
 from opensiddur.exporter.refdb import ReferenceDatabase
+from opensiddur.exporter import validate_urn_references
 from opensiddur.exporter.validate_urn_references import (
     UnresolvableUrnReference,
     _format_failure,
@@ -733,6 +734,24 @@ class TestMainExitCode(unittest.TestCase):
                     "--reference-db", str(base / "ref.db"),
                 ])
             self.assertEqual(code, 0)
+
+    def test_logs_progress_by_project(self):
+        with TemporaryDirectory() as td:
+            base = Path(td)
+            project_directory = base / "project"
+            for project in ("one", "two"):
+                _write_credits(project_directory, project, "a.xml",
+                               CONTRIBUTOR + "en.wikisource.org/Prosody")
+            with patch("sys.stdout", io.StringIO()), \
+                    self.assertLogs(validate_urn_references.logger, level="INFO") as logs:
+                main([
+                    "one", "two",
+                    "--project-directory", str(project_directory),
+                    "--reference-db", str(base / "ref.db"),
+                ])
+            messages = [r.getMessage() for r in logs.records]
+            self.assertIn("URN reference validation: 2 projects", messages)
+            self.assertTrue(any("2 projects done" in m for m in messages), messages)
 
     def test_several_projects_exit_2_when_any_is_bad(self):
         with TemporaryDirectory() as td:

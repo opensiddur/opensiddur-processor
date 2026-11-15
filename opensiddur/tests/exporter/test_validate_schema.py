@@ -178,6 +178,17 @@ class TestValidateSchema(unittest.TestCase):
             self.assertEqual(len(report.failures), 1)
             self.assertEqual(report.failures[0].path.name, "bad.xml")
 
+    def test_logs_progress(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _write(base, "proj", "a.xml", VALID_DOC)
+            _write(base, "proj", "b.xml", VALID_DOC)
+            with self.assertLogs(validate_schema_module.logger, level="INFO") as logs:
+                validate_schema(project_directory=base)
+            messages = [r.getMessage() for r in logs.records]
+            self.assertIn("Schema validation: 2 files", messages)
+            self.assertTrue(any("2 files done" in m for m in messages), messages)
+
 
 class TestFormatAnnotation(unittest.TestCase):
     def test_jing_line_becomes_error_annotation(self):

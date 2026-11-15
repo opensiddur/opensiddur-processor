@@ -886,6 +886,15 @@ class TestReferenceDatabaseSync(unittest.TestCase):
         self.assertIn("proj2", projects)
         self.assertNotIn("orphaned_proj", projects)
 
+    def test_sync_projects_logs_progress(self):
+        self._create_xml_file("proj1", "doc1.xml", ["urn:x-opensiddur:test:1"])
+        self._create_xml_file("proj2", "doc2.xml", ["urn:x-opensiddur:test:2"])
+        with self.assertLogs(refdb.logger, level="INFO") as logs:
+            self.db.sync_projects(self.project_dir)
+        messages = [r.getMessage() for r in logs.records]
+        self.assertIn("Reference database sync: 2 projects", messages)
+        self.assertTrue(any("2 projects done" in m for m in messages), messages)
+
     def test_sync_projects_empty_directory(self):
         """Test syncing with empty project directory."""
         # Add some data to database

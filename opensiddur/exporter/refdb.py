@@ -16,6 +16,7 @@ from lxml import etree
 from lxml.etree import ElementBase
 from pydantic import BaseModel
 from opensiddur.common.constants import PROJECT_DIRECTORY, INDEX_DB_DIRECTORY
+from opensiddur.common.progress import progress
 
 logger = logging.getLogger(__name__)
 
@@ -1061,7 +1062,8 @@ class ReferenceDatabase:
         total_files_removed = 0
         project_results = {}
         
-        for project in sorted(disk_projects):
+        for project in progress(sorted(disk_projects), "Reference database sync",
+                                unit="project", logger=logger):
             result = self.sync_project(project, project_directory)
             project_results[project] = result
             total_added += result.get('added', 0)
@@ -1186,4 +1188,6 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover
 
 
 if __name__ == '__main__':  # pragma: no cover
+    # Only the CLI turns the progress log on; under the test runner the records go nowhere.
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     main()

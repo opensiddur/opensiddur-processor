@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
   panned (drag, arrow keys). The reader can switch layouts, and the book remembers the choice.
   Archive.org and Wikisource scans are shown as images; HebrewBooks pages as their one-page PDF.
+- Schema validation, the reference-database sync and URN reference validation log their
+  progress to stderr: how many files or projects are done, the time elapsed and an estimate of
+  the time left, at most every 15 seconds. A slow step in the projects check no longer looks
+  the same as a hung one.
 
 ### Fixed
 - Scan links no longer link pages of another printing among the pages of the one the book

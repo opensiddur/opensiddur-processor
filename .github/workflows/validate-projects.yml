@@ -29,6 +29,10 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      # The validators log progress to stderr, which is unbuffered; without this their
+      # stdout reports are block-buffered and land in the log out of order with it.
+      PYTHONUNBUFFERED: '1'
 
     steps:
       - name: Install Jing (RelaxNG validator)

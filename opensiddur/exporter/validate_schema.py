@@ -38,6 +38,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import logging
 import os
 import re
 import tempfile
@@ -50,9 +51,12 @@ from opensiddur.exporter.refdb import file_hash
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.common.progress import progress
 from opensiddur.importer.util import validation as _validation
 from opensiddur.importer.util.constants import SCHEMA_RNG_PATH, SCHEMA_SCH_XSLT_PATH
 from opensiddur.importer.util.validation import relaxng_validate, schematron_validate
+
+logger = logging.getLogger(__name__)
 
 #: A cleaned Jing line: ``XML:<line>:<col>: <level>: <message>`` (the temp path is replaced
 #: with the literal ``XML`` by ``relaxng_validate``).
@@ -252,10 +256,11 @@ def validate_files(
     paths: list[Path], cache: Optional[ValidationCache] = None
 ) -> list[FileResult]:
     """Validate each of ``paths``, skipping any whose content ``cache`` records as valid."""
+    tracked = progress(paths, "Schema validation", logger=logger)
     if cache is None:
-        return [validate_file(path) for path in paths]
+        return [validate_file(path) for path in tracked]
     results = []
-    for path in paths:
+    for path in tracked:
         try:
             file_hash = _file_hash(path)
         except OSError:
@@ -308,6 +313,7 @@ def validate_schema(
     results = validate_files(files, cache)
     # Keep the hashes of every file that exists now, not only the ones validated in this run:
     # a PR run validates only the projects it touched and must not drop the rest.
+    logger.info("Updating the schema-validation cache: %s", cache_path)
     current = {_file_hash(path) for path in Path(project_directory).glob("*/*.xml")}
     current |= {_file_hash(r.path) for r in results if r.ok and Path(r.path).is_file()}
     cache.save(cache_path, keep=current)
@@ -400,4 +406,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 
 if __name__ == "__main__":  # pragma: no cover
+    # Only the CLI turns the progress log on. Tests call main() directly, so under the test
+    # runner the records go nowhere.
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     raise SystemExit(main())

@@ -10,6 +10,7 @@ the registry rather than against the corpus.
 from __future__ import annotations
 
 import argparse
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional
@@ -17,6 +18,7 @@ from typing import Iterable, Optional
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.common.progress import progress
 from opensiddur.common.urn_registry import (
     ROSTERED_CONTRIBUTOR_NAMESPACES,
     check_contributor_urn,
@@ -26,6 +28,8 @@ from opensiddur.common.urn_registry import (
 from opensiddur.exporter.refdb import INDEX_DB_FILE, ReferenceDatabase
 from opensiddur.exporter.urn import ResolvedUrnRange, UrnResolver, coarsen
 from opensiddur.exporter.xml_id_ref import parse_file_fragment_ref, resolve_file_fragment_ref
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -402,7 +406,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     reference_db_path = Path(args.reference_db)
 
     status = 0
-    for project in args.projects:
+    for project in progress(args.projects, "URN reference validation", unit="project",
+                            logger=logger):
         failures = validate_project_urn_references(
             project,
             project_directory=project_directory,
@@ -433,5 +438,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 
 if __name__ == "__main__":  # pragma: no cover
+    # Only the CLI turns the progress log on. Tests call main() directly, so under the test
+    # runner the records go nowhere.
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     raise SystemExit(main())
 
