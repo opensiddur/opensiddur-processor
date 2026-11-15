@@ -1414,11 +1414,18 @@
       render();
     }
 
+    // What the viewer may load: a web address or an embedded image, never script.
+    // scan_view.py makes no other kind; this keeps a hand-edited book from running one.
+    function scanAddress(from) {
+      var address = from.getAttribute("data-scan-view") || "";
+      return /^(https?:\/\/|data:image\/)/i.test(address) ? address : null;
+    }
+
     function openViewer(from) {
       var wasHidden = viewer.hidden;
       link = from;
       kind = from.getAttribute("data-scan-kind") === "pdf" ? "pdf" : "image";
-      var address = from.getAttribute("data-scan-view");
+      var address = scanAddress(from);
       var page = from.getAttribute("data-n") || "";
       say(title, page ? "Page " + page : "Scan");
       newTab.href = from.href;
@@ -1576,7 +1583,7 @@
       if (event.defaultPrevented || event.button || event.ctrlKey || event.metaKey
           || event.shiftKey || event.altKey) return;
       var from = event.target.closest && event.target.closest("a.scan-link[data-scan-view]");
-      if (!from) return;
+      if (!from || !scanAddress(from)) return;
       event.preventDefault();
       openViewer(from);
     });

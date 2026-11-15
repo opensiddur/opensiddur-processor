@@ -39,7 +39,7 @@ def scan_view(facs: str) -> Optional[tuple[ScanKind, str]]:
         if page:
             # The full-size image, not the medium one the link shows: the reader zooms in.
             return "image", f"https://archive.org{page.group(1)}.jpg"
-    if host.endswith("wikisource.org"):
+    if host == "wikisource.org" or host.endswith(".wikisource.org"):
         page = _WIKISOURCE_PAGE.match(parts.path)
         if page:
             return "image", wikimedia_page_image(unquote(page.group(1)), int(page.group(2)))

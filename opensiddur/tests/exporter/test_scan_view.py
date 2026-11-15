@@ -48,6 +48,10 @@ class TestScanView(unittest.TestCase):
         self.assertIsNone(scan_view("ftp://scan.example/page.png"))
         self.assertIsNone(scan_view(""))
 
+    def test_only_wikisource_itself_is_read_as_wikisource(self):
+        self.assertIsNone(scan_view("https://notwikisource.org/wiki/Page:Some_Scan.djvu/1"))
+        self.assertIsNotNone(scan_view("https://wikisource.org/wiki/Page:Some_Scan.djvu/1"))
+
 
 if __name__ == "__main__":
     unittest.main()
