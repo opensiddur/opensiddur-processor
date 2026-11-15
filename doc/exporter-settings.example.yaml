@@ -251,6 +251,11 @@ typography:
       block: rule                  # rule | brackets | none
       rule_width: "25%"
       rule_thickness: "0.4pt"
+    # For a book read on a screen: a symbol at each page break of a scanned source
+    # edition that opens the scan of that page.
+    scan_links:
+      placement: none              # none | inline | margin
+      symbol: "↗"                  # set in the Latin family
 
   parallel:
     layout: pairs            # pairs: two columns on a page. pages: facing pages,

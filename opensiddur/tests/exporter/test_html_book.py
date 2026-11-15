@@ -1117,3 +1117,78 @@ class TestNotesAndDirection(unittest.TestCase):
     def test_hebrew_is_right_to_left(self):
         main = _render('<tei:p><tei:foreign xml:lang="he">שמע</tei:foreign></tei:p>')
         self.assertEqual(main.xpath("//*[@lang='he']")[0].get("dir"), "rtl")
+
+
+class TestScanLinks(unittest.TestCase):
+    """typography.markers.scan_links in the electronic book."""
+
+    _URL = "https://www.hebrewbooks.org/pdfpager.aspx?req=4909&amp;pgnum=6"
+
+    def _pb(self, marked: bool = True) -> str:
+        mark = ' p:scan-link="true"' if marked else ""
+        return f'<tei:pb n="3v" ed="1822" facs="{self._URL}"{mark}/>'
+
+    def test_a_marked_break_links_to_its_scan(self):
+        out = _render(f"<tei:p>{self._pb()}words</tei:p>", **{"scan-links": "margin"})
+        link = out.find(".//h:a[@data-n='3v']", NS)
+        self.assertEqual("https://www.hebrewbooks.org/pdfpager.aspx?req=4909&pgnum=6",
+                         link.get("href"))
+        self.assertEqual(["pb", "scan-link", "scan-link-margin"], _classes(link))
+        self.assertEqual("Scan of page 3v", link.get("aria-label"))
+        self.assertEqual("_blank", link.get("target"))
+        self.assertEqual("noopener", link.get("rel"))
+        # The symbol is CSS's, so the link has no words of its own.
+        self.assertEqual("", "".join(link.itertext()))
+
+    def test_without_scan_links_the_break_stays_hidden(self):
+        out = _render(f"<tei:p>{self._pb()}words</tei:p>")
+        self.assertIsNone(out.find(".//h:a[@data-n='3v']", NS))
+        self.assertIsNotNone(out.find(".//h:span[@class='pb']", NS))
+
+    def test_an_unmarked_break_stays_hidden(self):
+        out = _render(f"<tei:p>{self._pb(marked=False)}words</tei:p>",
+                      **{"scan-links": "inline"})
+        self.assertIsNone(out.find(".//h:a[@data-n='3v']", NS))
+
+    def test_a_column_holding_only_a_link_is_still_empty(self):
+        out = _render(
+            '<p:parallel column-order="primary_first">'
+            f'<p:parallelItem role="primary" xml:lang="he">{self._pb()}</p:parallelItem>'
+            '<p:parallelItem role="parallel" xml:lang="en"><tei:p>Words</tei:p></p:parallelItem>'
+            "</p:parallel>", **{"scan-links": "inline"})
+        column = out.find(".//h:div[@lang='he']", NS)
+        self.assertIn("col-empty", _classes(column))
+
+    def test_the_parameter_follows_the_setting(self):
+        typography = TypographyConfig.model_validate(
+            {"markers": {"scan_links": {"placement": "inline"}}})
+        self.assertEqual("inline", xslt_parameters(typography)["scan-links"])
+        self.assertEqual("none", xslt_parameters(TypographyConfig())["scan-links"])
+
+
+class TestScanLinkCss(unittest.TestCase):
+    def _css(self, **scan_links) -> str:
+        return typography_css(TypographyConfig.model_validate(
+            {"markers": {"scan_links": scan_links}}))
+
+    def test_none_draws_no_symbol(self):
+        css = typography_css(TypographyConfig())
+        self.assertNotIn(".scan-link::before", css)
+        self.assertNotIn(".scan-link-margin", css)
+
+    def test_the_symbol_is_drawn_in_the_latin_family(self):
+        css = self._css(placement="inline", symbol='"x')
+        self.assertIn('.scan-link::before { content: "\\"x"; font-family: var(--font-latin); }',
+                      css)
+        self.assertIn(".scan-link { display: inline;", css)
+
+    def test_inline_has_no_margin(self):
+        self.assertNotIn(".scan-link-margin", self._css(placement="inline"))
+
+    def test_margin_is_kept_inside_the_row_and_only_on_wide_screens(self):
+        css = self._css(placement="margin")
+        margin = css[css.index("@media (min-width: 40.001rem) { .os-book"):]
+        self.assertIn(".par { padding-inline: 1.6em; }", margin)
+        self.assertIn(".col { position: relative; --scan-link-offset: -1.6em; }", margin)
+        self.assertIn(".scan-link-margin { position: absolute; "
+                      "inset-inline-start: var(--scan-link-offset); }", margin)

@@ -42,6 +42,7 @@ from opensiddur.exporter.cli_common import (  # noqa: E402
     add_settings_arguments,
     load_output_settings,
     prepare_compiled_tree,
+    scan_links_wanted,
 )
 from opensiddur.exporter.tex.typography_tex import (  # noqa: E402
     build_typography_preamble,
@@ -345,6 +346,7 @@ def typography_parameters(typography: TypographyConfig, root: etree._Element) ->
         "layout": typography.parallel.layout.value,
         "notes-placement": typography.notes.placement.value,
         "notes-mark": typography.notes.mark.value,
+        "scan-links": typography.markers.scan_links.placement.value,
         "table-of-contents": typography.table_of_contents.enabled,
         "table-of-contents-depth": typography.table_of_contents.depth,
         "bookmarks-from": typography.bookmarks.from_.value,
@@ -407,7 +409,7 @@ def transform_xml_to_tex(
 
     parsed = etree.parse(input_file)
     root = parsed.getroot()
-    prepare_compiled_tree(root)
+    prepare_compiled_tree(root, scan_links=scan_links_wanted(typography))
     input_xml = etree.tostring(root, encoding="unicode")
 
     result = xslt_transform_string(

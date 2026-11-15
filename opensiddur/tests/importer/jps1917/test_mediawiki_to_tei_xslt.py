@@ -105,3 +105,32 @@ class TestRepeatedVerse(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPageBreaks(unittest.TestCase):
+    """A page break records its printed number and links to its page of the scan."""
+
+    def _breaks(self, pages: str, **params) -> list:
+        outputs = xslt_transform_string(
+            MEDIAWIKI_TO_TEI_XSLT, f"<mediawikis>{pages}</mediawikis>",
+            multiple_results=True,
+            xslt_params={"book_name": "genesis", "is_section": False, **params})
+        root = etree.fromstring(f"<root xmlns:tei='{TEI_NS}'>{outputs['']}</root>")
+        return root.findall(".//tei:pb", NS)
+
+    _PAGE = '<mediawiki scan="25">Text<noinclude><c>3</c></noinclude></mediawiki>'
+
+    def test_a_page_links_to_its_scan(self):
+        pb, = self._breaks(self._PAGE, facs_prefix="https://scan.example/Page:Book/")
+        self.assertEqual("3", pb.get("n"))
+        self.assertEqual("1917", pb.get("ed"))
+        self.assertEqual("https://scan.example/Page:Book/25", pb.get("facs"))
+
+    def test_without_a_prefix_there_is_no_link(self):
+        pb, = self._breaks(self._PAGE)
+        self.assertIsNone(pb.get("facs"))
+
+    def test_a_page_with_no_scan_number_has_no_link(self):
+        pb, = self._breaks('<mediawiki>Text<noinclude><c>3</c></noinclude></mediawiki>',
+                           facs_prefix="https://scan.example/Page:Book/")
+        self.assertIsNone(pb.get("facs"))

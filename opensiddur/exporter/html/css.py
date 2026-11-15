@@ -20,6 +20,7 @@ from opensiddur.exporter.typography import (
     Alignment,
     ConditionalBlock,
     NamedSize,
+    ScanLinkPlacement,
     TypographyConfig,
     Visibility,
 )
@@ -78,6 +79,7 @@ STYLE_SELECTORS = {
     "instruction": ".rubric",
     "note": ".note",
     "note_mark": ".note-ref, .note-number",
+    "scan_link": ".scan-link",
     "section_separator": ".section-separator",
     "list_label": ".list > .label",
     # html.xslt gives a tei:hi a rend-* class per token; the superscript's raise is
@@ -161,6 +163,7 @@ def xslt_parameters(typography: TypographyConfig) -> dict[str, str | bool]:
         "block": conditional.block.value,
         "notes-mark": typography.notes.mark.value,
         "notes-visible": typography.notes.placement.value != "none",
+        "scan-links": typography.markers.scan_links.placement.value,
     }
 
 
@@ -216,4 +219,38 @@ def typography_css(typography: TypographyConfig) -> str:
         rules.append(".ch { display: none; }")
     if conditional.block != ConditionalBlock.RULE:
         rules.append(".cm-block .cm-br { border: 0; width: auto; }")
+    rules += _scan_link_css(markers.scan_links)
     return "\n".join(rules) + "\n"
+
+
+#: The width of the margin a scan link is set in, beside the column it belongs to.
+SCAN_LINK_GUTTER = "1.6em"
+
+
+def _scan_link_css(scan_links) -> list[str]:
+    """The symbol of a link to the scan of a page, and where it stands.
+
+    In the margin, it stands at the start of its line's column -- the right of a Hebrew
+    column, the left of an English one: in a parallel row each is that column's outer
+    edge. A row lays out only its own box (``content-visibility`` in reader.css), so the
+    margin is kept inside the row. A narrow screen has no margin to spare: the symbol
+    stands in the line.
+    """
+    if scan_links.placement is ScanLinkPlacement.NONE:
+        return []
+    rules = [
+        ".scan-link { display: inline; text-decoration: none; color: inherit; }",
+        f".scan-link::before {{ content: {css_string(scan_links.symbol)}; "
+        "font-family: var(--font-latin); }",
+    ]
+    if scan_links.placement is ScanLinkPlacement.MARGIN:
+        rules.append(
+            "@media (min-width: 40.001rem) { "
+            f".os-book {{ position: relative; padding-inline-start: {SCAN_LINK_GUTTER}; "
+            "--scan-link-offset: 0; } "
+            f".par {{ padding-inline: {SCAN_LINK_GUTTER}; }} "
+            f".col {{ position: relative; --scan-link-offset: -{SCAN_LINK_GUTTER}; }} "
+            ".scan-link-margin { position: absolute; "
+            "inset-inline-start: var(--scan-link-offset); } }"
+        )
+    return rules

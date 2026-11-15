@@ -253,6 +253,8 @@ _EXPECTED: dict[str, list[Expect]] = {
         _preamble(lambda v: rf"\rule{{{_fraction(v)}\hsize}}")
     ],
     "markers.conditional.rule_thickness": [_preamble(lambda v: rf"\hsize}}{{{v}}}\hss")],
+    "markers.scan_links.placement": [_parameter("scan-links")],
+    "markers.scan_links.symbol": [_preamble(lambda v: rf"\newcommand{{\OSScanLinkSymbol}}{{{v}}}")],
     "lists.item_indent": [_preamble(lambda v: rf"\newcommand{{\OSListIndent}}{{{v}}}")],
     "parallel.layout": [_parameter("layout")],
     "parallel.column_width": [
@@ -314,6 +316,7 @@ _ROLES: dict[str, tuple[str, Optional[str]]] = {
     "note": (r"\notenote", None),
     "note_mark": (r"\OSInterlinearNotemark", None),
     "line_number": (r"\linenumrep", None),
+    "scan_link": (r"\OSScanLinkStyle", None),
     "section_separator": (r"\OSSectionSeparatorStyle", r"\begin{center}"),
     "list_label": (r"\OSListLabelStyle", None),
     "highlight_italic": (r"\OSHighlightItalic", None),

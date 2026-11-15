@@ -730,3 +730,63 @@ class TestLists(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestScanLinks(unittest.TestCase):
+    """markers.scan_links: the symbol, in the line or in the margin."""
+
+    def _scan(self, placement: str, has_parallel: bool = False, **settings) -> str:
+        data = {"markers": {"scan_links": {"placement": placement}}, **settings}
+        tex = _tex(data, has_parallel)
+        return tex[tex.index("% --- Scan links"):]
+
+    def test_the_symbol_is_set_in_the_latin_family(self):
+        tex = _tex({})
+        self.assertIn(r"\newcommand{\OSScanLinkSymbol}{↗}", tex)
+        self.assertIn(r"\newcommand{\OSScanLinkStyle}[1]{{\textdir TLT"
+                      r"\foreignlanguage{english}{\normalfont\small #1}}}", tex)
+
+    def test_the_symbol_is_escaped(self):
+        tex = _tex({"markers": {"scan_links": {"symbol": "#"}}})
+        self.assertIn(r"\newcommand{\OSScanLinkSymbol}{\#}", tex)
+
+    def test_the_link_hides_its_border(self):
+        self.assertIn(r"\newcommand{\OSScanLink}[1]{\leavevmode{\hypersetup{hidelinks}"
+                      r"\href{#1}{\OSScanLinkStyle{\OSScanLinkSymbol}}}}", self._scan("inline"))
+
+    def test_inline_needs_no_positions(self):
+        tex = self._scan("inline")
+        self.assertIn(r"\newcommand{\OSScanLinkMargin}[1]{\OSScanLink{#1}}", tex)
+        self.assertNotIn("zref", tex)
+
+    def test_margin_saves_the_place_and_moves_out_to_the_edge(self):
+        tex = self._scan("margin")
+        self.assertIn(r"\usepackage{zref-savepos,zref-abspage}", tex)
+        self.assertIn(r"\zsavepos{\OSScanLink@label}", tex)
+        self.assertIn(r"\hbox dir TLT to \z@{\kern\dimexpr\OSScanLink@edge"
+                      r"-\zposx{\OSScanLink@label}sp\relax", tex)
+
+    def test_margin_is_the_line_numbers(self):
+        self.assertIn(r"\OSScanLink@resolve{outer}%",
+                      self._scan("margin", line_numbers={"margin": "outer"},
+                                 page={"binding": "left"}))
+
+    def test_margin_follows_a_right_binding(self):
+        tex = self._scan("margin", line_numbers={"margin": "inner"},
+                         page={"binding": "right"})
+        self.assertIn(r"\OSScanLink@resolve{outer}%", tex)
+
+    def test_margin_clears_shown_line_numbers(self):
+        self.assertIn(r"\newcommand{\OSScanLinkSep}{\dimexpr\linenumsep+2em\relax}",
+                      self._scan("margin"))
+        self.assertIn(r"\newcommand{\OSScanLinkSep}{1em}",
+                      self._scan("margin", line_numbers={"enabled": False}))
+
+    def test_paired_columns_use_their_outer_sides(self):
+        tex = self._scan("margin", has_parallel=True, parallel={"layout": "pairs"})
+        self.assertIn(r"\ifl@dpairing\ifledRcol\OSScanLink@resolve{right}"
+                      r"\else\OSScanLink@resolve{left}\fi\else", tex)
+
+    def test_a_single_stream_uses_the_line_number_margin_alone(self):
+        tex = self._scan("margin", has_parallel=False)
+        self.assertNotIn(r"\ifl@dpairing", tex)

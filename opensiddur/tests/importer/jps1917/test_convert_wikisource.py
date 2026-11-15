@@ -727,6 +727,27 @@ class TestProcessMediawiki(unittest.TestCase):
     @patch('opensiddur.importer.jps1917.convert_wikisource.mediawiki_xml_to_tei')
     @patch('opensiddur.importer.jps1917.convert_wikisource.create_processor')
     @patch('opensiddur.importer.jps1917.convert_wikisource.get_page')
+    def test_process_mediawiki_records_each_scan_page(self, mock_get_page, mock_create_processor,
+                                                      mock_mediawiki_xml_to_tei):
+        """Each page is marked with its number in the scan, for its page break's link."""
+        mock_get_page.return_value = MagicMock(content="text")
+        mock_create_processor.return_value.process_wikitext.side_effect = [
+            MagicMock(xml_content="<mediawiki>one</mediawiki>"),
+            MagicMock(xml_content="<mediawiki>two</mediawiki>"),
+        ]
+        mock_mediawiki_xml_to_tei.return_value = {"front": "", "body": "", "standOff": ""}
+
+        process_mediawiki(25, 26, "body")
+
+        call_args = mock_mediawiki_xml_to_tei.call_args
+        self.assertIn('<mediawiki scan="25">one</mediawiki>', call_args[0][0])
+        self.assertIn('<mediawiki scan="26">two</mediawiki>', call_args[0][0])
+        self.assertEqual("https://en.wikisource.org/wiki/Page:JPS-1917-Universal.djvu/",
+                         call_args[1]["xslt_params"]["facs_prefix"])
+
+    @patch('opensiddur.importer.jps1917.convert_wikisource.mediawiki_xml_to_tei')
+    @patch('opensiddur.importer.jps1917.convert_wikisource.create_processor')
+    @patch('opensiddur.importer.jps1917.convert_wikisource.get_page')
     def test_process_mediawiki_multiple_pages(self, mock_get_page, mock_create_processor, mock_mediawiki_xml_to_tei):
         """Test processing multiple pages."""
         # Setup mocks for multiple pages
@@ -2024,8 +2045,13 @@ class TestTitlePage(unittest.TestCase):
         self.assertIn("<tei:pubPlace>PHILADELPHIA</tei:pubPlace>", TITLE_PAGE)
         # The copyright verso is its own page and its own title page.
         self.assertEqual(TITLE_PAGE.count("<tei:titlePage"), 2)
-        self.assertIn('<tei:pb n="i"/>', TITLE_PAGE)
-        self.assertIn('<tei:pb n="ii"/>', TITLE_PAGE)
+        # Each page links to its scan: the title leaf is scan pages 7 and 8.
+        self.assertIn('<tei:pb n="i" ed="1917" '
+                      'facs="https://en.wikisource.org/wiki/Page:JPS-1917-Universal.djvu/7"/>',
+                      TITLE_PAGE)
+        self.assertIn('<tei:pb n="ii" ed="1917" '
+                      'facs="https://en.wikisource.org/wiki/Page:JPS-1917-Universal.djvu/8"/>',
+                      TITLE_PAGE)
 
     @patch('opensiddur.importer.jps1917.convert_wikisource.validate_and_write_tei_file')
     @patch('opensiddur.importer.jps1917.convert_wikisource.tei_file')

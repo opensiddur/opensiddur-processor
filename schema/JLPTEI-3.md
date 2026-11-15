@@ -547,6 +547,11 @@ not overload `@corresp`, which is reserved for alignment:
 <tei:pb n="3v" ed="1822" facs="https://www.hebrewbooks.org/pdfpager.aspx?req=4909&amp;pgnum=6"/>
 ```
 
+An output stage can set a link to the scan at each page break (`typography.markers.scan_links`).
+Where an edition prints one text in several places, `@ed` names which printing each break belongs
+to, after the edition (see `specs/SIDDUR_URN_SCHEME.md`), and only the breaks of the printing a
+book uses are linked.
+
 `@facs` is available on every element via `att.global.facs`. The TEI `transcr` module is not
 included in this schema, so `tei:facsimile`, `tei:surface` and `tei:graphic` are unavailable and
 `@facs` takes an absolute URL rather than a local pointer. Record the scan on the `tei:bibl` of

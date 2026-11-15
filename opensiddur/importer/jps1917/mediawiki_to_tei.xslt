@@ -14,6 +14,9 @@
     <xsl:param name="wrapper_div_type" as="xs:string?"/>
     <!-- book file/reference name-->
     <xsl:param name="book_name" as="xs:string?"/>
+    <!-- The scan page a page break links to is this followed by its number in the scan,
+         which convert_wikisource.py records on each page as @scan. -->
+    <xsl:param name="facs_prefix" as="xs:string?"/>
 
     <!-- is the book section-delimited? -->
     <xsl:param name="is_section" as="xs:boolean?"/>
@@ -221,7 +224,11 @@
             noinclude[last()]/c, 
             following-sibling::mediawiki[1]/noinclude[last()]/c/number() - 1,
             preceding-sibling::mediawiki[1]/noinclude[last()]/c/number() + 1)[1]"/>
-        <tei:pb n="{$page-number}"/>
+        <tei:pb n="{$page-number}" ed="1917">
+            <xsl:if test="$facs_prefix and @scan">
+                <xsl:attribute name="facs" select="concat($facs_prefix, @scan)"/>
+            </xsl:if>
+        </tei:pb>
         <xsl:apply-templates />  
     </xsl:template>
 

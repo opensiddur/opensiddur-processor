@@ -5159,3 +5159,91 @@ class TestInlineRoles(unittest.TestCase):
             with self.subTest(token=token):
                 body = self._body(f'<tei:p><tei:hi rend="{token}">x</tei:hi></tei:p>')
                 self.assertIn(r"\textsuperscript{\OSHighlightSuperscript{x}}", body)
+
+
+class TestScanLinks(unittest.TestCase):
+    """A page break marked by scan_links.py links to the scan of its page."""
+
+    _URL = "https://www.hebrewbooks.org/pdfpager.aspx?req=4909&amp;pgnum=6"
+
+    def _document(self, body: str) -> str:
+        return (
+            '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" '
+            'xmlns:p="http://jewishliturgy.org/ns/processing">'
+            f"<tei:text><tei:body>{body}</tei:body></tei:text></tei:TEI>")
+
+    def _paragraph(self, marked: bool = True) -> str:
+        mark = ' p:scan-link="true"' if marked else ""
+        return self._document(
+            f'<tei:p>Before <tei:pb n="3v" ed="1822" facs="{self._URL}"{mark}/>after.</tei:p>')
+
+    def _out(self, placement: str, marked: bool = True) -> str:
+        """The document body: the preamble defines the macros, by name."""
+        return transform(self._paragraph(marked),
+                         typography={"markers": {"scan_links": {"placement": placement}}}
+                         ).split(r"\begin{document}")[1]
+
+    def test_inline(self):
+        self.assertIn(
+            r"Before \OSScanLink{https://www.hebrewbooks.org/pdfpager.aspx?req=4909\&pgnum=6}"
+            "after.", self._out("inline"))
+
+    def test_margin(self):
+        self.assertIn(r"\OSScanLinkMargin{https://www.hebrewbooks.org/pdfpager.aspx?"
+                      r"req=4909\&pgnum=6}after.", self._out("margin"))
+
+    def test_none(self):
+        out = self._out("none")
+        self.assertNotIn(r"\OSScanLink{", out)
+        self.assertNotIn(r"\OSScanLinkMargin{", out)
+        self.assertIn("Before after.", out)
+
+    def test_an_unmarked_break_sets_nothing(self):
+        out = self._out("inline", marked=False)
+        self.assertNotIn(r"\OSScanLink{", out)
+
+    def test_a_reference_url_escapes_its_ampersand(self):
+        out = transform(self._document(
+            f'<tei:p><tei:ref target="{self._URL}">the scan</tei:ref></tei:p>'))
+        self.assertIn(r"\href{https://www.hebrewbooks.org/pdfpager.aspx?req=4909\&pgnum=6}",
+                      out)
+
+    def test_a_title_page_link_stands_in_the_line(self):
+        xml = (
+            '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" '
+            'xmlns:p="http://jewishliturgy.org/ns/processing"><tei:text><tei:front>'
+            f'<tei:pb n="i" facs="{self._URL}" p:scan-link="true"/>'
+            '<tei:titlePage><tei:docTitle><tei:titlePart type="main">Title</tei:titlePart>'
+            "</tei:docTitle></tei:titlePage></tei:front>"
+            "<tei:body><tei:p>Body</tei:p></tei:body></tei:text></tei:TEI>")
+        from opensiddur.exporter.scan_links import mark_scan_links
+        root = etree.fromstring(xml)
+        mark_scan_links(root)
+        out = transform(etree.tostring(root, encoding="unicode"),
+                        typography={"markers": {"scan_links": {"placement": "margin"}}})
+        body = out.split(r"\begin{document}")[1]
+        self.assertIn(r"\OSTitleMain{\OSScanLink{" + self._URL.replace("&amp;", r"\&")
+                      + "}Title}", body)
+        self.assertNotIn(r"\OSScanLinkMargin{", body)
+
+    def test_a_link_at_the_end_of_a_column_keeps_the_columns_paired(self):
+        """Moved up to the next words, a page break opens no paragraph of its own."""
+        from opensiddur.exporter.scan_links import mark_scan_links
+
+        def block(he: str, en: str) -> str:
+            return ('<p:parallel column-order="primary_first">'
+                    f'<p:parallelItem role="primary" xml:lang="he">{he}</p:parallelItem>'
+                    f'<p:parallelItem role="parallel" xml:lang="en">{en}</p:parallelItem>'
+                    "</p:parallel>")
+
+        root = etree.fromstring(self._document(
+            block('<tei:p>שלום</tei:p><tei:pb n="2" facs="https://scan.example/2"/>',
+                  "<tei:p>Peace</tei:p>")
+            + block("<tei:p>עולם</tei:p>", "<tei:p>World</tei:p>")))
+        mark_scan_links(root)
+        out = transform(etree.tostring(root, encoding="unicode"),
+                        typography={"markers": {"scan_links": {"placement": "inline"}}})
+        self.assertIn(r"\OSScanLink{https://scan.example/2}עולם", out)
+        left = out.split(r"\begin{Leftside}")[1].split(r"\end{Leftside}")[0]
+        right = out.split(r"\begin{Rightside}")[1].split(r"\end{Rightside}")[0]
+        self.assertEqual(left.count(r"\pstart"), right.count(r"\pstart"))

@@ -230,6 +230,11 @@ that is the mechanism:
 A break falling at the same point in two printings names both:
 `ed="1949 chol/shacharit/amidah chol/minchah/amidah"`.
 
+The output stages read these tokens to choose which breaks link to the scan
+(`opensiddur/exporter/scan_links.py`): those of the printing named by the `siddur:` unit the
+book sets the text in. The tokens are compared as a set, so an older sigil written in words
+with no slash (`ed="1949 sukkot rites"`) still counts as one printing.
+
 **A text needs its own file per context only when the words differ.** Where they are
 identical, the second unit transcludes the same URN, and its page breaks sit beside the
 first unit's in the one text, each under its own sigil. `tei:biblScope unit="pages"` in

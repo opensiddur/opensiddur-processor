@@ -78,6 +78,11 @@
     <!-- numeric | alpha | roman | symbol — the series note marks are drawn
          from. The serial is known here, so the conversion is done here. -->
     <xsl:param name="notes-mark" as="xs:string" required="yes"/>
+    <!-- none | inline | margin: where the link from a page break of the source edition to
+         the scan of its page is set (typography.markers.scan_links). The page breaks that
+         link are those marked p:scan-link by the pre-pass (scan_links.py), which also moves
+         each one up to the words it precedes. -->
+    <xsl:param name="scan-links" as="xs:string" required="yes"/>
 
     <!-- Auto-generated table of contents (driven by settings.yaml
          `typography.table_of_contents`). Depth is independent of the PDF
@@ -3165,6 +3170,10 @@ end
 
     <xsl:template match="tei:pb" mode="leaves"/>
 
+    <xsl:template match="tei:pb[@p:scan-link = 'true'][$scan-links != 'none']" mode="leaves">
+        <xsl:sequence select="."/>
+    </xsl:template>
+
     <xsl:template match="tei:standOff" mode="leaves"/>
 
     <!-- A title page is never part of a numbered stream. tei:front handles it directly;
@@ -3692,6 +3701,16 @@ end
     <!-- A page break inside front matter records the source foliation only; the
          typeset page breaks are produced by the titlepage environment itself. -->
     <xsl:template match="tei:pb[ancestor::tei:titlePage]" mode="emit"/>
+
+    <!-- A scan link. A title page is set outside the numbered text, where a side note
+         cannot go, so there the symbol stands in the line. -->
+    <xsl:template match="tei:pb[@p:scan-link = 'true'][$scan-links != 'none']" mode="emit"
+                  priority="10">
+        <xsl:value-of select="if ($scan-links = 'margin' and not(ancestor::tei:titlePage))
+                              then '\OSScanLinkMargin{' else '\OSScanLink{'"/>
+        <xsl:value-of select="f:escape-url(@facs)"/>
+        <xsl:text>}</xsl:text>
+    </xsl:template>
 
     <!-- Every title page part already ends its own paragraph, so the pretty-printing
          whitespace between them would only add stray blank lines (= \par) and
@@ -4508,11 +4527,14 @@ end
 
     <xsl:function name="f:escape-url" as="xs:string">
         <xsl:param name="s" as="xs:string"/>
-        <!-- Inside \href targets, only `%`, `#`, and `\` need escaping. -->
+        <!-- Inside \href targets, only `%`, `#`, `&` and `\` need escaping: `&` because
+             a target passed through another macro's argument (a scan link's, a side note's)
+             has been read already, as an alignment character. hyperref turns `\&` back
+             into `&`. -->
         <xsl:variable name="t1" select="replace($s, '\\', '\\textbackslash{}')"/>
         <xsl:variable name="t2" select="replace($t1, '%', '\\%')"/>
         <xsl:variable name="t3" select="replace($t2, '#', '\\#')"/>
-        <xsl:sequence select="$t3"/>
+        <xsl:sequence select="replace($t3, '&amp;', '\\&amp;')"/>
     </xsl:function>
 
 </xsl:stylesheet>

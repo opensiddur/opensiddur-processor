@@ -219,6 +219,7 @@ as the surrounding text has it.
 | `styles.note` | bold | The text of an editorial note. |
 | `styles.note_mark` | `xx-small` | The mark that anchors a note, in the text and where the note is printed. |
 | `styles.line_number` | inherits | Marginal line numbers. |
+| `styles.scan_link` | `small` | The symbol that links a page break of the source edition to the scan of the page ([`markers.scan_links`](#markersscan_links)). Always set in the Latin family. |
 | `styles.section_separator` | centered | The separator between unheaded sections. |
 | `styles.list_label` | small-caps | The label naming an item of a labelled list, set on a line of its own above the item. Like the headings, it is set inside an aligned unit rather than as a block, so `space_before` and `space_after` do nothing here; the space above it is the space between one aligned unit and the next. See [`lists`](#lists) for the item's indent. |
 | `styles.highlight_italic` | italic | Text the source highlights in italics (`tei:hi` with `rend="italic"`). Each look-changing `rend` token has a role of its own, and a highlight with several tokens nests them in order. Layout and reading tokens (`centered`, `align-right`, `ketiv-only`, `qeri-only`) have none. |
@@ -288,6 +289,26 @@ this only if …", and the reader has to be able to see where the passage starts
 | `markers.conditional.block` | `rule` \| `brackets` \| `none` | `rule` | How a whole conditional paragraph is delimited. Brackets several lines apart do not read as a pair, hence the rule. |
 | `markers.conditional.rule_width` | percentage | `25%` | Width of the rule, as a percentage of the measure. |
 | `markers.conditional.rule_thickness` | length | `0.4pt` | |
+
+### `markers.scan_links`
+
+For a book read on a screen: a symbol where a page of the source edition begins (a `tei:pb`
+with `@facs`), which opens the scan of that page. Both the PDF and the electronic book honour
+it; it is off by default, since a link does nothing on paper.
+
+Where an edition prints one text in several places — Birnbaum prints Ashrei at Shacharit and
+again at Minchah — the text keeps a page break for each printing, told apart by the tokens of
+`@ed` after the edition (`ed="1949 chol/minchah/opening"`). Only the breaks of the printing
+the book is using are linked: the one named by the `siddur:` unit around the text, or failing
+that the printing sharing the longest path with it, whose scan shows the same words. Where
+nothing around the text says, every printing's breaks are linked. A break is set at the first
+words of its page, so one between paragraphs or before a heading stands at the start of the
+next paragraph.
+
+| Key | Type | Default | Effect |
+| --- | --- | --- | --- |
+| `markers.scan_links.placement` | `none` \| `inline` \| `margin` | `none` | Where the symbol is set: nowhere, in the line at the page break, or in the margin beside that line. In the PDF the margin is the line numbers', outside the numbers when they are shown; in a paired layout each column's is its outer side. In the electronic book it is the side each column's lines begin on, and a narrow screen sets it in the line. |
+| `markers.scan_links.symbol` | text | `↗` | The symbol. It is set in the Latin family, since Hebrew fonts often lack symbols. |
 
 ## `lists`
 
@@ -555,7 +576,7 @@ HTML, CSS, and reader controls:
 | `styles` | Every text role except `line_number` has an HTML selector. Font, size, weight, italic style, small caps, alignment and applicable vertical spacing are emitted. Named sizes scale with the chosen family's normal size. Absolute sizes remain exact across language changes. |
 | `paragraphs` | Indent, spacing, line spacing and alignment apply to running text. |
 | `lists.item_indent` | Applies to both margins of list items. |
-| `markers` | Verse/chapter visibility, section separators, conditional brackets and rule dimensions apply. |
+| `markers` | Verse/chapter visibility, section separators, conditional brackets and rule dimensions apply. `scan_links` applies; its margin is the start side of each column, and narrow screens set the symbol in the line. |
 | `notes` | Numeric, alphabetic, Roman and symbol marks apply, as do inline, superscript and interlinear anchors. `placement: none` omits notes. Both physical-page placements use accessible popovers on screen. |
 | `parallel` | Wide-screen pairs use the configured column width and position. Interleaved output uses its translation size, indent and spacing. Narrow screens and the reader's one-column choice continue to reflow. Facing-page layout uses responsive columns on screen. |
 | `table_of_contents.depth` | Limits the reader's Contents dialog to the configured heading depth, including level four. |

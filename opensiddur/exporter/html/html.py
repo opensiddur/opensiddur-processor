@@ -45,6 +45,7 @@ from opensiddur.exporter.cli_common import (
     add_settings_arguments,
     load_output_settings,
     prepare_compiled_tree,
+    scan_links_wanted,
 )
 from opensiddur.exporter.calendar.compute import FS_HOLIDAY, FS_PURIM_OBSERVANCE
 from opensiddur.exporter.client_settings import is_reader_supplied, resolve
@@ -607,7 +608,8 @@ def build_book(
     if settings.electronic.psalm_titles == "uniform":
         normalize_psalm_titles(root)
     # The reader's settings can hide the first occurrence of a destination: label them all.
-    prepare_compiled_tree(root, every_occurrence=True)
+    prepare_compiled_tree(root, every_occurrence=True,
+                          scan_links=scan_links_wanted(typography))
     book_columns = columns(root)
     book = prepare(root)
     notice = notices.distribution_notice(settings.distribution)

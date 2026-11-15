@@ -16,6 +16,7 @@ from opensiddur.importer.util.pages import (
 from opensiddur.importer.util.wikisource_book import download_date
 from opensiddur.importer.jps1917.canonical_verses import annotate_canonical_verses
 from opensiddur.importer.jps1917.mediawiki_processor import create_processor
+from opensiddur.importer.jps1917.wikisource import BOOK_NAME
 from opensiddur.importer.util.parshiyot import skeleton_map_json
 from opensiddur.importer.util.prettify import prettify_xml
 from opensiddur.importer.util.validation import validate
@@ -75,6 +76,11 @@ class Index(BaseModel):
     end_page: Optional[int] = None
 
 PAGE_OFFSET = 22
+#: A page of the scan Wikisource transcribes, by its number in the scan: `@facs` of each page
+#: break (schema/JLPTEI-3.md). The page shows the scan beside its transcription.
+FACS_PREFIX = f"https://en.wikisource.org/wiki/Page:{BOOK_NAME}/"
+#: The scan itself.
+SCAN_URL = f"https://commons.wikimedia.org/wiki/File:{BOOK_NAME}"
 
 JPS_1917 = [
     Index(
@@ -487,6 +493,7 @@ def header(
                <tei:pubPlace>Philadelphia</tei:pubPlace>
                <tei:date>1917</tei:date>
                <tei:note>Lakeside Press, Chicago</tei:note>
+               <tei:idno type="url">{SCAN_URL}</tei:idno>
             </tei:bibl>
         </tei:sourceDesc>
     </tei:fileDesc>
@@ -498,7 +505,7 @@ def header(
 # entirely deterministic, so they are transcribed here rather than run through the LLM
 # encoding agent along with the preface (which starts at page 9). The foliation is the
 # printed book's own — the preface that follows opens at page iii.
-TITLE_PAGE = """<tei:pb n="i"/>
+TITLE_PAGE = f"""<tei:pb n="i" ed="1917" facs="{FACS_PREFIX}7"/>
     <tei:titlePage>
         <tei:docTitle>
             <tei:titlePart type="alt" xml:lang="he">תורה נביאים וכתובים</tei:titlePart>
@@ -513,7 +520,7 @@ TITLE_PAGE = """<tei:pb n="i"/>
             <tei:docDate>5677–1917</tei:docDate>
         </tei:docImprint>
     </tei:titlePage>
-    <tei:pb n="ii"/>
+    <tei:pb n="ii" ed="1917" facs="{FACS_PREFIX}8"/>
     <tei:titlePage type="copyright">
         <tei:docImprint>Copyright, 1917,<tei:lb/>By <tei:publisher>The Jewish Publication Society of America</tei:publisher><tei:lb/><tei:hi rend="italic">All rights reserved</tei:hi></tei:docImprint>
         <tei:docEdition>Third Impression, August, 1919</tei:docEdition>
@@ -589,7 +596,10 @@ def process_mediawiki(
                 f"JPS 1917 page file missing for page {page} (check sourcetexts tree)"
             )
         page_content = page_obj.content
-        content += " " + mw_processor.process_wikitext(page_content).xml_content
+        page_xml = mw_processor.process_wikitext(page_content).xml_content
+        # Which scan page this is, for the page break's link to it (mediawiki_to_tei.xslt).
+        page_xml = page_xml.replace("<mediawiki>", f'<mediawiki scan="{page}">', 1)
+        content += " " + page_xml
 
     pre_xml = f"""<tei:{wrapper_element} xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">
     <mediawikis>{content}</mediawikis>
@@ -601,7 +611,7 @@ def process_mediawiki(
     # Path("temp").mkdir(parents=True, exist_ok=True)
     # with open(f"temp/{kwargs.get("book_name", "temp")}.temp.xml", "w") as f:
     #     f.write(pre_xml)
-    return mediawiki_xml_to_tei(pre_xml, xslt_params=kwargs)
+    return mediawiki_xml_to_tei(pre_xml, xslt_params={**kwargs, "facs_prefix": FACS_PREFIX})
 
 def validate_and_write_tei_file(
     tei_content: str,

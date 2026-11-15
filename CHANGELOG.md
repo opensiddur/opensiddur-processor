@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)
+  at each page break of a scanned source edition. The symbol links to the scan of that page.
+  It goes in the line or in the margin, in the PDF and in the electronic book. Where an edition
+  prints a text in several places, only the page breaks of the printing the book uses are
+  linked.
+- The JPS 1917 importer links each page break to its page of the Wikisource scan.
+
 ## [0.7.0] - 2026-11-08
 
 ### Added

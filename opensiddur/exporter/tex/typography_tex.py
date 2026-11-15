@@ -45,6 +45,7 @@ from opensiddur.exporter.typography import (
     Numerals,
     Orientation,
     PaperType,
+    ScanLinkPlacement,
     ParallelLayout,
     Sides,
     TextStyle,
@@ -649,6 +650,14 @@ def _styles_section(config: TypographyConfig) -> list[str]:
 
     for role, macro in INLINE_ROLE_MACROS.items():
         define(role, lambda s, macro=macro: inline(s, macro))
+    # The scan link's symbol, set in the Latin family whatever text it stands in, as a
+    # verse number is: \foreignlanguage{english} leaves polyglossia's Hebrew font, which
+    # has no symbols, and \normalfont would only return to it.
+    define(
+        "scan_link",
+        lambda s: r"\newcommand{\OSScanLinkStyle}[1]{{\textdir TLT"
+        r"\foreignlanguage{english}{\normalfont" + tokens(s) + " #1}}}",
+    )
     return lines
 
 
@@ -924,6 +933,85 @@ def _interleaved_section(config: TypographyConfig, has_parallel: bool) -> list[s
     ]
 
 
+def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[str]:
+    """The link from a page break of the source edition to the scan of its page.
+
+    ``\\OSScanLink{url}`` sets the symbol in the line; ``\\OSScanLinkMargin{url}`` sets it
+    in the margin beside the line.
+
+    Not as a reledmac side note: reledmac loses every side note set in right-to-left
+    text, so a Hebrew text would have no links at all. The symbol is set where the page
+    break is, in a box of no width, and moved out to the margin from there: the place is
+    saved (zref's savepos) and the next run knows how far it is from the edge of the text
+    block. Every book takes more than one run, for reledmac and the table of contents.
+
+    The margin is the line numbers', so the symbol is where a reader looks for a line's
+    number, and past the numbers while they are shown. In a paired layout each column's
+    numbers are on its outer side (see reledmac.xslt), and so are its symbols.
+    """
+    scan_links = config.markers.scan_links
+    lines = [
+        rf"\newcommand{{\OSScanLinkSymbol}}{{{escape_tex(scan_links.symbol)}}}",
+        # hidelinks in a group: no coloured box around the symbol, for this link only.
+        r"\newcommand{\OSScanLink}[1]{\leavevmode{\hypersetup{hidelinks}"
+        r"\href{#1}{\OSScanLinkStyle{\OSScanLinkSymbol}}}}",
+    ]
+    if scan_links.placement is not ScanLinkPlacement.MARGIN:
+        lines.append(r"\newcommand{\OSScanLinkMargin}[1]{\OSScanLink{#1}}")
+        return lines
+
+    # reledmac's margin names, resolved as the line numbers' are (_line_numbers_section).
+    margin = config.line_numbers.margin
+    if right_bound_pages(config.page):
+        margin = _MIRRORED_LINE_NUMBER_MARGIN.get(margin, margin)
+    side = rf"\OSScanLink@resolve{{{margin.value}}}"
+    if uses_reledpar and config.parallel.layout is ParallelLayout.PAIRS:
+        side = (r"\ifl@dpairing\ifledRcol\OSScanLink@resolve{right}"
+                r"\else\OSScanLink@resolve{left}\fi\else" + side + r"\fi")
+    separation = (r"\dimexpr\linenumsep+2em\relax" if config.line_numbers.enabled
+                  else "1em")
+    lines += [
+        r"\usepackage{zref-savepos,zref-abspage}",
+        r"\makeatletter",
+        # The page a place is on, to tell inner from outer and odd margins from even.
+        r"\zref@addprop{savepos}{abspage}",
+        r"\newcount\OSScanLink@serial",
+        r"\newdimen\OSScanLink@edge",
+        rf"\newcommand{{\OSScanLinkSep}}{{{separation}}}",
+        r"\newif\ifOSScanLink@left",
+        # left | right | inner | outer, on the page \OSScanLink@page; inner and outer as
+        # reledmac reads them, with the binding at the left of an odd page.
+        r"\newcommand{\OSScanLink@resolve}[1]{\def\OSScanLink@tmp{#1}%",
+        r"  \ifodd\OSScanLink@page\relax\def\OSScanLink@odd{1}\else\def\OSScanLink@odd{0}\fi",
+        r"  \OSScanLink@lefttrue",
+        r"  \ifx\OSScanLink@tmp\OSScanLink@right\OSScanLink@leftfalse\fi",
+        r"  \ifx\OSScanLink@tmp\OSScanLink@inner",
+        r"    \if1\OSScanLink@odd\else\OSScanLink@leftfalse\fi\fi",
+        r"  \ifx\OSScanLink@tmp\OSScanLink@outer",
+        r"    \if1\OSScanLink@odd\OSScanLink@leftfalse\fi\fi}",
+        r"\def\OSScanLink@right{right}\def\OSScanLink@inner{inner}"
+        r"\def\OSScanLink@outer{outer}",
+        r"\newcommand{\OSScanLinkMargin}[1]{\leavevmode",
+        r"  \global\advance\OSScanLink@serial\@ne",
+        r"  \edef\OSScanLink@label{OSScanLink\the\OSScanLink@serial}%",
+        r"  \zsavepos{\OSScanLink@label}\zref@refused{\OSScanLink@label}%",
+        r"  \edef\OSScanLink@page{\zref@extractdefault{\OSScanLink@label}{abspage}{1}}%",
+        "  " + side + "%",
+        # The edge of the text block on that page, from the page's left edge.
+        r"  \OSScanLink@edge=\dimexpr1in+\hoffset\relax",
+        r"  \ifodd\OSScanLink@page\relax\advance\OSScanLink@edge\oddsidemargin",
+        r"  \else\advance\OSScanLink@edge\evensidemargin\fi",
+        r"  \ifOSScanLink@left\else\advance\OSScanLink@edge\textwidth\fi",
+        # Laid out left to right whatever the text's direction, so the kern goes right.
+        r"  \hbox dir TLT to \z@{\kern\dimexpr\OSScanLink@edge"
+        r"-\zposx{\OSScanLink@label}sp\relax",
+        r"    \ifOSScanLink@left\llap{\OSScanLink{#1}\kern\OSScanLinkSep}%",
+        r"    \else\rlap{\kern\OSScanLinkSep\OSScanLink{#1}}\fi\hss}}",
+        r"\makeatother",
+    ]
+    return lines
+
+
 # ---------------------------------------------------------------------------
 # The whole block
 # ---------------------------------------------------------------------------
@@ -953,6 +1041,7 @@ def build_typography_preamble(
         ("Notes", _notes_section(config)),
         ("Line numbers", _line_numbers_section(config, uses_reledpar)),
         ("Markers", _markers_section(config)),
+        ("Scan links", _scan_links_section(config, uses_reledpar)),
         ("Lists", _lists_section(config)),
         ("Parallel columns", _parallel_section(config, has_parallel)),
         ("Interleaved parallel", _interleaved_section(config, has_parallel)),

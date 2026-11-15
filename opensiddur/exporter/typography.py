@@ -313,6 +313,19 @@ class ConditionalBlock(StrEnum):
     NONE = "none"
 
 
+class ScanLinkPlacement(StrEnum):
+    """ Where the link from a page break to the scan of its page is set.
+
+    none:   no link; the page breaks of the source edition leave no trace.
+    inline: at the page break, in the line.
+    margin: in the margin beside the line the page break falls on.
+    """
+
+    NONE = "none"
+    INLINE = "inline"
+    MARGIN = "margin"
+
+
 class Visibility(StrEnum):
     SHOWN = "shown"
     HIDDEN = "hidden"
@@ -660,6 +673,13 @@ class Styles(ForbidExtra):
     line_number: TextStyle = Field(
         default_factory=TextStyle,
         description="Marginal line numbers.",
+    )
+    scan_link: TextStyle = Field(
+        default_factory=lambda: TextStyle(size=NamedSize.SMALL),
+        description=(
+            "The symbol at a page break of the source edition that links to the "
+            "scan of the page (markers.scan_links)."
+        ),
     )
     section_separator: TextStyle = Field(
         default_factory=lambda: TextStyle(align=Alignment.CENTER),
@@ -1063,6 +1083,32 @@ class ConditionalMarkerConfig(ForbidExtra):
     rule_thickness: NonNegativeLength = Field(default="0.4pt", description="Thickness of the rule.")
 
 
+class ScanLinkConfig(ForbidExtra):
+    """ A link, at each page break of a scanned source edition, to the scan of the page.
+
+    For a book read on a screen: a symbol where a page of the source edition begins
+    (a ``tei:pb`` with ``@facs``) that opens the scan of that page. Where a text is
+    printed in several places in its edition, only the page breaks of the printing the
+    book uses are linked (see ``opensiddur/exporter/scan_links.py``).
+    """
+
+    placement: ScanLinkPlacement = Field(
+        default=ScanLinkPlacement.NONE,
+        description=(
+            "none | inline | margin — where the symbol is set: nowhere, at the page "
+            "break in the line, or in the margin beside that line."
+        ),
+    )
+    symbol: str = Field(
+        default="\u2197",
+        min_length=1,
+        description=(
+            "The symbol that links to the scan. It is set in the Latin family, "
+            "whose fonts have symbols that Hebrew fonts often lack."
+        ),
+    )
+
+
 class MarkerConfig(ForbidExtra):
     """ The small marks that structure a text without being part of it. """
 
@@ -1082,6 +1128,10 @@ class MarkerConfig(ForbidExtra):
     conditional: ConditionalMarkerConfig = Field(
         default_factory=ConditionalMarkerConfig,
         description="Markers around passages whose condition could not be decided.",
+    )
+    scan_links: ScanLinkConfig = Field(
+        default_factory=ScanLinkConfig,
+        description="Links from the source edition's page breaks to its scanned pages.",
     )
 
 

@@ -17,7 +17,9 @@ from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS, XML_NS
 from opensiddur.exporter.conditional_markers import mark_silent_scopes
 from opensiddur.exporter.page_references import resolve_page_references
+from opensiddur.exporter.scan_links import mark_scan_links
 from opensiddur.exporter.settings import SettingsYaml, validate_settings
+from opensiddur.exporter.typography import ScanLinkPlacement, TypographyConfig
 
 
 #: The settings file's help for a stage that typesets, with the fonts this machine has.
@@ -69,16 +71,25 @@ def load_output_settings(settings_file: Path | None, *, resolve_fonts: bool) -> 
     return validate_settings(data, resolve_fonts=resolve_fonts, check_projects=False)
 
 
-def prepare_compiled_tree(root: etree.ElementBase, *, every_occurrence: bool = False) -> None:
+def scan_links_wanted(typography: TypographyConfig) -> bool:
+    """Whether a book sets links from its source's page breaks to the scanned pages."""
+    return typography.markers.scan_links.placement is not ScanLinkPlacement.NONE
+
+
+def prepare_compiled_tree(root: etree.ElementBase, *, every_occurrence: bool = False,
+                          scan_links: bool = False) -> None:
     """What every stage does to a compiled tree before rendering it, in place.
 
     Page references become labels (`every_occurrence`, for a book whose reader may hide the
     first occurrence of a destination). Whether a scope prints delimiters is decided here, on
     the whole document: a stage meets a scope's two markers apart, in different streams or in
     copies. Colophon divisions leave the front matter for the end (see
-    :func:`relocate_colophons`).
+    :func:`relocate_colophons`). With `scan_links`, the page breaks that link to their scan
+    where the tree uses them are marked (see :func:`mark_scan_links`).
     """
     relocate_colophons(root)
+    if scan_links:
+        mark_scan_links(root)
     resolve_page_references(root, every_occurrence=every_occurrence)
     mark_silent_scopes(root)
 
