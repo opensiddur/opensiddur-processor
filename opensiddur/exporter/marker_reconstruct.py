@@ -27,10 +27,16 @@ _P_PART = f"{{{PROCESSING_NAMESPACE}}}part"
 _PARALLEL_ITEM = f"{{{PROCESSING_NAMESPACE}}}parallelItem"
 _PARALLEL = f"{{{PROCESSING_NAMESPACE}}}parallel"
 _TEI_MILESTONE = f"{{{TEI_NS}}}milestone"
+_TEI_PB = f"{{{TEI_NS}}}pb"
+_TRANSCLUDE = f"{{{PROCESSING_NAMESPACE}}}transclude"
 _CONDITIONAL_MARKERS = (
     f"{{{JLPTEI_NAMESPACE}}}conditional",
     f"{{{JLPTEI_NAMESPACE}}}endConditional",
 )
+
+_SCOPE_MARKERS = (*_CONDITIONAL_MARKERS,
+                  f"{{{JLPTEI_NAMESPACE}}}declare",
+                  f"{{{JLPTEI_NAMESPACE}}}endDeclare")
 
 
 def _structural_marker_map(el: etree.ElementBase) -> dict[str, str]:
@@ -56,6 +62,7 @@ def substantive_content(el: etree.ElementBase) -> bool:
     one, on the same footing as a genuinely empty leftover paragraph shell, would drop it
     from the compiled document before the exporter ever sees it — which is what silently
     erased chapter numbers whenever one landed alone in its own parallel-aligned segment.
+    Page breaks are nonprinting: normalization relocates them before pruning wrappers.
     """
     def walk(x: etree.ElementBase) -> bool:
         if x.tag == _TEI_MILESTONE:
@@ -256,37 +263,96 @@ def _collect_logical_buckets(root: etree.ElementBase) -> dict[str, list[etree.El
     return buckets
 
 
-def _hoist_conditional_markers(segment: etree.ElementBase) -> None:
-    """Move the conditional markers out of a segment that is about to be pruned.
+def _hoist_nonprinting_markers(segment: etree.ElementBase) -> None:
+    """Keep page/scope boundaries in order when their empty display wrapper is removed.
 
-    A segment with no words of its own can still hold one end of a conditional scope: the
-    closer of a scope around a transclusion lands alone in the segment that resumes after
-    it. Pruning the segment must not prune the marker, or the scope loses an end and stays
-    open to the end of the book. The markers take the segment's place in its parent, in
-    order; a pair that is left with nothing between them is dropped later, by
-    `drop_empty_scopes`.
+    This is also the fallback for page markers that cannot safely be forwarded: they
+    must not disappear or cross a scope just because there are no words beside them.
     """
-    markers = list(segment.iter(*_CONDITIONAL_MARKERS))
+    markers = list(segment.iter(*_SCOPE_MARKERS, _TEI_PB))
     if not markers:
         return
     parent = segment.getparent()
     position = parent.index(segment)
     for offset, marker in enumerate(markers):
+        # A prunable segment has no non-whitespace text to carry with it.
         marker.tail = None
         parent.insert(position + offset, marker)
+    if segment.tail:
+        markers[-1].tail = segment.tail
+        segment.tail = None
+
+
+def _page_marker_context(element: etree.ElementBase) -> tuple:
+    """A column's identity and its enclosing transclusion/scope instances."""
+    ancestors = list(element.iterancestors())
+    column = (element if element.tag == _PARALLEL_ITEM else
+              next((a for a in ancestors if a.tag == _PARALLEL_ITEM), None))
+    column_key = None if column is None else tuple(column.get(k) for k in (
+        'role', '{http://www.w3.org/XML/1998/namespace}lang',
+        f'{{{PROCESSING_NAMESPACE}}}project', f'{{{PROCESSING_NAMESPACE}}}file_name'))
+    scopes = tuple(a for a in ancestors if a.tag in (_TRANSCLUDE, *_SCOPE_MARKERS))
+    return column_key, scopes
+
+
+def _forward_page_markers(segment, destination, nodes, positions, forwarded) -> bool:
+    """Prepend leading page markers to a continuation, without passing text or scopes."""
+    markers = list(segment.iter(_TEI_PB))
+    if (not markers or (segment.tail or '').strip()
+            or next(segment.iter(*_SCOPE_MARKERS), None) is not None):
+        return False
+    context = _page_marker_context(segment)
+    if context != _page_marker_context(destination):
+        return False
+    moved = {marker for group in forwarded.values() for marker in group}
+    for node in nodes[positions[segment] + 1:positions[destination]]:
+        if node in moved:
+            continue
+        node_context = _page_marker_context(node)
+        # The opposite column does not intervene in this column's source order.
+        if node_context[0] is not None and node_context[0] != context[0]:
+            continue
+        if node.tag in (_TRANSCLUDE, *_SCOPE_MARKERS):
+            return False
+        if (node.text or '').strip() or (node.tail or '').strip():
+            return False
+    previous = forwarded.setdefault(destination, [])
+    prefix = destination.text or ''
+    destination.text = None
+    if previous:
+        prefix = (previous[-1].tail or '') + prefix
+        previous[-1].tail = None
+    for index, marker in enumerate(markers, len(previous)):
+        marker.tail = None  # Discard indentation from the empty source wrapper.
+        destination.insert(index, marker)
+    previous.extend(markers)
+    if prefix:
+        markers[-1].tail = (markers[-1].tail or '') + prefix
+    return True
 
 
 def normalize_segment_parts(root: etree.ElementBase) -> None:
     buckets = _collect_logical_buckets(root)
     stray_markers = {_P_START, _P_SUSPEND, _P_RESUME, _P_END}
+    nodes = list(root.iter())
+    positions = {el: i for i, el in enumerate(nodes)}
+    forwarded: dict[etree.ElementBase, list[etree.ElementBase]] = {}
 
     for _lid, elems in buckets.items():
-        for e in list(elems):
+        for index, e in enumerate(elems):
             if substantive_content(e):
                 continue
             parent = e.getparent()
             if parent is not None:
-                _hoist_conditional_markers(e)
+                if next(e.iter(_TEI_PB), None) is not None:
+                    destination = next((candidate for candidate in elems[index + 1:]
+                                        if candidate.getparent() is not None
+                                        and substantive_content(candidate)), None)
+                    if destination is not None:
+                        _forward_page_markers(e, destination, nodes, positions, forwarded)
+                # Trailing markers and markers blocked by a scope stay where they were,
+                # but without the otherwise empty paragraph/division around them.
+                _hoist_nonprinting_markers(e)
                 parent.remove(e)
 
         surviving = [e for e in elems if e.getparent() is not None]

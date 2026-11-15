@@ -345,3 +345,106 @@ class TestMarkerReconstruct(unittest.TestCase):
         self.assertEqual(root[0][500].get(f'{{{XML_NS}}}id'), 'word-500')
         reparsed = etree.fromstring(etree.tostring(root))
         self.assertEqual(len(reparsed.xpath("id('word-500')")), 1)
+
+
+class TestPageMarkerFragments(unittest.TestCase):
+    ns = {'t': TEI_NS, 'p': P_NS, 'j': J_NS}
+
+    def normalize(self, content):
+        root = etree.fromstring((f'<root xmlns:t="{TEI_NS}" xmlns:p="{P_NS}" '
+                                 f'xmlns:j="{J_NS}">{content}</root>').encode())
+        mr.normalize_segment_parts(root)
+        return root
+
+    def test_leading_markers_move_to_text_without_empty_paragraph(self):
+        root = self.normalize(
+            '<t:p p:logical-id="x"><t:pb n="1" ed="book" facs="leaf1"/></t:p>'
+            '<t:p p:logical-id="x">Words<t:hi> more</t:hi></t:p>')
+        self.assertEqual(len(root), 1)
+        paragraph = root[0]
+        self.assertEqual(paragraph[0].attrib, {'n': '1', 'ed': 'book', 'facs': 'leaf1'})
+        self.assertIsNone(paragraph.text)
+        self.assertEqual(paragraph[0].tail, 'Words')
+        self.assertEqual(''.join(paragraph.itertext()), 'Words more')
+        self.assertIsNone(paragraph.get(f'{{{P_NS}}}part'))
+
+    def test_multiple_empty_fragments_preserve_marker_order_and_column(self):
+        root = self.normalize(
+            '<p:parallel><p:parallelItem role="primary" xml:lang="he">'
+            '<t:p p:logical-id="h"><t:pb n="1"/></t:p></p:parallelItem>'
+            '<p:parallelItem role="parallel" xml:lang="en">English</p:parallelItem></p:parallel>'
+            '<p:parallel><p:parallelItem role="primary" xml:lang="he">'
+            '<t:p p:logical-id="h"><t:pb n="2"/><t:pb n="3"/></t:p></p:parallelItem></p:parallel>'
+            '<p:parallel><p:parallelItem role="primary" xml:lang="he">'
+            '<t:p p:logical-id="h">Hebrew</t:p></p:parallelItem></p:parallel>')
+        paragraphs = root.xpath('//t:p', namespaces=self.ns)
+        self.assertEqual(len(paragraphs), 1)
+        self.assertEqual([n.get('n') for n in paragraphs[0]], ['1', '2', '3'])
+        self.assertEqual(paragraphs[0][-1].tail, 'Hebrew')
+        self.assertFalse(root.xpath('//p:parallelItem[@role="parallel"]//t:pb', namespaces=self.ns))
+
+    def test_trailing_marker_survives_without_empty_wrapper(self):
+        root = self.normalize('<t:p p:logical-id="x">Words</t:p>'
+                              '<t:p p:logical-id="x"><t:pb n="2"/></t:p>')
+        self.assertEqual([n.tag for n in root], [f'{{{TEI_NS}}}p', f'{{{TEI_NS}}}pb'])
+        self.assertEqual(root[1].get('n'), '2')
+
+    def test_cannot_pass_intervening_text_or_scope(self):
+        for middle in ['<t:p>Other words</t:p>', '<j:conditional xml:id="c"/>',
+                       '<j:endConditional target="#c"/>', '<j:declare xml:id="d"/>',
+                       '<j:endDeclare target="#d"/>', '<p:transclude><t:p>Other</t:p></p:transclude>']:
+            with self.subTest(middle=middle):
+                root = self.normalize('<t:p p:logical-id="x"><t:pb n="1"/></t:p>' +
+                                      middle + '<t:p p:logical-id="x">Words</t:p>')
+                self.assertEqual(root[0].tag, f'{{{TEI_NS}}}pb')
+                self.assertEqual(root[-1].text, 'Words')
+
+    def test_cannot_cross_column_or_transclusion_instances(self):
+        for opening, closing in [('<p:parallelItem role="parallel" xml:lang="en">', '</p:parallelItem>'),
+                                 ('<p:transclude>', '</p:transclude>')]:
+            with self.subTest(opening=opening):
+                root = self.normalize(
+                    '<p:parallelItem role="primary" xml:lang="he">'
+                    '<t:p p:logical-id="x"><t:pb n="1"/></t:p></p:parallelItem>' +
+                    opening + '<t:p p:logical-id="x">Words</t:p>' + closing)
+                self.assertEqual(root[0][0].tag, f'{{{TEI_NS}}}pb')
+                self.assertFalse(root[1].xpath('.//t:pb', namespaces=self.ns))
+
+    def test_donor_scope_markers_stay_in_original_order(self):
+        root = self.normalize(
+            '<t:div p:logical-id="x"><t:p><j:conditional xml:id="c"/>'
+            '<t:pb n="1"/><j:endConditional target="#c"/></t:p></t:div>'
+            '<t:div p:logical-id="x">Words</t:div>')
+        self.assertEqual([n.tag for n in root], [f'{{{J_NS}}}conditional',
+                         f'{{{TEI_NS}}}pb', f'{{{J_NS}}}endConditional', f'{{{TEI_NS}}}div'])
+        self.assertEqual(root[-1].text, 'Words')
+
+    def test_destination_conditional_is_not_entered(self):
+        root = self.normalize('<t:p p:logical-id="x"><t:pb n="1"/></t:p>'
+                              '<j:conditional xml:id="c"/><t:p p:logical-id="x">Words</t:p>')
+        self.assertEqual(root[0].tag, f'{{{TEI_NS}}}pb')
+        self.assertEqual(root[-1].text, 'Words')
+
+    def test_marker_does_not_pass_text_in_empty_wrappers_tail(self):
+        root = self.normalize('<t:p p:logical-id="x"><t:pb n="1"/></t:p>Between'
+                              '<t:p p:logical-id="x">Words</t:p>')
+        self.assertEqual(root[0].tag, f'{{{TEI_NS}}}pb')
+        self.assertEqual(root[0].tail, 'Between')
+        self.assertEqual(root[1].text, 'Words')
+
+    def test_reconstructed_parallel_preamble_joins_following_alignment_row(self):
+        root = etree.fromstring((f'<root xmlns:t="{TEI_NS}" xmlns:p="{P_NS}">'
+            '<p:parallel><p:parallelItem role="primary" xml:lang="he">'
+            '<t:p p:start="x"/><t:pb xml:id="pb1" n="92" facs="scan203"/>'
+            '<t:p p:suspend="x"/></p:parallelItem></p:parallel>'
+            '<p:parallel><p:parallelItem role="primary" xml:lang="he">'
+            '<t:p p:resume="x"/><t:milestone unit="prayer-part" corresp="urn:part"/>Words'
+            '<t:p p:end="x"/></p:parallelItem></p:parallel></root>').encode())
+        reconstruct_markered_document(root)
+        paragraphs = root.xpath('//t:p', namespaces=self.ns)
+        self.assertEqual(len(paragraphs), 1)
+        self.assertEqual([n.tag for n in paragraphs[0]],
+                         [f'{{{TEI_NS}}}pb', f'{{{TEI_NS}}}milestone'])
+        self.assertEqual(paragraphs[0][0].get(f'{{{XML_NS}}}id'), 'pb1')
+        self.assertEqual(paragraphs[0][0].get('facs'), 'scan203')
+        self.assertEqual(''.join(paragraphs[0].itertext()), 'Words')
