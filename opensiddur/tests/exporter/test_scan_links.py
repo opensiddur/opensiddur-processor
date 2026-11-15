@@ -327,3 +327,38 @@ class TestAPageThatBeginsAtTheEndOfAText(unittest.TestCase):
         root = self._book("jps")
         mark_scan_links(root)
         self.assertEqual([], _linked(root))
+
+
+class TestTheContextTheEditionPrints(unittest.TestCase):
+    """Where the edition prints the unit the book sets a text in, only that printing links."""
+
+    @staticmethod
+    def _minchah(shared: str) -> str:
+        # The unit has breaks of its own printing, so the edition prints it.
+        return _transclude(SIDDUR + "chol/minchah/amidah",
+                           "<tei:p>" + _pb("161", "1949 chol/minchah/amidah") + "Avot</tei:p>"
+                           + shared)
+
+    def test_a_text_with_only_another_printings_breaks_links_none(self):
+        shared = _transclude("urn:x-opensiddur:text:prayer:gevurot",
+                             "<tei:p>" + _pb("83", "1949 chol/shacharit/amidah")
+                             + "Atah gibor</tei:p>")
+        self.assertEqual(["161"], _marked(self._minchah(shared)))
+
+    def test_a_text_with_two_other_printings_links_neither(self):
+        shared = _transclude("urn:x-opensiddur:text:prayer:gevurot",
+                             "<tei:p>" + _pb("83", "1949 chol/shacharit/amidah")
+                             + _pb("203", "1949 chol/arvit/amidah") + "Atah gibor</tei:p>")
+        self.assertEqual(["161"], _marked(self._minchah(shared)))
+
+    def test_its_own_printing_still_links(self):
+        shared = _transclude("urn:x-opensiddur:text:prayer:gevurot",
+                             "<tei:p>" + _pb("83", "1949 chol/shacharit/amidah")
+                             + _pb("162", "1949 chol/minchah/amidah") + "Atah gibor</tei:p>")
+        self.assertEqual(["161", "162"], _marked(self._minchah(shared)))
+
+    def test_a_context_the_edition_never_prints_falls_back_to_the_nearest(self):
+        shared = _transclude("urn:x-opensiddur:text:prayer:gevurot",
+                             "<tei:p>" + _pb("83", "1949 chol/shacharit/amidah")
+                             + "Atah gibor</tei:p>")
+        self.assertEqual(["83"], _marked(_transclude(SIDDUR + "chol/maariv_nusach_x", shared)))

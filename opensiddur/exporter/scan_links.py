@@ -17,17 +17,17 @@ not where it is being used, so it is read only above the text's wrapper too.
 
 The rule, for the breaks of one edition directly inside one transclusion (their *group*):
 
-1. A break with no printing token, or a group whose breaks all name the same printings, is
-   marked outright -- so a text carrying one printing's breaks only links them wherever it
-   is used. A multi-word printing with no slash (``"1949 sukkot rites"``) is read whole, as
-   one printing.
+1. A break with no printing token is marked outright. A multi-word printing with no slash
+   (``"1949 sukkot rites"``) is read whole, as one printing.
 2. Otherwise the context is read nearest first: the ``siddur:`` paths of the enclosing
    transclusions and divisions, then the printing of the nearest earlier page break in an
-   enclosing group. The first level at which some printing equals a context, or one is a
-   path prefix of the other, chooses the printing (the closest match, then the first in
-   document order).
-3. Failing that, the printing sharing the longest leading path with any context is chosen.
-   Its page may begin elsewhere in this context, but the scan shows the same words.
+   enclosing group. The nearest level the edition prints anywhere in the book (a printing
+   equal to it, or one a path prefix of the other) decides: the group's breaks of that
+   printing are linked (the closest match, then the first in document order), and if it has
+   none -- no page of that printing begins inside this text -- none are.
+3. If the edition prints none of the context, the printing sharing the longest leading path
+   with it is chosen: the book arranges the text as the edition does not, and the scan of
+   the nearest printing shows the same words.
 4. Failing that, every break is marked: when the context cannot tell, no link is lost. This
    is the case of a book that copies several printings' units into one file.
 
@@ -132,17 +132,28 @@ def _matches(printing: str, context: str) -> bool:
             or context.startswith(printing + "/"))
 
 
-def _choose(printings: list[str], levels: Iterable[set[str]]) -> set[str] | None:
-    """The printings the context chooses, or None when it cannot tell.
+def _choose(printings: list[str], levels: Iterable[set[str]],
+            edition: set[str] = frozenset()) -> set[str] | None:
+    """The printings the context chooses (possibly none), or None when it cannot tell.
 
-    `printings` is in document order; `levels` is the context, nearest first.
+    `printings` are the group's, in document order; `levels` is the context, nearest first;
+    `edition` is every printing the edition's breaks name anywhere in the book.
+
+    The nearest context that the edition prints decides. Its own printing is the group's
+    choice, and if the group has no break of it -- no page of that printing begins inside
+    this text -- the group links none: a break of another printing would be a page of some
+    other place in the book, among the pages of this one.
     """
     levels = [level for level in levels if level]
     for level in levels:
+        if edition and not any(_matches(p, c) for p in edition for c in level):
+            continue
         matched = [(max(_shared(p, c) for c in level if _matches(p, c)), -i, p)
                    for i, p in enumerate(printings) if any(_matches(p, c) for c in level)]
         if matched:
             return {max(matched)[2]}
+        if edition:
+            return set()
     contexts = set().union(*levels) if levels else set()
     scored = [(max((_shared(p, c) for c in contexts), default=0), -i, p)
               for i, p in enumerate(printings)]
@@ -181,15 +192,20 @@ def mark_scan_links(root: etree.ElementBase) -> None:
         group_elements[id(group)] = group
         groups.setdefault((id(group), brk.edition), []).append(brk)
 
-    for (group_id, _edition), breaks in groups.items():
+    editions: dict[str, set[str]] = {}
+    for brk in candidates:
+        editions.setdefault(brk.edition, set()).update(brk.printings)
+
+    for (group_id, edition), breaks in groups.items():
         sets = {brk.printings for brk in breaks if brk.printings}
-        if len(sets) <= 1:
+        if not sets:
             chosen = None
         else:
             printings = list(dict.fromkeys(p for brk in breaks for p in sorted(brk.printings)))
             first = position[id(breaks[0].element)]
             chosen = _choose(printings, _context(group_elements[group_id],
-                                                 reversed(candidates[:first])))
+                                                 reversed(candidates[:first])),
+                             editions[edition])
         for brk in breaks:
             if chosen is None or not brk.printings or brk.printings & chosen:
                 brk.element.set(SCAN_LINK, "true")
