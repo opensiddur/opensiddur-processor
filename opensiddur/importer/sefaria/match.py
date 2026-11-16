@@ -120,6 +120,12 @@ def block_text(block: TextBlock) -> str:
     return " ".join(plain_text(pair.he) for pair in block.phrases)
 
 
+def matching_words(pair) -> list[str]:
+    """A phrase's words as matching compares them: without an alternative or insertion the
+    book prints in parentheses (``(בעשי"ת הַשָּׁלוֹם)``)."""
+    return words(re.sub(r"\([^)]*\)", " ", plain_text(pair.he)))
+
+
 def block_hash(block: TextBlock) -> str:
     return hashlib.sha256(skeleton(block_text(block)).encode("utf-8")).hexdigest()[:16]
 
@@ -142,6 +148,10 @@ CONFIRM_OPENING = 0.6
 #: How much better the best of several four-word matches must agree than the next.
 CLEARLY_BEST = 0.1
 
+#: How much a text the block opens like must agree, to be taken when the first text it opens
+#: like is printed earlier and differs.
+SECOND_CHOICE = 0.75
+
 
 def excluded_projects(project_directory: Path) -> set[Path]:
     return projects_with_source(project_directory, EXCLUDED_SOURCES)
@@ -158,8 +168,9 @@ def lookup(index: IncipitIndex, block_words: list[str], *, confirm: bool = True)
        rite's wording may part from the collection's within six words (Sefard וְלִתְפִלָּתָם,
        Ashkenaz וּבִתְפִלָּתָם), and a short blessing (בורא מיני מזונות) is all of three words.
     3. The same, a word or two out of step: the collection's text opens with a label or a
-       heading word the book does not print (``א אזה מקמן``, ``ישתבח ישתבח``), or the book's
-       block opens a word late (``ואמונה``, its ``אמת`` ending the Shema before it).
+       heading word the book does not print (``א אזה מקמן``, ``ישתבח ישתבח``), the book's
+       block opens a word late (``ואמונה``, its ``אמת`` ending the Shema before it), or the
+       book prints a line of up to three words before the text (``לעמתם משבחים ואומרים``).
 
     ``confirm`` false takes the index's own keys unconfirmed: for the volume's own earlier
     printings, which the caller compares phrase by phrase.
@@ -201,7 +212,7 @@ def lookup(index: IncipitIndex, block_words: list[str], *, confirm: bool = True)
     shifted: dict[str, float] = {}
     for urn, offset in shifted_openings(index).get(tuple(block_words[:SHORT_INCIPIT_WORDS]), ()):
         shifted[urn] = max(shifted.get(urn, 0.0), opening_agreement(urn, block_words, index, skip_text=offset))
-    for skip in (1, 2):
+    for skip in (1, 2, 3):
         for urn in index.by_incipit.get(tuple(block_words[skip:skip + SHORT_INCIPIT_WORDS]), ()):
             shifted[urn] = max(shifted.get(urn, 0.0),
                                opening_agreement(urn, block_words, index, skip_block=skip))
@@ -339,8 +350,7 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         if len(path) >= 3:
             evidence.append(f"opens with the verse {urn}; a liturgical text, not that verse")
             return Resolution(None, evidence)
-        verses = index.children.get(urn, [])
-        first_verse = index.incipit_of.get(verses[0], ())[:INCIPIT_WORDS] if verses else ()
+        first_verse = (index.incipit_of.get(f"{urn}/1") or index.incipit_of.get(f"{urn}/1/a") or ())[:INCIPIT_WORDS]
         if not first_verse or tuple(block_words[:len(first_verse)]) != first_verse:
             evidence.append(f"quotes {urn} but does not open at its first verse")
             return Resolution(None, evidence)
@@ -566,6 +576,8 @@ class _Decider:
         #: texts the collection names that a variant's own words are, each used once
         self.parts_used: set[str] = set()
         self._printed_numbers: set[int] = set()
+        #: where the candidate :meth:`another_candidate` took would cut the block
+        self.candidate_cut: int | None = None
         self.index = index
         self.records = records
         self.taken = taken
@@ -683,7 +695,7 @@ class _Decider:
         block = blocks[i]
         assert isinstance(block, TextBlock)
         text = block_text(block)
-        phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
+        phrase_words = [matching_words(pair) for pair in block.phrases]
         block_words = [w for phrase in phrase_words for w in phrase]
         skeletons = phrase_skeletons(block)
         evidence: list[str] = []
@@ -701,8 +713,9 @@ class _Decider:
         if urn is not None and urn in self.printed and not same_blessing(
                 block_words, words(block_text(self.printed[urn].block))):
             evidence.append(f"a blessing other than {urn}, whose formula it shares")
+            self.candidate_cut = None
             urn = self.another_candidate(block_words, phrase_words, evidence)
-            cut = None
+            cut = self.candidate_cut
         if urn is not None and urn in self.printed:
             earlier = self.printed[urn]
             earlier_skeletons = phrase_skeletons(earlier.block)
@@ -733,8 +746,9 @@ class _Decider:
                                 "a variant of it")
             else:
                 evidence.append(f"differs from the first printing of {urn} in this volume")
+                self.candidate_cut = None
                 urn = self.another_candidate(block_words, phrase_words, evidence)
-                cut = None
+                cut = self.candidate_cut
         if cut is not None:
             block = self.cut(leaf, blocks, i, cut)
             text = block_text(block)
@@ -830,11 +844,16 @@ class _Decider:
         candidates: set[str] = set()
         for key in keys(block_words):
             candidates |= self.index.by_incipit.get(key, set())
-        candidates = {u for u in candidates - set(self.printed) if confirmed(u, block_words, self.index)}
+        # A second choice must agree more closely than a first, and a blessing must be the same
+        # blessing past its formulas: the formula alone finds every blessing.
+        candidates = {u for u in candidates - set(self.printed)
+                      if opening_agreement(u, block_words, self.index) >= SECOND_CHOICE
+                      and same_blessing(block_words, list(self.index.incipit_of.get(u, ())))}
         for urn in sorted(candidates, key=lambda u: (-opening_agreement(u, block_words, self.index), u)):
             resolution = resolve({urn}, phrase_words, self.index)
-            if resolution.urn is not None and resolution.urn not in self.printed and resolution.split_at is None:
+            if resolution.urn is not None and resolution.urn not in self.printed:
                 evidence.append(f"took {resolution.urn}, which opens alike and is not printed earlier")
+                self.candidate_cut = resolution.split_at
                 return resolution.urn
         return None
 
