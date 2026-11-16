@@ -21,7 +21,9 @@ may contain, so they are never built by hand. The JSON is stored re-indented, on
 a line, so that a later export's changes read as a diff.
 
 A file whose ``md5Hash`` is the one recorded is not fetched again, and a run that fetches
-nothing writes nothing: the manifest, and its export date, change only with the text.
+nothing writes nothing: the manifest, and its export date, change only with the text. Each
+version's licence is recorded; ``convert`` refuses one that is no longer ``CC-BY`` until it
+has been decided, and ``update`` reports it.
 
 Run::
 
@@ -156,11 +158,6 @@ def _check_version(work: Work, lang: str, data: dict[str, Any]) -> None:
     if data.get("versionTitle") != expected:
         raise DownloadError(
             f"{work.key}: the {lang} file is version {data.get('versionTitle')!r}, not {expected!r}")
-    if data.get("license") != "CC-BY":
-        # works.yaml records CC BY 3.0 for "CC-BY"; anything else needs a decision first.
-        raise DownloadError(
-            f"{work.key}: the {lang} version is now licensed {data.get('license')!r}, not CC-BY; "
-            "decide whether it can still be imported before downloading it")
 
 
 def load_manifest(directory: Path) -> dict[str, Any]:

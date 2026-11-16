@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from difflib import SequenceMatcher
@@ -38,7 +39,7 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, TextBlock, split_block
 from opensiddur.importer.sefaria.markup import plain_text
-from opensiddur.importer.sefaria.phrases import map_phrases, skeleton
+from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
     INCIPIT_WORDS,
@@ -264,7 +265,8 @@ def repeat_length(block_phrases: list[str], earlier: list[str]) -> int | None:
 def mint(text: str, taken: set[str], spellings: Spellings) -> str:
     """A new ``prayer:`` URN from a text's incipit. A blessing is named from the words after
     its formula, which every blessing shares."""
-    hebrew = text.split()
+    # Words as the index counts them: a maqaf separates words, punctuation alone is none.
+    hebrew = [token for token in re.split(r"[\s\u05be]+", text) if words(token)]
     if tuple(words(" ".join(hebrew[:6]))) == BLESSING_FORMULA:
         hebrew = hebrew[6:] or hebrew
         if tuple(words(" ".join(hebrew[:4]))) == MITZVAH_FORMULA:
@@ -327,6 +329,8 @@ def decide_work(
     outcome = Decisions(dict(records))
     #: the texts this work printed earlier: URN -> the skeletons of its first printing's phrases
     printed: dict[str, list[str]] = {}
+    #: texts too short for the incipit index: their words -> URN
+    short_printed: dict[str, str] = {}
     own = IncipitIndex()
     stale_keys = {key for key in records if key[0] == work_key}
     for leaf_path, blocks in leaves:
@@ -338,6 +342,7 @@ def decide_work(
                 continue
             key = (work_key, leaf_path, block.first_index)
             text = block_text(block)
+            this_short = skeleton(text)
             phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
             block_words = [w for phrase in phrase_words for w in phrase]
             skeletons = phrase_skeletons(block)
@@ -347,11 +352,35 @@ def decide_work(
                 if record.kind != "repeat":
                     printed.setdefault(record.urn, skeletons)
                     own.add(record.urn, block_words)
+                    short_printed.setdefault(skeleton(text), record.urn)
+                i += 1
+                continue
+            if record is not None and record.kind != "repeat" and record.urn not in printed and (
+                    similarity(skeleton(record.incipit), skeleton(" ".join(text.split()[:INCIPIT_WORDS])))
+                    >= SAME_PHRASE):
+                # The words changed, but it is still the text it was: it keeps its URN, and its
+                # phrases their numbers.
+                stale_keys.discard(key)
+                outcome.lapsed.append(record)
+                kept = TextRecord(
+                    work=work_key, leaf=leaf_path, block=block.first_index, urn=record.urn,
+                    kind=record.kind, incipit=" ".join(text.split()[:INCIPIT_WORDS]),
+                    as_of=block_hash(block),
+                    evidence=record.evidence + ["the words changed; the URN of the earlier decision is kept"],
+                    phrases=record.phrases if record.phrases and len(record.phrases) == len(skeletons) else None)
+                outcome.records[key] = kept
+                outcome.decided.append(kept)
+                printed.setdefault(kept.urn, skeletons)
+                own.add(kept.urn, block_words)
                 i += 1
                 continue
             evidence: list[str] = []
             kind = "existing"
-            resolution = resolve(lookup(own, block_words), phrase_words, own)
+            if len(block_words) < SHORT_INCIPIT_WORDS and this_short in short_printed:
+                # Too short for the incipit index: a repeat is found by its words alone.
+                resolution = Resolution(short_printed[this_short], ["the same words as an earlier text"])
+            else:
+                resolution = resolve(lookup(own, block_words), phrase_words, own)
             if resolution.urn is None:
                 resolution = resolve(lookup(index, block_words), phrase_words, index)
             urn = resolution.urn
@@ -382,6 +411,7 @@ def decide_work(
                 if record.kind != "repeat":
                     printed.setdefault(record.urn, skeletons)
                     own.add(record.urn, block_words)
+                    short_printed.setdefault(skeleton(text), record.urn)
                 i += 1
                 continue
             if record is not None:
@@ -395,6 +425,7 @@ def decide_work(
             if kind != "repeat":
                 printed.setdefault(urn, skeletons)
                 own.add(urn, block_words)
+                short_printed.setdefault(skeleton(text), urn)
                 numbers = map_phrases(skeletons, recorded_phrases.get(text_path(urn), {}))
                 if numbers != list(range(1, len(numbers) + 1)):
                     phrases = numbers

@@ -97,6 +97,14 @@ class TestConvertWork(unittest.TestCase):
         self.assertEqual({p.name: p.read_text() for p in he.iterdir()}, before)
         self.assertEqual((self.registry / "prayer.jsonl").read_text(), registry_before)
 
+    def test_a_version_no_longer_cc_by_is_refused(self):
+        manifest_path = self.sources / "sefaria" / WORK.key / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["files"]["en.json"]["license"] = "CC-BY-NC"
+        manifest_path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ConvertError, "CC-BY-NC"):
+            self.convert()
+
     def test_stale_files_are_removed(self):
         he = self.projects / WORK.projects["he"]
         he.mkdir(parents=True)

@@ -62,7 +62,7 @@ from opensiddur.importer.sefaria.tei_builder import (
     siddur_urn,
     text_body,
 )
-from opensiddur.importer.sefaria.works import LANGUAGES, Work, select_works
+from opensiddur.importer.sefaria.works import LANGUAGES, Work, load_works, select_works
 from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index
 from opensiddur.importer.util.tei_project import prune_stale_files, validate_and_write
 
@@ -84,7 +84,7 @@ def load_structure(work: Work, source: WorkSource, path: Path | None = None) -> 
     problems = [f"{p}: not placed in {path.name}" for p in paths if p not in table]
     problems += [f"{p}: placed in {path.name} but not in the schema" for p in table if p not in paths]
     for leaf in source.leaves:
-        if table.get(leaf.path) is None and (any(s.strip() for s in leaf.he + leaf.en)) and leaf.path in table:
+        if leaf.path in table and table[leaf.path] is None and any(s.strip() for s in leaf.he + leaf.en):
             problems.append(f"{leaf.path}: has text but no place in {path.name}")
     places = [v for v in table.values() if v]
     problems += [f"{p}: placed twice" for p in sorted({p for p in places if places.count(p) > 1})]
@@ -145,17 +145,20 @@ def _preorder(source: WorkSource) -> list[tuple[str, ...]]:
     return order
 
 
-def _children(plan: WorkPlan, keys: tuple[str, ...]) -> list[str]:
-    """The ``siddur:`` URNs of a node's placed children in schema order (the root's, when
-    ``keys`` is empty)."""
-    children = [k for k in _preorder(plan.source) if len(k) == len(keys) + 1 and k[:len(keys)] == keys]
-    places = [plan.structure.get(PATH_SEPARATOR.join(k)) for k in children]
-    return [siddur_urn(place) for place in places if place]
+def children_by_parent(plan: WorkPlan) -> dict[tuple[str, ...], list[str]]:
+    """Each node's placed children, as ``siddur:`` URNs in schema order; the root's under ()."""
+    children: dict[tuple[str, ...], list[str]] = {}
+    for keys in _preorder(plan.source):
+        place = plan.structure.get(PATH_SEPARATOR.join(keys))
+        if place:
+            children.setdefault(keys[:-1], []).append(siddur_urn(place))
+    return children
 
 
 def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
     work = plan.work
     out = ProjectFiles()
+    children = children_by_parent(plan)
     titles = {n.path: n.titles[-1] for n in plan.source.nodes}
     titles.update({leaf.path: leaf.titles[-1] for leaf in plan.source.leaves})
     for node in plan.source.nodes:
@@ -163,7 +166,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         if not place:
             continue
         urn = siddur_urn(place)
-        body = node_body(urn, titles[node.path], _children(plan, node.keys), lang)
+        body = node_body(urn, titles[node.path], children.get(node.keys, []), lang)
         title = titles[node.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang))
     for leaf in plan.source.leaves:
@@ -189,7 +192,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes)
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
-    out.add("index", document(index_header(work, lang, info), index_body(work, _children(plan, ()), lang), lang))
+    out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang), lang))
     return out
 
 
@@ -198,6 +201,13 @@ def source_info(work: Work, directory: Path) -> SourceInfo:
     if not manifest:
         raise ConvertError(f"{directory}: no manifest; run the download first")
     files = manifest["files"]
+    for lang in LANGUAGES:
+        licence = files[f"{lang}.json"].get("license")
+        if licence != "CC-BY":
+            # works.yaml records CC BY 3.0 for Sefaria's "CC-BY"; anything else needs a decision.
+            raise ConvertError(
+                f"{work.key}: the {lang} version is licensed {licence!r}, not CC-BY; decide whether it "
+                "can still be imported, and record the licence in works.yaml, before converting")
     return SourceInfo(
         last_export=manifest["last_export"],
         version_url={lang: f"https://www.sefaria.org/{work.schema_file_title}" for lang in LANGUAGES},
@@ -301,12 +311,12 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     records = load_records(urns_path)
     taken = registry_urns(registry_directory) | {r.urn for r in records.values()}
     own = {project_directory / work.projects[lang] for lang in LANGUAGES}
+    excluded = excluded_projects(project_directory)
     if index is None:
-        index = load_incipit_index(INCIPIT_CACHE, project_directory,
-                                   excluded_projects(project_directory) | own)
-    other_volumes = [d for d in excluded_projects(project_directory) - own
-                     if d.name.endswith("-he") and (d / "index.xml").exists()
-                     and _is_sefaria_metsudah(d)]
+        index = load_incipit_index(INCIPIT_CACHE, project_directory, excluded | own)
+    # The Hebrew projects of the other Sefaria works, whose phrases this one may share.
+    hebrew_projects = {w.projects["he"] for w in load_works().values() if w.key != work.key}
+    other_volumes = [d for d in excluded if d.name in hebrew_projects]
     plan = plan_work(work, source, index=index, records=records, taken=taken,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
                      decisions_path=decisions_path)
@@ -328,11 +338,6 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     (output_directory / f"sefaria_{work.key}_report.md").write_text(
         report(plan, written, pruned), encoding="utf-8")
     return plan
-
-
-def _is_sefaria_metsudah(project: Path) -> bool:
-    """Whether a project was imported from Sefaria (its source bibl has a ``sefaria`` idno)."""
-    return 'type="sefaria"' in (project / "index.xml").read_text(encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

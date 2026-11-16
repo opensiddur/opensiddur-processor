@@ -115,6 +115,18 @@ class TestDecide(unittest.TestCase):
         self.assertEqual(len(changed.lapsed), 1)
         self.assertEqual(len(changed.decided), 1)
 
+    def test_a_text_whose_words_changed_keeps_its_urn(self):
+        first = decide([("L", items(*UNKNOWN))])
+        corrected = [UNKNOWN[0], "שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף הַזֶּה"]
+        again = decide([("L", items(*corrected))], records=first.records)
+        self.assertEqual(again.decided[0].urn, first.decided[0].urn)
+        self.assertEqual(again.lapsed, [first.decided[0]])
+
+    def test_a_short_text_printed_again_is_a_repeat(self):
+        short = ["<b>אָמֵן</b> סֶלָה"]
+        outcome = decide([("A", items(*short)), ("B", items(*short))])
+        self.assertEqual([r.kind for r in outcome.decided], ["new", "repeat"])
+
     def test_a_block_no_longer_printed_lapses(self):
         first = decide([("L", items(*MODEH))])
         gone = decide([("M", items(*UNKNOWN))], records=first.records)
@@ -131,6 +143,10 @@ class TestMint(unittest.TestCase):
     def test_a_blessing_is_named_after_its_formulas(self):
         text = "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם אֲשֶׁר קִדְּשָֽׁנוּ בְּמִצְוֹתָיו וְצִוָּֽנוּ עַל מִצְוַת צִיצִית"
         self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:al_mitzvat")
+
+    def test_maqaf_and_stray_punctuation_do_not_hide_the_formula(self):
+        text = "בָּרוּךְ אַתָּה יְהֹוָה , אֱלֹהֵֽינוּ מֶֽלֶךְ־הָעוֹלָם הַמּוֹצִיא לֶֽחֶם מִן הָאָֽרֶץ"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:hamotzi_lechem")
 
     def test_a_taken_name_grows(self):
         text = "זֶה טֶקְסְט חָדָשׁ לְגַמְרֵי"

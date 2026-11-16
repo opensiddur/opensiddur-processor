@@ -4,7 +4,8 @@ This seeds a name; it does not settle one. It knows the table (het ``ch``, khaf 
 ``q``, tzadi ``tz``, aleph and ayin silent, dagesh hazak doubled but never a digraph, final heh
 written, the divine name read ``adonai``, no doubling after a one-letter prefix) and the common cases of the vowels, but not grammar:
 it reads every qamatz as ``a``, and a sheva as ``e`` only on a word's first letter or where the
-source marks it sounded, and it doubles a dagesh it cannot tell from a prefix's. A name it makes
+source marks it sounded, and it tells a prefix from a root letter only by its vowel
+(:data:`PREFIX_VOWELS`), so that שַׁבָּת is doubled but הַלֵּל is not. A name it makes
 is respelled by ``specs/naming/spellings.yaml`` (:func:`name_from_hebrew`) and reviewed where it
 is recorded, like any other name an importer mints.
 """
@@ -72,6 +73,18 @@ def _letters(word: str) -> list[tuple[str, str]]:
     return out
 
 
+#: A first letter read as a prefix -- whose dagesh in the next letter is not doubled -- by its
+#: vowel: the article (הַ, הָ, הֶ), מִ (from), שֶׁ (that), and בַּ, כַּ, לַ (the article
+#: merged). A root letter with those vowels (שַׁבָּת, הַלֵּל) is misread, and doubled
+#: names that need it are listed in spellings.yaml.
+PREFIX_VOWELS = {"ה": {"\u05b7", "\u05b8", "\u05b6"}, "מ": {HIRIQ}, "ש": {"\u05b6"},
+                 "ב": {"\u05b7"}, "כ": {"\u05b7"}, "ל": {"\u05b7"}}
+
+
+def _is_prefix(letter: str, marks: str) -> bool:
+    return any(mark in PREFIX_VOWELS.get(letter, ()) for mark in marks)
+
+
 def transliterate_word(word: str) -> str:
     letters = _letters(_SILENT_MARKS.sub("", unicodedata.normalize("NFD", word)))
     spelled = "".join(letter for letter, _ in letters)
@@ -119,7 +132,7 @@ def transliterate_word(word: str) -> str:
             sound = hard if dagesh else soft
         else:
             sound = CONSONANTS.get(letter, "")
-        after_prefix = i == 1 and letters[0][0] in PREFIXES
+        after_prefix = i == 1 and _is_prefix(*letters[0])
         if (dagesh and i > 0 and last_vowel and letter not in NOT_DOUBLED and len(sound) == 1
                 and not after_prefix):
             sound += sound

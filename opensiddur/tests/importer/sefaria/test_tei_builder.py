@@ -50,6 +50,30 @@ class TestTextBody(unittest.TestCase):
         self.assertEqual(en.xpath("string(//tei:head)", namespaces=NS), "FOREFATHERS")
         self.assertEqual(en.xpath("//tei:hi/@rend", namespaces=NS), ["italic"])
 
+    def test_a_rubric_closes_the_phrase_before_it_in_both_languages(self):
+        (block,) = blocks([
+            ("<b>מוֹדֶה אֲנִי</b> לְפָנֶֽיךָ", "I give thanks"),
+            ("", "<small>(bow)</small>"),
+            ("מֶֽלֶךְ חַי", "living King"),
+        ])
+        for lang in ("he", "en"):
+            body = parse(text_body(T + "prayer:modeh_ani", block, [1, 2], lang, Notes("note")))
+            marks = body.xpath("//tei:milestone[@unit='phrase']", namespaces=NS)
+            self.assertEqual([m.get("corresp") for m in marks],
+                             [T + "metsudah:modeh_ani/1", None, T + "metsudah:modeh_ani/2"])
+        en = parse(text_body(T + "prayer:modeh_ani", block, [1, 2], "en", Notes("note")))
+        self.assertEqual(en.xpath("string(//tei:note)", namespaces=NS), "(bow)")
+
+    def test_a_footnote_in_a_heading_is_kept(self):
+        (block,) = blocks([
+            ('<b>אבות</b>', '<b>FOREFATHERS</b><sup class="footnote-marker">1</sup><i class="footnote">The first.</i>'),
+            ("<b>בָּרוּךְ</b> אַתָּה", "Blessed"),
+        ])
+        notes = Notes("note")
+        en = parse(text_body(T + "prayer:amidah/avot", block, [1], "en", notes))
+        self.assertEqual(en.xpath("//tei:head/tei:anchor/@xml:id", namespaces=NS), ["note_1"])
+        self.assertEqual(len(notes.entries), 1)
+
     def test_hebrew_is_decomposed_and_bold_dropped(self):
         out = render(parse_segment("<b>שָׁ</b>"), "he", None)
         self.assertNotIn("<", out)

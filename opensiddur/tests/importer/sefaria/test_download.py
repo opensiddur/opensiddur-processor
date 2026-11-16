@@ -103,11 +103,14 @@ class TestDownload(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, self.assertRaisesRegex(DownloadError, "not 'Test Siddur"):
             download_work(WORK, client, books(), Path(tmp))
 
-    def test_a_new_licence_is_refused(self):
+    def test_a_new_licence_is_recorded_not_refused(self):
+        # update.py must be able to report it; convert.py refuses to convert it.
         tree = {"Blessings": [("א", "a")]}
         client = FakeClient(bucket(en=make_version(tree, "en", license="CC-BY-NC")))
-        with tempfile.TemporaryDirectory() as tmp, self.assertRaisesRegex(DownloadError, "CC-BY-NC"):
+        with tempfile.TemporaryDirectory() as tmp:
             download_work(WORK, client, books(), Path(tmp))
+            manifest = json.loads((Path(tmp) / "manifest.json").read_text())
+        self.assertEqual(manifest["files"]["en.json"]["license"], "CC-BY-NC")
 
     def test_a_corrupt_download_is_refused(self):
         files = bucket()

@@ -179,10 +179,16 @@ def phrase_xml(pair: Pair, lang: str, notes: Notes, milestone: str | None) -> st
     return f"{mark}{prefix}{_trim(render(nodes, lang, notes))}"
 
 
-def head_xml(pair: Pair, lang: str) -> str:
+def head_xml(pair: Pair, lang: str, notes: Notes | None, *, element: str = "head") -> str:
+    """A heading (or, in a structure file, a ``tei:label``), with its footnotes anchored."""
     nodes = pair.he if lang == "he" else pair.en
-    text = _trim(render(nodes, lang, None, in_note=True))
-    return f'<tei:head xml:lang="{lang}">{text}</tei:head>' if text else ""
+    if not plain_text(nodes):
+        return ""
+    return f'<tei:{element} xml:lang="{lang}">{_trim(render(nodes, lang, notes))}</tei:{element}>'
+
+
+#: Closes a phrase's scope without opening another (SIDDUR_URN_SCHEME.md, "Ending a scope").
+PHRASE_END = '<tei:milestone unit="phrase"/>'
 
 
 # --------------------------------------------------------------------------------------------
@@ -203,16 +209,28 @@ def standoff(notes: Notes, lang: str) -> str:
 
 def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes) -> str:
     """A text's division: its heading, then its phrases and the rubrics among them."""
-    head = head_xml(block.head, lang) if block.head is not None else ""
+    head = head_xml(block.head, lang, notes) if block.head is not None else ""
     numbers = iter(phrase_numbers)
     parts: list[str] = []
+    phrase_open = False
     for pair in block.pairs:
         if is_phrase(pair):
             number = next(numbers)
             nodes = pair.he if lang == "he" else pair.en
             milestone = phrase_urn(urn, number) if plain_text(nodes) else None
             xml = phrase_xml(pair, lang, notes, milestone)
+            if milestone:
+                phrase_open = True
+            elif phrase_open and xml:
+                # Words with no counterpart in the other language: not the last phrase's.
+                parts.append(PHRASE_END)
+                phrase_open = False
         else:
+            # A rubric is not the phrase before it. The scope is closed in both languages,
+            # whichever the rubric is printed in, so that the two divide alike.
+            if phrase_open:
+                parts.append(PHRASE_END)
+                phrase_open = False
             xml = rubric_xml(pair, lang, notes)
         if xml:
             parts.append(xml)
@@ -231,10 +249,9 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
         if isinstance(item, Rubric):
             parts.extend(x for x in (rubric_xml(pair, lang, notes) for pair in item.pairs) if x)
         elif isinstance(item, Heading):
-            nodes = item.pair.he if lang == "he" else item.pair.en
-            text = _trim(render(nodes, lang, None, in_note=True))
-            if text:
-                parts.append(f'<tei:label xml:lang="{lang}">{text}</tei:label>')
+            label = head_xml(item.pair, lang, notes, element="label")
+            if label:
+                parts.append(label)
         elif isinstance(item, TextBlock):
             parts.append(f'<j:transclude type="external" target="{attr(text_urns[id(item)])}"/>')
     return f'<tei:body><tei:div corresp="{attr(urn)}">{"".join(parts)}</tei:div></tei:body>'
