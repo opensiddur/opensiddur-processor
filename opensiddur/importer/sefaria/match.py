@@ -135,7 +135,22 @@ def lookup(index: IncipitIndex, block_words: list[str]) -> set[str]:
     formula: the formula itself opens every blessing, and finds them all."""
     n = len(BLESSING_FORMULA)
     if tuple(block_words[:n]) != BLESSING_FORMULA:
-        return index.lookup(block_words)
+        found = index.lookup(block_words)
+        if found:
+            return found
+        # Another rite's wording may part from the collection's within the first six words
+        # (Sefard וְלִתְפִלָּתָם, Ashkenaz וּבִתְפִלָּתָם): four words, when they name one text --
+        # a text and its first part counting as one, the part -- and :func:`confirmed` then
+        # checks the rest of the opening agrees.
+        short = index.by_incipit.get(tuple(block_words[:SHORT_INCIPIT_WORDS]), set())
+        deepest = {u for u in short if not any(o.startswith(u + "/") for o in short)}
+        if len(deepest) <= 1:
+            return deepest
+        # Several texts open with these four words: the one whose opening goes on agreeing
+        # best, when it is clearly the best.
+        ranked = sorted(deepest, key=lambda u: (-opening_agreement(u, block_words, index), u))
+        best, second = (opening_agreement(u, block_words, index) for u in ranked[:2])
+        return {ranked[0]} if best >= CONFIRM_OPENING and best - second >= CLEARLY_BEST else set()
     for key in keys(block_words)[:-1]:
         if len(key) >= SHORT_INCIPIT_WORDS:
             found = index.by_incipit.get(key, set())
@@ -164,12 +179,22 @@ def _opens_at(phrase_words: list[list[str]], start: int, incipit: tuple[str, ...
 CONFIRM_OPENING = 0.6
 
 
-def confirmed(urn: str, block_words: list[str], index: IncipitIndex) -> bool:
+#: How much better the best of several four-word matches must agree than the next.
+CLEARLY_BEST = 0.1
+
+
+def opening_agreement(urn: str, block_words: list[str], index: IncipitIndex) -> float:
+    """How far a candidate's collected opening (up to 16 words) agrees with the block's."""
     opening = list(index.incipit_of.get(urn, ()))
-    if len(opening) <= INCIPIT_WORDS or len(block_words) <= INCIPIT_WORDS:
+    if not opening:
+        return 0.0
+    return SequenceMatcher(None, opening, block_words[:len(opening)], autojunk=False).ratio()
+
+
+def confirmed(urn: str, block_words: list[str], index: IncipitIndex) -> bool:
+    if len(index.incipit_of.get(urn, ())) <= INCIPIT_WORDS or len(block_words) <= INCIPIT_WORDS:
         return True
-    ours = block_words[:len(opening)]
-    return SequenceMatcher(None, opening, ours, autojunk=False).ratio() >= CONFIRM_OPENING
+    return opening_agreement(urn, block_words, index) >= CONFIRM_OPENING
 
 
 def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitIndex) -> Resolution:
@@ -260,6 +285,8 @@ MOVE_UP_COVERAGE = 0.75
 #: phrases (up to where the earlier printing ends) that must be the earlier printing's, for the
 #: block to be that text again.
 REPEAT_COVERAGE = 0.75
+#: The most phrases between two matched phrases of one printing.
+REPEAT_GAP = 3
 
 
 def repeat_length(block_phrases: list[str], earlier: list[str]) -> int | None:
@@ -270,11 +297,17 @@ def repeat_length(block_phrases: list[str], earlier: list[str]) -> int | None:
         return None
     numbers = map_phrases(block_phrases, {i + 1: s for i, s in enumerate(earlier)})
     matched = [i for i, n in enumerate(numbers) if n <= len(earlier)]
-    if not matched:
+    needed = math.ceil(REPEAT_COVERAGE * len(earlier))
+    if len(matched) < needed:
         return None
-    length = matched[-1] + 1
-    if (len(matched) / len(earlier) >= REPEAT_COVERAGE
-            and len(matched) / length >= REPEAT_COVERAGE):
+    # Where the earlier printing ends in the block: once enough of it is matched, as far as the
+    # matches run on without a gap. A phrase further on that happens to be like one of the
+    # earlier printing's (a closing verse both texts end with) is not part of it.
+    end = needed - 1
+    while end + 1 < len(matched) and matched[end + 1] - matched[end] <= REPEAT_GAP:
+        end += 1
+    length = matched[end] + 1
+    if (end + 1) / length >= REPEAT_COVERAGE:
         return length
     return None
 

@@ -167,6 +167,15 @@ class TestReviewCases(unittest.TestCase):
         outcome = decide([("L", items("<b>אֶת־צֶֽמַח</b> דָּוִד עַבְדְּךָ", "מְהֵרָה תַצְמִיחַ"))], index)
         self.assertEqual(outcome.decided[0].urn, T + "prayer:amidah/david")
 
+    def test_another_rites_wording_keeps_the_urn(self):
+        index = IncipitIndex()
+        ashkenaz = "רְצֵה יְהֹוָה אֱלֹהֵינוּ בְּעַמְּךָ יִשְׂרָאֵל וּבִתְפִלָּתָם וְהָשֵׁב אֶת הָעֲבוֹדָה לִדְבִיר בֵּיתֶךָ"
+        index.add(T + "prayer:amidah/avodah", words(ashkenaz))
+        index.add(T + "prayer:amidah/avodah/retzeh", words(ashkenaz))
+        sefard = ["<b>רְצֵה</b> יְהֹוָה אֱלֹהֵינוּ בְּעַמְּךָ יִשְׂרָאֵל", "וְלִתְפִלָּתָם שְׁעֵה וְהָשֵׁב אֶת הָעֲבוֹדָה לִדְבִיר בֵּיתֶךָ"]
+        outcome = decide([("L", items(*sefard))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "prayer:amidah/avodah/retzeh")
+
     def test_one_part_does_not_claim_the_whole(self):
         # The parent's opening is the first part's, but the block holds only that part and one
         # of three others: it stays the part.
