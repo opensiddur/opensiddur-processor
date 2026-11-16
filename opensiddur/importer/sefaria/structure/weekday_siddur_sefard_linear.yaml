@@ -1,0 +1,93 @@
+# Where each node of Sefaria's schema for the Weekday Siddur sits in the book's running order:
+# its siddur: URN (specs/SIDDUR_URN_SCHEME.md), scoped to the Metsudah projects by @project.
+#
+# A node is named by its English keys joined by " / ". An inner node names the division that
+# holds its children; a leaf names the structure file that holds its text's transclusions and
+# rubrics. A leaf Sefaria has left empty (Hoshanos, the weekday Selichos) is listed with no
+# path and is skipped; any other node missing here is an error.
+
+The Morning Prayers: chol/shacharit
+The Morning Prayers / Upon Arising in the Morning: chol/shacharit/upon_arising
+The Morning Prayers / Putting On the Tallis: chol/shacharit/tallit
+The Morning Prayers / Putting on the Tefillin: chol/shacharit/tefillin
+The Morning Prayers / Ma Tovu: chol/shacharit/mah_tovu
+The Morning Prayers / Adon Olam: chol/shacharit/adon_olam
+The Morning Prayers / Yigdal: chol/shacharit/yigdal
+The Morning Prayers / Blessings Upon Arising: chol/shacharit/birkhot_hashkamah
+The Morning Prayers / Blessings of the Torah: chol/shacharit/birkhot_hatorah
+The Morning Prayers / Morning Blessings: chol/shacharit/birkhot_hashachar
+The Morning Prayers / Akeidah (The Binding of Isaac): chol/shacharit/aqedah
+The Morning Prayers / Morning Supplications: chol/shacharit/baqqashot
+The Morning Prayers / Korbanos (Sacrificial Offerings): chol/shacharit/qorbanot
+The Morning Prayers / Korban Tamid (Daily Offering): chol/shacharit/qorban_tamid
+The Morning Prayers / Ketores (Incense Offering): chol/shacharit/qetoret
+The Morning Prayers / Kaddish d'Rabanan: chol/shacharit/kaddish_derabbanan
+The Morning Prayers / Hodu: chol/shacharit/hodu
+The Morning Prayers / Mizmor Shir: chol/shacharit/mizmor_shir
+The Morning Prayers / Baruch She'amar: chol/shacharit/barukh_sheamar
+The Morning Prayers / Mizmor Lesodah: chol/shacharit/mizmor_letodah
+The Morning Prayers / Yehi Chevod: chol/shacharit/yehi_khevod
+The Morning Prayers / Ashrei: chol/shacharit/ashrei
+The Morning Prayers / Shiras Hayam: chol/shacharit/shirat_hayam
+The Morning Prayers / Yishtabach: chol/shacharit/yishtabbach
+The Morning Prayers / The Blessings of Shema: chol/shacharit/birkhot_keriat_shema
+The Morning Prayers / Recitation of Shema: chol/shacharit/keriat_shema
+The Morning Prayers / Shemoneh Esrei: chol/shacharit/shemoneh_esreh
+The Morning Prayers / Tachanun: chol/shacharit/tachanun
+The Morning Prayers / Avinu Malkeinu: chol/shacharit/avinu_malkenu
+The Morning Prayers / Vehu Rachum: chol/shacharit/vehu_rachum
+The Morning Prayers / Reading of the Torah: chol/shacharit/keriat_hatorah
+The Morning Prayers / Birchas Hagomeil: chol/shacharit/birkat_hagomel
+The Morning Prayers / Berachah for Father of Bar Mitzvah: chol/shacharit/bar_mitzvah
+The Morning Prayers / Ashrei U'va L'Tzion: chol/shacharit/ashrei_uva_letziyyon
+The Morning Prayers / Psalm of the Day: chol/shacharit/shir_shel_yom
+The Morning Prayers / My Soul Bless: chol/shacharit/barekhi_nafshi
+The Morning Prayers / Psalm from Rosh Chodesh Elul: chol/shacharit/ledavid_adonai_ori
+The Morning Prayers / Psalm in the House of a Mourner: chol/shacharit/mizmor_leveit_haavel
+The Morning Prayers / Aleinu: chol/shacharit/aleinu
+The Morning Prayers / Mourner's Kaddish: chol/shacharit/kaddish_yatom
+The Morning Prayers / Six Verses of Remembrance: chol/shacharit/shesh_zekhirot
+The Morning Prayers / Thirteen Principles of Faith: chol/shacharit/shelosh_esreh_iqqarim
+The Morning Prayers / The Chapter of Reverence for God: chol/shacharit/parashat_hayirah
+The Morning Prayers / The Chapter of Repentance: chol/shacharit/parashat_hateshuvah
+The Morning Prayers / The Chapter of Mannah: chol/shacharit/parashat_haman
+Birkas Hamazon: berakhot/birkat_hamazon
+Concluding Blessings: berakhot/berakhah_meein_shalosh
+Berachos Said Before Performing Mitzvos: berakhot/birkhot_hamitzvot
+Berachos Said Before Eating or Drinking: berakhot/birkhot_hanehenin
+Berachos Said Upon Witnessing Phenomenal Sights: berakhot/birkhot_hareiyah
+Various Other Berachos: berakhot/various
+Marriage Service: lifecycle/nissuin
+Birchas Hamazon for Sheva Berachos: lifecycle/sheva_berakhot_birkat_hamazon
+Service at a Circumcision: lifecycle/berit_milah
+Birkas Hamzon for Bris Milah: lifecycle/berit_milah_birkat_hamazon
+Redemption of the Firstborn: lifecycle/pidyon_haben
+The Travelers' Prayer: berakhot/tefillat_haderekh
+Mincha: chol/minchah
+Mincha / Ashrei: chol/minchah/ashrei
+Mincha / Shemoneh Esrei: chol/minchah/shemoneh_esreh
+Mincha / Tachanun: chol/minchah/tachanun
+Mincha / Aleinu: chol/minchah/aleinu
+Maariv: chol/arvit
+Maariv / Berachos Preceding Shema: chol/arvit/blessings_before_shema
+Maariv / Shema: chol/arvit/shema
+Maariv / Berachos Following Shema: chol/arvit/blessings_after_shema
+Maariv / Shemoneh Esrei: chol/arvit/shemoneh_esreh
+Maariv / Motzei Shabbos Prayers: chol/arvit/motzaei_shabbat
+Maariv / Aleinu: chol/arvit/aleinu
+Counting the Omer: sefirat_haomer
+Prayer Before Retiring at Night: chol/keriat_shema_al_hamittah
+Berachos on Lulav: sukkot/netilat_lulav
+Hallel: hallel
+Musaf for Rosh Chodesh: rosh_chodesh/musaf
+Musaf for Chol Hamo'ed: chol_hamoed/musaf
+Hoshanos:
+Chanukah Service: chanukah
+Purim Service: purim
+Selichos:
+Selichos / Monday (1):
+Selichos / Thursday:
+Selichos / Monday (2):
+Selichos / Tenth of Teves:
+Selichos / Fast of Esther:
+Selichos / Seventeenth of Tamuz:

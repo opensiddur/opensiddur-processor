@@ -1,0 +1,33 @@
+# The Sefaria works this importer converts, and everything about them that differs from one to
+# the next. See specs/SEFARIA_IMPORT.md.
+#
+# key            the work's directory under sourcetexts/sources/sefaria/, and its name in the
+#                importer's decision files
+# title          Sefaria's index title
+# versions       the versionTitle of the Hebrew and of the English version imported, exactly as
+#                the version file gives it (with any colon; Sefaria's file names drop it)
+# projects       the Hebrew and English project IDs (specs/NAMING_SCHEME.md)
+# title_en/he    the titles the project headers carry
+# rite           the rite, as the headers describe it
+# licence        the licence of both versions: Sefaria's "CC-BY" is CC BY 3.0
+# publisher, translator, date
+#                the printed source the versions transcribe
+
+weekday_siddur_sefard_linear:
+  title: Weekday Siddur Sefard Linear
+  versions:
+    he: "The Metsudah siddur: a new linear siddur with English translation by Avrohom Davis, 1981"
+    en: "The Metsudah siddur: a new linear siddur with English translation by Avrohom Davis, 1981 [en]"
+  projects:
+    he: metsudah_siddur_weekday-davis-1981-he
+    en: metsudah_siddur_weekday-davis-1981-en
+  title_en: "The Metsudah Siddur: A New Linear Siddur (Weekday)"
+  title_he: "סידור ספרד לימות החול"
+  rite: >-
+    Nusach Sefard (Nusach haAri), the Chassidic variant of the Ashkenazi rite; not the rite of
+    the Sefaradim or Edot haMizrach.
+  licence: https://creativecommons.org/licenses/by/3.0/
+  publisher: Metsudah Publications
+  place: New York
+  translator: Avrohom Davis
+  date: "1981"
