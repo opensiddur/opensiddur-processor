@@ -23288,3 +23288,97 @@
 {"urn": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin/1", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:a_ten_step_dolgin", "label_en": "A Ten-Step, Four-Worlds, One-Earth Tashlikh, by Avi Dolgin / 1"}
 {"urn": "urn:x-opensiddur:text:prayer:preview", "status": "canonical", "label_en": "Synthetic settings preview"}
 {"urn": "urn:x-opensiddur:text:prayer:preview/parallel", "status": "canonical", "label_en": "Synthetic parallel preview passage", "parent": "urn:x-opensiddur:text:prayer:preview"}
+{"urn": "urn:x-opensiddur:text:prayer:reshit_chakhmah_yirat", "status": "canonical", "label_he": "רֵאשִׁית חָכְמָה יִרְאַת יְהֹוָה, שֵֽׂכֶל טוֹב", "label_en": "reshit chakhmah yirat"}
+{"urn": "urn:x-opensiddur:text:prayer:leshem_yichud_qudesha", "status": "canonical", "label_he": "לְשֵׁם יִחוּד קוּדְ֒שָׁא בְּרִיךְ הוּא וּשְׁ֒כִינְתֵּהּ", "label_en": "leshem yichud qudesha"}
+{"urn": "urn:x-opensiddur:text:prayer:hareini_meqabbel_alay", "status": "canonical", "label_he": "הֲרֵינִי מְקַבֵּל עָלַי מִצְוַת עֲשֵׂה שֶׁל", "label_en": "hareini meqabbel alay"}
+{"urn": "urn:x-opensiddur:text:prayer:vesamu_et_shemi", "status": "canonical", "label_he": "וְשָׂמוּ אֶת שְׁמִי עַל בְּנֵי יִשְׂרָאֵל", "label_en": "vesamu et shemi"}
+{"urn": "urn:x-opensiddur:text:prayer:hanoten_lasekhvi_vinah", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "hanoten lasekhvi vinah"}
+{"urn": "urn:x-opensiddur:text:prayer:ribbono_shel_olam_kemo", "status": "canonical", "label_he": "רִבּוֹנוֹ שֶׁל עוֹלָם כְּמוֹ שֶׁכָּבַשׁ אַבְרָהָם", "label_en": "ribbono shel olam kemo"}
+{"urn": "urn:x-opensiddur:text:prayer:ribbon_kal_haolamim", "status": "canonical", "label_he": "רִבּוֹן כָּל הָעוֹלָמִים וַאֲדוֹנֵי הָאֲדוֹנִים, לֹא", "label_en": "ribbon kal haolamim"}
+{"urn": "urn:x-opensiddur:text:prayer:barukh_shem_kevod", "status": "canonical", "label_he": "בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ לְעוֹלָם וָעֶד:", "label_en": "barukh shem kevod"}
+{"urn": "urn:x-opensiddur:text:prayer:vaydabber_adonai_el", "status": "canonical", "label_he": "וַיְדַבֵּר יְהֹוָה אֶל־משֶׁה לֵּאמֹר: צַו אֶת־אַהֲרֹן", "label_en": "vaydabber adonai el"}
+{"urn": "urn:x-opensiddur:text:prayer:vehiqtir_alav_aharon", "status": "canonical", "label_he": "וְהִקְטִיר עָלָיו אַהֲרֹן קְטֹֽרֶת סַמִּים בַּבֹּֽקֶר", "label_en": "vehiqtir alav aharon"}
+{"urn": "urn:x-opensiddur:text:prayer:veneemar_zot_hatorah", "status": "canonical", "label_he": "וְנֶאֱמַר זֹאת הַתּוֹרָה לָעֹלָה לַמִּנְחָה וְלַחַטָּאת", "label_en": "veneemar zot hatorah"}
+{"urn": "urn:x-opensiddur:text:prayer:uverashei_chadsheikhem_taqrivu", "status": "canonical", "label_he": "וּבְרָאשֵׁי חָדְשֵׁיכֶם תַּקְרִֽיבוּ עֹלָה לַיהוָֹה פָּרִים", "label_en": "uverashei chadsheikhem taqrivu"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_milefanekha", "status": "canonical", "label_he": "יְהִי רָצוֹן מִלְּ֒פָנֶֽיךָ יְהֹוָה אֱלֹהֵֽינוּ וֵאלֹהֵי", "label_en": "yehi ratzon milefanekha"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_keillu", "status": "canonical", "label_he": "יְהִי רָצוֹן כְּאִֽלּוּ הִקְרַֽבְתִּי עוֹלָה:", "label_en": "yehi ratzon keillu"}
+{"urn": "urn:x-opensiddur:text:prayer:miqal_vachomer_umiggezerah", "status": "canonical", "label_he": "מִקַּל וָחֹֽמֶר, וּמִגְּ֒זֵרָה שָׁוָה, מִבִּנְיַן אָב", "label_en": "miqal vachomer umiggezerah"}
+{"urn": "urn:x-opensiddur:text:prayer:hodu_ladonai_qiru", "status": "canonical", "label_he": "הוֹדוּ לַיהוָֹה קִרְאוּ בִשְׁמוֹ הוֹדִֽיעוּ בָעַמִּים", "label_en": "hodu ladonai qiru"}
+{"urn": "urn:x-opensiddur:text:prayer:hoshienu_adonai_eloheinu", "status": "canonical", "label_he": "הֽוֹשִׁיעֵֽנוּ יְהוָֹה אֱלֹהֵֽינוּ, וְקַבְּ֒צֵֽנוּ מִן־הַגּוֹיִם לְהוֹדוֹת", "label_en": "hoshienu adonai eloheinu"}
+{"urn": "urn:x-opensiddur:text:prayer:hael_haav_harachaman", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "hael haav harachaman"}
+{"urn": "urn:x-opensiddur:text:prayer:mizmor_letodah_hariu", "status": "canonical", "label_he": "מִזְמוֹר לְתוֹדָה הָרִֽיעוּ לַיהוָֹה כָּל־הָאָֽרֶץ: עִבְדוּ", "label_en": "mizmor letodah hariu"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_khevod_adonai", "status": "canonical", "label_he": "יְהִי כְבוֹד יְהֹוָה לְעוֹלָם יִשְׂמַח יְהֹוָה", "label_en": "yehi khevod adonai"}
+{"urn": "urn:x-opensiddur:text:prayer:haleluyah_shiru_ladonai", "status": "canonical", "label_he": "הַלְ֒לוּיָהּ שִֽׁירוּ לַיהוָֹה שִׁיר חָדָשׁ תְּהִלָּתוֹ", "label_en": "haleluyah shiru ladonai"}
+{"urn": "urn:x-opensiddur:text:prayer:barukh_adonai_leolam", "status": "canonical", "label_he": "בָּרוּךְ יְהֹוָה לְעוֹלָם אָמֵן וְאָמֵן: בָּרוּךְ", "label_en": "barukh adonai leolam"}
+{"urn": "urn:x-opensiddur:text:prayer:vayvarekh_david_et", "status": "canonical", "label_he": "וַיְבָֽרֶךְ דָּוִיד אֶת־יְהֹוָה לְעֵינֵי כָּל־הַקָּהָל וַיֹּֽאמֶר", "label_en": "vayvarekh david et"}
+{"urn": "urn:x-opensiddur:text:prayer:vekharot_immo_haberit", "status": "canonical", "label_he": "וְכָרוֹת עִמּוֹ הַבְּ֒רִית לָתֵת אֶת־אֶֽרֶץ הַכְּ֒נַעֲנִי", "label_en": "vekharot immo haberit"}
+{"urn": "urn:x-opensiddur:text:prayer:vayyosha_adonai_bayom", "status": "canonical", "label_he": "וַיּֽוֹשַׁע יְהֹוָה בַּיּוֹם הַהוּא אֶת־יִשְׂרָאֵל מִיַּד", "label_en": "vayyosha adonai bayom"}
+{"urn": "urn:x-opensiddur:text:prayer:az_yashir_msheh", "status": "canonical", "label_he": "אָז יָשִׁיר משֶׁה וּבְנֵי יִשְׂרָאֵל אֶת־הַשִּׁירָה", "label_en": "az yashir msheh"}
+{"urn": "urn:x-opensiddur:text:prayer:titbarekh_lanetzach_tzurenu", "status": "canonical", "label_he": "תִּתְבָּרֵךְ לָנֶצַח צוּרֵֽנוּ מַלְכֵּֽנוּ וְגוֹאֲלֵֽנוּ, בּוֹרֵא", "label_en": "titbarekh lanetzach tzurenu"}
+{"urn": "urn:x-opensiddur:text:prayer:ahavat_olam_ahavtanu", "status": "canonical", "label_he": "אַהֲבַת עוֹלָם אֲהַבְתָּֽנוּ יְהֹוָה אֱלֹהֵֽינוּ חֶמְלָה", "label_en": "ahavat olam ahavtanu"}
+{"urn": "urn:x-opensiddur:text:prayer:el_melekh_neeman", "status": "canonical", "label_he": "אֵל מֶֽלֶךְ נֶאֱמָן:", "label_en": "el melekh neeman"}
+{"urn": "urn:x-opensiddur:text:prayer:vehayah_im_shamoa", "status": "canonical", "label_he": "וְהָיָה אִם־שָׁמֹֽעַ תִּשְׁמְ֒עוּ אֶל־מִצְוֹתַי אֲשֶׁר֯ אָ֯נֹכִי", "label_en": "vehayah im shamoa"}
+{"urn": "urn:x-opensiddur:text:prayer:vayyomer_adonai_el", "status": "canonical", "label_he": "וַֽיֹּאמֶר֯ יְ֯הֹוָה֯ אֶ֯ל־משֶׁה לֵּאמֹר: דַּבֵּר֯ אֶ֯ל־בְּנֵי", "label_en": "vayyomer adonai el"}
+{"urn": "urn:x-opensiddur:text:prayer:adonai_eloheikhem_emet", "status": "canonical", "label_he": "יְהֹוָה אֱלֹהֵיכֶם֯ אֱ֯מֶת:", "label_en": "adonai eloheikhem emet"}
+{"urn": "urn:x-opensiddur:text:prayer:morid_hatal_mashiv", "status": "canonical", "label_he": "מוֹרִיד הַטָּל מַשִּׁיב הָרֽוּחַ וּמוֹרִיד הַגֶּֽשֶׁם:", "label_en": "morid hatal mashiv"}
+{"urn": "urn:x-opensiddur:text:prayer:naqdishakh_venaaritzakh_kenoam", "status": "canonical", "label_he": "נַקְדִישָׁךְ וְנַעֲרִיצָךְ כְּנֹֽעַם שִֽׂיחַ סוֹד שַׂרְפֵי", "label_en": "naqdishakh venaaritzakh kenoam"}
+{"urn": "urn:x-opensiddur:text:prayer:leummatam_meshabbechim_veomerim", "status": "canonical", "label_he": "לְעֻמָּתָם מְשַׁבְּ֒חִים וְאוֹמְ֒רִים:", "label_en": "leummatam meshabbechim veomerim"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_milfanekha", "status": "canonical", "label_he": "יְהִי רָצוֹן מִלְפָנֶֽיךָ יְהֹוָה אֱלֹהֵֽינוּ וֵאלֹהֵי", "label_en": "yehi ratzon milfanekha"}
+{"urn": "urn:x-opensiddur:text:prayer:veal_hanissim_veal", "status": "canonical", "label_he": "וְעַל הַנִּסִּים וְעַל הַפֻּרְקָן וְעַל הַגְּ֒בוּרוֹת", "label_en": "veal hanissim veal"}
+{"urn": "urn:x-opensiddur:text:prayer:vehu_rachum_yekhapper", "status": "canonical", "label_he": "וְהוּא רַחוּם יְכַפֵּר עָוֺן וְלֹא־יַשְׁחִית וְהִרְבָּה", "label_en": "vehu rachum yekhapper"}
+{"urn": "urn:x-opensiddur:text:prayer:el_erekh_appayim_umale", "status": "canonical", "label_he": "אֵל אֶֽרֶךְ אַפַּֽיִם וּמָלֵא רַחֲמִים, אַל־תַּסְתֵּר", "label_en": "el erekh appayim umale"}
+{"urn": "urn:x-opensiddur:text:prayer:gaddelu_ladonai_itti", "status": "canonical", "label_he": "גַּדְּ֒לוּ לַיהוָֹה אִתִּי וּנְ֒רוֹמְ֒מָה שְׁמוֹ יַחְדָּו:", "label_en": "gaddelu ladonai itti"}
+{"urn": "urn:x-opensiddur:text:prayer:vezot_hatorah_asher", "status": "canonical", "label_he": "וְזֹאת הַתּוֹרָה אֲשֶׁר שָׂם משֶׁה לִפְנֵי", "label_en": "vezot hatorah asher"}
+{"urn": "urn:x-opensiddur:text:prayer:lealam_ulealemei_alemayya", "status": "canonical", "label_he": "לְעָלַם וּלְעָלְ֒מֵי עָלְ֒מַיָּא: יְהֹוָה אֱלֺהֵי אַבְרָהָם", "label_en": "lealam ulealemei alemayya"}
+{"urn": "urn:x-opensiddur:text:prayer:yehalelu_et_shem", "status": "canonical", "label_he": "יְהַלְ֒לוּ אֶת־שֵׁם יְהֹוָה כִּי־נִשְׂגָּב שְׁמוֹ לְבַדּוֹ:", "label_en": "yehalelu et shem"}
+{"urn": "urn:x-opensiddur:text:prayer:hameqareh_vamayim_aliotav", "status": "canonical", "label_he": "הַמְ֒קָרֶה בַמַּֽיִם עֲלִיּוֹתָיו הַשָּׂם־עָבִים רְכוּבוֹ, הַמְ֒הַלֵּךְ", "label_en": "hameqareh vamayim aliotav"}
+{"urn": "urn:x-opensiddur:text:prayer:qauh_el_adonai", "status": "canonical", "label_he": "קַוּה אֶל יְהֹוָה חֲזַק וְיַאֲמֵץ לִבֶּךָ", "label_en": "qauh el adonai"}
+{"urn": "urn:x-opensiddur:text:prayer:aleinu_leshabbecha_laadon", "status": "canonical", "label_he": "עָלֵֽינוּ לְשַׁבֵּֽחַ לַאֲדוֹן הַכֹּל לָתֵת גְּדֻלָּה", "label_en": "aleinu leshabbecha laadon"}
+{"urn": "urn:x-opensiddur:text:prayer:lemaan_tizkor_et", "status": "canonical", "label_he": "לְמַֽעַן תִּזְכֹּר אֶת יוֹם צֵאתְ֒ךָ מֵאֶֽרֶץ", "label_en": "lemaan tizkor et"}
+{"urn": "urn:x-opensiddur:text:prayer:raq_hishamer_lekha", "status": "canonical", "label_he": "רַק הִשָּֽׁמֶר לְךָ וּשְׁמֹר נַפְשְׁ֒ךָ מְאֹד", "label_en": "raq hishamer lekha"}
+{"urn": "urn:x-opensiddur:text:prayer:zakhor_et_asher", "status": "canonical", "label_he": "זָכוֹר אֵת אֲשֶׁר עָשָׂה לְךָ עֲמָלֵק,", "label_en": "zakhor et asher"}
+{"urn": "urn:x-opensiddur:text:prayer:zekhor_al_tishkach", "status": "canonical", "label_he": "זְכֹר אַל תִּשְׁכַּח אֵת אֲשֶׁר הִקְצַֽפְתָּ", "label_en": "zekhor al tishkach"}
+{"urn": "urn:x-opensiddur:text:prayer:zakhor_et_asher_asah", "status": "canonical", "label_he": "זָכוֹר אֵת אֲשֶׁר עָשָׂה יְהֹוָה אֱלֺהֶֽיךָ", "label_en": "zakhor et asher asah"}
+{"urn": "urn:x-opensiddur:text:prayer:veattah_yisrael_mah", "status": "canonical", "label_he": "וְעַתָּה֙ יִשְׂרָאֵ֔ל מָ֚ה יְהוָ֣ה אֱלֹהֶ֔יךָ שֹׁאֵ֖ל", "label_en": "veattah yisrael mah"}
+{"urn": "urn:x-opensiddur:text:prayer:vehayah_khi_yavou", "status": "canonical", "label_he": "וְהָיָה֩ כִֽי־יָבֹ֨אוּ עָלֶ֜יךָ כָּל־הַדְּבָרִ֣ים הָאֵ֗לֶּה הַבְּרָכָה֙", "label_en": "vehayah khi yavou"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_milefanekha_adonai", "status": "canonical", "label_he": "יְהִי רָצוֹן מִלְּ֒פָנֶֽיךָ יְהֺוָה אֱלֹהֵֽינוּ וֵאלֹהֵי", "label_en": "yehi ratzon milefanekha adonai"}
+{"urn": "urn:x-opensiddur:text:prayer:rabbotay_nevarekh_yehi", "status": "canonical", "label_he": "רַבּוֹתַי נְבָרֵךְ: יְהִי שֵׁם יְהֹוָה מְבֹרָךְ", "label_en": "rabbotay nevarekh yehi"}
+{"urn": "urn:x-opensiddur:text:prayer:bireshut_maranan_verabbanan", "status": "canonical", "label_he": "בִּרְ֒שׁוּת מָרָנָן וְרַבָּנָן וְרַבּוֹתַי נְבָרֵךְ (בעשרה", "label_en": "bireshut maranan verabbanan"}
+{"urn": "urn:x-opensiddur:text:prayer:barukh_sheakhalnu_mishello", "status": "canonical", "label_he": "בָּרוּךְ (בעשרה אֱלֺהֵֽינוּ) שֶֽׁאָכַֽלְנוּ מִשֶּׁלּוֹ וּבְ֒טוּבוֹ", "label_en": "barukh sheakhalnu mishello"}
+{"urn": "urn:x-opensiddur:text:prayer:asher_natan_shabbatot", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "asher natan shabbatot"}
+{"urn": "urn:x-opensiddur:text:prayer:asher_natan_rashei", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "asher natan rashei"}
+{"urn": "urn:x-opensiddur:text:prayer:asher_natan_yamim", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "asher natan yamim"}
+{"urn": "urn:x-opensiddur:text:prayer:vehazzemannim", "status": "canonical", "label_he": "וְהַזְּ֒מַנִּים:", "label_en": "vehazzemannim"}
+{"urn": "urn:x-opensiddur:text:prayer:asher_natan_yamim_tovim", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "asher natan yamim tovim"}
+{"urn": "urn:x-opensiddur:text:prayer:veyom_hazikkaron", "status": "canonical", "label_he": "וְיוֹם הַזִכָּרוֹן:", "label_en": "veyom hazikkaron"}
+{"urn": "urn:x-opensiddur:text:prayer:al_hamichyah_veal", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶלֶֽךְ הָעוֹלָם", "label_en": "al hamichyah veal"}
+{"urn": "urn:x-opensiddur:text:prayer:al_hagefen_veal", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶלֶֽךְ הָעוֹלָם", "label_en": "al hagefen veal"}
+{"urn": "urn:x-opensiddur:text:prayer:al_haetz_veal", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֺהֵֽינוּ מֶלֶֽךְ הָעוֹלָם", "label_en": "al haetz veal"}
+{"urn": "urn:x-opensiddur:text:prayer:veal_hagefen_veal", "status": "canonical", "label_he": "וְעַל הַגֶּֽפֶן וְעַל פְּרִי הַגֶּֽפֶן וְעַל", "label_en": "veal hagefen veal"}
+{"urn": "urn:x-opensiddur:text:prayer:laasot_maaqeh", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "laasot maaqeh"}
+{"urn": "urn:x-opensiddur:text:prayer:al_tevilat_kelim", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "al tevilat kelim"}
+{"urn": "urn:x-opensiddur:text:prayer:lehafrish_challah_min", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "lehafrish challah min"}
+{"urn": "urn:x-opensiddur:text:prayer:sheasah_li_nes", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "sheasah li nes"}
+{"urn": "urn:x-opensiddur:text:prayer:sheasah_nes_leavi", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "sheasah nes leavi"}
+{"urn": "urn:x-opensiddur:text:prayer:bore_atzei_vesamim", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "bore atzei vesamim"}
+{"urn": "urn:x-opensiddur:text:prayer:bore_isvei_vesamim", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהוָֹה אֱלֺהֵֽינוּ מֶֽלֶךְ הָעוֹלָם,", "label_en": "bore isvei vesamim"}
+{"urn": "urn:x-opensiddur:text:prayer:barukh_eloheinu_shehashimchah", "status": "canonical", "label_he": "בָּרוּךְ אֱלֺהֵֽינוּ שֶׁהַשִּׁמְחָה בִּמְעוֹנוֹ (וְ)שֶׁאָכַֽלְנוּ מִשֶּׁלּוֹ", "label_en": "barukh eloheinu shehashimchah"}
+{"urn": "urn:x-opensiddur:text:prayer:barukh_haba_zeh", "status": "canonical", "label_he": "בָּרוּךְ הַבָּא: זֶה הַכִּסֵּא שֶׁל אֵלִיָּֽהוּ", "label_en": "barukh haba zeh"}
+{"urn": "urn:x-opensiddur:text:prayer:amen_keshem_shenikhnas", "status": "canonical", "label_he": "אָמֵן. כְּשֵׁם שֶׁנִּכְנַס לַבְּרִית, כֵּן יִכָּנֵס", "label_en": "amen keshem shenikhnas"}
+{"urn": "urn:x-opensiddur:text:prayer:birshut_hakohanim_vehaleviyyim", "status": "canonical", "label_he": "בִּרְשׁוּת הַכֹּהֲנִים וְהַלְ֒וִיִּם, אֶקְרָא לֵאלֺהֵי הָעִבְרִיִּים,", "label_en": "birshut hakohanim vehaleviyyim"}
+{"urn": "urn:x-opensiddur:text:prayer:birshut_maranan_verabbanan", "status": "canonical", "label_he": "בִּרְשׁוּת מָרָנָן וְרַבָּנָן וְרַבּוֹתַי, אֶפְתַּח פִּי", "label_en": "birshut maranan verabbanan"}
+{"urn": "urn:x-opensiddur:text:prayer:zeh_beni_bekhori", "status": "canonical", "label_he": "זֶה בְּנִי בְּכוֹרִי וְהוּא פֶּטֶר רֶחֶם", "label_en": "zeh beni bekhori"}
+{"urn": "urn:x-opensiddur:text:prayer:zeh_tachat_zeh", "status": "canonical", "label_he": "זֶה תַּחַת זֶה זֶה חִלּוּף זֶה", "label_en": "zeh tachat zeh"}
+{"urn": "urn:x-opensiddur:text:prayer:ki_shem_adonai", "status": "canonical", "label_he": "כִּי שֵׁם יְהֹוָה אֶקְרָא הָבוּ גֹֽדֶל", "label_en": "ki shem adonai"}
+{"urn": "urn:x-opensiddur:text:prayer:ki_el_melekh", "status": "canonical", "label_he": "כִּי אֵל מֶֽלֶךְ רוֹפֵא נֶאֱמָן וְרַחֲמָן", "label_en": "ki el melekh"}
+{"urn": "urn:x-opensiddur:text:prayer:vehu_rachum_yekhapper_aon", "status": "canonical", "label_he": "וְהוּא רַחוּם יְכַפֵּר עָוֹן וְלֹא־יַשְׁחִית וְהִרְבָּה", "label_en": "vehu rachum yekhapper aon"}
+{"urn": "urn:x-opensiddur:text:prayer:attah_chonen_leadam", "status": "canonical", "label_he": "אַתָּה חוֹנֵן לְאָדָם דַּֽעַת וּמְ֒לַמֵּד לֶאֱנוֹשׁ", "label_en": "attah chonen leadam"}
+{"urn": "urn:x-opensiddur:text:prayer:attah_hu_adonai", "status": "canonical", "label_he": "אַתָּה הוּא יְהֺוָה הָאֱלֹהִים הַזָּן וּמְפַרְנֵס", "label_en": "attah hu adonai"}
+{"urn": "urn:x-opensiddur:text:prayer:vihi_noam_adonay", "status": "canonical", "label_he": "וִיהִי נֹֽעַם אֲדֹנָי אֱלֹהֵֽינוּ עָלֵֽינוּ וּמַעֲשֵׂה", "label_en": "vihi noam adonay"}
+{"urn": "urn:x-opensiddur:text:prayer:ribbono_shel_olam_hareini", "status": "canonical", "label_he": "רִבּוֹנוֹ שֶׁל־עוֹלָם הֲרֵינִי מוֹחֵל לְכָל־מִי שֶׁהִכְעִיס", "label_en": "ribbono shel olam hareini"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_milefanekha_adonai_elohay", "status": "canonical", "label_he": "יְהִי רָצוֹן מִלְּפָנֶֽיךָ יְהֹוָה אֱלֹהַי וֵאלֹהֵי", "label_en": "yehi ratzon milefanekha adonai elohay"}
+{"urn": "urn:x-opensiddur:text:prayer:al_netilat_lulav", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "al netilat lulav"}
+{"urn": "urn:x-opensiddur:text:prayer:keter_yittenu_lekha", "status": "canonical", "label_he": "כֶּֽתֶר יִתְּ֒נוּ לְךָ יְהֹוָה אֱלֹהֵֽינוּ מַלְאָכִים", "label_en": "keter yittenu lekha"}
+{"urn": "urn:x-opensiddur:text:prayer:addir_bamarom_shokhen", "status": "canonical", "label_he": "אַדִּיר בַּמָּרוֹם שׁוֹכֵן בִּגְ֒בוּרָה, אַתָּה שָׁלוֹם", "label_en": "addir bamarom shokhen"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_milefanekha_adonai_eloheinu", "status": "canonical", "label_he": "יְהִי רָצוֹן מִלְּ֒פָנֶֽיךָ יְהֹוָה אֱלֹהֵֽינוּ וֵאלֹהֵי", "label_en": "yehi ratzon milefanekha adonai eloheinu"}
+{"urn": "urn:x-opensiddur:text:prayer:hanerot_halalu_anu", "status": "canonical", "label_he": "הַנֵּרוֹת הַלָּלוּ אָנוּ מַדְלִיקִין עַל הַנִּסִּים", "label_en": "hanerot halalu anu"}
