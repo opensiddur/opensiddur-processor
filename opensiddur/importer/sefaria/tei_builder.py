@@ -233,6 +233,8 @@ class VariantPrinting:
     name: str
     block: TextBlock
     numbers: list[int]
+    #: texts the collection names among the variant's own words: first phrase number -> URN
+    parts: dict[int, str] = field(default_factory=dict)
 
 
 class _TextWriter:
@@ -336,11 +338,21 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
         for variant, by_anchor in passages:
             if anchor in by_anchor:
                 xml_id = writer.open_condition([(variant_urn(urn, variant.name), True)])
+                part_open = False
                 for pair, number in by_anchor[anchor]:
                     if number is None:
                         writer.rubric(pair)
-                    else:
-                        writer.phrase(pair, number)
+                        continue
+                    if number in variant.parts:
+                        # A text the collection names, inside this text: its URN on a
+                        # milestone (the next part's ends it), its scope closed with the passage.
+                        writer.end_phrase()
+                        writer.parts.append(f'<tei:milestone unit="prayer" corresp="{attr(variant.parts[number])}"/>')
+                        part_open = True
+                    writer.phrase(pair, number)
+                if part_open:
+                    writer.end_phrase()
+                    writer.parts.append('<tei:milestone unit="prayer"/>')
                 writer.close_condition(xml_id)
 
     insert(None)

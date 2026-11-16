@@ -189,8 +189,9 @@ def text_printings(plan: WorkPlan) -> dict[str, list[VariantPrinting]]:
             if isinstance(item, TextBlock):
                 record = plan.record(leaf_path, item)
                 if record.kind == "variant" and record.variant:
-                    found.setdefault(record.urn, []).append(
-                        VariantPrinting(record.variant, item, record.phrases or []))
+                    found.setdefault(record.urn, []).append(VariantPrinting(
+                        record.variant, item, record.phrases or [],
+                        {int(n): u for n, u in (record.parts or {}).items()}))
     return found
 
 

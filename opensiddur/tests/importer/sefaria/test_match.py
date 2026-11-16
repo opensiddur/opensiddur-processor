@@ -186,6 +186,20 @@ class TestReviewCases(unittest.TestCase):
                          ("variant", first.urn, "chol_minchah_amidah"))
         self.assertEqual(second.phrases, [1, 2, 5, 3, 4])
 
+    def test_a_long_passage_introduced_by_a_rubric_stands_inside_the_text(self):
+        # Nachem at Minchah of Tisha b'Av: the text, then "On Tisha b'Av:" and a long passage of
+        # its own, then the rest of the text.
+        passage = [f"נַחֵם יְהֹוָה אֱלֹהֵינוּ פָּסוּק {n} חָדָשׁ לְגַמְרֵי" for n in "אבגדהוזחט"]
+        later = [*MODEH[:2], ("", "<small>On Tisha b'Av:</small>"), *[(p, "x") for p in passage], *MODEH[2:]]
+        leaf = Leaf(("B",), (("B", "B"),), tuple(h if isinstance(h, str) else h[0] for h in later),
+                    tuple("e" if isinstance(h, str) else h[1] for h in later))
+        later_items = divide(align_leaf(leaf).pairs)
+        outcome = decide_work("w", [("A", items(*MODEH)), ("B", later_items)], IncipitIndex(), {}, set(),
+                              spellings=NO_SPELLINGS, places={"B": "chol/minchah"})
+        b = [r for r in outcome.decided if r.leaf == "B"]
+        self.assertEqual([r.kind for r in b], ["variant"])
+        self.assertEqual(b[0].phrases, [1, 2, *range(5, 14), 3, 4])
+
     def test_one_part_does_not_claim_the_whole(self):
         # The parent's opening is the first part's, but the block holds only that part and one
         # of three others: it stays the part.

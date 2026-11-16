@@ -140,6 +140,11 @@ Each text's URN, in order of preference:
      place that transcludes the text declares (`j:declare`) which of its variants it prints,
      so each compiles as its own printing; a transclusion elsewhere that declares nothing keeps
      every passage. A variant's own phrases are numbered after every number the text has used.
+     A long passage of its own stands inside the text, rather than ending it, when the book
+     introduces it with a rubric and the rest of the text follows it in order; and a passage
+     that is a text the collection names (Nachem is Birnbaum's
+     `amidah/nachem_hashem_eloheinu`) carries that text's URN, part by part, on
+     `tei:milestone unit="prayer"`.
 2. **An existing text.** The block's opening is looked up in the incipit index of the
    collection's Hebrew projects (`util/incipit.py`, shared with the opensiddur.org importer).
    The opensiddur.org imports and the Sefaria imports themselves are left out: their openings

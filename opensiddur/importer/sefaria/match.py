@@ -84,6 +84,9 @@ class TextRecord:
     #: For a "variant" -- a later printing of a text with words of its own -- its name: the
     #: last component of its condition URN (``tei_builder.variant_urn``).
     variant: str | None = None
+    #: For a "variant", the texts the collection already names among its own words: the
+    #: number of the passage's first phrase -> the text's URN (Nachem in Boneh Yerushalayim).
+    parts: dict[str, str] | None = None
 
     @property
     def key(self) -> tuple[str, str, int]:
@@ -375,15 +378,26 @@ REPEAT_COVERAGE = 0.75
 REPEAT_GAP = 3
 
 
+#: The share of an earlier printing that must follow a variant's own passage, for the passage
+#: to stand inside the text rather than after it.
+INSERTION_REST = 0.15
+
 #: The share, for a variant, in place of :data:`REPEAT_COVERAGE`: a later printing that adds or
 #: leaves out a passage (Nachem at Minchah of Tisha b'Av) is still the text.
 VARIANT_COVERAGE = 0.5
 
 
-def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float = REPEAT_COVERAGE) -> int | None:
+def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float = REPEAT_COVERAGE,
+                  *, insertions: bool = False, introduced: frozenset[int] = frozenset()) -> int | None:
     """How many of a block's phrases are a later printing of ``earlier`` (phrase skeletons),
     or None when the block is not that text. Phrases are paired as :func:`map_phrases` pairs
-    them, so a phrase that is mostly the same counts."""
+    them, so a phrase that is mostly the same counts.
+
+    With ``insertions``, a passage of the block's own may stand in the middle, however long:
+    when the book introduces it with a rubric (its first phrase in ``introduced``, the block's
+    phrases a rubric comes before) and the rest of ``earlier`` follows it, in order, to its last
+    phrase (Minchah's Boneh Yerushalayim, Nachem printed before its closing), the printing runs
+    on to there."""
     if not earlier or not block_phrases:
         return None
     numbers = map_phrases(block_phrases, {i + 1: s for i, s in enumerate(earlier)})
@@ -397,10 +411,38 @@ def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float 
     end = needed - 1
     while end + 1 < len(matched) and matched[end + 1] - matched[end] <= REPEAT_GAP:
         end += 1
+    if insertions and end + 1 < len(matched):
+        seen = [numbers[i] for i in matched[:end + 1]]
+        rest = [numbers[i] for i in matched[end + 1:]]
+        rest_at = matched[end + 1:]
+        # The rest of the earlier printing, after the passage: all of it, in order, without
+        # gaps, and enough of it -- a closing "וְאִמְרוּ אָמֵן" many texts share is not.
+        if (matched[end] + 1 in introduced
+                and rest == sorted(rest) and min(rest) > max(seen)
+                and sorted(seen + rest) == list(range(1, len(earlier) + 1))
+                and len(rest) >= max(2, math.ceil(INSERTION_REST * len(earlier)))
+                and all(b - a <= REPEAT_GAP for a, b in zip(rest_at, rest_at[1:]))):
+            return matched[-1] + 1
     length = matched[end] + 1
     if (end + 1) / length >= coverage:
         return length
     return None
+
+
+def introduced_phrases(block: TextBlock) -> frozenset[int]:
+    """The positions of a block's phrases that a rubric comes directly before."""
+    found: set[int] = set()
+    position = 0
+    after_rubric = False
+    for pair in block.pairs:
+        if pair in block.phrases:
+            if after_rubric:
+                found.add(position)
+            position += 1
+            after_rubric = False
+        else:
+            after_rubric = True
+    return frozenset(found)
 
 
 def mint(text: str, taken: set[str], spellings: Spellings) -> str:
@@ -491,6 +533,9 @@ class _Decider:
         self.numbers_used: dict[str, int] = {}
         #: the variant names each text has
         self.variant_names: dict[str, set[str]] = {}
+        #: texts the collection names that a variant's own words are, each used once
+        self.parts_used: set[str] = set()
+        self._printed_numbers: set[int] = set()
         self.index = index
         self.records = records
         self.taken = taken
@@ -539,6 +584,7 @@ class _Decider:
         """Take a current record into account without deciding anew."""
         if record.kind == "variant":
             self.note_numbers(record.urn, record.phrases or [])
+            self.parts_used.update((record.parts or {}).values())
             self.variant_names.setdefault(record.urn, set()).add(record.variant or "")
         elif record.kind != "repeat":
             self.remember(record.urn, leaf, blocks, block, record.phrases)
@@ -626,7 +672,8 @@ class _Decider:
             earlier = self.printed[urn]
             earlier_skeletons = phrase_skeletons(earlier.block)
             # Where each printing of the text ends in the other, matching mostly-same phrases.
-            length = repeat_length(skeletons, earlier_skeletons, VARIANT_COVERAGE)
+            length = repeat_length(skeletons, earlier_skeletons, VARIANT_COVERAGE, insertions=True,
+                                   introduced=introduced_phrases(block))
             earlier_length = repeat_length(earlier_skeletons, skeletons, VARIANT_COVERAGE)
             if (earlier_length is not None and earlier_length < len(earlier_skeletons)
                     and skeletons == earlier_skeletons[:earlier_length]):
@@ -668,15 +715,57 @@ class _Decider:
         self.taken.add(urn)
         phrases = None
         variant_name = None
+        parts = None
         if kind == "variant":
             phrases = self.variant_numbers(urn, skeletons)
             variant_name = self.variant_name(urn, leaf, block)
+            parts = self.inserted_texts(block, phrases, evidence) or None
         elif kind != "repeat":
             phrases = self.phrase_numbers(urn, skeletons, evidence)
             self.remember(urn, leaf, blocks, block, phrases)
         self.save(TextRecord(work=self.work_key, leaf=leaf, block=block.first_index, urn=urn, kind=kind,
                              incipit=" ".join(text.split()[:INCIPIT_WORDS]), as_of=block_hash(block),
-                             evidence=evidence, phrases=phrases, variant=variant_name), lapsed=record)
+                             evidence=evidence, phrases=phrases, variant=variant_name, parts=parts),
+                  lapsed=record)
+
+    def inserted_texts(self, block: TextBlock, phrases: list[int], evidence: list[str]) -> dict[str, str]:
+        """The variant's own passages that are texts the collection names, and not printed
+        elsewhere in this project: first phrase number -> URN."""
+        printing = self.printed_numbers
+        found: dict[str, str] = {}
+        run: list[int] = []
+
+        def close() -> None:
+            # The passage, text by text: a match that is one part of a text (the passage lacking
+            # the rest of it) is that part, and the passage goes on from where another opens.
+            start = 0
+            while len(run) - start >= 2:
+                phrase_words = [words(plain_text(block.phrases[i].he)) for i in run[start:]]
+                run_words = [w for phrase in phrase_words for w in phrase]
+                resolution = resolve(lookup(self.index, run_words), phrase_words, self.index)
+                urn = resolution.urn
+                if not urn or urn in self.printed or urn in self.parts_used:
+                    break
+                self.parts_used.add(urn)
+                self.taken.add(urn)
+                found[str(phrases[run[start]])] = urn
+                evidence.append(f"its own words from phrase {phrases[run[start]]} are {urn}")
+                if resolution.split_at is None:
+                    break
+                start += resolution.split_at
+            run.clear()
+
+        for i, number in enumerate(phrases):
+            if number in printing:
+                close()
+            else:
+                run.append(i)
+        close()
+        return found
+
+    @property
+    def printed_numbers(self) -> set[int]:
+        return self._printed_numbers
 
     def variant_numbers(self, urn: str, skeletons: list[str]) -> list[int]:
         """A variant's phrase numbers: the first printing's where the phrase has the same words,
@@ -685,6 +774,7 @@ class _Decider:
         base = self.outcome.records[self.key(printing.leaf, printing.block)]
         base_numbers = base.phrases or list(range(1, len(printing.block.phrases) + 1))
         recorded = dict(zip(base_numbers, phrase_skeletons(printing.block)))
+        self._printed_numbers = set(base_numbers)
         mapped = map_phrases(skeletons, recorded)
         top = max(base_numbers)
         next_number = self.numbers_used.get(urn, top) + 1
