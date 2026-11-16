@@ -214,6 +214,38 @@ class TestReviewCases(unittest.TestCase):
         self.assertEqual(outcome.decided[0].urn, T + "prayer:kaddish/x/a")
 
 
+class TestThirdReview(unittest.TestCase):
+    def test_a_block_moved_by_a_cut_in_its_own_leaf_is_decided_once(self):
+        # One leaf: a first printing that runs on, a rubric, and the text printed again.
+        outcome = decide([("A", items(*MODEH, *UNKNOWN[1:], "", *MODEH))])
+        keys = [r.key for r in outcome.decided]
+        self.assertEqual(len(keys), len(set(keys)))
+
+    def test_a_repeat_whose_first_printing_was_renamed_is_decided_again(self):
+        first = decide([("A", items(*MODEH)), ("B", items(*MODEH))])
+        records = dict(first.records)
+        a = next(r for r in records.values() if r.leaf == "A")
+        records[a.key] = TextRecord(**{**a.__dict__, "urn": T + "prayer:renamed"})
+        again = decide([("A", items(*MODEH)), ("B", items(*MODEH))], records=records)
+        b = next(r for r in again.records.values() if r.leaf == "B")
+        self.assertEqual(b.urn, T + "prayer:renamed")
+
+    def test_a_reprint_with_a_parenthesized_insertion_is_a_repeat(self):
+        text = ["<b>עוֹשֶׂה שָׁלוֹם</b> (בעשי\"ת הַשָּׁלוֹם) בִּמְרוֹמָיו הוּא", "יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל"]
+        outcome = decide([("A", items(*text)), ("B", items(*text))])
+        self.assertEqual([r.kind for r in outcome.decided], ["new", "repeat"])
+
+    def test_a_changed_text_keeps_the_numbers_its_phrases_had(self):
+        first = decide([("L", items(*MODEH))])
+        from opensiddur.importer.sefaria.phrases import text_path
+        own = {text_path(first.decided[0].urn): {i + 1: skeleton(h) for i, h in enumerate(MODEH)}}
+        inserted = [*MODEH[:3], "מְשֻׁנֶּה מְאֹד בְּיוֹתֵר", MODEH[3]]
+        again = decide_work("w", [("L", items(*inserted))], IncipitIndex(), first.records, set(),
+                            spellings=NO_SPELLINGS, own_phrases=own)
+        self.assertEqual(again.decided[0].urn, first.decided[0].urn)
+        self.assertEqual(again.decided[0].phrases, [1, 2, 3, 5, 4])
+
+
 class TestBlessings(unittest.TestCase):
     def test_blessings_over_different_commandments_are_different_texts(self):
         tzitzit = ["<b>בָּרוּךְ</b> אַתָּה יְהֹוָה", "אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם", "אֲשֶׁר קִדְּשָׁנוּ בְּמִצְוֹתָיו",
@@ -248,6 +280,10 @@ class TestMint(unittest.TestCase):
         text = "זֶה טֶקְסְט חָדָשׁ לְגַמְרֵי"
         self.assertEqual(mint(text, {T + "prayer:zeh_teqst_chadash"}, NO_SPELLINGS),
                          T + "prayer:zeh_teqst_chadash_legamrei")
+
+    def test_a_whole_parenthetical_is_left_out_of_the_name(self):
+        text = "עוֹשֶׂה (בעשי\"ת הַשָּׁלוֹם) שָׁלוֹם בִּמְרוֹמָיו"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:oseh_shalom_bimromav")
 
     def test_unpointed_and_parenthesized_words_are_not_the_name(self):
         text = "(בעשי\"ת) זֶה טֶקְסְט חָדָשׁ"

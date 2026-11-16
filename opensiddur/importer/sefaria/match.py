@@ -38,7 +38,7 @@ from pathlib import Path
 from opensiddur.common.constants import REPO_ROOT
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
-from opensiddur.importer.sefaria.blocks import Item, TextBlock, split_block
+from opensiddur.importer.sefaria.blocks import Item, TextBlock, is_phrase, split_block
 from opensiddur.importer.sefaria.markup import is_pointed, plain_text
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
@@ -475,7 +475,7 @@ def introduced_phrases(block: TextBlock) -> frozenset[int]:
     position = 0
     after_rubric = False
     for pair in block.pairs:
-        if pair in block.phrases:
+        if is_phrase(pair):
             if after_rubric:
                 found.add(position)
             position += 1
@@ -490,7 +490,7 @@ def mint(text: str, taken: set[str], spellings: Spellings) -> str:
     its formula, which every blessing shares."""
     # Words as the index counts them: a maqaf separates words, punctuation alone is none.
     # A parenthesized or unpointed word is a label or an abbreviation, not the text's words.
-    hebrew = [token for token in re.split(r"[\s\u05be]+", text)
+    hebrew = [token for token in re.split(r"[\s\u05be]+", re.sub(r"\([^)]*\)", " ", text))
               if words(token) and is_pointed(token) and not token.startswith("(")]
     if tuple(words(" ".join(hebrew[:6]))) == BLESSING_FORMULA:
         hebrew = hebrew[6:] or hebrew
@@ -538,6 +538,7 @@ def decide_work(
     recorded_phrases: dict[str, dict[int, str]] | None = None,
     spellings: Spellings | None = None,
     places: dict[str, str] | None = None,
+    own_phrases: dict[str, dict[int, str]] | None = None,
 ) -> Decisions:
     """Decide the URN of every block of ``work_key`` that has no current record.
 
@@ -547,11 +548,14 @@ def decide_work(
     recorded by the second part's record, and replayed from it on every later run.
     ``taken`` is every URN already in use (registry and records); minted URNs are added to it.
     ``recorded_phrases`` are the phrases other Metsudah volumes have named
-    (``phrases.recorded_phrases``). ``places`` gives each leaf's ``siddur:`` path, which names
-    the variants printed there.
+    (``phrases.recorded_phrases``), and ``own_phrases`` the ones this work's Hebrew project named
+    on its last run, which a text whose words changed keeps. ``places`` gives each leaf's
+    ``siddur:`` path, which names the variants printed there.
     """
-    return _Decider(work_key, index, records, taken, recorded_phrases or {},
-                    spellings or load_spellings(), places or {}).run(leaves)
+    decider = _Decider(work_key, index, records, taken, recorded_phrases or {},
+                       spellings or load_spellings(), places or {})
+    decider.own_phrases = own_phrases or {}
+    return decider.run(leaves)
 
 
 @dataclass
@@ -578,6 +582,10 @@ class _Decider:
         self._printed_numbers: set[int] = set()
         #: where the candidate :meth:`another_candidate` took would cut the block
         self.candidate_cut: int | None = None
+        #: the blocks decided (by ``id``)
+        self.done: set[int] = set()
+        #: the phrases this work's own Hebrew project named on the last run, by text path
+        self.own_phrases: dict[str, dict[int, str]] = {}
         self.index = index
         self.records = records
         self.taken = taken
@@ -599,7 +607,9 @@ class _Decider:
         for leaf_path, blocks in leaves:
             i = 0
             while i < len(blocks):
-                if isinstance(blocks[i], TextBlock):
+                # A first printing cut in this leaf moves the blocks after it along: a block
+                # already decided is not decided again.
+                if isinstance(blocks[i], TextBlock) and id(blocks[i]) not in self.done:
                     self.decide(leaf_path, blocks, i)
                 i += 1
         for key in sorted(self.stale_keys):
@@ -615,7 +625,7 @@ class _Decider:
                  phrases: list[int] | None = None) -> None:
         self.note_numbers(urn, phrases or list(range(1, len(block.phrases) + 1)))
         self.printed.setdefault(urn, _Printing(leaf, blocks, block))
-        self.own.add(urn, words(block_text(block)))
+        self.own.add(urn, [w for pair in block.phrases for w in matching_words(pair)])
         self.short_printed.setdefault(skeleton(block_text(block)), urn)
 
     def note_numbers(self, urn: str, phrases: list[int]) -> None:
@@ -624,12 +634,38 @@ class _Decider:
 
     def keep(self, record: TextRecord, leaf: str, blocks: list[Item], block: TextBlock) -> None:
         """Take a current record into account without deciding anew."""
+        self.done.add(id(block))
         if record.kind == "variant":
             self.note_numbers(record.urn, record.phrases or [])
             self.parts_used.update((record.parts or {}).values())
             self.variant_names.setdefault(record.urn, set()).add(record.variant or "")
         elif record.kind != "repeat":
             self.remember(record.urn, leaf, blocks, block, record.phrases)
+
+    def opens_as_recorded(self, leaf: str, block: TextBlock, j: int) -> bool:
+        """Whether the text a record says begins at the block's ``j``-th phrase still begins
+        with the words it was recorded with: a recorded cut is replayed only then, not after the
+        leaf was resegmented under it."""
+        record = self.records.get((self.work_key, leaf, block.phrases[j].he_index))
+        if record is None:
+            return False
+        here = " ".join(" ".join(plain_text(p.he) for p in block.phrases[j:]).split()[:INCIPIT_WORDS])
+        return skeleton(here) == skeleton(record.incipit)
+
+    def kept_numbers(self, record: TextRecord, skeletons: list[str]) -> list[int] | None:
+        """The phrase numbers of a text whose words changed: the ones its phrases had, by the
+        phrases this project named last time where they are known, else as recorded when the
+        count is the same, else 1, 2, 3..."""
+        from opensiddur.importer.sefaria.phrases import text_path
+
+        named = self.own_phrases.get(text_path(record.urn))
+        if named:
+            numbers = map_phrases(skeletons, named)
+        elif record.phrases and len(record.phrases) == len(skeletons):
+            numbers = record.phrases
+        else:
+            numbers = list(range(1, len(skeletons) + 1))
+        return None if numbers == list(range(1, len(numbers) + 1)) else numbers
 
     def variant_name(self, urn: str, leaf: str, block: TextBlock) -> str:
         """A variant's name: the ``siddur:`` place it is printed at (``chol_minchah_amidah``),
@@ -643,9 +679,11 @@ class _Decider:
         return name
 
     def save(self, record: TextRecord, *, lapsed: TextRecord | None = None) -> None:
-        if lapsed is not None:
+        if lapsed is not None and lapsed not in self.outcome.lapsed:
             self.outcome.lapsed.append(lapsed)
         self.outcome.records[record.key] = record
+        # A record decided again this run (a first printing cut later) replaces the first.
+        self.outcome.decided = [r for r in self.outcome.decided if r.key != record.key]
         self.outcome.decided.append(record)
 
     def cut(self, leaf: str, blocks: list[Item], i: int, at: int) -> TextBlock:
@@ -660,7 +698,8 @@ class _Decider:
         assert isinstance(block, TextBlock)
         # Replay the cuts earlier runs made: a recorded start inside this block.
         replay = next((j for j, pair in enumerate(block.phrases)
-                       if j > 0 and pair.he_index in self.starts.get(leaf, ())), None)
+                       if j > 0 and pair.he_index in self.starts.get(leaf, ())
+                       and self.opens_as_recorded(leaf, block, j)), None)
         if replay is None:
             # A new blessing in the middle of a block is a text of its own.
             phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
@@ -672,7 +711,9 @@ class _Decider:
         self.stale_keys.discard(key)
         text = block_text(block)
         record = self.records.get(key)
-        if record is not None and record.as_of == block_hash(block):
+        if record is not None and record.as_of == block_hash(block) and (
+                record.kind in ("existing", "new") or record.urn in self.printed):
+            # A repeat or variant is current only while its first printing is.
             self.keep(record, leaf, blocks, block)
             return
         if record is not None and record.kind in ("existing", "new") and record.urn not in self.printed and (
@@ -681,13 +722,14 @@ class _Decider:
             # The words changed, but it is still the text it was: it keeps its URN, and its
             # phrases their numbers.
             skeletons = phrase_skeletons(block)
+            phrases = self.kept_numbers(record, skeletons)
+            self.done.add(id(block))
             self.save(TextRecord(
                 work=self.work_key, leaf=leaf, block=block.first_index, urn=record.urn, kind=record.kind,
                 incipit=" ".join(text.split()[:INCIPIT_WORDS]), as_of=block_hash(block),
                 evidence=record.evidence + ["the words changed; the URN of the earlier decision is kept"],
-                phrases=record.phrases if record.phrases and len(record.phrases) == len(skeletons) else None),
-                lapsed=record)
-            self.remember(record.urn, leaf, blocks, block)
+                phrases=phrases), lapsed=record)
+            self.remember(record.urn, leaf, blocks, block, phrases)
             return
         self.decide_anew(leaf, blocks, i, record)
 
@@ -772,6 +814,7 @@ class _Decider:
         elif kind != "repeat":
             phrases = self.phrase_numbers(urn, skeletons, evidence)
             self.remember(urn, leaf, blocks, block, phrases)
+        self.done.add(id(block))
         self.save(TextRecord(work=self.work_key, leaf=leaf, block=block.first_index, urn=urn, kind=kind,
                              incipit=" ".join(text.split()[:INCIPIT_WORDS]), as_of=block_hash(block),
                              evidence=evidence, phrases=phrases, variant=variant_name, parts=parts),
@@ -880,6 +923,15 @@ class _Decider:
         printing.block = first
         self.decide_anew(printing.leaf, printing.blocks, i + 1, self.records.get(
             self.key(printing.leaf, printing.blocks[i + 1])))
+
+
+def verse_length(urn: str, index: IncipitIndex) -> int | None:
+    """A verse's length in words, when the index holds it whole (shorter than its collected
+    opening)."""
+    opening = index.incipit_of.get(urn) or index.incipit_of.get(f"{urn}/a")
+    if opening and len(opening) < COLLECTED_WORDS and urn in index.incipit_of:
+        return len(opening)
+    return None
 
 
 def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:

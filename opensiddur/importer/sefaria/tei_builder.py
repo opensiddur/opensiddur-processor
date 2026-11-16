@@ -269,9 +269,10 @@ class _TextWriter:
         self.phrase_open = True
 
     def rubric(self, pair: Pair) -> None:
-        # A rubric is not the phrase before it. The scope is closed in both languages,
-        # whichever the rubric is printed in, so that the two divide alike.
+        # A rubric is not the phrase before it, nor scripture. The scopes are closed in both
+        # languages, whichever the rubric is printed in, so that the two divide alike.
         self.end_phrase()
+        self.verse(None)
         xml = rubric_xml(pair, self.lang, self.notes)
         if xml:
             self.parts.append(xml)
@@ -317,7 +318,8 @@ def _variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | No
 
 
 def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes,
-              variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None) -> str:
+              variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None,
+              verse_lengths: dict[str, int] | None = None) -> str:
     """A text's division: its heading, then its phrases and the rubrics among them.
 
     With ``variants``, the one text of every printing: the first printing's words, a phrase a
@@ -326,8 +328,12 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
 
     ``verses`` (``match.scripture_verses``) gives the verse of scripture each phrase that opens
     one opens: its ``bible:`` URN is set before the phrase, in both languages, and its scope
-    closed after the phrase that ends it unless another verse follows at once."""
+    closed after the phrase that ends it -- by its punctuation, or by its length in words where
+    ``verse_lengths`` knows it -- or before a rubric, unless another verse follows at once."""
     verses = verses or {}
+    verse_lengths = verse_lengths or {}
+    verse_words = 0
+    verse_length: int | None = None
     head = head_xml(block.head, lang, notes) if block.head is not None else ""
     writer = _TextWriter(urn, lang, notes)
     base = set(phrase_numbers)
@@ -366,14 +372,17 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
         position += 1
         if position in verses:
             writer.verse(verses[position])
+            verse_words, verse_length = 0, verse_lengths.get(verses[position])
+        verse_words += len(plain_text(pair.he).split())
         if absent.get(number):
             xml_id = writer.open_condition([(variant_urn(urn, name), False) for name in absent[number]])
             writer.phrase(pair, number)
             writer.close_condition(xml_id)
         else:
             writer.phrase(pair, number)
-        if writer.verse_open and plain_text(pair.he).rstrip().endswith(VERSE_ENDINGS) \
-                and position + 1 not in verses:
+        ended = plain_text(pair.he).rstrip().endswith(VERSE_ENDINGS) or (
+            verse_length is not None and verse_words >= verse_length)
+        if writer.verse_open and ended and position + 1 not in verses:
             writer.end_phrase()
             writer.verse(None)
         insert(number)

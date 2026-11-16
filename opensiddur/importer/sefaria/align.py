@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 
 import yaml
@@ -56,11 +57,11 @@ class Pair:
     he: tuple[Node, ...]
     en: tuple[Node, ...]
 
-    @property
+    @cached_property
     def he_kind(self) -> HebrewKind:
         return hebrew_kind(self.he)
 
-    @property
+    @cached_property
     def en_kind(self) -> EnglishKind:
         return english_kind(self.en)
 

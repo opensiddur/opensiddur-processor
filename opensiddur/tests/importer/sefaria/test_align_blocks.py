@@ -111,6 +111,14 @@ class TestDivide(unittest.TestCase):
         ]))
         self.assertEqual(len(items), 1)
 
+    def test_a_bold_opening_after_a_rubric_opens_a_text(self):
+        items = divide(pairs_of([
+            ("<b>בָּרוּךְ יְהֹוָה הַמְבֹרָךְ</b>", "<b>Blessed is Adonoy</b>"),
+            ("", "<small>Continue:</small>"),
+            ("<b>אַהֲבָה</b> רַבָּה", "With great love"),
+        ]))
+        self.assertEqual([type(i) for i in items], [TextBlock, Rubric, TextBlock])
+
     def test_a_placeholder_label_is_part_of_the_text(self):
         items = divide(pairs_of([
             ("<b>רְפָאֵֽנוּ</b> יְהֹוָה", "Heal us"),

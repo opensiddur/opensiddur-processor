@@ -86,6 +86,22 @@ class TestTextBody(unittest.TestCase):
                                        namespaces=NS)
             self.assertEqual(following, [T + "metsudah:ashrei/3"])
 
+    def test_a_verse_without_punctuation_closes_at_its_length_or_a_rubric(self):
+        (block,) = blocks([
+            ("<b>תְּהִלָּה</b> לְדָוִד", "A praise by David"),
+            ("וְעוֹד דָּבָר אַחֵר", "and more"),
+            ("", "<small>Say:</small>"),
+            ("וְעוֹד", "more"),
+        ])
+        verse = T + "bible:psalms/145/1"
+        by_length = parse(text_body(T + "prayer:x", block, [1, 2, 3], "he", Notes("note"), (), {0: verse},
+                                    {verse: 2}))
+        closes = by_length.xpath("//tei:milestone[@unit='verse'][not(@corresp)]", namespaces=NS)
+        self.assertEqual(closes[0].xpath("following::tei:milestone[@corresp][1]/@corresp", namespaces=NS),
+                         [T + "metsudah:x/2"])
+        by_rubric = parse(text_body(T + "prayer:x", block, [1, 2, 3], "he", Notes("note"), (), {0: verse}))
+        self.assertEqual(len(by_rubric.xpath("//tei:milestone[@unit='verse'][not(@corresp)]", namespaces=NS)), 1)
+
     def test_a_footnote_in_a_heading_is_kept(self):
         (block,) = blocks([
             ('<b>אבות</b>', '<b>FOREFATHERS</b><sup class="footnote-marker">1</sup><i class="footnote">The first.</i>'),

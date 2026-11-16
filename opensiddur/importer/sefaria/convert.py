@@ -49,6 +49,7 @@ from opensiddur.importer.sefaria.match import (
     registry_urns,
     save_records,
     scripture_verses,
+    verse_length,
 )
 from opensiddur.importer.sefaria.phrases import recorded_phrases, text_path
 from opensiddur.importer.sefaria.source import PATH_SEPARATOR, WorkSource, load_work_source
@@ -110,6 +111,8 @@ class WorkPlan:
     decisions: Decisions
     #: the verses of scripture each text quotes: (leaf, block) -> phrase position -> verse URN
     verses: dict[tuple[str, int], dict[int, str]] = field(default_factory=dict)
+    #: the length in words of each verse whose length the index knows
+    verse_lengths: dict[str, int] = field(default_factory=dict)
 
     def record(self, leaf_path: str, block: TextBlock) -> TextRecord:
         return self.decisions.records[(self.work.key, leaf_path, block.first_index)]
@@ -120,14 +123,16 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
               phrases: dict[str, dict[int, str]] | None = None,
               structure_path: Path | None = None,
               decisions_path: Path | None = None,
-              spellings: Spellings | None = None) -> WorkPlan:
+              spellings: Spellings | None = None,
+              own_phrases: dict[str, dict[int, str]] | None = None) -> WorkPlan:
     structure = load_structure(work, source, structure_path)
     alignments = align_work(work.key, source.leaves,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
     items = {a.leaf.path: divide(a.pairs) for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
                             recorded_phrases=phrases, spellings=spellings,
-                            places={path: place for path, place in structure.items() if place})
+                            places={path: place for path, place in structure.items() if place},
+                            own_phrases=own_phrases)
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
     # quoted by two texts is marked in the first.
     verses: dict[tuple[str, int], dict[int, str]] = {}
@@ -145,7 +150,9 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                     found[position] = urn
             if found:
                 verses[(leaf, block.first_index)] = found
-    return WorkPlan(work, source, structure, alignments, items, decisions, verses)
+    lengths = {urn: n for found in verses.values() for urn in found.values()
+               if (n := verse_length(urn, index)) is not None}
+    return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths)
 
 
 @dataclass
@@ -232,7 +239,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             numbers = record.phrases or list(range(1, len(item.phrases) + 1))
             notes = Notes(prefix="note")
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
-                             plan.verses.get((leaf.path, item.first_index)))
+                             plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths)
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
@@ -371,7 +378,9 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     other_volumes = [d for d in excluded if d.name in hebrew_projects]
     plan = plan_work(work, source, index=index, records=records, taken=taken,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
-                     decisions_path=decisions_path, spellings=spellings)
+                     decisions_path=decisions_path, spellings=spellings,
+                     own_phrases=recorded_phrases([project_directory / work.projects["he"]]
+                                                  if (project_directory / work.projects["he"]).exists() else []))
     check_phrase_paths({k: r for k, r in plan.decisions.records.items()
                         if r.kind in ("existing", "new") and r.work == work.key})
     written: dict[str, int] = {}

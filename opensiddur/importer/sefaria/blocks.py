@@ -102,6 +102,7 @@ def divide(pairs: tuple[Pair, ...] | list[Pair]) -> list[Item]:
     for pair in pairs:
         if is_rubric(pair):
             pending.append(pair)
+            previous_wholly_bold = False  # a rubric between them: the next bold opens a text
             continue
         if is_heading(pair):
             close()
