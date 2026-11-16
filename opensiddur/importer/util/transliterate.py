@@ -3,8 +3,8 @@
 This seeds a name; it does not settle one. It knows the table (het ``ch``, khaf ``kh``, qof
 ``q``, tzadi ``tz``, aleph and ayin silent, dagesh hazak doubled but never a digraph, final heh
 written, the divine name read ``adonai``, no doubling after a one-letter prefix) and the common cases of the vowels, but not grammar:
-it reads every qamatz as ``a``, and a sheva as ``e`` only on a word's first letter or where the
-source marks it sounded, and it tells a prefix from a root letter only by its vowel
+it reads every qamatz as ``a``, and a sheva as ``e`` only on a word's first letter, under a
+dagesh, or where the source marks it sounded, and it tells a prefix from a root letter only by its vowel
 (:data:`PREFIX_VOWELS`), so that שַׁבָּת is doubled but הַלֵּל is not. A name it makes
 is respelled by ``specs/naming/spellings.yaml`` (:func:`name_from_hebrew`) and reviewed where it
 is recorded, like any other name an importer mints.
@@ -106,7 +106,9 @@ def transliterate_word(word: str) -> str:
             last_vowel = "\u05bb"
             continue
         if letter == "ו" and i > 0 and not (vowel_mark and vowel_mark not in HOLAM):
-            if vowel_mark in HOLAM:
+            # Vav with holam is the vowel o, except after a sheva, where it is a consonant
+            # carrying the o (מִצְוֹת, "mitzvot").
+            if vowel_mark in HOLAM and SHEVA not in letters[i - 1][1]:
                 out.append("o")
                 last_vowel = vowel_mark
                 continue
@@ -140,7 +142,7 @@ def transliterate_word(word: str) -> str:
         if vowel_mark:
             out.append(VOWELS[vowel_mark])
             last_vowel = vowel_mark
-        elif SHEVA in marks and (i == 0 or VOCAL_SHEVA_MARK in marks
+        elif SHEVA in marks and (i == 0 or VOCAL_SHEVA_MARK in marks or (dagesh and len(sound) >= 1)
                                  or (i == 1 and out[:1] == ["u"])):
             out.append("e")
             last_vowel = SHEVA

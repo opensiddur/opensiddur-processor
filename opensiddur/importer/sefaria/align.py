@@ -8,7 +8,8 @@ number of segments, that is the alignment. Where they do not, it is decided:
   leaf -- English rubrics after the last Hebrew ("Mourner's Kaddish is said here:"), or Hebrew
   the English leaves untranslated -- they stand alone and the rest pair one to one. This is
   accepted without a decision when every extra English segment is a rubric (printed whole in
-  small or italic) or every extra Hebrew segment is text, and reported for review.
+  small or italic), or when there are at most :data:`MAX_UNTRANSLATED` extra Hebrew segments,
+  and reported for review.
 - **A recorded decision** (``alignment_decisions.yaml``) names, by 1-based index, the Hebrew
   segments with no English (``he_only``) and the English with no Hebrew (``en_only``); the rest
   pair in order. A decision records the hashes of the leaf it was made for (``as_of``) and
@@ -36,6 +37,10 @@ from opensiddur.importer.sefaria.markup import (
 from opensiddur.importer.sefaria.source import Leaf, segments_hash
 
 DECISIONS_FILE = Path(__file__).with_name("alignment_decisions.yaml")
+#: The most Hebrew segments the trailing rule leaves untranslated without a decision. Unlike an
+#: English rubric, untranslated Hebrew looks like any other Hebrew, so a version that dropped one
+#: English segment mid-leaf would pass as a trailing run if the run could be long.
+MAX_UNTRANSLATED = 3
 
 
 class AlignmentError(ValueError):
@@ -130,7 +135,7 @@ def _trailing(leaf: Leaf) -> tuple[frozenset[int], frozenset[int]] | None:
         extras = range(he_count + 1, en_count + 1)
         if all(english_kind(parse_segment(leaf.en[i - 1])) is EnglishKind.RUBRIC for i in extras):
             return frozenset(), frozenset(extras)
-    elif he_count > en_count:
+    elif 0 < he_count - en_count <= MAX_UNTRANSLATED:
         extras = range(en_count + 1, he_count + 1)
         if all(hebrew_kind(parse_segment(leaf.he[i - 1])) is not HebrewKind.EMPTY for i in extras):
             return frozenset(extras), frozenset()

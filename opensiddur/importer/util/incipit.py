@@ -56,7 +56,9 @@ def _key_word(skeleton: str) -> str:
 
 
 def _words(text: str) -> list[str]:
-    return [_key_word(w) for w in (normalize_hebrew(word) for word in text.split()) if w]
+    """A text as compared: word by word, a maqaf separating words as a space does
+    (``אֶת־צֶמַח`` is ``אֶת צֶמַח``), each word a key word."""
+    return [_key_word(w) for w in (normalize_hebrew(word) for word in text.replace("\u05be", " ").split()) if w]
 
 
 #: The opening every blessing shares. A blessing is told apart by what follows it.
@@ -221,7 +223,8 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 
 #: Bumped whenever the words the index stores are normalized differently.
 #: 2: parts are kept in document order, which the spans of departing rows need.
-INDEX_VERSION = 2
+#: 3: a maqaf separates words.
+INDEX_VERSION = 3
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:

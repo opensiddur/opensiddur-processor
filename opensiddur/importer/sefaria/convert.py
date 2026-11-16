@@ -34,9 +34,11 @@ import yaml
 
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
+from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import Alignment, align_work, load_decisions
 from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide
 from opensiddur.importer.sefaria.download import load_manifest
+from opensiddur.importer.sefaria.markup import plain_text
 from opensiddur.importer.sefaria.match import (
     URNS_PATH,
     Decisions,
@@ -112,13 +114,14 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
               records: dict[tuple[str, str, int], TextRecord], taken: set[str],
               phrases: dict[str, dict[int, str]] | None = None,
               structure_path: Path | None = None,
-              decisions_path: Path | None = None) -> WorkPlan:
+              decisions_path: Path | None = None,
+              spellings: Spellings | None = None) -> WorkPlan:
     structure = load_structure(work, source, structure_path)
     alignments = align_work(work.key, source.leaves,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
     items = {a.leaf.path: divide(a.pairs) for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
-                            recorded_phrases=phrases)
+                            recorded_phrases=phrases, spellings=spellings)
     return WorkPlan(work, source, structure, alignments, items, decisions)
 
 
@@ -185,7 +188,8 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             numbers = record.phrases or list(range(1, len(item.phrases) + 1))
             notes = Notes(prefix="note")
             body = text_body(record.urn, item, numbers, lang, notes)
-            title = record.incipit if lang == "he" else f"{leaf.title_en}: {record.urn.rsplit(':', 1)[-1]}"
+            english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
+            title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
@@ -304,7 +308,9 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                  index: IncipitIndex | None = None,
                  output_directory: Path = OUTPUT_DIRECTORY,
                  structure_path: Path | None = None,
-                 decisions_path: Path | None = None) -> WorkPlan:
+                 decisions_path: Path | None = None,
+                 spellings: Spellings | None = None,
+                 works: dict[str, Work] | None = None) -> WorkPlan:
     directory = work.data_directory(sourcetexts_root)
     source = load_work_source(directory)
     info = source_info(work, directory)
@@ -315,11 +321,12 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     if index is None:
         index = load_incipit_index(INCIPIT_CACHE, project_directory, excluded | own)
     # The Hebrew projects of the other Sefaria works, whose phrases this one may share.
-    hebrew_projects = {w.projects["he"] for w in load_works().values() if w.key != work.key}
+    hebrew_projects = {w.projects["he"] for w in (load_works() if works is None else works).values()
+                       if w.key != work.key}
     other_volumes = [d for d in excluded if d.name in hebrew_projects]
     plan = plan_work(work, source, index=index, records=records, taken=taken,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
-                     decisions_path=decisions_path)
+                     decisions_path=decisions_path, spellings=spellings)
     check_phrase_paths({k: r for k, r in plan.decisions.records.items() if r.kind != "repeat"
                         and r.work == work.key})
     written: dict[str, int] = {}

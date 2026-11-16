@@ -56,7 +56,7 @@ class TestDecide(unittest.TestCase):
         outcome = decide([("L", items(*UNKNOWN))])
         (record,) = outcome.decided
         self.assertEqual(record.kind, "new")
-        self.assertEqual(record.urn, T + "prayer:zeh_teqst")
+        self.assertEqual(record.urn, T + "prayer:zeh_teqst_chadash")
 
     def test_a_later_printing_transcludes_the_first(self):
         outcome = decide([("A", items(*MODEH)), ("B", items(*MODEH))])
@@ -134,23 +134,70 @@ class TestDecide(unittest.TestCase):
         self.assertNotIn(first.decided[0].key, gone.records)
 
     def test_phrases_follow_an_earlier_volume(self):
-        recorded = {"zeh_teqst": {1: skeleton(UNKNOWN[1]), 2: "something else entirely"}}
+        recorded = {"zeh_teqst_chadash": {1: skeleton(UNKNOWN[1]), 2: "something else entirely"}}
         outcome = decide([("L", items(*UNKNOWN))], phrases=recorded)
         self.assertEqual(outcome.decided[0].phrases, [3, 1])
+
+
+class TestReviewCases(unittest.TestCase):
+    def test_a_rerun_replays_the_cuts_and_decides_nothing(self):
+        index = IncipitIndex()
+        index.add(T + "prayer:kaddish/x/a", words(" ".join(PART_A)))
+        index.add(T + "prayer:kaddish/x/b", words(" ".join(PART_B)))
+        first = decide([("L", items(*PART_A, *PART_B))], index)
+        self.assertEqual(len(first.decided), 2)
+        leaf = items(*PART_A, *PART_B)
+        again = decide([("L", leaf)], index, records=first.records)
+        self.assertEqual((again.decided, again.lapsed), ([], []))
+        self.assertEqual(len([i for i in leaf if isinstance(i, TextBlock)]), 2)
+
+    def test_a_first_printing_that_ran_on_is_cut_where_the_later_ends(self):
+        first_leaf = items(*MODEH, *UNKNOWN[1:])
+        outcome = decide([("A", first_leaf), ("B", items(*MODEH))])
+        self.assertEqual(len([i for i in first_leaf if isinstance(i, TextBlock)]), 2)
+        a = [r for r in outcome.records.values() if r.leaf == "A"]
+        b = [r for r in outcome.records.values() if r.leaf == "B"]
+        self.assertEqual([r.kind for r in b], ["repeat"])
+        self.assertEqual(b[0].urn, min(a, key=lambda r: r.block).urn)
+        self.assertEqual(len(a), 2)
+
+    def test_a_maqaf_does_not_hide_an_existing_text(self):
+        index = IncipitIndex()
+        index.add(T + "prayer:amidah/david", words("אֶת צֶמַח דָּוִד עַבְדְּךָ מְהֵרָה תַצְמִיחַ"))
+        outcome = decide([("L", items("<b>אֶת־צֶֽמַח</b> דָּוִד עַבְדְּךָ", "מְהֵרָה תַצְמִיחַ"))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "prayer:amidah/david")
+
+    def test_one_part_does_not_claim_the_whole(self):
+        # The parent's opening is the first part's, but the block holds only that part and one
+        # of three others: it stays the part.
+        index = IncipitIndex()
+        c = ["וְעוֹד חֵלֶק שְׁלִישִׁי שֶׁל הַתְּפִלָּה הַזֹּאת", "וְחֵלֶק רְבִיעִי אַחֲרוֹן בַּתְּפִלָּה הַזֹּאת"]
+        index.add(T + "prayer:kaddish/x", words(" ".join(PART_A + PART_B + c)))
+        index.add(T + "prayer:kaddish/x/a", words(" ".join(PART_A)))
+        index.add(T + "prayer:kaddish/x/b", words(" ".join(PART_B)))
+        index.add(T + "prayer:kaddish/x/c", words(c[0]))
+        index.add(T + "prayer:kaddish/x/d", words(c[1]))
+        outcome = decide([("L", items(*PART_A, *PART_B))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "prayer:kaddish/x/a")
 
 
 class TestMint(unittest.TestCase):
     def test_a_blessing_is_named_after_its_formulas(self):
         text = "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם אֲשֶׁר קִדְּשָֽׁנוּ בְּמִצְוֹתָיו וְצִוָּֽנוּ עַל מִצְוַת צִיצִית"
-        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:al_mitzvat")
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:al_mitzvat_tzitzit")
 
     def test_maqaf_and_stray_punctuation_do_not_hide_the_formula(self):
         text = "בָּרוּךְ אַתָּה יְהֹוָה , אֱלֹהֵֽינוּ מֶֽלֶךְ־הָעוֹלָם הַמּוֹצִיא לֶֽחֶם מִן הָאָֽרֶץ"
-        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:hamotzi_lechem")
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:hamotzi_lechem_min")
 
     def test_a_taken_name_grows(self):
         text = "זֶה טֶקְסְט חָדָשׁ לְגַמְרֵי"
-        self.assertEqual(mint(text, {T + "prayer:zeh_teqst"}, NO_SPELLINGS), T + "prayer:zeh_teqst_chadash")
+        self.assertEqual(mint(text, {T + "prayer:zeh_teqst_chadash"}, NO_SPELLINGS),
+                         T + "prayer:zeh_teqst_chadash_legamrei")
+
+    def test_unpointed_and_parenthesized_words_are_not_the_name(self):
+        text = "(בעשי\"ת) זֶה טֶקְסְט חָדָשׁ"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:zeh_teqst_chadash")
 
 
 class TestRecords(unittest.TestCase):

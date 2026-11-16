@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
@@ -38,7 +39,7 @@ from opensiddur.common.constants import REPO_ROOT
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, TextBlock, split_block
-from opensiddur.importer.sefaria.markup import plain_text
+from opensiddur.importer.sefaria.markup import is_pointed, plain_text
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
@@ -59,8 +60,9 @@ URNS_PATH = REPO_ROOT / "specs" / "sefaria" / "metsudah_urns.jsonl"
 EXCLUDED_SOURCES = ("opensiddur.org", "sefaria")
 #: After the blessing formula, the words every blessing over a commandment shares.
 MITZVAH_FORMULA = tuple(words("אשר קדשנו במצותיו וצונו"))
-#: Words of a new text's incipit its name starts from, and the most it grows to.
-MIN_NAME_WORDS, MAX_NAME_WORDS = 2, 8
+#: Words of a new text's incipit its name starts from, and the most it grows to. Two words
+#: ("yehi_ratzon", "shir_hamaalot") would claim an opening many texts share.
+MIN_NAME_WORDS, MAX_NAME_WORDS = 3, 8
 NEW_NAMESPACE = "prayer"
 
 
@@ -199,19 +201,30 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         # always the order of the text, so every other part counts.
         return [s for s in index.children.get(parent(u), []) if s != u]
 
-    def opens_parent(u: str) -> bool:
+    def opening_in_parent(u: str) -> bool:
+        # The parent is encoded, and the part's opening is at (or, past a heading caught in
+        # the parent's opening, near) the start of it.
         up = parent(u)
-        return up in index.incipit_of and index.incipit_of[up][:INCIPIT_WORDS] == index.incipit_of[u][:INCIPIT_WORDS]
+        if up not in index.incipit_of:
+            return False
+        key = index.incipit_of[u][:SHORT_INCIPIT_WORDS]
+        opening = index.incipit_of[up]
+        return any(opening[k:k + len(key)] == key for k in range(0, SHORT_INCIPIT_WORDS + 1))
+
+    def covers(u: str) -> bool:
+        # The block holds most of the parent's other parts: it is the whole text, not one
+        # part that happens to open it.
+        others = other_parts(u)
+        found = sum(1 for s in others if "".join(index.incipit_of[s][:INCIPIT_WORDS]) in joined)
+        return bool(others) and found >= max(1, math.ceil(MOVE_UP_COVERAGE * len(others)))
 
     while parent(urn):
         namespace, path = _namespace_and_path(urn)
         if namespace == "bible" and len(path) <= 2:
             break  # never above a chapter
-        if not opens_parent(urn):
-            break  # a later part, or a part of a text not encoded whole: cut, below
-        if not any("".join(index.incipit_of[s][:INCIPIT_WORDS]) in joined for s in other_parts(urn)):
-            break
-        evidence.append(f"runs on past {urn.rsplit('/', 1)[-1]} into the rest of {parent(urn)}")
+        if not (opening_in_parent(urn) and covers(urn)):
+            break  # a part of the text: cut, below, where another part opens
+        evidence.append(f"runs on past {urn.rsplit('/', 1)[-1]} through most of {parent(urn)}")
         urn = parent(urn)
     namespace, path = _namespace_and_path(urn)
     if namespace == "bible":
@@ -238,6 +251,10 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         evidence.append(f"cut before phrase {split_at + 1}, where the next part of {parent(urn)} opens")
     return Resolution(urn, evidence, split_at)
 
+
+#: Share of a text's other parts a block must hold to be the whole text rather than the part
+#: that opens it.
+MOVE_UP_COVERAGE = 0.75
 
 #: Share of an earlier printing's phrases a later block must print, and share of the block's
 #: phrases (up to where the earlier printing ends) that must be the earlier printing's, for the
@@ -266,7 +283,9 @@ def mint(text: str, taken: set[str], spellings: Spellings) -> str:
     """A new ``prayer:`` URN from a text's incipit. A blessing is named from the words after
     its formula, which every blessing shares."""
     # Words as the index counts them: a maqaf separates words, punctuation alone is none.
-    hebrew = [token for token in re.split(r"[\s\u05be]+", text) if words(token)]
+    # A parenthesized or unpointed word is a label or an abbreviation, not the text's words.
+    hebrew = [token for token in re.split(r"[\s\u05be]+", text)
+              if words(token) and is_pointed(token) and not token.startswith("(")]
     if tuple(words(" ".join(hebrew[:6]))) == BLESSING_FORMULA:
         hebrew = hebrew[6:] or hebrew
         if tuple(words(" ".join(hebrew[:4]))) == MITZVAH_FORMULA:
@@ -315,127 +334,212 @@ def decide_work(
 ) -> Decisions:
     """Decide the URN of every block of ``work_key`` that has no current record.
 
-    ``leaves`` is each leaf's path with its items (``blocks.divide``), in book order; a text
-    found to run on past the text it opens is cut, and the leaf's list is changed in place to
-    hold both parts.
+    ``leaves`` is each leaf's path with its items (``blocks.divide``), in book order. A text
+    found to run on past the text it is -- or a first printing that a later one shows ran on
+    past it -- is cut, and its leaf's list is changed in place to hold both parts. A cut is
+    recorded by the second part's record, and replayed from it on every later run.
     ``taken`` is every URN already in use (registry and records); minted URNs are added to it.
     ``recorded_phrases`` are the phrases other Metsudah volumes have named
     (``phrases.recorded_phrases``).
     """
-    from opensiddur.importer.sefaria.phrases import text_path
+    return _Decider(work_key, index, records, taken, recorded_phrases or {},
+                    spellings or load_spellings()).run(leaves)
 
-    spellings = spellings or load_spellings()
-    recorded_phrases = recorded_phrases or {}
-    outcome = Decisions(dict(records))
-    #: the texts this work printed earlier: URN -> the skeletons of its first printing's phrases
-    printed: dict[str, list[str]] = {}
-    #: texts too short for the incipit index: their words -> URN
-    short_printed: dict[str, str] = {}
-    own = IncipitIndex()
-    stale_keys = {key for key in records if key[0] == work_key}
-    for leaf_path, blocks in leaves:
-        i = 0
-        while i < len(blocks):
-            block = blocks[i]
-            if not isinstance(block, TextBlock):
+
+@dataclass
+class _Printing:
+    """Where this volume first printed a text, so that a later printing can cut it."""
+
+    leaf: str
+    blocks: list[Item]
+    block: TextBlock
+
+
+class _Decider:
+    def __init__(self, work_key: str, index: IncipitIndex, records: dict[tuple[str, str, int], TextRecord],
+                 taken: set[str], recorded_phrases: dict[str, dict[int, str]], spellings: Spellings):
+        self.work_key = work_key
+        self.index = index
+        self.records = records
+        self.taken = taken
+        self.recorded_phrases = recorded_phrases
+        self.spellings = spellings
+        self.outcome = Decisions(dict(records))
+        self.printed: dict[str, _Printing] = {}
+        #: texts too short for the incipit index: their words -> URN
+        self.short_printed: dict[str, str] = {}
+        self.own = IncipitIndex()
+        self.stale_keys = {key for key in records if key[0] == work_key}
+        #: each leaf's recorded block starts: where earlier runs cut
+        self.starts: dict[str, set[int]] = {}
+        for work, leaf, block in records:
+            if work == work_key:
+                self.starts.setdefault(leaf, set()).add(block)
+
+    def run(self, leaves: Iterable[tuple[str, list[Item]]]) -> Decisions:
+        for leaf_path, blocks in leaves:
+            i = 0
+            while i < len(blocks):
+                if isinstance(blocks[i], TextBlock):
+                    self.decide(leaf_path, blocks, i)
                 i += 1
-                continue
-            key = (work_key, leaf_path, block.first_index)
-            text = block_text(block)
-            this_short = skeleton(text)
-            phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
-            block_words = [w for phrase in phrase_words for w in phrase]
+        for key in sorted(self.stale_keys):
+            self.outcome.lapsed.append(self.outcome.records.pop(key))
+        return self.outcome
+
+    # -- bookkeeping -----------------------------------------------------------------------
+
+    def key(self, leaf: str, block: TextBlock) -> tuple[str, str, int]:
+        return (self.work_key, leaf, block.first_index)
+
+    def remember(self, urn: str, leaf: str, blocks: list[Item], block: TextBlock) -> None:
+        self.printed.setdefault(urn, _Printing(leaf, blocks, block))
+        self.own.add(urn, words(block_text(block)))
+        self.short_printed.setdefault(skeleton(block_text(block)), urn)
+
+    def save(self, record: TextRecord, *, lapsed: TextRecord | None = None) -> None:
+        if lapsed is not None:
+            self.outcome.lapsed.append(lapsed)
+        self.outcome.records[record.key] = record
+        self.outcome.decided.append(record)
+
+    def cut(self, leaf: str, blocks: list[Item], i: int, at: int) -> TextBlock:
+        first, rest = split_block(blocks[i], at)
+        blocks[i:i + 1] = [first, rest]
+        return first
+
+    # -- deciding --------------------------------------------------------------------------
+
+    def decide(self, leaf: str, blocks: list[Item], i: int) -> None:
+        block = blocks[i]
+        assert isinstance(block, TextBlock)
+        # Replay the cuts earlier runs made: a recorded start inside this block.
+        replay = next((j for j, pair in enumerate(block.phrases)
+                       if j > 0 and pair.he_index in self.starts.get(leaf, ())), None)
+        if replay is not None:
+            block = self.cut(leaf, blocks, i, replay)
+        key = self.key(leaf, block)
+        self.stale_keys.discard(key)
+        text = block_text(block)
+        record = self.records.get(key)
+        if record is not None and record.as_of == block_hash(block):
+            if record.kind != "repeat":
+                self.remember(record.urn, leaf, blocks, block)
+            return
+        if record is not None and record.kind != "repeat" and record.urn not in self.printed and (
+                similarity(skeleton(record.incipit), skeleton(" ".join(text.split()[:INCIPIT_WORDS])))
+                >= SAME_PHRASE):
+            # The words changed, but it is still the text it was: it keeps its URN, and its
+            # phrases their numbers.
             skeletons = phrase_skeletons(block)
-            record = records.get(key)
-            if record is not None and record.as_of == block_hash(block):
-                stale_keys.discard(key)
-                if record.kind != "repeat":
-                    printed.setdefault(record.urn, skeletons)
-                    own.add(record.urn, block_words)
-                    short_printed.setdefault(skeleton(text), record.urn)
-                i += 1
-                continue
-            if record is not None and record.kind != "repeat" and record.urn not in printed and (
-                    similarity(skeleton(record.incipit), skeleton(" ".join(text.split()[:INCIPIT_WORDS])))
-                    >= SAME_PHRASE):
-                # The words changed, but it is still the text it was: it keeps its URN, and its
-                # phrases their numbers.
-                stale_keys.discard(key)
-                outcome.lapsed.append(record)
-                kept = TextRecord(
-                    work=work_key, leaf=leaf_path, block=block.first_index, urn=record.urn,
-                    kind=record.kind, incipit=" ".join(text.split()[:INCIPIT_WORDS]),
-                    as_of=block_hash(block),
-                    evidence=record.evidence + ["the words changed; the URN of the earlier decision is kept"],
-                    phrases=record.phrases if record.phrases and len(record.phrases) == len(skeletons) else None)
-                outcome.records[key] = kept
-                outcome.decided.append(kept)
-                printed.setdefault(kept.urn, skeletons)
-                own.add(kept.urn, block_words)
-                i += 1
-                continue
-            evidence: list[str] = []
-            kind = "existing"
-            if len(block_words) < SHORT_INCIPIT_WORDS and this_short in short_printed:
-                # Too short for the incipit index: a repeat is found by its words alone.
-                resolution = Resolution(short_printed[this_short], ["the same words as an earlier text"])
+            self.save(TextRecord(
+                work=self.work_key, leaf=leaf, block=block.first_index, urn=record.urn, kind=record.kind,
+                incipit=" ".join(text.split()[:INCIPIT_WORDS]), as_of=block_hash(block),
+                evidence=record.evidence + ["the words changed; the URN of the earlier decision is kept"],
+                phrases=record.phrases if record.phrases and len(record.phrases) == len(skeletons) else None),
+                lapsed=record)
+            self.remember(record.urn, leaf, blocks, block)
+            return
+        self.decide_anew(leaf, blocks, i, record)
+
+    def decide_anew(self, leaf: str, blocks: list[Item], i: int, record: TextRecord | None) -> None:
+        block = blocks[i]
+        assert isinstance(block, TextBlock)
+        text = block_text(block)
+        phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
+        block_words = [w for phrase in phrase_words for w in phrase]
+        skeletons = phrase_skeletons(block)
+        evidence: list[str] = []
+        kind = "existing"
+        if len(block_words) < SHORT_INCIPIT_WORDS and skeleton(text) in self.short_printed:
+            # Too short for the incipit index: a repeat is found by its words alone.
+            resolution = Resolution(self.short_printed[skeleton(text)], ["the same words as an earlier text"])
+        else:
+            resolution = resolve(lookup(self.own, block_words), phrase_words, self.own)
+        if resolution.urn is None:
+            resolution = resolve(lookup(self.index, block_words), phrase_words, self.index)
+        urn = resolution.urn
+        evidence.extend(resolution.evidence)
+        cut = resolution.split_at
+        if urn is not None and urn in self.printed:
+            earlier = self.printed[urn]
+            earlier_skeletons = phrase_skeletons(earlier.block)
+            length = repeat_length(skeletons, earlier_skeletons)
+            earlier_length = repeat_length(earlier_skeletons, skeletons)
+            if (earlier_length is not None and earlier_length < len(earlier_skeletons)
+                    and length == len(skeletons)):
+                # The first printing ran on past this text: cut it where this one ends.
+                self.cut_earlier(urn, earlier_length)
+                kind, cut = "repeat", None
+                evidence.append("the same text as its first printing in this volume, which ran on past "
+                                "it and is cut where this one ends; transcluded")
+            elif length is not None:
+                kind = "repeat"
+                cut = length if length < len(skeletons) else None
+                evidence.append("the same text as its first printing in this volume, transcluded")
+                if cut is not None:
+                    evidence.append(f"cut before phrase {cut + 1}, where the first printing ends")
             else:
-                resolution = resolve(lookup(own, block_words), phrase_words, own)
-            if resolution.urn is None:
-                resolution = resolve(lookup(index, block_words), phrase_words, index)
-            urn = resolution.urn
-            evidence.extend(resolution.evidence)
-            cut = resolution.split_at
-            if urn is not None and urn in printed:
-                length = repeat_length(skeletons, printed[urn])
-                if length is not None:
-                    kind = "repeat"
-                    cut = length if length < len(skeletons) else None
-                    evidence.append("the same text as its first printing in this volume, transcluded")
-                    if cut is not None:
-                        evidence.append(f"cut before phrase {cut + 1}, where the first printing ends")
-                else:
-                    evidence.append(f"differs from the first printing of {urn} in this volume")
-                    urn, cut = None, None
-            if cut is not None:
-                block, rest = split_block(block, cut)
-                blocks[i:i + 1] = [block, rest]
-                key = (work_key, leaf_path, block.first_index)
-                text = block_text(block)
-                block_words = words(text)
-                skeletons = phrase_skeletons(block)
-            record = records.get(key)
-            if record is not None and record.as_of == block_hash(block):
-                # The part before the cut was recorded already.
-                stale_keys.discard(key)
+                evidence.append(f"differs from the first printing of {urn} in this volume")
+                urn = self.another_candidate(block_words, phrase_words, evidence)
+                cut = None
+        if cut is not None:
+            block = self.cut(leaf, blocks, i, cut)
+            text = block_text(block)
+            skeletons = phrase_skeletons(block)
+            key = self.key(leaf, block)
+            record = self.records.get(key)
+            if record is not None and record.as_of == block_hash(block) and record.urn == urn:
                 if record.kind != "repeat":
-                    printed.setdefault(record.urn, skeletons)
-                    own.add(record.urn, block_words)
-                    short_printed.setdefault(skeleton(text), record.urn)
-                i += 1
-                continue
-            if record is not None:
-                outcome.lapsed.append(record)
-            stale_keys.discard(key)
-            if urn is None:
-                urn = mint(text, taken, spellings)
-                kind = "new"
-            taken.add(urn)
-            phrases = None
-            if kind != "repeat":
-                printed.setdefault(urn, skeletons)
-                own.add(urn, block_words)
-                short_printed.setdefault(skeleton(text), urn)
-                numbers = map_phrases(skeletons, recorded_phrases.get(text_path(urn), {}))
-                if numbers != list(range(1, len(numbers) + 1)):
-                    phrases = numbers
-                    evidence.append("phrase numbers follow the phrases an earlier volume named")
-            new = TextRecord(work=work_key, leaf=leaf_path, block=block.first_index, urn=urn, kind=kind,
+                    self.remember(record.urn, leaf, blocks, block)
+                return
+        if urn is None:
+            urn = mint(text, self.taken, self.spellings)
+            kind = "new"
+        self.taken.add(urn)
+        phrases = None
+        if kind != "repeat":
+            self.remember(urn, leaf, blocks, block)
+            phrases = self.phrase_numbers(urn, skeletons, evidence)
+        self.save(TextRecord(work=self.work_key, leaf=leaf, block=block.first_index, urn=urn, kind=kind,
                              incipit=" ".join(text.split()[:INCIPIT_WORDS]), as_of=block_hash(block),
-                             evidence=evidence, phrases=phrases)
-            outcome.records[key] = new
-            outcome.decided.append(new)
-            i += 1
-    for key in sorted(stale_keys):
-        outcome.lapsed.append(outcome.records.pop(key))
-    return outcome
+                             evidence=evidence, phrases=phrases), lapsed=record)
+
+    def another_candidate(self, block_words: list[str], phrase_words: list[list[str]],
+                          evidence: list[str]) -> str | None:
+        """A text the block opens like that this volume has not printed yet, or None."""
+        candidates: set[str] = set()
+        for key in keys(block_words):
+            candidates |= self.index.by_incipit.get(key, set())
+        candidates -= set(self.printed)
+        if not candidates:
+            return None
+        resolution = resolve(candidates, phrase_words, self.index)
+        if resolution.urn is None or resolution.urn in self.printed or resolution.split_at is not None:
+            return None
+        evidence.append(f"took {resolution.urn}, which opens alike and is not printed earlier")
+        return resolution.urn
+
+    def phrase_numbers(self, urn: str, skeletons: list[str], evidence: list[str]) -> list[int] | None:
+        from opensiddur.importer.sefaria.phrases import text_path
+
+        numbers = map_phrases(skeletons, self.recorded_phrases.get(text_path(urn), {}))
+        if numbers == list(range(1, len(numbers) + 1)):
+            return None
+        evidence.append("phrase numbers follow the phrases an earlier volume named")
+        return numbers
+
+    def cut_earlier(self, urn: str, length: int) -> None:
+        """Cut the first printing of ``urn`` after ``length`` phrases, and decide the rest."""
+        printing = self.printed[urn]
+        i = printing.blocks.index(printing.block)
+        first = self.cut(printing.leaf, printing.blocks, i, length)
+        previous = self.outcome.records[self.key(printing.leaf, first)]
+        self.save(TextRecord(
+            work=self.work_key, leaf=printing.leaf, block=first.first_index, urn=urn, kind=previous.kind,
+            incipit=previous.incipit, as_of=block_hash(first),
+            evidence=previous.evidence + [f"cut before phrase {length + 1}, where a later printing ends"],
+            phrases=previous.phrases[:length] if previous.phrases else None))
+        printing.block = first
+        self.decide_anew(printing.leaf, printing.blocks, i + 1, self.records.get(
+            self.key(printing.leaf, printing.blocks[i + 1])))

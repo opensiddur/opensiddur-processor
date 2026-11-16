@@ -5,6 +5,7 @@ from pathlib import Path
 
 from lxml import etree
 
+from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.convert import ConvertError, convert_work, load_structure
 from opensiddur.importer.util.incipit import IncipitIndex, words
 
@@ -53,9 +54,14 @@ class TestConvertWork(unittest.TestCase):
         self.index.add(T + "prayer:modeh_ani", words(" ".join(h for h, _ in MORNING[1:3])))
 
     def convert(self, **kwargs):
+        # Synthetic configuration throughout: no real spellings, decisions or works.
+        decisions = Path(self.tmp.name) / "decisions.yaml"
+        decisions.write_text("{}\n")
         return convert_work(WORK, sourcetexts_root=self.sources, project_directory=self.projects,
                             registry_directory=self.registry, urns_path=self.urns, index=self.index,
-                            output_directory=self.output, structure_path=self.structure, **kwargs)
+                            output_directory=self.output, structure_path=self.structure,
+                            decisions_path=decisions, spellings=Spellings(frozenset(), {}),
+                            works={WORK.key: WORK}, **kwargs)
 
     def test_writes_parallel_projects(self):
         plan = self.convert(do_register=True)

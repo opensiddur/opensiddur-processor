@@ -34,6 +34,10 @@ class TestAlign(unittest.TestCase):
         result = align_leaf(leaf(["א", "ב"], ["a"]))
         self.assertEqual([(p.he_index, p.en_index) for p in result.pairs], [(1, 1), (2, None)])
 
+    def test_a_long_untranslated_run_needs_a_decision(self):
+        with self.assertRaisesRegex(AlignmentError, "record a decision"):
+            align_leaf(leaf(["א", "ב", "ג", "ד", "ה"], ["a"]))
+
     def test_other_mismatch_needs_a_decision(self):
         with self.assertRaisesRegex(AlignmentError, "record a decision"):
             align_leaf(leaf(["א"], ["a", "b plain"]))
