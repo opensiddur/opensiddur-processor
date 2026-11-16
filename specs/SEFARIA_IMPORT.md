@@ -95,9 +95,9 @@ Pairs each leaf's Hebrew and English segments:
 
 - the same number of segments: one to one;
 - **trailing extras**: the longer version's extra segments all at the end, every extra English
-  segment a rubric or every extra Hebrew segment text — accepted and listed in the report (in
-  the Weekday Siddur, 12 leaves: rubrics after the last Hebrew, and two leaves of untranslated
-  Hebrew);
+  segment a rubric, or at most three extra Hebrew segments — accepted and listed in the report
+  (in the Weekday Siddur, 12 leaves: rubrics after the last Hebrew, and two leaves of
+  untranslated Hebrew);
 - otherwise a decision in `alignment_decisions.yaml`, naming by 1-based index the Hebrew with
   no English (`he_only`) and the English with no Hebrew (`en_only`), with the hashes of the
   leaf it was made for (`as_of`). A decision lapses when its leaf changes. An undecided
@@ -124,27 +124,39 @@ Each text's URN, in order of preference:
 
 1. **A repeat.** A text this volume printed earlier is transcluded from its first printing —
    one project carries a URN once. Printings are compared phrase by phrase (`map_phrases`): at
-   least three quarters of the earlier printing's phrases, and of the block's phrases up to
-   where the earlier printing ends, must be the same. A block that runs on past the earlier
-   printing is cut there, and the rest decided on its own.
+   least three quarters of the earlier printing's phrases must be found in the block, without
+   long gaps, and three quarters of the block's phrases up to where the earlier printing ends
+   must be the earlier printing's. A block that runs on past the earlier printing is cut there,
+   and the rest decided on its own; an earlier printing that ran on past a later one is cut
+   where the later one ends.
 2. **An existing text.** The block's opening is looked up in the incipit index of the
    collection's Hebrew projects (`util/incipit.py`, shared with the opensiddur.org importer).
    The opensiddur.org imports and the Sefaria imports themselves are left out: their openings
    are formulas that match unrelated texts. A blessing is found only by the words after its
-   formula. A match that opens a text whose whole is encoded moves up to the whole when the
-   block runs on into another part of it; a later part stays that part, and the block is cut
-   where another part opens (the Kaddish divides into its parts this way). Scripture is kept
+   formula. Words are compared as consonant skeletons, a maqaf separating words. Where another
+   rite's wording parts from the collection's within the first six words (Sefard
+   וְלִתְפִלָּתָם, Ashkenaz וּבִתְפִלָּתָם), four words find the text when one text agrees
+   clearly best. Every match must agree with the block over the candidate's whole collected
+   opening (sixteen words), not just the key that found it: many texts open "יהי רצון מלפניך"
+   and go on differently. A match moves up to the whole text it is part of only when the whole
+   is encoded, opens with it, and the block holds three quarters of the whole's other parts;
+   otherwise it stays the part, and the block is cut where another part opens (the Kaddish
+   divides into its parts this way). Scripture is kept
    only as a whole chapter opened at its first verse; a block that opens mid-chapter (Hodu) is
    liturgy quoting scripture.
-3. **A new text**, `prayer:` plus its Hebrew incipit romanized (`util/transliterate.py`, the
-   JLPTEI-3 table) and respelled by `specs/naming/spellings.yaml`; a blessing is named after
-   its formulas (`al_mitzvat`, not `barukh_attah`). Lengthened until it is not taken.
+3. **A new text**, `prayer:` plus at least three words of its Hebrew incipit romanized
+   (`util/transliterate.py`, the JLPTEI-3 table) and respelled by `specs/naming/spellings.yaml`
+   — two words ("yehi_ratzon") would claim an opening many texts share; unpointed and
+   parenthesized words (labels) are skipped, and a blessing is named after its formulas
+   (`al_mitzvat_tzitzit`, not `barukh_attah`). Lengthened until it is not taken.
 
 Every decision is recorded at once in `specs/sefaria/metsudah_urns.jsonl` — one line per text,
 keyed by work, leaf and the Hebrew index of its first phrase, with its kind
 (`existing`/`new`/`repeat`), incipit, evidence and a hash of its words (`as_of`). Records are
-sticky: a reviewer may correct a URN in the file and rerun. A record lapses, and is decided
-again and reported, when its text changes.
+sticky: a reviewer may correct a URN in the file and rerun, and a rerun on an unchanged export
+decides nothing. A cut is recorded by the record of the text after it, and replayed from it.
+When a text's words change, its record lapses and is reported; the text keeps its URN (and its
+phrases their numbers) when its opening still agrees, and is decided again otherwise.
 
 Phrase numbers are 1, 2, 3… unless an earlier volume named the text's phrases: then the
 record carries the numbers `map_phrases` gives (`phrases`).
