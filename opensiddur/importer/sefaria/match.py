@@ -178,10 +178,14 @@ def lookup(index: IncipitIndex, block_words: list[str], *, confirm: bool = True)
     if found:
         return found
     rest = block_words[len(BLESSING_FORMULA):]
+    # A blessing over a commandment shares "אשר קדשנו במצותיו וצונו" with every other: its
+    # keys must reach a word past it.
+    shared = len(MITZVAH_FORMULA) if tuple(rest[:len(MITZVAH_FORMULA)]) == MITZVAH_FORMULA else 0
     if blessing:
         short = set()
         for length in (5, 4, 3):
-            short |= index.by_incipit.get(("§", *rest[:length]), set()) if len(rest) >= length else set()
+            if len(rest) >= length > shared:
+                short |= index.by_incipit.get(("§", *rest[:length]), set())
     else:
         short = set(index.by_incipit.get(tuple(block_words[:SHORT_INCIPIT_WORDS]), set()))
     best = clearly_best(short, lambda u: opening_agreement(u, block_words, index),
@@ -191,7 +195,8 @@ def lookup(index: IncipitIndex, block_words: list[str], *, confirm: bool = True)
     if blessing:
         # A blessing of two words after its formula (פוקח עורים) has no key of its own: it is
         # found by those words in the openings the index holds.
-        two = blessings_by_two_words(index).get(tuple(rest[:2]), set()) if len(rest) >= 2 else set()
+        two = (blessings_by_two_words(index).get(tuple(rest[:2]), set())
+               if len(rest) >= 2 and not shared else set())
         return clearly_best(two, lambda u: opening_agreement(u, block_words, index))
     shifted: dict[str, float] = {}
     for urn, offset in shifted_openings(index).get(tuple(block_words[:SHORT_INCIPIT_WORDS]), ()):
@@ -427,6 +432,31 @@ def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float 
     if (end + 1) / length >= coverage:
         return length
     return None
+
+
+def distinctive_words(block_words: list[str]) -> list[str]:
+    """What tells a blessing apart: its words after the formula, and after "אשר קדשנו במצותיו
+    וצונו" for a blessing over a commandment. Not a blessing: all its words."""
+    if tuple(block_words[:len(BLESSING_FORMULA)]) != BLESSING_FORMULA:
+        return block_words
+    rest = block_words[len(BLESSING_FORMULA):]
+    if tuple(rest[:len(MITZVAH_FORMULA)]) == MITZVAH_FORMULA:
+        rest = rest[len(MITZVAH_FORMULA):]
+    return rest
+
+
+def same_blessing(block_words: list[str], earlier_words: list[str]) -> bool:
+    """Whether two printings can be one text, as far as blessings go: two blessings only when
+    their first words past the formulas agree (על מצות ציצית is not על מצות תפלין)."""
+    if tuple(block_words[:len(BLESSING_FORMULA)]) != BLESSING_FORMULA:
+        return True
+    ours, theirs = distinctive_words(block_words), distinctive_words(earlier_words)
+    length = min(BLESSING_DISTINCTIVE_WORDS, len(ours), len(theirs))
+    return length > 0 and ours[:length] == theirs[:length]
+
+
+#: The words past a blessing's formulas that must agree for two printings to be one blessing.
+BLESSING_DISTINCTIVE_WORDS = 3
 
 
 def introduced_phrases(block: TextBlock) -> frozenset[int]:
@@ -668,6 +698,11 @@ class _Decider:
         urn = resolution.urn
         evidence.extend(resolution.evidence)
         cut = resolution.split_at
+        if urn is not None and urn in self.printed and not same_blessing(
+                block_words, words(block_text(self.printed[urn].block))):
+            evidence.append(f"a blessing other than {urn}, whose formula it shares")
+            urn = self.another_candidate(block_words, phrase_words, evidence)
+            cut = None
         if urn is not None and urn in self.printed:
             earlier = self.printed[urn]
             earlier_skeletons = phrase_skeletons(earlier.block)

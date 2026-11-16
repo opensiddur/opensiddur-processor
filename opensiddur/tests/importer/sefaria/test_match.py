@@ -214,6 +214,17 @@ class TestReviewCases(unittest.TestCase):
         self.assertEqual(outcome.decided[0].urn, T + "prayer:kaddish/x/a")
 
 
+class TestBlessings(unittest.TestCase):
+    def test_blessings_over_different_commandments_are_different_texts(self):
+        tzitzit = ["<b>בָּרוּךְ</b> אַתָּה יְהֹוָה", "אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם", "אֲשֶׁר קִדְּשָׁנוּ בְּמִצְוֹתָיו",
+                   "וְצִוָּנוּ עַל מִצְוַת צִיצִית"]
+        tefillin = [*tzitzit[:3], "וְצִוָּנוּ עַל מִצְוַת תְּפִלִּין"]
+        outcome = decide([("A", items(*tzitzit)), ("B", items(*tefillin))])
+        first, second = outcome.decided
+        self.assertEqual(second.kind, "new")
+        self.assertNotEqual(second.urn, first.urn)
+
+
 class TestScriptureVerses(unittest.TestCase):
     def test_a_quoted_verse_is_found_at_its_phrase(self):
         from opensiddur.importer.sefaria.match import scripture_verses
