@@ -403,7 +403,7 @@ def main(argv: list[str] | None = None) -> int:
     for work in select_works(args.work):
         plan = convert_work(work, sourcetexts_root=args.sourcetexts_root,
                             project_directory=args.project_directory, do_register=args.register)
-        kinds = {k: sum(1 for r in plan.decisions.decided if r.kind == k) for k in ("existing", "new", "repeat")}
+        kinds = {k: sum(1 for r in plan.decisions.decided if r.kind == k) for k in ("existing", "new", "repeat", "variant")}
         print(f"{work.key}: {len(plan.decisions.decided)} text(s) decided this run {kinds}; "
               f"{len(plan.decisions.lapsed)} lapsed; report in "
               f"{OUTPUT_DIRECTORY / f'sefaria_{work.key}_report.md'}")
