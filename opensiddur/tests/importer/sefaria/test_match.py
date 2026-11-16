@@ -151,6 +151,15 @@ class TestReviewCases(unittest.TestCase):
         self.assertEqual((again.decided, again.lapsed), ([], []))
         self.assertEqual(len([i for i in leaf if isinstance(i, TextBlock)]), 2)
 
+    def test_a_rerun_replays_a_cut_before_a_short_text(self):
+        index = IncipitIndex()
+        index.add(T + "prayer:kaddish/x/a", words(" ".join(PART_A)))
+        index.add(T + "prayer:kaddish/x/b", words("יְהֵא שְׁלָמָא רַבָּא מִן"))
+        leaf = [*PART_A, "יְהֵא שְׁלָמָא רַבָּא מִן", *UNKNOWN[1:]]
+        first = decide([("L", items(*leaf))], index)
+        again = decide([("L", items(*leaf))], index, records=first.records)
+        self.assertEqual((again.decided, again.lapsed), ([], []))
+
     def test_a_first_printing_that_ran_on_is_cut_where_the_later_ends(self):
         first_leaf = items(*MODEH, *UNKNOWN[1:])
         outcome = decide([("A", first_leaf), ("B", items(*MODEH))])

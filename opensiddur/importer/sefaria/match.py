@@ -649,8 +649,10 @@ class _Decider:
         record = self.records.get((self.work_key, leaf, block.phrases[j].he_index))
         if record is None:
             return False
-        here = " ".join(" ".join(plain_text(p.he) for p in block.phrases[j:]).split()[:INCIPIT_WORDS])
-        return skeleton(here) == skeleton(record.incipit)
+        # The record holds at most six words: fewer when its text is shorter.
+        recorded = record.incipit.split()
+        here = " ".join(" ".join(plain_text(p.he) for p in block.phrases[j:]).split()[:len(recorded)])
+        return skeleton(here) == skeleton(" ".join(recorded))
 
     def kept_numbers(self, record: TextRecord, skeletons: list[str]) -> list[int] | None:
         """The phrase numbers of a text whose words changed: the ones its phrases had, by the
