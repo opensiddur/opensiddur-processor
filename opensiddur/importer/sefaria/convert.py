@@ -48,12 +48,14 @@ from opensiddur.importer.sefaria.match import (
     load_records,
     registry_urns,
     save_records,
+    scripture_verses,
 )
 from opensiddur.importer.sefaria.phrases import recorded_phrases, text_path
 from opensiddur.importer.sefaria.source import PATH_SEPARATOR, WorkSource, load_work_source
 from opensiddur.importer.sefaria.tei_builder import (
     Notes,
     SourceInfo,
+    VariantPrinting,
     document,
     document_header,
     file_stem,
@@ -63,6 +65,7 @@ from opensiddur.importer.sefaria.tei_builder import (
     node_body,
     siddur_urn,
     text_body,
+    variant_urn,
 )
 from opensiddur.importer.sefaria.works import LANGUAGES, Work, load_works, select_works
 from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index
@@ -105,6 +108,8 @@ class WorkPlan:
     alignments: list[Alignment]
     items: dict[str, list[Item]]
     decisions: Decisions
+    #: the verses of scripture each text quotes: (leaf, block) -> phrase position -> verse URN
+    verses: dict[tuple[str, int], dict[int, str]] = field(default_factory=dict)
 
     def record(self, leaf_path: str, block: TextBlock) -> TextRecord:
         return self.decisions.records[(self.work.key, leaf_path, block.first_index)]
@@ -121,8 +126,24 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
     items = {a.leaf.path: divide(a.pairs) for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
-                            recorded_phrases=phrases, spellings=spellings)
-    return WorkPlan(work, source, structure, alignments, items, decisions)
+                            recorded_phrases=phrases, spellings=spellings,
+                            places={path: place for path, place in structure.items() if place})
+    # The verses each text the project writes quotes. A project carries a URN once, so a verse
+    # quoted by two texts is marked in the first.
+    verses: dict[tuple[str, int], dict[int, str]] = {}
+    marked: set[str] = set()
+    for leaf, leaf_items in items.items():
+        for block in leaf_items:
+            if not isinstance(block, TextBlock):
+                continue
+            if decisions.records[(work.key, leaf, block.first_index)].kind not in ("existing", "new"):
+                continue
+            found = {position: urn for position, urn in scripture_verses(block, index).items()
+                     if urn not in marked}
+            marked.update(found.values())
+            if found:
+                verses[(leaf, block.first_index)] = found
+    return WorkPlan(work, source, structure, alignments, items, decisions, verses)
 
 
 @dataclass
@@ -158,6 +179,19 @@ def children_by_parent(plan: WorkPlan) -> dict[tuple[str, ...], list[str]]:
     return children
 
 
+def text_printings(plan: WorkPlan) -> dict[str, list[VariantPrinting]]:
+    """Each text's variants -- its later printings with words of their own -- in book order."""
+    found: dict[str, list[VariantPrinting]] = {}
+    for leaf_path, items in plan.items.items():
+        for item in items:
+            if isinstance(item, TextBlock):
+                record = plan.record(leaf_path, item)
+                if record.kind == "variant" and record.variant:
+                    found.setdefault(record.urn, []).append(
+                        VariantPrinting(record.variant, item, record.phrases or []))
+    return found
+
+
 def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
     work = plan.work
     out = ProjectFiles()
@@ -172,28 +206,36 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         body = node_body(urn, titles[node.path], children.get(node.keys, []), lang)
         title = titles[node.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang))
+    printings = text_printings(plan)
     for leaf in plan.source.leaves:
         place = plan.structure.get(leaf.path)
         if not place:
             continue
         items = plan.items[leaf.path]
         text_urns: dict[int, str] = {}
+        declarations: dict[int, list[tuple[str, bool]]] = {}
         for item in items:
             if not isinstance(item, TextBlock):
                 continue
             record = plan.record(leaf.path, item)
             text_urns[id(item)] = record.urn
-            if record.kind == "repeat":
+            variants = printings.get(record.urn, ())
+            if variants:
+                # Which of the text's variants this place prints, and which it does not.
+                declarations[id(item)] = [(variant_urn(record.urn, v.name), v.name == record.variant)
+                                          for v in variants]
+            if record.kind in ("repeat", "variant"):
                 continue
             numbers = record.phrases or list(range(1, len(item.phrases) + 1))
             notes = Notes(prefix="note")
-            body = text_body(record.urn, item, numbers, lang, notes)
+            body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
+                             plan.verses.get((leaf.path, item.first_index)))
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
-        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes)
+        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations)
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
     out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang), lang))
@@ -327,8 +369,8 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     plan = plan_work(work, source, index=index, records=records, taken=taken,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
                      decisions_path=decisions_path, spellings=spellings)
-    check_phrase_paths({k: r for k, r in plan.decisions.records.items() if r.kind != "repeat"
-                        and r.work == work.key})
+    check_phrase_paths({k: r for k, r in plan.decisions.records.items()
+                        if r.kind in ("existing", "new") and r.work == work.key})
     written: dict[str, int] = {}
     pruned: dict[str, list[Path]] = {}
     for lang in LANGUAGES:

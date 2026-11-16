@@ -70,6 +70,22 @@ class TestTextBody(unittest.TestCase):
         self.assertEqual(en.xpath("//tei:milestone/@corresp", namespaces=NS),
                          [T + "metsudah:modeh_ani/1", T + "metsudah:modeh_ani/2"])
 
+    def test_verses_are_marked_and_closed_where_they_end(self):
+        (block,) = blocks([
+            ("<b>תְּהִלָּה</b> לְדָוִד", "A praise by David"),
+            ("אֲרוֹמִמְךָ אֱלוֹהַי הַמֶּלֶךְ:", "I will exalt You"),
+            ("וְעוֹד דָּבָר", "and more"),
+        ])
+        verses = {0: T + "bible:psalms/145/1"}
+        for lang in ("he", "en"):
+            body = parse(text_body(T + "prayer:ashrei", block, [1, 2, 3], lang, Notes("note"), (), verses))
+            marks = body.xpath("//tei:milestone[@unit='verse']", namespaces=NS)
+            self.assertEqual([m.get("corresp") for m in marks], [T + "bible:psalms/145/1", None])
+            # The verse closes after the phrase that ends it, before the third phrase.
+            following = marks[1].xpath("following::tei:milestone[@unit='phrase'][@corresp][1]/@corresp",
+                                       namespaces=NS)
+            self.assertEqual(following, [T + "metsudah:ashrei/3"])
+
     def test_a_footnote_in_a_heading_is_kept(self):
         (block,) = blocks([
             ('<b>אבות</b>', '<b>FOREFATHERS</b><sup class="footnote-marker">1</sup><i class="footnote">The first.</i>'),

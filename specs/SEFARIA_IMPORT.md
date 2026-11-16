@@ -122,28 +122,43 @@ are unpointed, its liturgy pointed.
 
 Each text's URN, in order of preference:
 
-1. **A repeat.** A text this volume printed earlier is transcluded from its first printing —
-   one project carries a URN once. Printings are compared phrase by phrase (`map_phrases`): at
-   least three quarters of the earlier printing's phrases must be found in the block, without
-   long gaps, and three quarters of the block's phrases up to where the earlier printing ends
-   must be the earlier printing's. A block that runs on past the earlier printing is cut there,
-   and the rest decided on its own; an earlier printing that ran on past a later one is cut
-   where the later one ends.
+1. **The same text again.** A text this volume printed earlier is that text: one project
+   carries a URN once. Printings are paired phrase by phrase (`map_phrases`, on consonant
+   skeletons): the later printing is the text where half the earlier one's phrases are found
+   in it without long gaps, and is cut where the earlier printing ends; an earlier printing that
+   ran on past a later one is cut where the later one ends.
+   - **A repeat** prints exactly the first printing's words, phrase for phrase, and transcludes
+     it.
+   - **A variant** is mostly the same with words of its own — a passage added (Nachem in
+     Minchah's Boneh Yerushalayim on Tisha b'Av), left out, or worded otherwise. It keeps the
+     text's URN, and the one text file holds every printing: the first printing's words, a
+     phrase a variant leaves out conditional on that variant being false, and each variant's
+     own words after the phrase they follow, conditional on it being true — `j:conditional`
+     on `opensiddur:variant`, whose feature is the variant's condition URN,
+     `urn:x-opensiddur:condition:<text path>/<variant>`, the variant named by the `siddur:`
+     place that prints it (`…:prayer:amidah/yerushalayim/chol_minchah_shemoneh_esreh`). Each
+     place that transcludes the text declares (`j:declare`) which of its variants it prints,
+     so each compiles as its own printing; a transclusion elsewhere that declares nothing keeps
+     every passage. A variant's own phrases are numbered after every number the text has used.
 2. **An existing text.** The block's opening is looked up in the incipit index of the
    collection's Hebrew projects (`util/incipit.py`, shared with the opensiddur.org importer).
    The opensiddur.org imports and the Sefaria imports themselves are left out: their openings
-   are formulas that match unrelated texts. A blessing is found only by the words after its
-   formula. Words are compared as consonant skeletons, a maqaf separating words. Where another
-   rite's wording parts from the collection's within the first six words (Sefard
-   וְלִתְפִלָּתָם, Ashkenaz וּבִתְפִלָּתָם), four words find the text when one text agrees
-   clearly best. Every match must agree with the block over the candidate's whole collected
+   are formulas that match unrelated texts. Words are compared as consonant skeletons, a maqaf
+   separating words. Every match must agree with the block over the candidate's whole collected
    opening (sixteen words), not just the key that found it: many texts open "יהי רצון מלפניך"
-   and go on differently. A match moves up to the whole text it is part of only when the whole
-   is encoded, opens with it, and the block holds three quarters of the whole's other parts;
-   otherwise it stays the part, and the block is cut where another part opens (the Kaddish
-   divides into its parts this way). Scripture is kept
-   only as a whole chapter opened at its first verse; a block that opens mid-chapter (Hodu) is
-   liturgy quoting scripture.
+   and go on differently. The lookup goes in tiers, the first that finds a text winning:
+   six words (a blessing only by the words after its formula, which every blessing shares);
+   four words — for a blessing, two to five after the formula (פוקח עורים) — when one text
+   agrees clearly best, which finds another rite's wording (Sefard וְלִתְפִלָּתָם, Ashkenaz
+   וּבִתְפִלָּתָם); and the same a word or two out of step, past a label or heading word the
+   collection's text opens with (`א אזה מקמן`, `ישתבח ישתבח`) or one the book's block lacks
+   (`ואמונה`, its `אמת` ending the Shema). A match moves up to the whole text it is part of
+   only when the whole is encoded, opens with it, and the block holds three quarters of the
+   whole's other parts; otherwise it stays the part, and the block is cut where another part
+   opens (the Kaddish divides into its parts this way), or where a text the index holds whole
+   ends. A block is also cut before a blessing's formula in its middle: a new blessing is a
+   text of its own. Scripture is kept as a text only as a whole chapter opened at its first
+   verse; a block that opens mid-chapter (Hodu) is liturgy quoting scripture.
 3. **A new text**, `prayer:` plus at least three words of its Hebrew incipit romanized
    (`util/transliterate.py`, the JLPTEI-3 table) and respelled by `specs/naming/spellings.yaml`
    — two words ("yehi_ratzon") would claim an opening many texts share; unpointed and
@@ -179,6 +194,11 @@ Each language's project is laid out as the house style lays out a siddur:
   text.
 - **text files**, one per text, named by its URN: a `tei:div` with that URN, the text's
   heading, and a `tei:milestone unit="phrase"` with its `metsudah:` URN before each phrase.
+  Where a phrase opens a verse of scripture the collection encodes, a `tei:milestone
+  unit="verse"` with the verse's `bible:` URN is set before it, and closed after the phrase that
+  ends the verse (sof pasuq or colon) unless another verse follows — so a liturgical text that
+  quotes scripture (the Six Remembrances, Hodu, Ashrei's psalms) reuses the verses' URNs, once
+  in a project. A text's variants are merged into its file (see URNs).
 
 | Sefaria markup | JLPTEI |
 |---|---|
@@ -229,7 +249,9 @@ With nothing to review, the work is converted with `--register`. The report,
 
 - The other four volumes: a `works.yaml` entry and a structure table each; their phrases
   reuse the Weekday Siddur's numbers where the text is shared.
-- **Conditions.** Seasonal insertions are marked in the book (`<small>לְר"ח:</small>`, "On
+- **Conditions on the calendar.** A variant is selected by where it is printed, not yet by
+  the day: Nachem is printed at Minchah, conditional on that place, not on Tisha b'Av.
+  Seasonal insertions are marked in the book (`<small>לְר"ח:</small>`, "On
   Chanukah:", "Ten Days of Penitence") and are text, with their rubric, in the pilot. They are
   to become `j:conditional` — `type="marked"` where the book marks them
   (see `schema/JLPTEI-3.md`, conditional presentation) — and the index's services gated by

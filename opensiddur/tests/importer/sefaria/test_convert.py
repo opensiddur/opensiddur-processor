@@ -9,7 +9,7 @@ from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.convert import ConvertError, convert_work, load_structure
 from opensiddur.importer.util.incipit import IncipitIndex, words
 
-from .support import MORNING, STRUCTURE, WORK, make_source, write_structure, write_work_dir
+from .support import BLESSINGS, MORNING, STRUCTURE, WORK, make_source, write_structure, write_work_dir
 
 T = "urn:x-opensiddur:text:"
 NS = {"tei": "http://www.tei-c.org/ns/1.0", "j": "http://jewishliturgy.org/ns/jlptei/2"}
@@ -33,6 +33,41 @@ class TestLoadStructure(unittest.TestCase):
             path = write_structure(Path(tmp) / "s.yaml", doubled)
             with self.assertRaisesRegex(ConvertError, "placed twice"):
                 load_structure(WORK, make_source(), path)
+
+
+class TestVariants(unittest.TestCase):
+    """A text printed twice, the second time with a phrase of its own."""
+
+    def test_one_text_with_a_conditional_insertion(self):
+        # The insertion follows the opening phrases, as Nachem does Boneh Yerushalayim's.
+        text = [MORNING[1], MORNING[2], ("שֶׁהֶחֱזַֽרְתָּ בִּי נִשְׁמָתִי", "for You have restored my soul")]
+        again = [text[0], text[1], ("מְשֻׁנֶּה מְאֹד בְּיוֹתֵר", "changed"), text[2]]
+        tree = {"Morning": {"Upon Arising": text, "Again": again}, "Blessings": BLESSINGS}
+        structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
+                     "Morning / Again": "chol/shacharit/again", "Blessings": "berakhot/test"}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_work_dir(root / "sources" / "sefaria" / WORK.key, tree)
+            (root / "project").mkdir()
+            (root / "registry").mkdir()
+            (root / "decisions.yaml").write_text("{}\n")
+            plan = convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
+                                registry_directory=root / "registry", urns_path=root / "urns.jsonl",
+                                index=IncipitIndex(), output_directory=root / "out",
+                                structure_path=write_structure(root / "s.yaml", structure),
+                                decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
+                                works={WORK.key: WORK})
+            variant = [r for r in plan.decisions.records.values() if r.kind == "variant"]
+            self.assertEqual(len(variant), 1)
+            condition = "urn:x-opensiddur:condition:" + variant[0].urn.split(":", 3)[3] + "/chol_shacharit_again"
+            he = root / "project" / WORK.projects["he"]
+            text = etree.parse(str(he / (variant[0].urn.rsplit(":", 1)[1] + ".xml")))
+            self.assertEqual(text.xpath("//j:conditional//tei:f/@name", namespaces=NS), [condition])
+            self.assertEqual(text.xpath("//j:conditional//tei:binary/@value", namespaces=NS), ["true"])
+            again = etree.parse(str(he / "siddur_chol_shacharit_again.xml"))
+            self.assertEqual(again.xpath("//j:declare//tei:binary/@value", namespaces=NS), ["true"])
+            first = etree.parse(str(he / "siddur_chol_shacharit_upon_arising.xml"))
+            self.assertEqual(first.xpath("//j:declare//tei:binary/@value", namespaces=NS), ["false"])
 
 
 class TestConvertWork(unittest.TestCase):

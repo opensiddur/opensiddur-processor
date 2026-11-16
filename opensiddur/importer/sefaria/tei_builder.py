@@ -189,6 +189,10 @@ def head_xml(pair: Pair, lang: str, notes: Notes | None, *, element: str = "head
 
 #: Closes a phrase's scope without opening another (SIDDUR_URN_SCHEME.md, "Ending a scope").
 PHRASE_END = '<tei:milestone unit="phrase"/>'
+#: Closes a verse's scope.
+VERSE_END = '<tei:milestone unit="verse"/>'
+#: How a phrase that ends a verse of scripture ends (sof pasuq, or the colon prayer books use).
+VERSE_ENDINGS = (":", "\u05c3")
 
 
 # --------------------------------------------------------------------------------------------
@@ -207,37 +211,173 @@ def standoff(notes: Notes, lang: str) -> str:
     return f'<tei:standOff type="notes">{entries}</tei:standOff>'
 
 
-def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes) -> str:
-    """A text's division: its heading, then its phrases and the rubrics among them."""
-    head = head_xml(block.head, lang, notes) if block.head is not None else ""
-    numbers = iter(phrase_numbers)
-    parts: list[str] = []
-    phrase_open = False
-    for pair in block.pairs:
-        if is_phrase(pair):
-            # The Hebrew makes the phrase, so both languages mark it, the English even where it
-            # leaves the phrase untranslated: the row is then set with an empty English cell,
-            # rather than the Hebrew running on into the row before.
-            xml = phrase_xml(pair, lang, notes, phrase_urn(urn, next(numbers)))
-            phrase_open = True
-        else:
-            # A rubric is not the phrase before it. The scope is closed in both languages,
-            # whichever the rubric is printed in, so that the two divide alike.
-            if phrase_open:
-                parts.append(PHRASE_END)
-                phrase_open = False
-            xml = rubric_xml(pair, lang, notes)
+CONDITION_PREFIX = "urn:x-opensiddur:condition:"
+
+
+def variant_urn(text_urn: str, name: str) -> str:
+    """The condition URN of one variant of a text (``schema/JLPTEI-3.md``, textual variants):
+    the text's path with the variant's name, in the ``condition:`` namespace."""
+    return text_urn.replace(TEXT_PREFIX, CONDITION_PREFIX, 1) + f"/{name}"
+
+
+def variant_fs(features: list[tuple[str, bool]]) -> str:
+    fs = "".join(f'<tei:f name="{attr(name)}"><tei:binary value="{"true" if value else "false"}"/></tei:f>'
+                 for name, value in features)
+    return f'<tei:fs type="opensiddur:variant">{fs}</tei:fs>'
+
+
+@dataclass(frozen=True)
+class VariantPrinting:
+    """A later printing of a text with words of its own (``match.py``, kind "variant")."""
+
+    name: str
+    block: TextBlock
+    numbers: list[int]
+
+
+class _TextWriter:
+    """A text's phrases, rubrics and conditional passages, in one language."""
+
+    def __init__(self, urn: str, lang: str, notes: Notes):
+        self.urn, self.lang, self.notes = urn, lang, notes
+        self.parts: list[str] = []
+        self.phrase_open = False
+        self.verse_open = False
+        self.conditions = 0
+
+    def end_phrase(self) -> None:
+        if self.phrase_open:
+            self.parts.append(PHRASE_END)
+            self.phrase_open = False
+
+    def verse(self, urn: str | None) -> None:
+        """Open a verse's scope, or close it (``None``)."""
+        if urn is not None:
+            self.parts.append(f'<tei:milestone unit="verse" corresp="{attr(urn)}"/>')
+            self.verse_open = True
+        elif self.verse_open:
+            self.parts.append(VERSE_END)
+            self.verse_open = False
+
+    def phrase(self, pair: Pair, number: int) -> None:
+        # The Hebrew makes the phrase, so both languages mark it, the English even where it
+        # leaves the phrase untranslated: the row is then set with an empty English cell,
+        # rather than the Hebrew running on into the row before.
+        self.parts.append(phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number)))
+        self.phrase_open = True
+
+    def rubric(self, pair: Pair) -> None:
+        # A rubric is not the phrase before it. The scope is closed in both languages,
+        # whichever the rubric is printed in, so that the two divide alike.
+        self.end_phrase()
+        xml = rubric_xml(pair, self.lang, self.notes)
         if xml:
-            parts.append(xml)
-    content = "\n".join(parts)
+            self.parts.append(xml)
+
+    def open_condition(self, features: list[tuple[str, bool]]) -> str:
+        self.end_phrase()
+        self.conditions += 1
+        xml_id = f"variant_{self.conditions}"
+        self.parts.append(f'<j:conditional xml:id="{xml_id}">{variant_fs(features)}</j:conditional>')
+        return xml_id
+
+    def close_condition(self, xml_id: str) -> None:
+        self.end_phrase()
+        self.parts.append(f'<j:endConditional target="#{xml_id}"/>')
+
+
+def _variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | None, list[tuple[Pair, int | None]]]:
+    """A variant's own words, by the phrase of the first printing they follow (None: before
+    the first): each run of its new phrases, with the rubrics that lead into them."""
+    passages: dict[int | None, list[tuple[Pair, int | None]]] = {}
+    numbers = iter(variant.numbers)
+    anchor: int | None = None
+    run: list[tuple[Pair, int | None]] = []
+    pending: list[tuple[Pair, int | None]] = []
+    for pair in variant.block.pairs:
+        if not is_phrase(pair):
+            pending.append((pair, None))
+            continue
+        number = next(numbers)
+        if number in base:
+            if run:
+                passages.setdefault(anchor, []).extend(run)
+                run = []
+            pending = []  # a rubric before the shared words is the first printing's to give
+            anchor = number
+        else:
+            run.extend(pending)
+            pending = []
+            run.append((pair, number))
+    if run:
+        passages.setdefault(anchor, []).extend(run)
+    return passages
+
+
+def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes,
+              variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None) -> str:
+    """A text's division: its heading, then its phrases and the rubrics among them.
+
+    With ``variants``, the one text of every printing: the first printing's words, a phrase a
+    variant leaves out conditional on that variant being false, and each variant's own words,
+    after the phrase they follow, conditional on it being true.
+
+    ``verses`` (``match.scripture_verses``) gives the verse of scripture each phrase that opens
+    one opens: its ``bible:`` URN is set before the phrase, in both languages, and its scope
+    closed after the phrase that ends it unless another verse follows at once."""
+    verses = verses or {}
+    head = head_xml(block.head, lang, notes) if block.head is not None else ""
+    writer = _TextWriter(urn, lang, notes)
+    base = set(phrase_numbers)
+    passages = [(v, _variant_passages(v, base)) for v in variants]
+    absent = {n: [v.name for v in variants if n not in set(v.numbers)] for n in phrase_numbers}
+
+    def insert(anchor: int | None) -> None:
+        for variant, by_anchor in passages:
+            if anchor in by_anchor:
+                xml_id = writer.open_condition([(variant_urn(urn, variant.name), True)])
+                for pair, number in by_anchor[anchor]:
+                    if number is None:
+                        writer.rubric(pair)
+                    else:
+                        writer.phrase(pair, number)
+                writer.close_condition(xml_id)
+
+    insert(None)
+    numbers = iter(phrase_numbers)
+    position = -1
+    for pair in block.pairs:
+        if not is_phrase(pair):
+            writer.rubric(pair)
+            continue
+        number = next(numbers)
+        position += 1
+        if position in verses:
+            writer.verse(verses[position])
+        if absent.get(number):
+            xml_id = writer.open_condition([(variant_urn(urn, name), False) for name in absent[number]])
+            writer.phrase(pair, number)
+            writer.close_condition(xml_id)
+        else:
+            writer.phrase(pair, number)
+        if writer.verse_open and plain_text(pair.he).rstrip().endswith(VERSE_ENDINGS) \
+                and position + 1 not in verses:
+            writer.end_phrase()
+            writer.verse(None)
+        insert(number)
+    content = "\n".join(writer.parts)
     paragraph = f"<tei:p>{content}</tei:p>" if content else ""
     return f'<tei:body><tei:div corresp="{attr(urn)}">{head}{paragraph}</tei:div></tei:body>'
 
 
 def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: dict[int, str],
-              lang: str, notes: Notes) -> str:
+              lang: str, notes: Notes,
+              declarations: dict[int, list[tuple[str, bool]]] | None = None) -> str:
     """A leaf's structure division: its heading, then its rubrics, headings and texts.
-    ``text_urns`` maps each text block (by ``id``) to its URN."""
+    ``text_urns`` maps each text block (by ``id``) to its URN; ``declarations``, to the
+    variants of its text that are and are not printed here, declared around its transclusion."""
+    declarations = declarations or {}
+    declared = 0
     title = titles[1] if lang == "he" else titles[0]
     parts = [f'<tei:head xml:lang="{lang}">{_text(title, lang)}</tei:head>'] if title else []
     for item in items:
@@ -248,7 +388,13 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
             if label:
                 parts.append(label)
         elif isinstance(item, TextBlock):
-            parts.append(f'<j:transclude type="external" target="{attr(text_urns[id(item)])}"/>')
+            transclude = f'<j:transclude type="external" target="{attr(text_urns[id(item)])}"/>'
+            if declarations.get(id(item)):
+                declared += 1
+                xml_id = f"variants_{declared}"
+                transclude = (f'<j:declare xml:id="{xml_id}">{variant_fs(declarations[id(item)])}</j:declare>'
+                              f'{transclude}<j:endDeclare target="#{xml_id}"/>')
+            parts.append(transclude)
     return f'<tei:body><tei:div corresp="{attr(urn)}">{"".join(parts)}</tei:div></tei:body>'
 
 

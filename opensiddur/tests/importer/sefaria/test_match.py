@@ -176,6 +176,16 @@ class TestReviewCases(unittest.TestCase):
         outcome = decide([("L", items(*sefard))], index)
         self.assertEqual(outcome.decided[0].urn, T + "prayer:amidah/avodah/retzeh")
 
+    def test_a_printing_with_words_of_its_own_is_a_variant(self):
+        added = "נַחֵם יְהֹוָה אֱלֹהֵינוּ אֶת אֲבֵלֵי צִיּוֹן"
+        later = [*MODEH[:2], added, *MODEH[2:]]
+        outcome = decide_work("w", [("A", items(*MODEH)), ("B", items(*later))], IncipitIndex(), {}, set(),
+                              spellings=NO_SPELLINGS, places={"B": "chol/minchah/amidah"})
+        first, second = outcome.decided
+        self.assertEqual((second.kind, second.urn, second.variant),
+                         ("variant", first.urn, "chol_minchah_amidah"))
+        self.assertEqual(second.phrases, [1, 2, 5, 3, 4])
+
     def test_one_part_does_not_claim_the_whole(self):
         # The parent's opening is the first part's, but the block holds only that part and one
         # of three others: it stays the part.
@@ -188,6 +198,16 @@ class TestReviewCases(unittest.TestCase):
         index.add(T + "prayer:kaddish/x/d", words(c[1]))
         outcome = decide([("L", items(*PART_A, *PART_B))], index)
         self.assertEqual(outcome.decided[0].urn, T + "prayer:kaddish/x/a")
+
+
+class TestScriptureVerses(unittest.TestCase):
+    def test_a_quoted_verse_is_found_at_its_phrase(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        verse = "זָכוֹר אֵת אֲשֶׁר עָשָׂה לְךָ עֲמָלֵק בַּדֶּרֶךְ בְּצֵאתְכֶם מִמִּצְרָיִם"
+        index = IncipitIndex()
+        index.add(T + "bible:deuteronomy/25/17", words(verse))
+        (block,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם", verse) if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {1: T + "bible:deuteronomy/25/17"})
 
 
 class TestMint(unittest.TestCase):

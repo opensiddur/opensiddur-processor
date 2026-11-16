@@ -43,6 +43,7 @@ from opensiddur.importer.sefaria.markup import is_pointed, plain_text
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
+    COLLECTED_WORDS,
     INCIPIT_WORDS,
     SHORT_INCIPIT_WORDS,
     TEXT_PREFIX,
@@ -78,8 +79,11 @@ class TextRecord:
     as_of: str
     evidence: list[str] = field(default_factory=list)
     #: The block's phrase numbers, when they are not 1, 2, 3...: a text whose phrases an
-    #: earlier volume named.
+    #: earlier volume named, or a variant's.
     phrases: list[int] | None = None
+    #: For a "variant" -- a later printing of a text with words of its own -- its name: the
+    #: last component of its condition URN (``tei_builder.variant_urn``).
+    variant: str | None = None
 
     @property
     def key(self) -> tuple[str, str, int]:
@@ -126,37 +130,117 @@ def _namespace_and_path(urn: str) -> tuple[str, list[str]]:
     return namespace, path.split("/")
 
 
+#: How much of a candidate's collected opening (up to 16 words) the block must agree with,
+#: beyond the six-word key that found it: many texts open with the same few words ("יהי רצון
+#: מלפניך ה׳ אלהי ואלהי אבותי") and go on differently.
+CONFIRM_OPENING = 0.6
+
+
+#: How much better the best of several four-word matches must agree than the next.
+CLEARLY_BEST = 0.1
+
+
 def excluded_projects(project_directory: Path) -> set[Path]:
     return projects_with_source(project_directory, EXCLUDED_SOURCES)
 
 
-def lookup(index: IncipitIndex, block_words: list[str]) -> set[str]:
-    """The index's candidates for a block. A blessing is found only by the words after its
-    formula: the formula itself opens every blessing, and finds them all."""
-    n = len(BLESSING_FORMULA)
-    if tuple(block_words[:n]) != BLESSING_FORMULA:
+def lookup(index: IncipitIndex, block_words: list[str], *, confirm: bool = True) -> set[str]:
+    """The index's candidates for a block, each confirmed (:func:`confirmed`), in tiers; the
+    first tier that finds any wins.
+
+    1. The index's own keys: six words (a blessing only by the words after its formula, since
+       the formula opens every blessing and finds them all).
+    2. Four words -- for a blessing, three to five words after the formula -- when they name
+       one text, or one that agrees clearly best over its whole collected opening. Another
+       rite's wording may part from the collection's within six words (Sefard וְלִתְפִלָּתָם,
+       Ashkenaz וּבִתְפִלָּתָם), and a short blessing (בורא מיני מזונות) is all of three words.
+    3. The same, a word or two out of step: the collection's text opens with a label or a
+       heading word the book does not print (``א אזה מקמן``, ``ישתבח ישתבח``), or the book's
+       block opens a word late (``ואמונה``, its ``אמת`` ending the Shema before it).
+
+    ``confirm`` false takes the index's own keys unconfirmed: for the volume's own earlier
+    printings, which the caller compares phrase by phrase.
+    """
+    blessing = tuple(block_words[:len(BLESSING_FORMULA)]) == BLESSING_FORMULA
+    if blessing:
+        found: set[str] = set()
+        for key in keys(block_words)[:-1]:
+            if len(key) >= SHORT_INCIPIT_WORDS and index.by_incipit.get(key):
+                found = index._longest_opening(index.by_incipit[key], block_words)
+                break
+    else:
         found = index.lookup(block_words)
-        if found:
-            return found
-        # Another rite's wording may part from the collection's within the first six words
-        # (Sefard וְלִתְפִלָּתָם, Ashkenaz וּבִתְפִלָּתָם): four words, when they name one text --
-        # a text and its first part counting as one, the part -- and :func:`confirmed` then
-        # checks the rest of the opening agrees.
-        short = index.by_incipit.get(tuple(block_words[:SHORT_INCIPIT_WORDS]), set())
-        deepest = {u for u in short if not any(o.startswith(u + "/") for o in short)}
-        if len(deepest) <= 1:
-            return deepest
-        # Several texts open with these four words: the one whose opening goes on agreeing
-        # best, when it is clearly the best.
-        ranked = sorted(deepest, key=lambda u: (-opening_agreement(u, block_words, index), u))
-        best, second = (opening_agreement(u, block_words, index) for u in ranked[:2])
-        return {ranked[0]} if best >= CONFIRM_OPENING and best - second >= CLEARLY_BEST else set()
-    for key in keys(block_words)[:-1]:
-        if len(key) >= SHORT_INCIPIT_WORDS:
-            found = index.by_incipit.get(key, set())
-            if found:
-                return index._longest_opening(found, block_words)
-    return set()
+    if confirm:
+        found = {u for u in found if confirmed(u, block_words, index)}
+    if found:
+        return found
+    rest = block_words[len(BLESSING_FORMULA):]
+    if blessing:
+        short = set()
+        for length in (5, 4, 3):
+            short |= index.by_incipit.get(("§", *rest[:length]), set()) if len(rest) >= length else set()
+    else:
+        short = set(index.by_incipit.get(tuple(block_words[:SHORT_INCIPIT_WORDS]), set()))
+    best = clearly_best(short, lambda u: opening_agreement(u, block_words, index),
+                        threshold=CONFIRM_OPENING if confirm else 0.0)
+    if best:
+        return best
+    if blessing:
+        # A blessing of two words after its formula (פוקח עורים) has no key of its own: it is
+        # found by those words in the openings the index holds.
+        two = blessings_by_two_words(index).get(tuple(rest[:2]), set()) if len(rest) >= 2 else set()
+        return clearly_best(two, lambda u: opening_agreement(u, block_words, index))
+    shifted: dict[str, float] = {}
+    for urn, offset in shifted_openings(index).get(tuple(block_words[:SHORT_INCIPIT_WORDS]), ()):
+        shifted[urn] = max(shifted.get(urn, 0.0), opening_agreement(urn, block_words, index, skip_text=offset))
+    for skip in (1, 2):
+        for urn in index.by_incipit.get(tuple(block_words[skip:skip + SHORT_INCIPIT_WORDS]), ()):
+            shifted[urn] = max(shifted.get(urn, 0.0),
+                               opening_agreement(urn, block_words, index, skip_block=skip))
+    return clearly_best(set(shifted), shifted.__getitem__)
+
+
+def clearly_best(candidates: set[str], agreement, threshold: float = CONFIRM_OPENING) -> set[str]:
+    """Of several candidates (a text and its first part counting as one, the part), the one
+    that agrees best, when it agrees at least ``threshold`` and clearly better than the next."""
+    deepest = {u for u in candidates if not any(o.startswith(u + "/") for o in candidates)}
+    if not deepest:
+        return set()
+    ranked = sorted(deepest, key=lambda u: (-agreement(u), u))
+    best = agreement(ranked[0])
+    second = agreement(ranked[1]) if len(ranked) > 1 else 0.0
+    return {ranked[0]} if best >= threshold and best - second >= CLEARLY_BEST else set()
+
+
+def blessings_by_two_words(index: IncipitIndex) -> dict[tuple[str, ...], set[str]]:
+    """The blessings the index holds, by the first two words after their formula. Kept on the
+    index, and rebuilt when it has grown."""
+    cached = getattr(index, "_two_word_blessings", None)
+    if cached is not None and cached[0] == len(index.incipit_of):
+        return cached[1]
+    n = len(BLESSING_FORMULA)
+    table: dict[tuple[str, ...], set[str]] = {}
+    for urn, opening in index.incipit_of.items():
+        if tuple(opening[:n]) == BLESSING_FORMULA and len(opening) >= n + 2:
+            table.setdefault(tuple(opening[n:n + 2]), set()).add(urn)
+    index._two_word_blessings = (len(index.incipit_of), table)  # type: ignore[attr-defined]
+    return table
+
+
+def shifted_openings(index: IncipitIndex) -> dict[tuple[str, ...], list[tuple[str, int]]]:
+    """Four-word keys taken a word or two into each indexed opening, past a label or heading
+    word: key -> (URN, words skipped). Kept on the index, and rebuilt when it has grown."""
+    cached = getattr(index, "_shifted", None)
+    if cached is not None and cached[0] == len(index.incipit_of):
+        return cached[1]
+    table: dict[tuple[str, ...], list[tuple[str, int]]] = {}
+    for urn, opening in index.incipit_of.items():
+        for offset in (1, 2):
+            key = tuple(opening[offset:offset + SHORT_INCIPIT_WORDS])
+            if len(key) == SHORT_INCIPIT_WORDS:
+                table.setdefault(key, []).append((urn, offset))
+    index._shifted = (len(index.incipit_of), table)  # type: ignore[attr-defined]
+    return table
 
 
 @dataclass
@@ -173,22 +257,17 @@ def _opens_at(phrase_words: list[list[str]], start: int, incipit: tuple[str, ...
     return bool(incipit) and tuple(following) == incipit
 
 
-#: How much of a candidate's collected opening (up to 16 words) the block must agree with,
-#: beyond the six-word key that found it: many texts open with the same few words ("יהי רצון
-#: מלפניך ה׳ אלהי ואלהי אבותי") and go on differently.
-CONFIRM_OPENING = 0.6
 
 
-#: How much better the best of several four-word matches must agree than the next.
-CLEARLY_BEST = 0.1
-
-
-def opening_agreement(urn: str, block_words: list[str], index: IncipitIndex) -> float:
-    """How far a candidate's collected opening (up to 16 words) agrees with the block's."""
-    opening = list(index.incipit_of.get(urn, ()))
+def opening_agreement(urn: str, block_words: list[str], index: IncipitIndex, *,
+                      skip_text: int = 0, skip_block: int = 0) -> float:
+    """How far a candidate's collected opening (up to 16 words) agrees with the block's, past
+    ``skip_text`` words of the one and ``skip_block`` of the other."""
+    opening = list(index.incipit_of.get(urn, ()))[skip_text:]
     if not opening:
         return 0.0
-    return SequenceMatcher(None, opening, block_words[:len(opening)], autojunk=False).ratio()
+    ours = block_words[skip_block:skip_block + len(opening)]
+    return SequenceMatcher(None, opening, ours, autojunk=False).ratio()
 
 
 def confirmed(urn: str, block_words: list[str], index: IncipitIndex) -> bool:
@@ -208,10 +287,6 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     """
     evidence: list[str] = []
     block_words = [w for phrase in phrase_words for w in phrase]
-    unconfirmed = sorted(c for c in candidates if not confirmed(c, block_words, index))
-    if unconfirmed:
-        evidence.append(f"opens like {', '.join(unconfirmed[:3])} but goes on differently")
-        candidates = candidates - set(unconfirmed)
     if not candidates:
         return Resolution(None, evidence)
     liturgical = sorted(c for c in candidates if not c.startswith(TEXT_PREFIX + "bible:"))
@@ -274,6 +349,17 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
                 break
     if split_at is not None:
         evidence.append(f"cut before phrase {split_at + 1}, where the next part of {parent(urn)} opens")
+    # A text the index holds whole (shorter than its collected opening) ends where its words do.
+    whole = index.incipit_of.get(urn, ())
+    if 0 < len(whole) < COLLECTED_WORDS and len(block_words) > len(whole) + 2:
+        count = 0
+        for j, phrase in enumerate(phrase_words):
+            count += len(phrase)
+            if count >= len(whole):
+                if 0 < j + 1 < len(phrase_words) and (split_at is None or j + 1 < split_at):
+                    split_at = j + 1
+                    evidence.append(f"cut before phrase {j + 2}, where {urn.rsplit(':', 1)[-1]} ends")
+                break
     return Resolution(urn, evidence, split_at)
 
 
@@ -289,7 +375,12 @@ REPEAT_COVERAGE = 0.75
 REPEAT_GAP = 3
 
 
-def repeat_length(block_phrases: list[str], earlier: list[str]) -> int | None:
+#: The share, for a variant, in place of :data:`REPEAT_COVERAGE`: a later printing that adds or
+#: leaves out a passage (Nachem at Minchah of Tisha b'Av) is still the text.
+VARIANT_COVERAGE = 0.5
+
+
+def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float = REPEAT_COVERAGE) -> int | None:
     """How many of a block's phrases are a later printing of ``earlier`` (phrase skeletons),
     or None when the block is not that text. Phrases are paired as :func:`map_phrases` pairs
     them, so a phrase that is mostly the same counts."""
@@ -297,7 +388,7 @@ def repeat_length(block_phrases: list[str], earlier: list[str]) -> int | None:
         return None
     numbers = map_phrases(block_phrases, {i + 1: s for i, s in enumerate(earlier)})
     matched = [i for i, n in enumerate(numbers) if n <= len(earlier)]
-    needed = math.ceil(REPEAT_COVERAGE * len(earlier))
+    needed = math.ceil(coverage * len(earlier))
     if len(matched) < needed:
         return None
     # Where the earlier printing ends in the block: once enough of it is matched, as far as the
@@ -307,7 +398,7 @@ def repeat_length(block_phrases: list[str], earlier: list[str]) -> int | None:
     while end + 1 < len(matched) and matched[end + 1] - matched[end] <= REPEAT_GAP:
         end += 1
     length = matched[end] + 1
-    if (end + 1) / length >= REPEAT_COVERAGE:
+    if (end + 1) / length >= coverage:
         return length
     return None
 
@@ -364,6 +455,7 @@ def decide_work(
     *,
     recorded_phrases: dict[str, dict[int, str]] | None = None,
     spellings: Spellings | None = None,
+    places: dict[str, str] | None = None,
 ) -> Decisions:
     """Decide the URN of every block of ``work_key`` that has no current record.
 
@@ -373,10 +465,11 @@ def decide_work(
     recorded by the second part's record, and replayed from it on every later run.
     ``taken`` is every URN already in use (registry and records); minted URNs are added to it.
     ``recorded_phrases`` are the phrases other Metsudah volumes have named
-    (``phrases.recorded_phrases``).
+    (``phrases.recorded_phrases``). ``places`` gives each leaf's ``siddur:`` path, which names
+    the variants printed there.
     """
     return _Decider(work_key, index, records, taken, recorded_phrases or {},
-                    spellings or load_spellings()).run(leaves)
+                    spellings or load_spellings(), places or {}).run(leaves)
 
 
 @dataclass
@@ -390,8 +483,14 @@ class _Printing:
 
 class _Decider:
     def __init__(self, work_key: str, index: IncipitIndex, records: dict[tuple[str, str, int], TextRecord],
-                 taken: set[str], recorded_phrases: dict[str, dict[int, str]], spellings: Spellings):
+                 taken: set[str], recorded_phrases: dict[str, dict[int, str]], spellings: Spellings,
+                 places: dict[str, str]):
         self.work_key = work_key
+        self.places = places
+        #: the highest phrase number each text has used, its variants' included
+        self.numbers_used: dict[str, int] = {}
+        #: the variant names each text has
+        self.variant_names: dict[str, set[str]] = {}
         self.index = index
         self.records = records
         self.taken = taken
@@ -425,10 +524,35 @@ class _Decider:
     def key(self, leaf: str, block: TextBlock) -> tuple[str, str, int]:
         return (self.work_key, leaf, block.first_index)
 
-    def remember(self, urn: str, leaf: str, blocks: list[Item], block: TextBlock) -> None:
+    def remember(self, urn: str, leaf: str, blocks: list[Item], block: TextBlock,
+                 phrases: list[int] | None = None) -> None:
+        self.note_numbers(urn, phrases or list(range(1, len(block.phrases) + 1)))
         self.printed.setdefault(urn, _Printing(leaf, blocks, block))
         self.own.add(urn, words(block_text(block)))
         self.short_printed.setdefault(skeleton(block_text(block)), urn)
+
+    def note_numbers(self, urn: str, phrases: list[int]) -> None:
+        if phrases:
+            self.numbers_used[urn] = max(self.numbers_used.get(urn, 0), max(phrases))
+
+    def keep(self, record: TextRecord, leaf: str, blocks: list[Item], block: TextBlock) -> None:
+        """Take a current record into account without deciding anew."""
+        if record.kind == "variant":
+            self.note_numbers(record.urn, record.phrases or [])
+            self.variant_names.setdefault(record.urn, set()).add(record.variant or "")
+        elif record.kind != "repeat":
+            self.remember(record.urn, leaf, blocks, block, record.phrases)
+
+    def variant_name(self, urn: str, leaf: str, block: TextBlock) -> str:
+        """A variant's name: the ``siddur:`` place it is printed at (``chol_minchah_amidah``),
+        made unique among the text's variants."""
+        place = self.places.get(leaf) or re.sub(r"[^a-z0-9]+", "_", leaf.lower()).strip("_")
+        name = place.replace("/", "_")
+        names = self.variant_names.setdefault(urn, set())
+        if name in names:
+            name = f"{name}_{block.first_index}"
+        names.add(name)
+        return name
 
     def save(self, record: TextRecord, *, lapsed: TextRecord | None = None) -> None:
         if lapsed is not None:
@@ -449,6 +573,11 @@ class _Decider:
         # Replay the cuts earlier runs made: a recorded start inside this block.
         replay = next((j for j, pair in enumerate(block.phrases)
                        if j > 0 and pair.he_index in self.starts.get(leaf, ())), None)
+        if replay is None:
+            # A new blessing in the middle of a block is a text of its own.
+            phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
+            replay = next((j for j in range(1, len(phrase_words))
+                           if _opens_at(phrase_words, j, BLESSING_FORMULA)), None)
         if replay is not None:
             block = self.cut(leaf, blocks, i, replay)
         key = self.key(leaf, block)
@@ -456,10 +585,9 @@ class _Decider:
         text = block_text(block)
         record = self.records.get(key)
         if record is not None and record.as_of == block_hash(block):
-            if record.kind != "repeat":
-                self.remember(record.urn, leaf, blocks, block)
+            self.keep(record, leaf, blocks, block)
             return
-        if record is not None and record.kind != "repeat" and record.urn not in self.printed and (
+        if record is not None and record.kind in ("existing", "new") and record.urn not in self.printed and (
                 similarity(skeleton(record.incipit), skeleton(" ".join(text.split()[:INCIPIT_WORDS])))
                 >= SAME_PHRASE):
             # The words changed, but it is still the text it was: it keeps its URN, and its
@@ -488,7 +616,7 @@ class _Decider:
             # Too short for the incipit index: a repeat is found by its words alone.
             resolution = Resolution(self.short_printed[skeleton(text)], ["the same words as an earlier text"])
         else:
-            resolution = resolve(lookup(self.own, block_words), phrase_words, self.own)
+            resolution = resolve(lookup(self.own, block_words, confirm=False), phrase_words, self.own)
         if resolution.urn is None:
             resolution = resolve(lookup(self.index, block_words), phrase_words, self.index)
         urn = resolution.urn
@@ -497,21 +625,30 @@ class _Decider:
         if urn is not None and urn in self.printed:
             earlier = self.printed[urn]
             earlier_skeletons = phrase_skeletons(earlier.block)
-            length = repeat_length(skeletons, earlier_skeletons)
-            earlier_length = repeat_length(earlier_skeletons, skeletons)
+            # Where each printing of the text ends in the other, matching mostly-same phrases.
+            length = repeat_length(skeletons, earlier_skeletons, VARIANT_COVERAGE)
+            earlier_length = repeat_length(earlier_skeletons, skeletons, VARIANT_COVERAGE)
             if (earlier_length is not None and earlier_length < len(earlier_skeletons)
-                    and length == len(skeletons)):
+                    and skeletons == earlier_skeletons[:earlier_length]):
                 # The first printing ran on past this text: cut it where this one ends.
                 self.cut_earlier(urn, earlier_length)
                 kind, cut = "repeat", None
-                evidence.append("the same text as its first printing in this volume, which ran on past "
-                                "it and is cut where this one ends; transcluded")
-            elif length is not None:
+                evidence.append("the same words as its first printing in this volume, which ran on past "
+                                "them and is cut where this one ends; transcluded")
+            elif length is not None and skeletons[:length] == earlier_skeletons:
                 kind = "repeat"
                 cut = length if length < len(skeletons) else None
-                evidence.append("the same text as its first printing in this volume, transcluded")
+                evidence.append("the same words as its first printing in this volume, transcluded")
                 if cut is not None:
                     evidence.append(f"cut before phrase {cut + 1}, where the first printing ends")
+            elif length is not None:
+                # Mostly the same text, with words of its own -- added, left out or worded
+                # otherwise: the text's URN, its own words a variant of it, conditional where
+                # the text is printed.
+                kind = "variant"
+                cut = length if length < len(skeletons) else None
+                evidence.append("the text of its first printing in this volume, with words of its own: "
+                                "a variant of it")
             else:
                 evidence.append(f"differs from the first printing of {urn} in this volume")
                 urn = self.another_candidate(block_words, phrase_words, evidence)
@@ -523,20 +660,44 @@ class _Decider:
             key = self.key(leaf, block)
             record = self.records.get(key)
             if record is not None and record.as_of == block_hash(block) and record.urn == urn:
-                if record.kind != "repeat":
-                    self.remember(record.urn, leaf, blocks, block)
+                self.keep(record, leaf, blocks, block)
                 return
         if urn is None:
             urn = mint(text, self.taken, self.spellings)
             kind = "new"
         self.taken.add(urn)
         phrases = None
-        if kind != "repeat":
-            self.remember(urn, leaf, blocks, block)
+        variant_name = None
+        if kind == "variant":
+            phrases = self.variant_numbers(urn, skeletons)
+            variant_name = self.variant_name(urn, leaf, block)
+        elif kind != "repeat":
             phrases = self.phrase_numbers(urn, skeletons, evidence)
+            self.remember(urn, leaf, blocks, block, phrases)
         self.save(TextRecord(work=self.work_key, leaf=leaf, block=block.first_index, urn=urn, kind=kind,
                              incipit=" ".join(text.split()[:INCIPIT_WORDS]), as_of=block_hash(block),
-                             evidence=evidence, phrases=phrases), lapsed=record)
+                             evidence=evidence, phrases=phrases, variant=variant_name), lapsed=record)
+
+    def variant_numbers(self, urn: str, skeletons: list[str]) -> list[int]:
+        """A variant's phrase numbers: the first printing's where the phrase has the same words,
+        and new ones, after every number the text has used, for its own words."""
+        printing = self.printed[urn]
+        base = self.outcome.records[self.key(printing.leaf, printing.block)]
+        base_numbers = base.phrases or list(range(1, len(printing.block.phrases) + 1))
+        recorded = dict(zip(base_numbers, phrase_skeletons(printing.block)))
+        mapped = map_phrases(skeletons, recorded)
+        top = max(base_numbers)
+        next_number = self.numbers_used.get(urn, top) + 1
+        numbers: list[int] = []
+        for number, words_here in zip(mapped, skeletons):
+            # A phrase worded otherwise than the first printing's is a phrase of its own.
+            if number in recorded and recorded[number] == words_here:
+                numbers.append(number)
+            else:
+                numbers.append(next_number)
+                next_number += 1
+        self.note_numbers(urn, numbers)
+        return numbers
 
     def another_candidate(self, block_words: list[str], phrase_words: list[list[str]],
                           evidence: list[str]) -> str | None:
@@ -544,14 +705,13 @@ class _Decider:
         candidates: set[str] = set()
         for key in keys(block_words):
             candidates |= self.index.by_incipit.get(key, set())
-        candidates -= set(self.printed)
-        if not candidates:
-            return None
-        resolution = resolve(candidates, phrase_words, self.index)
-        if resolution.urn is None or resolution.urn in self.printed or resolution.split_at is not None:
-            return None
-        evidence.append(f"took {resolution.urn}, which opens alike and is not printed earlier")
-        return resolution.urn
+        candidates = {u for u in candidates - set(self.printed) if confirmed(u, block_words, self.index)}
+        for urn in sorted(candidates, key=lambda u: (-opening_agreement(u, block_words, self.index), u)):
+            resolution = resolve({urn}, phrase_words, self.index)
+            if resolution.urn is not None and resolution.urn not in self.printed and resolution.split_at is None:
+                evidence.append(f"took {resolution.urn}, which opens alike and is not printed earlier")
+                return resolution.urn
+        return None
 
     def phrase_numbers(self, urn: str, skeletons: list[str], evidence: list[str]) -> list[int] | None:
         from opensiddur.importer.sefaria.phrases import text_path
@@ -576,3 +736,29 @@ class _Decider:
         printing.block = first
         self.decide_anew(printing.leaf, printing.blocks, i + 1, self.records.get(
             self.key(printing.leaf, printing.blocks[i + 1])))
+
+
+def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
+    """The verses of scripture a text quotes, by the phrase each opens: phrase position ->
+    ``bible:`` verse URN. A verse is found at a phrase that opens like it (six words, confirmed
+    over its collected opening, as :func:`lookup` confirms); a half-verse found first is its
+    verse when it is the first half."""
+    phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
+    found: dict[int, str] = {}
+    for start in range(len(phrase_words)):
+        following = [w for phrase in phrase_words[start:] for w in phrase]
+        if len(following) < INCIPIT_WORDS:
+            break
+        verses = set()
+        for urn in index.by_incipit.get(tuple(following[:INCIPIT_WORDS]), ()):
+            namespace, path = _namespace_and_path(urn)
+            if namespace != "bible" or len(path) < 3 or not confirmed(urn, following, index):
+                continue
+            if len(path) == 4:
+                if path[3] != "a":
+                    continue
+                urn = urn.rsplit("/", 1)[0]
+            verses.add(urn)
+        if len(verses) == 1:
+            found[start] = verses.pop()
+    return found
