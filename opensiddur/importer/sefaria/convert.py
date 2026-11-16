@@ -138,9 +138,11 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                 continue
             if decisions.records[(work.key, leaf, block.first_index)].kind not in ("existing", "new"):
                 continue
-            found = {position: urn for position, urn in scripture_verses(block, index).items()
-                     if urn not in marked}
-            marked.update(found.values())
+            found: dict[int, str] = {}
+            for position, urn in sorted(scripture_verses(block, index).items()):
+                if urn not in marked:  # a verse repeated, even within one text, is marked once
+                    marked.add(urn)
+                    found[position] = urn
             if found:
                 verses[(leaf, block.first_index)] = found
     return WorkPlan(work, source, structure, alignments, items, decisions, verses)
