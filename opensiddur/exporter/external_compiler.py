@@ -645,10 +645,9 @@ class ExternalCompilerProcessor(CompilerProcessor):
             Paired first by what they transclude, as many as can be kept in order (the
             longest common subsequence of the two key sequences), not by position: a column
             that transcludes one file more than the other must not set the next file's
-            translation beside the wrong text. Between two such pairs, what is left on each
-            side is paired by position, as everything once was -- the two sides may take the
-            same text at different granularity (a chapter beside its verses). Only what is
-            left over then is set alone.
+            translation beside the wrong text. Between exact matches, pair different granularities only when their
+            target URNs identify an ancestor and descendant (a chapter beside its verse).
+            Unrelated targets remain separate even when they occupy the same position.
             """
             prim_keys = [transclude_key(t) for t in prim_ts]
             par_keys = [transclude_key(t) for t in par_ts]
@@ -659,7 +658,15 @@ class ExternalCompilerProcessor(CompilerProcessor):
             i0 = j0 = 0
             for i, j in anchors + [(len(prim_ts), len(par_ts))]:
                 gap = min(i - i0, j - j0)
-                pairs.extend((i0 + k, j0 + k) for k in range(gap))
+                for k in range(gap):
+                    left, right = prim_keys[i0 + k], par_keys[j0 + k]
+                    # A shared namespace or similar spelling is not correspondence.
+                    # Without range ends, an ancestor can represent a coarser division
+                    # of the same text. Arbitrary ranges need exact identity instead.
+                    if (not left[1] and not right[1] and left[0] and right[0]
+                            and (left[0].startswith(right[0] + "/")
+                                 or right[0].startswith(left[0] + "/"))):
+                        pairs.append((i0 + k, j0 + k))
                 if i < len(prim_ts):
                     pairs.append((i, j))
                 i0, j0 = i + 1, j + 1

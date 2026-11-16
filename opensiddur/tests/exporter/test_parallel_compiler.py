@@ -198,8 +198,27 @@ class TestAssembleParallelStreams(unittest.TestCase):
         self.assertEqual(self._transcluded_texts(result), ["X-he", "A-heA-en", "B-heB-en", "X-en"])
         self.assertEqual(sum("no counterpart" in line for line in logs.output), 2)
 
+    def test_unrelated_transclusions_are_not_paired_by_position(self):
+        for left, right in [("urn:prayer:qedushah", "urn:prayer:eruv"),
+                            ("urn:prayer:modim", "urn:prayer:modim_extra")]:
+            with self.subTest(left=left, right=right):
+                prim = [self._transclude(left + "@orig", self._div("Hebrew only"))]
+                par = [self._transclude(right + "@trans", self._div("Other English"))]
+                result = self._assemble(prim, par)
+                self.assertEqual(self._transcluded_texts(result),
+                                 ["Hebrew only", "Other English"])
+
+    def test_unrelated_gaps_between_shared_transclusions_stay_separate(self):
+        prim = [self._transclude("urn:" + k + "@orig", self._div(k + "-he"))
+                for k in ("a", "hebrew_only", "b")]
+        par = [self._transclude("urn:" + k + "@trans", self._div(k + "-en"))
+               for k in ("a", "english_only", "b")]
+        result = self._assemble(prim, par)
+        self.assertEqual(self._transcluded_texts(result),
+                         ["a-hea-en", "hebrew_only-he", "english_only-en", "b-heb-en"])
+
     def test_the_same_text_at_different_granularity_still_pairs(self):
-        """A chapter beside its first verse: nothing else to pair with, so they pair by place."""
+        """A chapter beside its first verse: their ancestor relationship allows pairing."""
         prim = [self._transclude("urn:x/1/1@orig", self._div("verse-he"))]
         par = [self._transclude("urn:x/1@trans", self._div("chapter-en"))]
         result = self._assemble(prim, par)
