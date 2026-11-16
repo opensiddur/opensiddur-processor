@@ -127,3 +127,17 @@ def divide(pairs: tuple[Pair, ...] | list[Pair]) -> list[Item]:
     close()
     flush_pending()
     return items
+
+
+def split_block(block: TextBlock, at: int) -> tuple[TextBlock, TextBlock]:
+    """``block`` cut before its ``at``-th phrase (0-based): the text before, and a new text
+    from there. Rubrics between the two go with the second, which they introduce."""
+    phrases = block.phrases
+    if not 0 < at < len(phrases):
+        raise ValueError(f"cannot split a text of {len(phrases)} phrases before phrase {at}")
+    first_of_rest = phrases[at]
+    cut = block.pairs.index(first_of_rest)
+    # Rubrics just before the cut introduce the second text.
+    while cut > 0 and not is_phrase(block.pairs[cut - 1]):
+        cut -= 1
+    return TextBlock(block.head, block.pairs[:cut]), TextBlock(None, block.pairs[cut:])

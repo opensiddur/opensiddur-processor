@@ -166,6 +166,11 @@ Passover haggadah projects use a dedicated `haggadah` namespace for seder-specif
 while reusing `prayer` for shared liturgy (kiddush, birkat hamazon) and `bible` for scriptural
 quotations. See [HAGGADAH_URN_SCHEME.md](../specs/HAGGADAH_URN_SCHEME.md) for the hybrid scheme.
 
+The Metsudah linear siddurim align their Hebrew and English phrase by phrase with the `metsudah`
+namespace, `urn:x-opensiddur:text:metsudah:<text path>/<n>`: the *n*th phrase, as Metsudah divides it,
+of the `prayer`, `poem` or `bible` text whose path it carries. See
+[SIDDUR_URN_SCHEME.md](../specs/SIDDUR_URN_SCHEME.md#metsudah--the-phrases-of-the-metsudah-linear-layout).
+
 To add URNs to reference parts of poems and prayers that don't have natural line divisions or have alternative numbers of lines, use the transliterated first word (or phrase, if the word is ambiguous) as the name of the division. For example `urn:x-opensiddur:text:poem:yonah_matzah/hayom` for the stanza in the song `יונה מצאה` that begins `היום אשר נא כצאן`.
 
 ## URN scope

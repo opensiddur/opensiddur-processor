@@ -255,5 +255,26 @@ def load_incipit_index(cache: Path, project_directory: Path = PROJECT_DIRECTORY,
     return index
 
 
-#: The public name of the comparison form of a text.
+def projects_with_source(project_directory: Path, idno_types: Collection[str]) -> set[Path]:
+    """The projects whose own source bibl (``project_source_bibl``) carries an ``idno`` of one
+    of ``idno_types``: what an importer made, and so leaves out of the index it matches its
+    source against."""
+    found: set[Path] = set()
+    wanted = set(idno_types)
+    for index_file in sorted(Path(project_directory).glob("*/index.xml")):
+        try:
+            root = etree.parse(str(index_file)).getroot()
+        except (OSError, etree.XMLSyntaxError):
+            continue
+        types = root.xpath(
+            "/tei:TEI/tei:teiHeader//tei:bibl[@xml:id='project_source_bibl']/tei:idno/@type",
+            namespaces={"tei": "http://www.tei-c.org/ns/1.0"},
+        )
+        if wanted.intersection(types):
+            found.add(index_file.parent)
+    return found
+
+
+#: The public names of the comparison form of a text, and of the keys an opening is indexed by.
 words = _words
+keys = _keys

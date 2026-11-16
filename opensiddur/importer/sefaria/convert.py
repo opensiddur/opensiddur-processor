@@ -1,0 +1,357 @@
+"""Convert a downloaded Sefaria work into its Hebrew and English JLPTEI projects.
+
+The stages, for each work in ``works.yaml``:
+
+1. Read the download (``source.py``) and the work's structure table
+   (``structure/<work>.yaml``): every node of Sefaria's schema must be placed.
+2. Align each leaf's Hebrew and English segments (``align.py``).
+3. Divide each leaf into its texts and the rubrics between them (``blocks.py``).
+4. Decide each text's URN, reusing the collection's (``match.py``), recorded at once in
+   ``specs/sefaria/metsudah_urns.jsonl``.
+5. Write both projects (``tei_builder.py``), validating every file before it is written, and
+   remove files an earlier run wrote that this one did not.
+6. With ``--register``, add the new URNs (texts, and ``siddur:`` places) to
+   ``specs/urn_registry/``.
+
+``output/sefaria_<work>_report.md`` lists what needs a person's eye: leaves aligned by the
+trailing rule, URNs decided this run, and decisions that lapsed. See ``specs/SEFARIA_IMPORT.md``.
+
+Run::
+
+    uv run python -m opensiddur.importer.sefaria.convert [--work KEY ...] [--register]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import yaml
+
+from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
+from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
+from opensiddur.importer.sefaria.align import Alignment, align_work, load_decisions
+from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide
+from opensiddur.importer.sefaria.download import load_manifest
+from opensiddur.importer.sefaria.match import (
+    URNS_PATH,
+    Decisions,
+    TextRecord,
+    decide_work,
+    excluded_projects,
+    load_records,
+    registry_urns,
+    save_records,
+)
+from opensiddur.importer.sefaria.phrases import recorded_phrases, text_path
+from opensiddur.importer.sefaria.source import PATH_SEPARATOR, WorkSource, load_work_source
+from opensiddur.importer.sefaria.tei_builder import (
+    Notes,
+    SourceInfo,
+    document,
+    document_header,
+    file_stem,
+    index_body,
+    index_header,
+    leaf_body,
+    node_body,
+    siddur_urn,
+    text_body,
+)
+from opensiddur.importer.sefaria.works import LANGUAGES, Work, select_works
+from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index
+from opensiddur.importer.util.tei_project import prune_stale_files, validate_and_write
+
+logger = logging.getLogger(__name__)
+
+INCIPIT_CACHE = OUTPUT_DIRECTORY / "sefaria_incipits.json"
+
+
+class ConvertError(RuntimeError):
+    pass
+
+
+def load_structure(work: Work, source: WorkSource, path: Path | None = None) -> dict[str, str | None]:
+    """The work's structure table, checked against its schema: every node and leaf placed,
+    nothing placed that the schema lacks, a leaf with text never left unplaced."""
+    path = path or work.structure_file()
+    table = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    paths = [node.path for node in source.nodes] + [leaf.path for leaf in source.leaves]
+    problems = [f"{p}: not placed in {path.name}" for p in paths if p not in table]
+    problems += [f"{p}: placed in {path.name} but not in the schema" for p in table if p not in paths]
+    for leaf in source.leaves:
+        if table.get(leaf.path) is None and (any(s.strip() for s in leaf.he + leaf.en)) and leaf.path in table:
+            problems.append(f"{leaf.path}: has text but no place in {path.name}")
+    places = [v for v in table.values() if v]
+    problems += [f"{p}: placed twice" for p in sorted({p for p in places if places.count(p) > 1})]
+    if problems:
+        raise ConvertError("\n".join(problems))
+    return {k: (str(v) if v else None) for k, v in table.items()}
+
+
+@dataclass
+class WorkPlan:
+    """Everything decided about a work, before any file is written."""
+
+    work: Work
+    source: WorkSource
+    structure: dict[str, str | None]
+    alignments: list[Alignment]
+    items: dict[str, list[Item]]
+    decisions: Decisions
+
+    def record(self, leaf_path: str, block: TextBlock) -> TextRecord:
+        return self.decisions.records[(self.work.key, leaf_path, block.first_index)]
+
+
+def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
+              records: dict[tuple[str, str, int], TextRecord], taken: set[str],
+              phrases: dict[str, dict[int, str]] | None = None,
+              structure_path: Path | None = None,
+              decisions_path: Path | None = None) -> WorkPlan:
+    structure = load_structure(work, source, structure_path)
+    alignments = align_work(work.key, source.leaves,
+                            load_decisions(decisions_path) if decisions_path else load_decisions())
+    items = {a.leaf.path: divide(a.pairs) for a in alignments if structure.get(a.leaf.path)}
+    decisions = decide_work(work.key, list(items.items()), index, records, taken,
+                            recorded_phrases=phrases)
+    return WorkPlan(work, source, structure, alignments, items, decisions)
+
+
+@dataclass
+class ProjectFiles:
+    files: dict[str, str] = field(default_factory=dict)
+
+    def add(self, stem: str, xml: str) -> None:
+        if stem in self.files:
+            raise ConvertError(f"two files would be named {stem}.xml")
+        self.files[stem] = xml
+
+
+def _preorder(source: WorkSource) -> list[tuple[str, ...]]:
+    """Every node and leaf's keys, in the order the schema lists them."""
+    order: list[tuple[str, ...]] = []
+    seen: set[tuple[str, ...]] = set()
+    for leaf in source.leaves:
+        for depth in range(1, len(leaf.keys) + 1):
+            prefix = leaf.keys[:depth]
+            if prefix not in seen:
+                seen.add(prefix)
+                order.append(prefix)
+    return order
+
+
+def _children(plan: WorkPlan, keys: tuple[str, ...]) -> list[str]:
+    """The ``siddur:`` URNs of a node's placed children in schema order (the root's, when
+    ``keys`` is empty)."""
+    children = [k for k in _preorder(plan.source) if len(k) == len(keys) + 1 and k[:len(keys)] == keys]
+    places = [plan.structure.get(PATH_SEPARATOR.join(k)) for k in children]
+    return [siddur_urn(place) for place in places if place]
+
+
+def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
+    work = plan.work
+    out = ProjectFiles()
+    titles = {n.path: n.titles[-1] for n in plan.source.nodes}
+    titles.update({leaf.path: leaf.titles[-1] for leaf in plan.source.leaves})
+    for node in plan.source.nodes:
+        place = plan.structure.get(node.path)
+        if not place:
+            continue
+        urn = siddur_urn(place)
+        body = node_body(urn, titles[node.path], _children(plan, node.keys), lang)
+        title = titles[node.path][1 if lang == "he" else 0]
+        out.add(file_stem(urn), document(document_header(work, lang, title), body, lang))
+    for leaf in plan.source.leaves:
+        place = plan.structure.get(leaf.path)
+        if not place:
+            continue
+        items = plan.items[leaf.path]
+        text_urns: dict[int, str] = {}
+        for item in items:
+            if not isinstance(item, TextBlock):
+                continue
+            record = plan.record(leaf.path, item)
+            text_urns[id(item)] = record.urn
+            if record.kind == "repeat":
+                continue
+            numbers = record.phrases or list(range(1, len(item.phrases) + 1))
+            notes = Notes(prefix="note")
+            body = text_body(record.urn, item, numbers, lang, notes)
+            title = record.incipit if lang == "he" else f"{leaf.title_en}: {record.urn.rsplit(':', 1)[-1]}"
+            out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
+        urn = siddur_urn(place)
+        notes = Notes(prefix="note")
+        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes)
+        title = titles[leaf.path][1 if lang == "he" else 0]
+        out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
+    out.add("index", document(index_header(work, lang, info), index_body(work, _children(plan, ()), lang), lang))
+    return out
+
+
+def source_info(work: Work, directory: Path) -> SourceInfo:
+    manifest = load_manifest(directory)
+    if not manifest:
+        raise ConvertError(f"{directory}: no manifest; run the download first")
+    files = manifest["files"]
+    return SourceInfo(
+        last_export=manifest["last_export"],
+        version_url={lang: f"https://www.sefaria.org/{work.schema_file_title}" for lang in LANGUAGES},
+        md5={lang: files[f"{lang}.json"]["md5Hash"] for lang in LANGUAGES},
+    )
+
+
+def write_project(files: ProjectFiles, project_dir: Path) -> list[Path]:
+    project_dir.mkdir(parents=True, exist_ok=True)
+    for stem, xml in files.files.items():
+        validate_and_write(xml, stem, project_dir)
+    return prune_stale_files(project_dir, set(files.files))
+
+
+def check_phrase_paths(records: dict[tuple[str, str, int], TextRecord]) -> None:
+    """A ``metsudah:`` path names one text: a ``prayer:`` and a ``poem:`` with the same path
+    would share their phrases' URNs."""
+    by_path: dict[str, set[str]] = {}
+    for record in records.values():
+        by_path.setdefault(text_path(record.urn), set()).add(record.urn)
+    clashes = {p: sorted(u) for p, u in by_path.items() if len(u) > 1}
+    if clashes:
+        raise ConvertError("texts that would share metsudah: phrase URNs: " + "; ".join(
+            f"{p}: {', '.join(u)}" for p, u in sorted(clashes.items())))
+
+
+def registry_lines(plan: WorkPlan, existing: set[str]) -> list[dict[str, object]]:
+    """Registry records for the new URNs a plan uses: minted texts and ``siddur:`` places
+    (with any parent place not yet registered)."""
+    lines: list[dict[str, object]] = []
+    seen = set(existing)
+    titles = {n.path: n.titles[-1] for n in plan.source.nodes}
+    titles.update({leaf.path: leaf.titles[-1] for leaf in plan.source.leaves})
+
+    def add(line: dict[str, object]) -> None:
+        if line["urn"] not in seen:
+            seen.add(str(line["urn"]))
+            lines.append(line)
+
+    for path, place in plan.structure.items():
+        if not place:
+            continue
+        parts = place.split("/")
+        for depth in range(1, len(parts)):
+            add({"urn": siddur_urn("/".join(parts[:depth])), "status": "canonical",
+                 **({"parent": siddur_urn("/".join(parts[:depth - 1]))} if depth > 1 else {}),
+                 "label_en": " / ".join(parts[:depth]).replace("_", " ")})
+        en, he = titles[path]
+        line: dict[str, object] = {"urn": siddur_urn(place), "status": "canonical"}
+        if len(parts) > 1:
+            line["parent"] = siddur_urn("/".join(parts[:-1]))
+        line["label_en"] = en
+        if he:
+            line["label_he"] = he
+        add(line)
+    for record in plan.decisions.records.values():
+        if record.work != plan.work.key or record.kind != "new":
+            continue
+        add({"urn": record.urn, "status": "canonical", "label_he": record.incipit,
+             "label_en": record.urn.rsplit(":", 1)[-1].replace("_", " ")})
+    return lines
+
+
+def register(lines: list[dict[str, object]], registry_directory: Path) -> int:
+    for line in lines:
+        namespace = str(line["urn"])[len(TEXT_PREFIX):].split(":", 1)[0]
+        with (registry_directory / f"{namespace}.jsonl").open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(line, ensure_ascii=False) + "\n")
+    return len(lines)
+
+
+def report(plan: WorkPlan, written: dict[str, int], pruned: dict[str, list[Path]]) -> str:
+    lines = [f"# Sefaria import: {plan.work.key}", ""]
+    for lang, count in written.items():
+        lines.append(f"- {plan.work.projects[lang]}: {count} files written, "
+                     f"{len(pruned[lang])} stale removed")
+    trailing = [a for a in plan.alignments if a.policy == "trailing"]
+    lines += ["", f"## Leaves aligned by the trailing rule ({len(trailing)})", ""]
+    for a in trailing:
+        lines.append(f"- {a.leaf.path}: {len(a.leaf.he)} Hebrew, {len(a.leaf.en)} English")
+    lines += ["", f"## URNs decided this run ({len(plan.decisions.decided)})", ""]
+    for r in plan.decisions.decided:
+        lines.append(f"- `{r.kind}` {r.leaf} @{r.block}: `{r.urn}` — {r.incipit} — {'; '.join(r.evidence)}")
+    lines += ["", f"## Decisions that lapsed ({len(plan.decisions.lapsed)})", ""]
+    for r in plan.decisions.lapsed:
+        lines.append(f"- {r.leaf} @{r.block}: was `{r.urn}`")
+    return "\n".join(lines) + "\n"
+
+
+def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
+                 project_directory: Path = PROJECT_DIRECTORY,
+                 registry_directory: Path = REGISTRY_DIRECTORY,
+                 urns_path: Path = URNS_PATH, do_register: bool = False,
+                 index: IncipitIndex | None = None,
+                 output_directory: Path = OUTPUT_DIRECTORY,
+                 structure_path: Path | None = None,
+                 decisions_path: Path | None = None) -> WorkPlan:
+    directory = work.data_directory(sourcetexts_root)
+    source = load_work_source(directory)
+    info = source_info(work, directory)
+    records = load_records(urns_path)
+    taken = registry_urns(registry_directory) | {r.urn for r in records.values()}
+    own = {project_directory / work.projects[lang] for lang in LANGUAGES}
+    if index is None:
+        index = load_incipit_index(INCIPIT_CACHE, project_directory,
+                                   excluded_projects(project_directory) | own)
+    other_volumes = [d for d in excluded_projects(project_directory) - own
+                     if d.name.endswith("-he") and (d / "index.xml").exists()
+                     and _is_sefaria_metsudah(d)]
+    plan = plan_work(work, source, index=index, records=records, taken=taken,
+                     phrases=recorded_phrases(other_volumes), structure_path=structure_path,
+                     decisions_path=decisions_path)
+    check_phrase_paths({k: r for k, r in plan.decisions.records.items() if r.kind != "repeat"
+                        and r.work == work.key})
+    written: dict[str, int] = {}
+    pruned: dict[str, list[Path]] = {}
+    for lang in LANGUAGES:
+        files = build_project(plan, lang, info)
+        pruned[lang] = write_project(files, project_directory / work.projects[lang])
+        written[lang] = len(files.files)
+    save_records(plan.decisions.records, urns_path)
+    lines = registry_lines(plan, registry_urns(registry_directory))
+    if do_register:
+        register(lines, registry_directory)
+    elif lines:
+        logger.warning("%d URN(s) are not registered; rerun with --register", len(lines))
+    output_directory.mkdir(parents=True, exist_ok=True)
+    (output_directory / f"sefaria_{work.key}_report.md").write_text(
+        report(plan, written, pruned), encoding="utf-8")
+    return plan
+
+
+def _is_sefaria_metsudah(project: Path) -> bool:
+    """Whether a project was imported from Sefaria (its source bibl has a ``sefaria`` idno)."""
+    return 'type="sefaria"' in (project / "index.xml").read_text(encoding="utf-8")
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    parser.add_argument("--work", action="append", help="a key from works.yaml; repeatable. Default: all")
+    parser.add_argument("--sourcetexts-root", type=Path, default=None)
+    parser.add_argument("--project-directory", type=Path, default=PROJECT_DIRECTORY)
+    parser.add_argument("--register", action="store_true", help="add new URNs to specs/urn_registry/")
+    args = parser.parse_args(argv)
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    for work in select_works(args.work):
+        plan = convert_work(work, sourcetexts_root=args.sourcetexts_root,
+                            project_directory=args.project_directory, do_register=args.register)
+        kinds = {k: sum(1 for r in plan.decisions.decided if r.kind == k) for k in ("existing", "new", "repeat")}
+        print(f"{work.key}: {len(plan.decisions.decided)} text(s) decided this run {kinds}; "
+              f"{len(plan.decisions.lapsed)} lapsed; report in "
+              f"{OUTPUT_DIRECTORY / f'sefaria_{work.key}_report.md'}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

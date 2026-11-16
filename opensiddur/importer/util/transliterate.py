@@ -2,7 +2,7 @@
 
 This seeds a name; it does not settle one. It knows the table (het ``ch``, khaf ``kh``, qof
 ``q``, tzadi ``tz``, aleph and ayin silent, dagesh hazak doubled but never a digraph, final heh
-written, the divine name read ``adonai``) and the common cases of the vowels, but not grammar:
+written, the divine name read ``adonai``, no doubling after a one-letter prefix) and the common cases of the vowels, but not grammar:
 it reads every qamatz as ``a``, and a sheva as ``e`` only on a word's first letter or where the
 source marks it sounded, and it doubles a dagesh it cannot tell from a prefix's. A name it makes
 is respelled by ``specs/naming/spellings.yaml`` (:func:`name_from_hebrew`) and reviewed where it
@@ -119,7 +119,9 @@ def transliterate_word(word: str) -> str:
             sound = hard if dagesh else soft
         else:
             sound = CONSONANTS.get(letter, "")
-        if dagesh and i > 0 and last_vowel and letter not in NOT_DOUBLED and len(sound) == 1:
+        after_prefix = i == 1 and letters[0][0] in PREFIXES
+        if (dagesh and i > 0 and last_vowel and letter not in NOT_DOUBLED and len(sound) == 1
+                and not after_prefix):
             sound += sound
         out.append(sound)
         if vowel_mark:

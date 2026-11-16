@@ -109,6 +109,19 @@ relicenses it. Decisions about single posts that the spec's rules get wrong or l
 language, what a post's colours mean, essays, where a post outside the site's tables keeps its text) live in `post_decisions.yaml`. `convert --emit-contributor-candidates` writes lines for
 unregistered contributors to `output/` for review; they are never registered automatically.
 
+**Import from Sefaria** (see `specs/SEFARIA_IMPORT.md`): the Metsudah linear volumes, a Hebrew and an
+English project per work. The works are listed in `opensiddur/importer/sefaria/works.yaml`; each work's
+schema nodes are placed in the book's `siddur:` order by `structure/<work>.yaml`.
+```bash
+uv run python -m opensiddur.importer.sefaria.download [--work KEY]    # bucket -> sourcetexts/sources/sefaria/<work>/; no-op when unchanged
+uv run python -m opensiddur.importer.sefaria.convert --register       # align, divide, decide URNs, write both projects; report in output/
+uv run python -m opensiddur.importer.sefaria.update                   # monthly: download, classify changed leaves, convert unless review is needed
+```
+URN decisions are recorded in `specs/sefaria/metsudah_urns.jsonl` (sticky: correct a line and rerun);
+leaves whose Hebrew and English cannot be paired automatically are decided in
+`opensiddur/importer/sefaria/alignment_decisions.yaml`. Phrases align through the `metsudah:` namespace
+(`specs/SIDDUR_URN_SCHEME.md`).
+
 **Download the Birnbaum siddur** — three sources for one book, all writing into
 `sourcetexts/sources/birnbaum_siddur/` keyed by the same scan page number. Needs
 `--contact-email` or `$OPENSIDDUR_CONTACT_EMAIL`; the Archive additionally asks that AI

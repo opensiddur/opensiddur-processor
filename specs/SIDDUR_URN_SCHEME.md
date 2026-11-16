@@ -29,6 +29,7 @@ None of these belong in the path.
 | Mishnah | `urn:x-opensiddur:text:mishnah:` | `…:shabbat/2` |
 | Talmud | `urn:x-opensiddur:text:talmud:` | `…:berakhot/11b/<incipit>` |
 | Rubrics | `urn:x-opensiddur:instruction:` | `…:role/congregation` |
+| Metsudah's linear phrases | `urn:x-opensiddur:text:metsudah:` | `…:amidah/avot/3` |
 
 ### Telling `siddur:` from `prayer:`
 
@@ -390,6 +391,38 @@ Two ways to handle such a work, and the choice turns on how often it is quoted:
 
 Either way the quotation carries a `tei:bibl`/`tei:ref` to the source. Standing up a new
 namespace is a change to this document; using an incipit is not.
+
+## `metsudah:` — the phrases of the Metsudah linear layout
+
+```
+urn:x-opensiddur:text:metsudah:<text path>/<n>
+```
+
+The Metsudah siddurim and machzorim (imported from Sefaria, see
+[SEFARIA_IMPORT.md](SEFARIA_IMPORT.md)) are *linear*: the Hebrew is printed a phrase to a
+line, each phrase beside its English. Setting the two side by side phrase by phrase needs an
+alignment key on every phrase, and the compiler aligns only on shared `@corresp` URNs.
+
+**The path is the enclosing text's**, not a book's: `<text path>` is the path of the
+`prayer:`, `poem:` or `bible:` URN of the text the phrase is in, with the namespace dropped.
+`metsudah:modeh_ani/2` is the second phrase of `prayer:modeh_ani`; `metsudah:psalms/145/4` the
+fourth phrase of `bible:psalms/145`. It never names a volume, so a text Metsudah prints in
+several volumes — Ashrei in the weekday and the Shabbat siddur and in both machzorim — has its
+phrases named once, and those volumes align with each other as well as Hebrew with English.
+Another edition that follows Metsudah's phrasing can align to it the same way. A `prayer:` and
+a `poem:` with the same path would share their phrases' URNs, so the importer refuses one.
+
+**`<n>` is Metsudah's own division** (see [Sub-division numbering](#sub-division-numbering)):
+the *n*th phrase as Metsudah divides the text. That is why the phrases have a namespace of
+their own rather than numbered parts under `prayer:` — `prayer:amidah/avot/1` would claim an
+alignment with every other edition that numbers its own divisions of Avot, which Metsudah's
+phrases do not have. A volume that prints a text whose phrases an earlier volume named keeps
+their numbers wherever its phrase is functionally the same and mostly the same in wording,
+even in another rite; a phrase it adds, or words that truly differ, take the next numbers.
+
+**Only on `tei:milestone unit="phrase"`**, inside the division of the text whose path they
+carry. The names are derived, not chosen — like `bible:`, the namespace is not governed by the
+registry and has no registry lines.
 
 ## `instruction:` — rubrics
 

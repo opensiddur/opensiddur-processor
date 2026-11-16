@@ -1,0 +1,13 @@
+# Leaves whose Hebrew and English segments the importer cannot pair by itself (align.py).
+#
+# <work key>:
+#   <leaf path, English keys joined by " / ">:
+#     as_of: {he: <segments hash>, en: <segments hash>}   # the leaf the decision was made for
+#     he_only: [<1-based Hebrew index>, ...]               # Hebrew with no English
+#     en_only: [<1-based English index>, ...]              # English with no Hebrew
+#     note: why
+#
+# A decision lapses when either version of its leaf changes; align.py then refuses the leaf
+# until it is decided again. Leaves with equal counts, or whose extras are trailing rubrics or
+# untranslated Hebrew, need no entry.
+{}
