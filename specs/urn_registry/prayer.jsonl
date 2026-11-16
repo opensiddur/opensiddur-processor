@@ -23309,7 +23309,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:vaydabber_adonai_el", "status": "canonical", "label_he": "וַיְדַבֵּר יְהֹוָה אֶל־משֶׁה לֵּאמֹר: וְעָשִֽׂיתָ כִּיּוֹר", "label_en": "vaydabber adonai el"}
 {"urn": "urn:x-opensiddur:text:prayer:vaydabber_adonai_el_msheh", "status": "canonical", "label_he": "וַיְדַבֵּר יְהֹוָה אֶל־משֶׁה לֵּאמֹר: צַו אֶת־בְּנֵי", "label_en": "vaydabber adonai el msheh"}
 {"urn": "urn:x-opensiddur:text:prayer:veshachat_oto", "status": "canonical", "label_he": "וְשָׁחַט אֹתוֹ עַל יֶֽרֶךְ הַמִּזְבֵּֽחַ צָפֹֽנָה", "label_en": "veshachat oto"}
-{"urn": "urn:x-opensiddur:text:prayer:vayomer_adonai", "status": "canonical", "label_he": "וַיֹּֽאמֶר יְהֹוָה אֶל־משֶׁה קַח־לְךָ סַמִּים נָטָף", "label_en": "vayomer adonai"}
+{"urn": "urn:x-opensiddur:text:prayer:vayyomer_adonai", "status": "canonical", "label_he": "וַיֹּֽאמֶר יְהֹוָה אֶל־משֶׁה קַח־לְךָ סַמִּים נָטָף", "label_en": "vayyomer adonai"}
 {"urn": "urn:x-opensiddur:text:prayer:vehiqtir_alav", "status": "canonical", "label_he": "וְהִקְטִיר עָלָיו אַהֲרֹן קְטֹֽרֶת סַמִּים בַּבֹּֽקֶר", "label_en": "vehiqtir alav"}
 {"urn": "urn:x-opensiddur:text:prayer:veshachat_oto_al", "status": "canonical", "label_he": "וְשָׁחַט אֹתוֹ עַל יֶֽרֶךְ הַמִּזְבֵּֽחַ צָפֹֽנָה", "label_en": "veshachat oto al"}
 {"urn": "urn:x-opensiddur:text:prayer:uverashei_chadsheikhem", "status": "canonical", "label_he": "וּבְרָאשֵׁי חָדְשֵׁיכֶם תַּקְרִֽיבוּ עֹלָה לַיהוָֹה פָּרִים", "label_en": "uverashei chadsheikhem"}
@@ -23345,7 +23345,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:el_melekh", "status": "canonical", "label_he": "אֵל מֶֽלֶךְ נֶאֱמָן:", "label_en": "el melekh"}
 {"urn": "urn:x-opensiddur:text:prayer:shema_yisrael", "status": "canonical", "label_he": "שְׁמַע יִשְׂרָאֵל יְהֹוָה אֱלֹהֵֽינוּ יְהֹוָה אֶחָד:", "label_en": "shema yisrael"}
 {"urn": "urn:x-opensiddur:text:prayer:vehayah_im", "status": "canonical", "label_he": "וְהָיָה אִם־שָׁמֹֽעַ תִּשְׁמְ֒עוּ אֶל־מִצְוֹתַי אֲשֶׁר֯ אָ֯נֹכִי", "label_en": "vehayah im"}
-{"urn": "urn:x-opensiddur:text:prayer:vayomer_adonai_el", "status": "canonical", "label_he": "וַֽיֹּאמֶר֯ יְ֯הֹוָה֯ אֶ֯ל־משֶׁה לֵּאמֹר: דַּבֵּר֯ אֶ֯ל־בְּנֵי", "label_en": "vayomer adonai el"}
+{"urn": "urn:x-opensiddur:text:prayer:vayyomer_adonai_el", "status": "canonical", "label_he": "וַֽיֹּאמֶר֯ יְ֯הֹוָה֯ אֶ֯ל־משֶׁה לֵּאמֹר: דַּבֵּר֯ אֶ֯ל־בְּנֵי", "label_en": "vayyomer adonai el"}
 {"urn": "urn:x-opensiddur:text:prayer:adonai_eloheikhem", "status": "canonical", "label_he": "יְהֹוָה אֱלֹהֵיכֶם֯ אֱ֯מֶת: וְיַצִּיב וְנָכוֹן וְקַיָּם", "label_en": "adonai eloheikhem"}
 {"urn": "urn:x-opensiddur:text:prayer:naqdishakh_venaaritzakh", "status": "canonical", "label_he": "נַקְדִישָׁךְ וְנַעֲרִיצָךְ כְּנֹֽעַם שִֽׂיחַ סוֹד שַׂרְפֵי", "label_en": "naqdishakh venaaritzakh"}
 {"urn": "urn:x-opensiddur:text:prayer:qadosh_qadosh", "status": "canonical", "label_he": "קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ יְהֹוָה צְבָאוֹת מְלֹא", "label_en": "qadosh qadosh"}
@@ -23402,7 +23402,6 @@
 {"urn": "urn:x-opensiddur:text:prayer:velirushalayim_irekha", "status": "canonical", "label_he": "וְלִירוּשָׁלַֽיִם עִירְ֒ךָ בְּרַחֲמִים תָּשׁוּב וְתִשְׁכּוֹן בְּתוֹכָהּ", "label_en": "velirushalayim irekha"}
 {"urn": "urn:x-opensiddur:text:prayer:av_harachaman_shema", "status": "canonical", "label_he": "אָב הָרַחֲמָן שְׁמַע קוֹלֵֽנוּ יְהֹוָה אֱלֹהֵֽינוּ", "label_en": "av harachaman shema"}
 {"urn": "urn:x-opensiddur:text:prayer:vehu_rachum_yekhapper", "status": "canonical", "label_he": "וְהוּא רַחוּם יְכַפֵּר עָוֹן וְלֹא־יַשְׁחִית וְהִרְבָּה", "label_en": "vehu rachum yekhapper"}
-{"urn": "urn:x-opensiddur:text:prayer:el_melekh_neeman", "status": "canonical", "label_he": "אֵל מֶֽלֶךְ נֶאֱמָן:", "label_en": "el melekh neeman"}
 {"urn": "urn:x-opensiddur:text:prayer:adonai_eloheikhem_emet", "status": "canonical", "label_he": "יְהֹוָה אֱלֹהֵיכֶם֯ אֱ֯מֶת:", "label_en": "adonai eloheikhem emet"}
 {"urn": "urn:x-opensiddur:text:prayer:veemunah_kal", "status": "canonical", "label_he": "וֶאֱמוּנָה כָּל זֹאת וְקַיָּם עָלֵֽינוּ כִּי", "label_en": "veemunah kal"}
 {"urn": "urn:x-opensiddur:text:prayer:attah_chonen", "status": "canonical", "label_he": "אַתָּה חוֹנֵן לְאָדָם דַּֽעַת וּמְ֒לַמֵּד לֶאֱנוֹשׁ", "label_en": "attah chonen"}

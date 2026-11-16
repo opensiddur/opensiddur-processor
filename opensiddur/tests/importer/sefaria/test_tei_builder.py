@@ -64,6 +64,12 @@ class TestTextBody(unittest.TestCase):
         en = parse(text_body(T + "prayer:modeh_ani", block, [1, 2], "en", Notes("note")))
         self.assertEqual(en.xpath("string(//tei:note)", namespaces=NS), "(bow)")
 
+    def test_an_untranslated_phrase_is_marked_in_the_english_too(self):
+        (block,) = blocks([("<b>מוֹדֶה אֲנִי</b> לְפָנֶֽיךָ", "I give thanks"), ("מֶֽלֶךְ חַי", "")])
+        en = parse(text_body(T + "prayer:modeh_ani", block, [1, 2], "en", Notes("note")))
+        self.assertEqual(en.xpath("//tei:milestone/@corresp", namespaces=NS),
+                         [T + "metsudah:modeh_ani/1", T + "metsudah:modeh_ani/2"])
+
     def test_a_footnote_in_a_heading_is_kept(self):
         (block,) = blocks([
             ('<b>אבות</b>', '<b>FOREFATHERS</b><sup class="footnote-marker">1</sup><i class="footnote">The first.</i>'),

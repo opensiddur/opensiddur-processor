@@ -168,14 +168,14 @@ def rubric_xml(pair: Pair, lang: str, notes: Notes | None) -> str:
 
 def phrase_xml(pair: Pair, lang: str, notes: Notes, milestone: str | None) -> str:
     nodes = pair.he if lang == "he" else pair.en
+    mark = f'<tei:milestone unit="phrase" corresp="{attr(milestone)}"/>' if milestone else ""
     if not plain_text(nodes) and not footnotes_in(nodes):
-        return ""
+        return mark
     prefix = ""
     if lang == "he":
         label, nodes = leading_label(nodes)
         if label is not None:
             prefix = instruction((label,), lang, notes) + " "
-    mark = f'<tei:milestone unit="phrase" corresp="{attr(milestone)}"/>' if milestone else ""
     return f"{mark}{prefix}{_trim(render(nodes, lang, notes))}"
 
 
@@ -215,16 +215,11 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     phrase_open = False
     for pair in block.pairs:
         if is_phrase(pair):
-            number = next(numbers)
-            nodes = pair.he if lang == "he" else pair.en
-            milestone = phrase_urn(urn, number) if plain_text(nodes) else None
-            xml = phrase_xml(pair, lang, notes, milestone)
-            if milestone:
-                phrase_open = True
-            elif phrase_open and xml:
-                # Words with no counterpart in the other language: not the last phrase's.
-                parts.append(PHRASE_END)
-                phrase_open = False
+            # The Hebrew makes the phrase, so both languages mark it, the English even where it
+            # leaves the phrase untranslated: the row is then set with an empty English cell,
+            # rather than the Hebrew running on into the row before.
+            xml = phrase_xml(pair, lang, notes, phrase_urn(urn, next(numbers)))
+            phrase_open = True
         else:
             # A rubric is not the phrase before it. The scope is closed in both languages,
             # whichever the rubric is printed in, so that the two divide alike.
