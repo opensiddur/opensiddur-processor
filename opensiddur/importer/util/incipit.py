@@ -121,6 +121,9 @@ class IncipitIndex:
     ends_with: dict[str, str] = field(default_factory=dict)
     #: The texts each text transcludes.
     includes: dict[str, set[str]] = field(default_factory=dict)
+    #: Texts whose scope is a milestone inside another text's words (a verse Ashrei quotes),
+    #: rather than a division of their own.
+    milestone_scoped: set[str] = field(default_factory=set)
 
     def included(self, urn: str) -> set[str]:
         """Every text ``urn`` transcludes, and every text those transclude."""
@@ -230,7 +233,8 @@ class IncipitIndex:
                 "length_of": dict(sorted(self.length_of.items())),
                 "closing_of": {urn: list(words) for urn, words in sorted(self.closing_of.items())},
                 "ends_with": dict(sorted(self.ends_with.items())),
-                "includes": {urn: sorted(targets) for urn, targets in sorted(self.includes.items())}}
+                "includes": {urn: sorted(targets) for urn, targets in sorted(self.includes.items())},
+                "milestone_scoped": sorted(self.milestone_scoped)}
 
     @classmethod
     def from_json(cls, data: dict) -> "IncipitIndex":
@@ -246,6 +250,7 @@ class IncipitIndex:
         index.ends_with = dict(data.get("ends_with", {})) if "incipits" in data else {}
         index.includes = ({urn: set(targets) for urn, targets in data.get("includes", {}).items()}
                           if "incipits" in data else {})
+        index.milestone_scoped = set(data.get("milestone_scoped", ())) if "incipits" in data else set()
         index.open_with_parts()
         return index
 
@@ -317,17 +322,21 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
         pending.clear()
 
     enclosing: list[str] = []  # the URNs of the elements around the one being walked
+    conditions: set[str] = set()  # the j:conditional scopes open here, by xml:id
 
     def transclusion(target: str) -> None:
         target = target.split("@", 1)[0]
         if not target.startswith(TEXT_PREFIX):
             return
-        for entry in pending:
-            if not entry[1] and entry[0] != target:
-                index.opens_with.setdefault(entry[0], target)
-        for scope in open_scopes:
-            if scope[0] != target:
-                scope[3] = target
+        if not conditions:
+            # A text said only on some occasions (Modim de-Rabbanan, in the repetition) is not
+            # where the text around it opens or ends.
+            for entry in pending:
+                if not entry[1] and entry[0] != target:
+                    index.opens_with.setdefault(entry[0], target)
+            for scope in open_scopes:
+                if scope[0] != target:
+                    scope[3] = target
         index.compound.update(enclosing)
         for urn in enclosing:
             if urn != target:
@@ -345,11 +354,22 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
             transclusion(element.get("target", ""))
             feed(element.tail)
             return
+        if local == "conditional":
+            xml_id = element.get("{http://www.w3.org/XML/1998/namespace}id")
+            if xml_id:
+                conditions.add(xml_id)
+            feed(element.tail)
+            return
+        if local == "endConditional":
+            conditions.discard(element.get("target", "").lstrip("#"))
+            feed(element.tail)
+            return
         corresp = element.get("corresp", "")
         if local == "milestone":
             unit = element.get("unit", "")
             close(lambda end: end == ("unit", unit))
             if corresp.startswith(TEXT_PREFIX):
+                index.milestone_scoped.add(corresp.split("@", 1)[0])
                 pending.append([corresp.split("@", 1)[0], [], None, ("unit", unit)])
                 open_scopes.append([corresp.split("@", 1)[0], [], ("unit", unit), None])
             feed(element.tail)
@@ -406,7 +426,9 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #: 3: a maqaf separates words.
 #: 4: הללו יה is one word; transcluded openings, compound texts and short texts' lengths are
 #:    recorded.
-INDEX_VERSION = 4
+#: 5: closings and transclusions; a conditional transclusion neither opens nor ends a text.
+#: 6: milestone-scoped texts.
+INDEX_VERSION = 6
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:
