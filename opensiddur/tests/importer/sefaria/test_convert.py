@@ -74,7 +74,8 @@ class TestVariants(unittest.TestCase):
 class TestConditionsReachTheFiles(unittest.TestCase):
     def test_a_condition_rubric_becomes_a_conditional_in_both_languages(self):
         text = [MORNING[1], ("", "<small><i>On Rosh Chodesh add:</i></small>"),
-                ("יַעֲלֶה וְיָבוֹא", "May it rise"), MORNING[2]]
+                ("יַעֲלֶה וְיָבוֹא", "May it rise"), ("", "<small>When the Holy Ark is opened, say:</small>"),
+                MORNING[2]]
         tree = {"Morning": {"Upon Arising": text}, "Blessings": BLESSINGS}
         structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
                      "Blessings": "berakhot/test"}
@@ -85,7 +86,9 @@ class TestConditionsReachTheFiles(unittest.TestCase):
             (root / "registry").mkdir()
             (root / "decisions.yaml").write_text("{}\n")
             (root / "conditions.yaml").write_text(
-                "rubrics:\n  - match: '^On Rosh Chodesh add:'\n    when: {holiday: {rosh-hodesh: true}}\n")
+                "rubrics:\n  - match: '^On Rosh Chodesh add:'\n    when: {holiday: {rosh-hodesh: true}}\n"
+                "directives: ['^When the Holy Ark is opened']\n"
+                f"leaves:\n  - work: {WORK.key}\n    leaf: Blessings\n    when: {{day-of-week: {{hebrew-day: 2}}}}\n")
             convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
                          registry_directory=root / "registry", urns_path=root / "urns.jsonl",
                          index=IncipitIndex(), output_directory=root / "out",
@@ -99,6 +102,13 @@ class TestConditionsReachTheFiles(unittest.TestCase):
                 self.assertIn(["rosh-hodesh"], found)
             report = (root / "out" / f"sefaria_{WORK.key}_report.md").read_text()
             self.assertIn("1× On Rosh Chodesh add:", report)
+            # A reviewed directive is not listed as an unmapped condition.
+            self.assertIn("not in conditions.yaml (0)", report)
+            # The gated leaf, a child of the root, is transcluded conditionally from the index.
+            for lang in ("he", "en"):
+                index = etree.parse(str(root / "project" / WORK.projects[lang] / "index.xml"))
+                self.assertEqual(index.xpath("//j:transclude[preceding-sibling::j:conditional]/@target",
+                                             namespaces=NS), ["urn:x-opensiddur:text:siddur:berakhot/test"])
 
 
 class TestConvertWork(unittest.TestCase):

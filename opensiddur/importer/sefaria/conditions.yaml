@@ -2,6 +2,78 @@
 # English, whitespace collapsed; the first match wins. `section: true` lets a rubric before a
 # heading govern the whole section to the next heading (the Kedushah), not only the next text.
 
+# Conditions used more than once, as YAML anchors (the loader ignores this key). They follow
+# Birnbaum's encodings (hasiddur_hashalem-birnbaum-1949-he), so that the two books agree.
+definitions:
+  # The days on which Tachanun is omitted (Birnbaum's list, with Pesach Sheini, which this rite
+  # adds). Month 1 is Nisan; 12 and 13 are Adar (Rishon) and Adar Sheni.
+  tachanun_omitted_days: &tachanun_omitted_days
+    any:
+      - holiday: {rosh-hodesh: true}
+      - holiday: {hanukkah: true}
+      - hebrew-date: {month: 12, day: [14, 15]}
+      - hebrew-date: {month: 13, day: [14, 15]}
+      - hebrew-date: {month: 1}
+      - hebrew-date: {month: 2, day: 14}
+      - holiday: {lag-baomer: true}
+      - hebrew-date: {month: 3, day: [1, 8]}
+      - holiday: {tisha-bav: true}
+      - hebrew-date: {month: 5, day: 15}
+      - hebrew-date: {month: 6, day: 29}
+      - hebrew-date: {month: 7, day: [9, 23]}
+      - all: [{hebrew-date: {month: 7, day: 24}}, {none: [{israel: {is-israel: true}}]}]
+      - hebrew-date: {month: 11, day: 15}
+  # ... and the occasions, as Birnbaum declares them, with a bridegroom present.
+  tachanun_omitted: &tachanun_omitted
+    any:
+      - *tachanun_omitted_days
+      - override: {omit-tahanun: true}
+      - override: {house-of-mourning: true}
+      - override: {brit-milah: true}
+      - override: {wedding: true}
+      - override: {sheva-brachot: true}
+  # At Minchah Tachanun is also omitted on the eve of those days ("it is also omitted at the
+  # preceding Mincha"), and on Fridays (Birnbaum's minchah_tachanun, with the eve of Pesach Sheini).
+  minchah_tachanun_omitted_days: &minchah_tachanun_omitted_days
+    any:
+      - day-of-week: {hebrew-day: [6, 7]}
+      - hebrew-date: {day: 29}
+      - hebrew-date: {month: 2, day: [13, 14]}
+      - hebrew-date: {month: 2, day: [17, 18]}
+      - hebrew-date: {month: 5, day: [8, 9]}
+      - hebrew-date: {month: 5, day: [14, 15]}
+      - hebrew-date: {month: 9, day: [24, 30]}
+      - hebrew-date: {month: 11, day: [14, 15]}
+      - hebrew-date: {month: 12, day: [13, 15]}
+      - hebrew-date: {month: 13, day: [13, 15]}
+  tachanun_said: &tachanun_said
+    none:
+      - *tachanun_omitted
+      - all: [{service-time: {minha: true}}, *minchah_tachanun_omitted_days]
+  monday_or_thursday: &monday_or_thursday
+    any: [{day-of-week: {hebrew-day: 2}}, {day-of-week: {hebrew-day: 5}}]
+  # A weekday on which the Torah is read, with a minyan (Birnbaum's torah_reading_day).
+  torah_reading_day: &torah_reading_day
+    none:
+      - quorum: {minyan: false}
+      - none:
+          - any:
+              - *monday_or_thursday
+              - holiday: {rosh-hodesh: true}
+              - holiday-aggregate: {chol-hamoed: true}
+              - holiday: {hanukkah: true}
+              - holiday: {purim-observed: true}
+              - holiday-aggregate: {minor-fast: true}
+              - holiday: {tzom-tammuz: true}
+  shabbat_or_yom_tov: &shabbat_or_yom_tov
+    any: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]
+  elul_to_shemini_atzeret: &elul_to_shemini_atzeret
+    any: [{hebrew-date: {month: 6}}, {hebrew-date: {month: 7, day: [1, 22]}}]
+  parents_host: &parents_host
+    any: [{meal-context: {father-is-host: true}}, {meal-context: {mother-is-host: true}}]
+  kohanim_bless: &kohanim_bless
+    all: [{quorum: {minyan: true}}, {recitation: {repetition: true}}, {practice: {birkat-kohanim: true}}]
+
 rubrics:
   # -- Seasons ----------------------------------------------------------------------------------
   - match: "^\\(?\\*?During the Ten Days of Penitence(,)? (add|say|continue here)\\b|^\\*?During the Ten Days of Penitence:"
@@ -16,8 +88,13 @@ rubrics:
     when: {holiday-aggregate: {tal-umatar: true}}
   - match: "^From the first (day|say) of Pesach until the evening service \\[Maariv\\] on December 4"
     when: {holiday-aggregate: {tal-umatar: false}}
-  - match: "^The following psalm \\(27\\) is recited"
-    when: {any: [{hebrew-date: {month: 6}}, {hebrew-date: {month: 7, day: [1, 22]}}]}
+  - match: "^The following psalm \\(27\\) is recited|^The following is recited here by some congregations from the first day of Elul"
+    when: *elul_to_shemini_atzeret
+  - match: "^During the Ten Days of Penitence, continue at the asterisk"
+    # the ordinary closing it skips (הָאֵל הַקָּדוֹשׁ), to the rubric at the asterisk
+    when: {none: [{holiday-aggregate: {aseret-ymei-tshuva: true}}]}
+  - match: "^During the Ten Days of Penitence, Avinu Malkeinu is recited here"
+    when: {any: [{holiday-aggregate: {aseret-ymei-tshuva: true}}, {holiday-aggregate: {minor-fast: true}}, {holiday: {tzom-tammuz: true}}]}
 
   # -- Days of the month and festivals ---------------------------------------------------------
   - match: "On Rosh Chodesh and on Chol HaMoed,? the following prayer is added"
@@ -46,7 +123,7 @@ rubrics:
     when: {holiday-aggregate: {shabbat: true}}
   - match: "^On (the )?Yom Tov say:"
     when: {holiday-aggregate: {yom-tov: true}}
-  - match: "^On Rosh Hash(o|a)nah? say:"
+  - match: "^On Rosh Hash(o|a)n(ah?|o) say:"
     when: {holiday: {rosh-hashana: true}}
   - match: "^On Sukkos( say)?:"
     when: {holiday: {sukkot: true}}
@@ -76,12 +153,73 @@ rubrics:
     when: {day-of-week: {hebrew-day: 5}}
   - match: "^On Friday:"
     when: {day-of-week: {hebrew-day: 6}}
+
+  # -- Tachanun, and the days the Torah is read --------------------------------------------------
   - match: "^The following prayers are added on Mondays and Thursday"
-    when: {any: [{day-of-week: {hebrew-day: 2}}, {day-of-week: {hebrew-day: 5}}]}
+    when: {all: [*monday_or_thursday, *tachanun_said]}
   - match: "^On those Mondays and Thursdays when Tachanun is said"
-    when: {all: [{any: [{day-of-week: {hebrew-day: 2}}, {day-of-week: {hebrew-day: 5}}]}, {override: {omit-tahanun: false}}]}
+    when: {all: [*monday_or_thursday, *tachanun_said]}
+  - match: "^Tachanun is also omitted"
+    # the book's list of days is printed garbled in the rubric before; Birnbaum's is used
+    when: *tachanun_said
+    until: "^The Chazzan recites the following Kaddish"
+  - match: "^On a day when Tachanun is not said, the following paragraph is omitted|^On days in which Tachanun is not said, \"A prayer of David,\" is omitted"
+    when: *tachanun_said
+  # In the house of a mourner, where Tachanun is never said: the days it would be, and not.
   - match: "^On days when Tachanun is said:"
-    when: {override: {omit-tahanun: false}}
+    when: {none: [*tachanun_omitted_days]}
+  - match: "^On weekdays when Tachanun is not said, the following is said in the house of a mourner"
+    when: *tachanun_omitted_days
+  - match: "^The following paragraph is said on Mondays and Thursdays except on Rosh Chodesh"
+    when:
+      all:
+        - *monday_or_thursday
+        - none:
+            - holiday: {rosh-hodesh: true}
+            - hebrew-date: {month: 1, day: 14}
+            - holiday: {tisha-bav: true}
+            - holiday: {hanukkah: true}
+            - hebrew-date: {month: 12, day: [14, 15]}
+            - hebrew-date: {month: 13, day: [14, 15]}
+            - hebrew-date: {month: 7, day: 9}
+            - override: {house-of-mourning: true}
+  - match: "^On Mondays, Thursdays and other days when the Torah is read"
+    when: *torah_reading_day
+  - match: "^Psalm 20 is omitted on the following days"
+    when:
+      none:
+        - holiday: {rosh-hodesh: true}
+        - hebrew-date: {month: 7, day: [9, 30]}
+        - holiday: {hanukkah: true}
+        - hebrew-date: {month: 12, day: [14, 15]}
+        - hebrew-date: {month: 13, day: [14, 15]}
+        - hebrew-date: {month: 1}
+        - holiday-aggregate: {chol-hamoed: true}
+        - holiday: {tisha-bav: true}
+        - override: {house-of-mourning: true}
+        - hebrew-date: {month: 2, day: 14}
+        - holiday: {lag-baomer: true}
+        - hebrew-date: {month: 3, day: [1, 12]}
+        - hebrew-date: {month: 5, day: 15}
+        - hebrew-date: {month: 11, day: 15}
+        - override: {brit-milah: true}
+        - override: {wedding: true}
+        - override: {sheva-brachot: true}
+  - match: "^On regular weekdays the Chazzan recites the following Kaddish"
+    when: {none: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
+    section: true  # the whole Kaddish, a text of several parts
+  - match: "^The following Psalm is omitted on Shabbat, Festivals, the day before Pesach"
+    # Mizmor Letodah: Birnbaum's days, with Shabbat and Yom Tov, which this rite names
+    when:
+      none:
+        - *shabbat_or_yom_tov
+        - hebrew-date: {month: 1, day: 14}
+        - all: [{holiday-aggregate: {chol-hamoed: true}}, {holiday: {pesah: true}}]
+        - hebrew-date: {month: 7, day: 9}
+  - match: "^On Tishah B'Av and on Yom Kippur this berachah is omitted"
+    when: {none: [{holiday: {tisha-bav: true}}, {holiday: {yom-kippur: true}}]}
+  - match: "^The following prayer is omitted on Shabbos and Yom Tov"
+    when: {none: [*shabbat_or_yom_tov]}
 
   # -- Who is praying, and how ------------------------------------------------------------------
   - match: "^\\(When the Chazzan repeats the Shemoneh Esrei, the Kedushah is said here\\)"
@@ -95,6 +233,39 @@ rubrics:
     when: {quorum: {minyan: true}}
   - match: "^If you are taking the lulav for the first time on Sukkos"
     when: {practice: {lulav-first-use: true}}
+  - match: "^After the reading of the Megillah, if there is a minyan"
+    when: {quorum: {minyan: true}}
+  - match: "^\\(When the Chazzan repeats the Shemoneh Esrei and says, .Who returns His Divine Presence to Zion"
+    # מודים דרבנן, which a text may print inside it, to its closing
+    when: {all: [{recitation: {repetition: true}}, {quorum: {minyan: true}}]}
+    through: "בָּרוּךְ אֵל הַהוֹדָאוֹת"
+  - match: "^When praying silently, continue .You are holy.* the Kedushah is said here"
+    when: {all: [{recitation: {repetition: true}}, {quorum: {minyan: true}}]}
+    section: true
+  - match: "^After Birkas Kohanim the congregation says:"
+    when: *kohanim_bless
+  - match: "^When Kohanim are present, the Birkas Kohanim is recited here, If no Kohanim are present"
+    when: {all: [{quorum: {minyan: true}}, {recitation: {repetition: true}}, {none: [{practice: {birkat-kohanim: true}}]}]}
+  - match: "^The following blessing is said by the father of a Bar Mitzvah"
+    when: {person: {bar-mitzvah-father: true}}
+  - match: "^A woman says:"
+    when: {person: {gender: female}}
+    instead_of_previous: true
+
+  # -- The meal -----------------------------------------------------------------------------------
+  - match: "^When three or more males, aged 13 or older eat together"
+    when: {meal-context: {zimmun: true}}
+  - match: "^Psalm 137 is recited before Birkas Hamazon on weekdays"
+    when: {none: [*shabbat_or_yom_tov, {override: {wedding: true}}, {override: {sheva-brachot: true}}, {override: {brit-milah: true}}]}
+  - match: "^Psalm 126 is recited on Shabbos, Yom Tov and other festive occasions"
+    when: {any: [*shabbat_or_yom_tov, {override: {wedding: true}}, {override: {sheva-brachot: true}}, {override: {brit-milah: true}}]}
+  # As Birnbaum: the host blessings are a guest's; the three are exclusive.
+  - match: "^When eating at your parents' table"
+    when: {all: [{meal-context: {guest: true}}, *parents_host]}
+  - match: "^When eating at your own table"
+    when: {none: [{meal-context: {guest: true}}]}
+  - match: "^A guest says:"
+    when: {all: [{meal-context: {guest: true}}, {none: [*parents_host]}]}
 
   # -- What was eaten (מעין שלש) ----------------------------------------------------------------
   - match: "^The following blessing is said after eating cooked or baked foods prepared from any of the five species of grain|^After food prepared from the five grains, say:"
@@ -133,3 +304,45 @@ replacements:
     replaces: 'שָׁלוֹם'
   - alternative: 'וּלְעֵֽלָּא מִכָּל'
     replaces: 'מִן כָּל'
+
+# Leaves the book says when to say only in a rubric at the end of the leaf before.
+leaves:
+  - work: weekday_siddur_sefard_linear
+    leaf: "The Morning Prayers / Reading of the Torah"
+    when: *torah_reading_day
+  - work: weekday_siddur_sefard_linear
+    leaf: "The Morning Prayers / Berachah for Father of Bar Mitzvah"
+    when: *torah_reading_day
+  - work: weekday_siddur_sefard_linear
+    leaf: "The Morning Prayers / Psalm in the House of a Mourner"
+    when: {override: {house-of-mourning: true}}
+
+# Rubrics that read like conditions, reviewed: stage directions, where to turn, an explanation,
+# or a choice among blessings no setting makes (what you see, smell or eat). They stay
+# instructions.
+directives:
+  - "^After washing your hands, say:"
+  - "^When wrapping the strap around the middle finger"
+  - "^When reciting Shemoneh Esrei, you must adhere"
+  - "^\\(On Fast Days, the Chazzan says"
+  - "^On Rosh Chodesh, Chol HaMoed, and Chanukah, Hallel is recited"
+  - "^On days when Tachanun is omitted \\(see below\\)"
+  - "^On days when the Torah is not read continue with Ashrei"
+  - "^On Mondays and Thursdays, as we are about to open the Ark"
+  - "^When the Holy Ark is opened"
+  - "^When the Torah is unrolled"
+  - "^After the Torah is read, the Kohein says"
+  - "^When the reading of the Torah is concluded"
+  - "^On Rosh Chodesh the Chazzan recites the half-Kaddish"
+  - "^On regular weekdays,? continue"
+  - "^On Rosh Chodesh and on Chol HaMoed the Chazzan recites the Whole Kaddish"
+  - "^On Succos, the Hoshanos are said"
+  - "^After eating foods of the five species of grain"
+  - "^After partaking of all other foods and drinks"
+  - "^After Birkas Hamazon the \"Seven Berachos\" begin here"
+  - "^After Birchas Hamazon, the leader says"
+  - "^After kindling the lights"
+  - "^The following blessings are said in the event you forgot"
+  - "^When seeing "
+  - "^When you smell "
+  - "^When putting on a new suit"

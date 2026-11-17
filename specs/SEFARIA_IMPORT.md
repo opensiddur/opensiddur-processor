@@ -78,7 +78,9 @@ only. Seasonal and variant wording is in parentheses.
   rite — not the rite of the Sefaradim or Edot haMizrach. The project headers say so.
 - **Licence.** Sefaria marks the Metsudah versions `CC-BY`, which Sefaria's own code maps to
   CC BY 3.0. The credit is to the publisher, Metsudah Publications, and the translator, with
-  Sefaria acknowledged as the digitizer. A version whose licence changes is refused by the
+  Sefaria acknowledged as the digitizer. The translation is part of the book, as Birnbaum's is of
+  his, so the translator is the source bibl's `tei:author` (with a note that the English is
+  theirs), not a `tei:respStmt`: a respStmt credits a contributor to the encoding, by URN. A version whose licence changes is refused by the
   download until a decision is made.
 - **Deterministic output.** The access date is the export date (`last_export.txt`), never the
   clock; an unchanged export rewrites nothing.
@@ -293,22 +295,47 @@ become `j:conditional`, from a curated table:
   which prints no rubric, carries the same conditional without one): a condition, not printed
   once it is true. Inside a text it governs the phrases after it up to the next rubric, or,
   where its passage opens with a parenthesis, to the phrase that closes it, or to the end of the
-  variant's passage it is in; the conditionals nest with the variants'. Between texts it gates
-  the next text's transclusion in the structure file — or, marked `section: true` (the
-  Kedushah, "When the Chazzan repeats the Shemoneh Esrei"), everything to the next heading.
+  variant's passage it is in; the conditionals nest with the variants'. A rubric between the
+  condition and the first words it governs ("Chazzan:", an explanation) is inside it. `through`
+  ends the passage with the phrase whose words end so (מודים דרבנן, printed inside the Hodaah,
+  `through: ברוך אל ההודאות`). Between texts it gates the next text's transclusion in the
+  structure file — or, marked `section: true` (the Kedushah, "When the Chazzan repeats the
+  Shemoneh Esrei"), everything to the next heading, or, with `until`, to the rubric that matches
+  it, past any heading (Tachanun, to "The Chazzan recites the following Kaddish"); either ends
+  at the next condition rubric, and at the end of the leaf. A text printed before, whose
+  file is its first printing's, keeps the condition rubric it opens with: it gates the
+  transclusion, unless the first printing opens with the same rubric (which its file gives). `instead_of_previous: true` makes the text before the rubric the alternative,
+  conditional on the opposite ("A woman says:": שלא עשני אשה unless female, שעשני כרצונו if so).
+- **Conditions follow Birnbaum.** A condition Birnbaum already encodes is written as Birnbaum
+  writes it, so that the two books agree: the days Tachanun is omitted (Birnbaum's list, with
+  Pesach Sheini, which this rite adds, and the `override` occasions — a mourner's house, a
+  circumcision, a wedding — and, at Minchah, the eves of those days and Fridays), the days the Torah is read, the Kohanim's blessing
+  (`practice/birkat-kohanim` in the repetition with a minyan), the meal's host and guest
+  (`meal-context`), a woman's blessing (`person/gender`), the father of a Bar Mitzvah. Such
+  conditions are YAML anchors under `definitions`, used by every rubric that needs them. Where
+  the book prints its own list (Psalm 20, El Erekh Appayim), its list is followed.
+- **Leaves.** A leaf the book says when to say only at the end of the leaf before ("On days
+  when the Torah is not read continue with Ashrei") is gated where its parent transcludes it:
+  `leaves`, by work and leaf path.
+- **Directives.** Rubrics that read like a condition but are reviewed and are not — a stage
+  direction ("When the Holy Ark is opened"), where to turn ("On regular weekdays continue …"),
+  or a choice among blessings no setting makes (what you see, smell or eat) — are listed under
+  `directives`, and stay instructions.
 - **Labels.** A Hebrew label before a phrase (`<small>לְר"ח:</small> רֹאשׁ הַחֹדֶשׁ הַזֶּה`, לפסח,
   לסכות, לר"ה, לש"ע וש"ת) makes the phrase conditional, the label its note.
 - **Inline alternatives.** A parenthesized alternative opening with an abbreviation the table
   lists (`(בעשי"ת הַשָּׁלוֹם)`, `(בעשרה אֱלֺהֵינוּ)`) is a `type="marked"` conditional, the
-  abbreviation its note; where the table says it replaces words beside it in the same phrase
-  (`הַשָּׁלוֹם` for `שָׁלוֹם`, `וּלְעֵלָּא מִכָּל` for `מִן כָּל`), those words are conditional on
-  the opposite.
+  abbreviation its note; where the table says it replaces words beside it (`הַשָּׁלוֹם` for
+  `שָׁלוֹם`, `וּלְעֵלָּא מִכָּל` for `מִן כָּל`), those words are conditional on the opposite, as
+  Birnbaum conditions `האל הקדוש` against `המלך הקדוש` — in the same phrase, or, where the
+  alternative ends its phrase, at the opening of the next (the Kaddish).
 - Conditions are written in the registry's types (`holiday`, `holiday-aggregate`,
   `day-of-week`, `service-time`, `hebrew-date`, `quorum`, `recitation`, `override`,
   `practice`, `meal-context`). `conditions.yaml` is checked for its grammar when it is loaded,
   and the projects written from it by `validate_features` against the registry. The report lists the condition
-  rubrics found, and the rubrics that read like a condition ("On …", "During …", "From …")
-  but are not in the table: they stay instructions until added.
+  rubrics found, and the rubrics that read like a condition ("On …", "During …", "From …",
+  "A woman …", "The following … is said on …") but are in neither `rubrics` nor `directives`:
+  they stay instructions until reviewed.
 
 Every file is validated (RelaxNG and Schematron) before it is written; a file an earlier run
 wrote that this run does not is removed. `--register` appends the new URNs — minted texts and
@@ -345,13 +372,9 @@ With nothing to review, the work is converted with `--register`. The report,
 
 - The other four volumes: a `works.yaml` entry and a structure table each; their phrases
   reuse the Weekday Siddur's numbers where the text is shared.
-- **Conditions the table does not hold yet.** Rubrics that say when in words the table cannot
-  match without a decision (the days Tachanun is omitted; "the day before Yom Kippur"; whom a
-  passage is said by), and conditions that are not the calendar's ("A woman says:", "When
-  eating at your parents' table") stay instructions; the report lists them. An inline
-  alternative printed as a phrase of its own, whose replaced words are in the phrase beside it
-  (the Kaddish's `(בעשי"ת וּלְעֵלָּא מִכָּל)` before `מִן כָּל`), is marked conditional, but the
-  replaced words are not yet conditional on the opposite.
+- **Conditions with no setting.** A choice no registered feature makes — which blessing for
+  what you see, smell or eat beyond מעין שלש, having forgotten רצה or יעלה ויבוא — stays an
+  instruction (`directives`); a feature for it is a registry change first.
 - Kaddish responses and the reader's and congregation's parts as speaker roles
   (`instruction:role/…`).
 - Sefaria's `links/` (citations from the footnotes to Tanakh and Talmud) as `bible_hint`s for

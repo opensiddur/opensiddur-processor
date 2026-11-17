@@ -36,8 +36,8 @@ import yaml
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings
-from opensiddur.importer.sefaria.align import Alignment, align_work, load_decisions
-from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide
+from opensiddur.importer.sefaria.align import Alignment, Pair, align_work, load_decisions
+from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide, is_phrase
 from opensiddur.importer.sefaria.download import load_manifest
 from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
 from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
@@ -202,6 +202,33 @@ def children_by_parent(plan: WorkPlan) -> dict[tuple[str, ...], list[str]]:
     return children
 
 
+def _norm(text: str) -> str:
+    return " ".join(text.split())
+
+
+def leading_condition(plan: WorkPlan, item: TextBlock) -> Pair | None:
+    """The last condition rubric a text block opens with, before its first phrase."""
+    found = None
+    for pair in item.pairs:
+        if is_phrase(pair):
+            break
+        if pair.he_kind is HebrewKind.EMPTY and plan.conditions.for_rubric(plain_text(pair.en)):
+            found = pair
+    return found
+
+
+def first_printing_rubrics(plan: WorkPlan) -> dict[str, str]:
+    """For each text written from its first printing, the condition rubric it opens with."""
+    found: dict[str, str] = {}
+    for leaf_path, items in plan.items.items():
+        for item in items:
+            if isinstance(item, TextBlock):
+                record = plan.record(leaf_path, item)
+                if record.kind not in ("repeat", "variant") and (pair := leading_condition(plan, item)):
+                    found[record.urn] = _norm(plain_text(pair.en))
+    return found
+
+
 def text_printings(plan: WorkPlan) -> dict[str, list[VariantPrinting]]:
     """Each text's variants -- its later printings with words of their own -- in book order."""
     found: dict[str, list[VariantPrinting]] = {}
@@ -222,15 +249,18 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
     children = children_by_parent(plan)
     titles = {n.path: n.titles[-1] for n in plan.source.nodes}
     titles.update({leaf.path: leaf.titles[-1] for leaf in plan.source.leaves})
+    gates = {siddur_urn(plan.structure[leaf.path]): gate for leaf in plan.source.leaves
+             if plan.structure.get(leaf.path) and (gate := plan.conditions.leaf_gate(work.key, leaf.path))}
     for node in plan.source.nodes:
         place = plan.structure.get(node.path)
         if not place:
             continue
         urn = siddur_urn(place)
-        body = node_body(urn, titles[node.path], children.get(node.keys, []), lang)
+        body = node_body(urn, titles[node.path], children.get(node.keys, []), lang, gates)
         title = titles[node.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang))
     printings = text_printings(plan)
+    opened = first_printing_rubrics(plan)
     for leaf in plan.source.leaves:
         place = plan.structure.get(leaf.path)
         if not place:
@@ -238,6 +268,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         items = plan.items[leaf.path]
         text_urns: dict[int, str] = {}
         declarations: dict[int, list[tuple[str, bool]]] = {}
+        leading: dict[int, Pair] = {}
         for item in items:
             if not isinstance(item, TextBlock):
                 continue
@@ -249,6 +280,10 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
                 declarations[id(item)] = [(variant_urn(record.urn, v.name), v.name == record.variant)
                                           for v in variants]
             if record.kind in ("repeat", "variant"):
+                # Its condition rubric, unless the first printing's file opens with it too.
+                pair = leading_condition(plan, item)
+                if pair is not None and _norm(plain_text(pair.en)) != opened.get(record.urn):
+                    leading[id(item)] = pair
                 continue
             numbers = record.phrases or list(range(1, len(item.phrases) + 1))
             notes = Notes(prefix="note")
@@ -260,10 +295,11 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
-        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions)
+        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions,
+                         leading)
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
-    out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang), lang))
+    out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang, gates), lang))
     return out
 
 
@@ -375,7 +411,9 @@ def report(plan: WorkPlan, written: dict[str, int], pruned: dict[str, list[Path]
 
 
 #: How a rubric that says when the passage after it is said begins.
-CONDITION_LIKE = re.compile(r"^\(?\*?(On |During |From |When |If there |Between |In a leap |After )")
+CONDITION_LIKE = re.compile(r"^\(?\*?(On |During |From |When |If there |Between |In a leap |After |A woman |"
+                            r"A man |Tachanun is |The following (\w+ )*(is|are) (said|recited|added|omitted) "
+                            r"(on|during|only|in|when))")
 
 
 def condition_rubrics(plan: WorkPlan) -> tuple[dict[str, int], dict[str, int]]:
@@ -392,7 +430,7 @@ def condition_rubrics(plan: WorkPlan) -> tuple[dict[str, int], dict[str, int]]:
                 continue
             if plan.conditions.for_rubric(text) is not None:
                 matched[text[:120]] = matched.get(text[:120], 0) + 1
-            elif CONDITION_LIKE.match(text):
+            elif CONDITION_LIKE.match(text) and not plan.conditions.is_directive(text):
                 unmatched[text[:120]] = unmatched.get(text[:120], 0) + 1
     return matched, unmatched
 

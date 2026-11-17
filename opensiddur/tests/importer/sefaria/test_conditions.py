@@ -5,6 +5,7 @@ from pathlib import Path
 from lxml import etree
 
 from opensiddur.importer.sefaria.conditions import ConditionsError, condition_xml, load_conditions
+from opensiddur.importer.util.incipit import words
 
 NS = {"tei": "http://www.tei-c.org/ns/1.0", "j": "http://jewishliturgy.org/ns/jlptei/2"}
 
@@ -31,6 +32,13 @@ inline:
 replacements:
   - alternative: 'הַשָּׁלוֹם'
     replaces: 'שָׁלוֹם'
+directives:
+  - "^When the Holy Ark is opened"
+leaves:
+  - work: w
+    leaf: "Morning / Reading of the Torah"
+    when: {day-of-week: {hebrew-day: 2}}
+    note: "On Mondays:"
 """
 
 
@@ -84,6 +92,52 @@ class TestTable(unittest.TestCase):
             table("rubrics:\n  - match: '('\n    when: {holiday: {purim: true}}\n")
         with self.assertRaises(ConditionsError):
             table("labels:\n  - label: ''\n    when: {holiday: {purim: true}}\n")
+
+
+class TestHowFarARubricGoverns(unittest.TestCase):
+    def test_until_through_and_instead_of_previous(self):
+        conditions = table("""
+definitions:
+  said: &said {override: {omit-tahanun: false}}
+rubrics:
+  - match: "^Tachanun is also omitted"
+    when: *said
+    until: "^The Chazzan recites the following Kaddish"
+  - match: "^\\\\(When the Chazzan repeats"
+    when: {recitation: {repetition: true}}
+    through: "בָּרוּךְ אֵל הַהוֹדָאוֹת"
+  - match: "^A woman says:"
+    when: {person: {gender: female}}
+    instead_of_previous: true
+""")
+        tachanun = conditions.for_rubric("Tachanun is also omitted in the presence of a bridegroom")
+        self.assertEqual(tachanun.when, {"override": {"omit-tahanun": False}})  # the anchor is resolved
+        self.assertTrue(tachanun.section)  # until implies a section
+        self.assertTrue(tachanun.until.search("The Chazzan recites the following Kaddish"))
+        self.assertEqual(conditions.for_rubric("(When the Chazzan repeats it)").through,
+                         tuple(words("ברוך אל ההודאות")))
+        self.assertTrue(conditions.for_rubric("A woman says:").instead_of_previous)
+        self.assertFalse(tachanun.instead_of_previous)
+
+
+class TestDirectivesAndLeaves(unittest.TestCase):
+    def test_reviewed_directives_are_known(self):
+        conditions = table()
+        self.assertTrue(conditions.is_directive("When the Holy Ark is opened, the following is said:"))
+        self.assertFalse(conditions.is_directive("On Sunday:"))
+
+    def test_a_leaf_gate_is_found_by_its_work_and_leaf(self):
+        gate = table().leaf_gate("w", "Morning / Reading of the Torah")
+        self.assertEqual((gate.when, gate.note), ({"day-of-week": {"hebrew-day": 2}}, "On Mondays:"))
+        self.assertIsNone(table().leaf_gate("other", "Morning / Reading of the Torah"))
+
+    def test_malformed_entries_are_errors(self):
+        for bad in ("directives: ['(']\n",
+                    "leaves:\n  - leaf: x\n    when: {holiday: {purim: true}}\n",
+                    "leaves:\n  - work: w\n    leaf: x\n",
+                    "rubrics:\n  - match: x\n    when: {holiday: {purim: true}}\n    until: '('\n"):
+            with self.assertRaises(ConditionsError, msg=bad):
+                table(bad)
 
 
 if __name__ == "__main__":

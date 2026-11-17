@@ -13,6 +13,7 @@ from .support import AMIDAH, MORNING
 
 T = "urn:x-opensiddur:text:"
 NS = {"tei": "http://www.tei-c.org/ns/1.0", "j": "http://jewishliturgy.org/ns/jlptei/2"}
+XML_ID = "{http://www.w3.org/XML/1998/namespace}id"
 
 
 def blocks(segments):
@@ -116,6 +117,76 @@ class TestTextBody(unittest.TestCase):
         out = render(parse_segment("<b>שָׁ</b>"), "he", None)
         self.assertNotIn("<", out)
         self.assertEqual(out, to_nfkd("\u05e9\u05c1\u05b8"))  # shin, shin dot, qamatz, reordered
+
+
+class TestConditionScopes(unittest.TestCase):
+    """How far a condition reaches inside a text, and where its parts go."""
+    URN = T + "prayer:amidah/gevurot"
+
+    def body(self, segments, numbers, lang):
+        (block,) = blocks(segments)
+        return parse(text_body(self.URN, block, numbers, lang, Notes("note"), conditions=conditions()))
+
+    def test_replaced_words_that_open_the_next_phrase(self):
+        # (בעשי"ת וּלְעֵלָּא מִכָּל) ends one phrase; the next opens with the words it replaces.
+        segments = [("<b>לְעֵלָּא</b> (בעשי\"ת וּלְעֵלָּא מִכָּל)", "above"),
+                    ("מִן כָּל בִּרְכָתָא", "all the blessings")]
+        he = self.body(segments, [1, 2], "he")
+        (negated,) = he.xpath("//j:conditional[j:none]", namespaces=NS)
+        self.assertEqual(negated.xpath("j:none/tei:fs/tei:f/@name", namespaces=NS), ["aseret-ymei-tshuva"])
+        # It is in the second phrase, around its opening words only.
+        self.assertEqual(negated.xpath("preceding-sibling::tei:milestone[@unit='phrase'][1]/@corresp",
+                                       namespaces=NS), [T + "metsudah:amidah/gevurot/2"])
+        self.assertEqual(negated.tail, to_nfkd("מִן כָּל"))
+        # Nor when the words it replaces were found before it in its own phrase.
+        before = [("שָׁלוֹם (בעשי\"ת הַשָּׁלוֹם)", "peace"), ("שָׁלוֹם עָלֵינוּ", "peace upon us")]
+        negated = self.body(before, [1, 2], "he").xpath("//j:conditional[j:none]", namespaces=NS)
+        self.assertEqual(len(negated), 1)
+        # Nothing carries past a phrase that does not open with them.
+        segments[1] = ("בִּרְכָתָא", "blessings")
+        self.assertEqual(self.body(segments, [1, 2], "he").xpath("//j:conditional[j:none]", namespaces=NS), [])
+
+    def test_a_rubric_leading_into_a_passage_stays_inside_it(self):
+        segments = [("<b>אַתָּה גִבּוֹר</b>", "You are mighty"),
+                    ("", "<small>During the Ten Days of Penitence add:</small>"),
+                    ("", "<small>Chazzan:</small>"),
+                    ("<small>מִי כָמוֹךָ</small>", "Who is like You"),
+                    ("", "<small>Congregation:</small>"),
+                    ("וְנֶאֱמָן אַתָּה", "And You are faithful")]
+        en = self.body(segments, [1, 2, 3], "en")
+        inside = en.xpath("//tei:note[preceding-sibling::j:conditional][following-sibling::j:endConditional]",
+                          namespaces=NS)
+        self.assertEqual([n.xpath("string()") for n in inside], ["Chazzan:"])
+        phrases = en.xpath("//tei:milestone[@unit='phrase'][preceding-sibling::j:conditional]"
+                           "[following-sibling::j:endConditional]/@corresp", namespaces=NS)
+        self.assertEqual(phrases, [T + "metsudah:amidah/gevurot/2"])
+
+    def test_a_passage_through_the_words_that_end_it(self):
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        from opensiddur.importer.util.incipit import words
+        table = Conditions(rubrics=(RubricCondition(_re.compile("^When the Chazzan repeats"),
+                                                    {"recitation": {"repetition": True}},
+                                                    through=tuple(words("בָּרוּךְ אֵל הַהוֹדָאוֹת"))),))
+        segments = [("<b>מוֹדִים</b> אֲנַחְנוּ לָךְ", "We thank You"), ("", "<small>When the Chazzan repeats:</small>"),
+                    ("מוֹדִים אֲנַחְנוּ לָךְ", "We thank You"), ("בָּרוּךְ אֵל", "Blessed is the Almighty"),
+                    ("הַהוֹדָאוֹת:", "of thanks"), ("וְעַל כֻּלָּם", "And for all these")]
+        (block,) = blocks(segments)
+        for lang in ("he", "en"):
+            body = parse(text_body(self.URN, block, [1, 2, 3, 4, 5], lang, Notes("n"), conditions=table))
+            inside = body.xpath("//tei:milestone[@unit='phrase'][preceding-sibling::j:conditional]"
+                                "[following-sibling::j:endConditional]/@corresp", namespaces=NS)
+            self.assertEqual([u.rsplit("/", 1)[-1] for u in inside], ["2", "3", "4"], lang)
+
+    def test_a_footnote_on_a_condition_rubric_is_anchored_after_the_conditional(self):
+        segments = [("<b>אַתָּה גִבּוֹר</b>", "You are mighty"),
+                    ("", '<small>During the Ten Days add:</small><sup class="footnote-marker">1</sup>'
+                         '<i class="footnote">A note.</i>'),
+                    ("מִי כָמוֹךָ", "Who is like You")]
+        en = self.body(segments, [1, 2], "en")
+        (anchor,) = en.xpath("//tei:anchor", namespaces=NS)
+        self.assertEqual(anchor.xpath("local-name(preceding-sibling::*[1])"), "conditional")
+        self.assertEqual(en.xpath("//j:conditional/tei:anchor", namespaces=NS), [])
 
 
 TABLE = None
@@ -289,6 +360,112 @@ class TestLeafGates(unittest.TestCase):
             f"[following-sibling::j:endConditional[@target='#{g.get('{http://www.w3.org/XML/1998/namespace}id')}']]",
             namespaces=NS)] for g in gates]
         self.assertEqual(inside, [["t0"], ["t2", "t3"]])
+
+    def leaf(self, he, en, table, **kwargs):
+        from opensiddur.importer.sefaria.tei_builder import leaf_body
+        leaf = Leaf(("L",), (("L", "L"),), he, en)
+        items = divide(align_leaf(leaf).pairs)
+        urns = {id(b): f"{T}prayer:t{n}" for n, b in enumerate(i for i in items if isinstance(i, TextBlock))}
+        return items, urns, lambda lang: parse(leaf_body(T + "siddur:x", ("L", "L"), items, urns, lang, Notes("n"),
+                                                         conditions=table, **kwargs))
+
+    @staticmethod
+    def gated(body):
+        return [[t.get("target").rsplit(":", 1)[-1] for t in body.xpath(
+            f"//j:transclude[preceding-sibling::j:conditional[@xml:id='{g.get(XML_ID)}']]"
+            f"[following-sibling::j:endConditional[@target='#{g.get(XML_ID)}']]", namespaces=NS)]
+            for g in body.xpath("//j:conditional", namespaces=NS)]
+
+    def test_a_section_runs_until_the_rubric_it_names(self):
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        table = Conditions(rubrics=(RubricCondition(_re.compile("^Tachanun is also omitted"),
+                                                    {"override": {"omit-tahanun": False}}, section=True,
+                                                    until=_re.compile("^The Chazzan recites the following Kaddish")),))
+        _, _, body = self.leaf(
+            ("", "<b>אָשַׁמְנוּ</b> בָּגַדְנוּ", "<b>וַיֹּאמֶר</b> דָּוִד", "", "<b>יִתְגַּדַּל</b> וְיִתְקַדַּשׁ"),
+            ("<small>Tachanun is also omitted today.</small>", "We have trespassed", "And David said",
+             "<small>The Chazzan recites the following Kaddish</small>", "Exalted"), table)
+        self.assertEqual(self.gated(body("en")), [["t0", "t1"]])
+        # A heading before that rubric does not end it.
+        _, _, body = self.leaf(
+            ("", "<b>אָשַׁמְנוּ</b> בָּגַדְנוּ", "<b>נפילת אפים</b>", "<b>וַיֹּאמֶר</b> דָּוִד", "",
+             "<b>יִתְגַּדַּל</b> וְיִתְקַדַּשׁ"),
+            ("<small>Tachanun is also omitted today.</small>", "We have trespassed", "<b>FALLING ON THE FACE</b>",
+             "And David said", "<small>The Chazzan recites the following Kaddish</small>", "Exalted"), table)
+        self.assertEqual(self.gated(body("en")), [["t0", "t1"]])
+
+    def test_a_woman_says_makes_the_text_before_the_alternative(self):
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        female = {"person": {"gender": "female"}}
+        table = Conditions(rubrics=(RubricCondition(_re.compile("^A woman says:"), female,
+                                                    instead_of_previous=True),))
+        _, _, body = self.leaf(("<b>שֶׁלֹּא</b> עָשַׂנִי אִשָּׁה", "", "<b>שֶׁעָשַׂנִי</b> כִּרְצוֹנוֹ"),
+                               ("Who did not make me a woman", "<small>A woman says:</small>", "Who made me"), table)
+        en = body("en")
+        self.assertEqual(self.gated(en), [["t0"], ["t1"]])
+        first, second = en.xpath("//j:conditional", namespaces=NS)
+        self.assertEqual(first.xpath("j:none/tei:fs/tei:f/tei:symbol/@value", namespaces=NS), ["female"])
+        self.assertEqual(second.xpath("tei:fs/tei:f/tei:symbol/@value", namespaces=NS), ["female"])
+
+    def test_the_text_before_the_alternative_may_be_gated_already(self):
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        female = {"person": {"gender": "female"}}
+        table = Conditions(rubrics=(RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}),
+                                    RubricCondition(_re.compile("^A woman says:"), female, instead_of_previous=True)))
+        _, _, body = self.leaf(("", "<b>שֶׁלֹּא</b> עָשַׂנִי אִשָּׁה", "", "<b>שֶׁעָשַׂנִי</b> כִּרְצוֹנוֹ"),
+                               ("<small>On Sunday:</small>", "Who did not make me a woman",
+                                "<small>A woman says:</small>", "Who made me"), table)
+        en = body("en")
+        self.assertEqual(self.gated(en), [["t0"], ["t0"], ["t1"]])
+        etree.fromstring(etree.tostring(en))  # well-formed, the conditionals nested
+
+    def test_a_text_printed_before_is_gated_by_the_condition_rubric_it_opens_with(self):
+        items, urns, body = self.leaf(("<b>מִי</b> כָמוֹךָ", "", "<b>וְנֶאֱמָן</b> אַתָּה"),
+                                      ("Who is like You", "<small>On Sunday:</small>", "And You are faithful"),
+                                      conditions())
+        # Make the leading rubric part of the block, as division does when a rubric opens it.
+        from dataclasses import replace
+        blocks_ = [i for i in items if isinstance(i, TextBlock)]
+        rubric = next(i for i in items if not isinstance(i, TextBlock)).pairs[0]
+        from opensiddur.importer.sefaria.tei_builder import leaf_body
+        repeat = blocks_[1]
+        en = parse(leaf_body(T + "siddur:x", ("L", "L"), [blocks_[0], repeat], urns, "en", Notes("n"),
+                             conditions=conditions(), leading={id(repeat): rubric}))
+        self.assertEqual(self.gated(en), [["t1"]])
+        self.assertEqual(en.xpath("string(//j:conditional/tei:note)", namespaces=NS), "On Sunday:")
+
+
+class TestNodeGates(unittest.TestCase):
+    def test_a_gated_child_is_transcluded_conditionally(self):
+        from opensiddur.importer.sefaria.conditions import LeafGate
+        from opensiddur.importer.sefaria.tei_builder import index_body, node_body
+        from .support import WORK
+        gate = LeafGate("w", "Morning / Torah", {"day-of-week": {"hebrew-day": 2}}, "On Mondays:")
+        children = [T + "siddur:a", T + "siddur:b"]
+        for lang in ("he", "en"):
+            for body in (node_body(T + "siddur:n", ("N", "N"), children, lang, {T + "siddur:b": gate}),
+                         index_body(WORK, children, lang, {T + "siddur:b": gate})):
+                xml = parse(body)
+                (conditional,) = xml.xpath("//j:conditional", namespaces=NS)
+                self.assertEqual(xml.xpath("//j:transclude[preceding-sibling::j:conditional]/@target",
+                                           namespaces=NS), [T + "siddur:b"])
+                self.assertEqual(conditional.xpath("string(tei:note)", namespaces=NS),
+                                 "On Mondays:" if lang == "en" else "")
+
+
+class TestSourceBibl(unittest.TestCase):
+    def test_the_translator_is_the_bibl_author_not_a_respstmt(self):
+        from opensiddur.importer.sefaria.tei_builder import SourceInfo, source_bibl
+        from .support import WORK
+        info = SourceInfo("2026-11-01T00:00:00", {"he": "https://x/he", "en": "https://x/en"},
+                          {"he": "a", "en": "b"})
+        for lang in ("he", "en"):
+            bibl = parse(source_bibl(WORK, lang, info))
+            self.assertEqual(bibl.xpath("//tei:bibl/tei:author/text()", namespaces=NS), [WORK.translator])
+            self.assertEqual(bibl.xpath("//tei:respStmt", namespaces=NS), [])
 
 
 class TestFileStem(unittest.TestCase):

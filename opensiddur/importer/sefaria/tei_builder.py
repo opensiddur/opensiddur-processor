@@ -37,6 +37,7 @@ import re
 from lxml import etree
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from typing import Any
 
 from opensiddur.importer.sefaria.align import Pair
 from opensiddur.importer.sefaria.blocks import Heading, Item, Rubric, TextBlock, is_heading, is_phrase
@@ -52,7 +53,7 @@ from opensiddur.importer.sefaria.markup import (
     leading_label,
     plain_text,
 )
-from opensiddur.importer.sefaria.conditions import Conditions, condition_xml
+from opensiddur.importer.sefaria.conditions import Conditions, LeafGate, condition_xml, negated_xml
 from opensiddur.importer.sefaria.phrases import phrase_urn
 from opensiddur.importer.sefaria.works import Work
 from opensiddur.importer.util.hebrew import to_nfkd
@@ -159,6 +160,13 @@ def instruction(nodes: tuple[Node, ...], lang: str, notes: Notes | None, *, kind
         return ""
     anchors = "".join(notes.anchor(n) for n in footnotes_in(nodes)) if notes is not None else ""
     return f'<tei:note type="{kind}" xml:lang="{lang}">{body}</tei:note>{anchors}'
+
+
+def conditional_open(xml_id: str, note: str, condition: str) -> str:
+    """A ``j:conditional`` whose note is a rubric (``instruction``): the anchors of the rubric's
+    footnotes, which the conditional cannot hold, follow it."""
+    head, end, anchors = note.rpartition("</tei:note>")
+    return f'<j:conditional xml:id="{xml_id}">{head}{end}{condition}</j:conditional>{anchors}'
 
 
 def rubric_xml(pair: Pair, lang: str, notes: Notes | None) -> str:
@@ -269,6 +277,9 @@ class _TextWriter:
         #: conditionals were open when it opened, whether its passage is in parentheses (None:
         #: not known until its first phrase), whether it is to close once it can]
         self.calendars: list[list] = []
+        #: an inline alternative that ended the last phrase, and replaces words the next opens
+        #: with: (its condition's XML, the replacement)
+        self.pending: tuple[str, Any] | None = None
 
     def next_id(self, kind: str) -> str:
         if kind == "inline":
@@ -284,12 +295,13 @@ class _TextWriter:
             return self.calendars[-1]
         return None
 
-    def open_calendar(self, pair: Pair, when) -> None:
+    def open_calendar(self, pair: Pair, when, through: tuple[str, ...] = ()) -> None:
         self.close_calendar()
         xml_id = self.next_id("when")
         note = instruction(pair.en, "en", self.notes) if self.lang == "en" else ""
-        self.parts.append(f'<j:conditional xml:id="{xml_id}">{note}{condition_xml(when)}</j:conditional>')
-        self.calendars.append([xml_id, len(self.open_variants), None, False])
+        self.parts.append(conditional_open(xml_id, note, condition_xml(when)))
+        # [id, depth, parenthesized, to close, the words that end it, the words so far]
+        self.calendars.append([xml_id, len(self.open_variants), None, False, through, []])
 
     def close_calendar(self, *, everything: bool = False) -> None:
         """Close the condition rubric's conditional opened at this level (or, with
@@ -334,16 +346,20 @@ class _TextWriter:
             self.end_phrase()
             xml_id = self.next_id("when")
             note = instruction((label,), "he", self.notes) if self.lang == "he" else ""
-            self.parts.append(f'<j:conditional xml:id="{xml_id}">{note}{condition_xml(labelled.when)}</j:conditional>')
+            self.parts.append(conditional_open(xml_id, note, condition_xml(labelled.when)))
         xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number), label=labelled is None)
         if self.lang == "he":
-            xml = self.inline_conditions(xml)
+            xml = self.inline_conditions(self._carried(xml))
         self.parts.append(xml)
         self.phrase_open = True
         if xml_id is not None:
             self.end_phrase()
             self.parts.append(f'<j:endConditional target="#{xml_id}"/>')
-        if current is not None and current[2] and ")" in hebrew:
+        if current is not None and current[4]:
+            current[5].extend(words(hebrew))
+            if tuple(current[5][-len(current[4]):]) == current[4]:
+                self.close_calendar()
+        elif current is not None and current[2] and ")" in hebrew:
             self.close_calendar()
         elif self.calendars and self.calendars[-1][2] and ")" in hebrew:
             self.calendars[-1][3] = True  # its passage ended inside a variant's conditional
@@ -382,14 +398,46 @@ class _TextWriter:
             # Markup that straddles the parenthesis: the phrase is left as the book prints it.
             self.inline = saved
             return xml
+        self.pending = self._unreplaced_at_end(out)
         return out
+
+    def _unreplaced_at_end(self, xml: str) -> tuple[str, Any] | None:
+        """The inline alternative the phrase ends with, when it replaces words and none beside it
+        were: the next phrase may open with them."""
+        last = None
+        for last in _INLINE.finditer(xml):
+            pass
+        if last is None or re.sub(r"<[^>]*>|[\s,.:;]", "", xml[last.end():]):
+            return None
+        if re.search(r'</j:none></j:conditional>[^<]*<j:endConditional target="#inline_\d+"/>\s*$',
+                     xml[:last.start()]):
+            return None  # the words it replaces were found before it
+        replacement = self.table.replaced(html.unescape(re.sub(r"<[^>]*>", "", last.group(3))))
+        if replacement is None:
+            return None
+        when = re.search(r"</tei:note>(.*)</j:conditional>$", last.group(1)).group(1)
+        return when, replacement
+
+    def _carried(self, xml: str) -> str:
+        """The words the last phrase's closing alternative replaces, where this phrase opens with
+        them, conditional on its condition being false."""
+        if self.pending is None:
+            return xml
+        when, replacement = self.pending
+        self.pending = None
+        opening = re.match(r"((?:\s|<tei:milestone[^>]*/>)*)([^<]*)", xml)
+        text = opening.group(2)
+        lead = len(text) - len(text.lstrip())
+        taken = _leading_words(text[lead:], replacement.replaces)
+        if taken is None:
+            return xml
+        begin = opening.start(2) + lead
+        return xml[:begin] + self._negated(when, taken) + xml[begin + len(taken):]
 
     def _replace(self, xml: str, replacement) -> str:
         """The words an inline alternative replaces, beside it -- after it or before it --
         conditional on its condition being false."""
-        pattern = re.compile(r'(<j:conditional xml:id="(inline_\d+)" type="marked">.*?</j:conditional>)'
-                             r'(.*?)(<j:endConditional target="#\2"/>)')
-        for match in pattern.finditer(xml):
+        for match in _INLINE.finditer(xml):
             if xml[match.end():].lstrip().startswith('<j:conditional xml:id="inline_') and "<j:none>" in \
                     xml[match.end():match.end() + 400].split("</j:conditional>", 1)[0]:
                 continue  # its replaced words are conditional already
@@ -419,10 +467,19 @@ class _TextWriter:
         # languages, whichever the rubric is printed in, so that the two divide alike.
         self.end_phrase()
         self.verse(None)
-        self.close_calendar()
         found = self.table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
+        current = self.calendar
+        if found is None and current is not None and current[2] is None:
+            # A rubric between a condition rubric and the first words it governs ("Chazzan:",
+            # an explanation) leads into the passage: the conditional stays open.
+            xml = rubric_xml(pair, self.lang, self.notes)
+            if xml:
+                self.parts.append(xml)
+            return
+        self.close_calendar()
+        self.pending = None
         if found is not None:
-            self.open_calendar(pair, found.when)
+            self.open_calendar(pair, found.when, found.through)
             return
         xml = rubric_xml(pair, self.lang, self.notes)
         if xml:
@@ -452,6 +509,11 @@ class _TextWriter:
             self.end_phrase()
             self.verse(None)
             self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
+
+
+#: an inline alternative: its conditional (1), id (2), words (3) and end (4)
+_INLINE = re.compile(r'(<j:conditional xml:id="(inline_\d+)" type="marked">.*?</j:conditional>)'
+                     r'(.*?)(<j:endConditional target="#\2"/>)')
 
 
 def _well_formed(xml: str) -> bool:
@@ -593,20 +655,26 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
 def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: dict[int, str],
               lang: str, notes: Notes,
               declarations: dict[int, list[tuple[str, bool]]] | None = None,
-              conditions: Conditions | None = None) -> str:
+              conditions: Conditions | None = None,
+              leading: dict[int, Pair] | None = None) -> str:
     """A leaf's structure division: its heading, then its rubrics, headings and texts.
     ``text_urns`` maps each text block (by ``id``) to its URN; ``declarations``, to the
     variants of its text that are and are not printed here, declared around its transclusion.
 
     A condition rubric (``conditions``) between texts gates the next text's transclusion --
     or, for a rubric that governs a section, everything to the next heading -- its words the
-    conditional's note."""
+    conditional's note. ``leading`` gives, for a text printed before (whose own file is the first
+    printing's), the condition rubric it opens with, which then gates its transclusion here."""
+    leading = leading or {}
     declarations = declarations or {}
     table = conditions or Conditions()
     declared = 0
     gates = 0
     gate: str | None = None
     section = False
+    until = None
+    #: where in ``parts`` the last transclusion is, while nothing has followed it
+    previous: int | None = None
     texts = 0
     title = titles[1] if lang == "he" else titles[0]
     parts = [f'<tei:head xml:lang="{lang}">{_text(title, lang)}</tei:head>'] if title else []
@@ -622,23 +690,31 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
             for pair in item.pairs:
                 found = table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
                 if found is None:
+                    if gate is not None and until is not None and until.search(" ".join(plain_text(pair.en).split())):
+                        close_gate()  # the rubric the section's condition runs to
                     xml = rubric_xml(pair, lang, notes)
                     if xml:
                         parts.append(xml)
                     continue
                 close_gate()
+                if found.instead_of_previous and previous is not None and all(
+                        p.startswith("<j:endConditional") for p in parts[previous + 1:]):
+                    # (inside a gate of its own that has closed: the conditionals nest)
+                    gates += 1
+                    parts[previous] = (f'<j:conditional xml:id="when_{gates}">{negated_xml(found.when)}</j:conditional>'
+                                       f'{parts[previous]}<j:endConditional target="#when_{gates}"/>')
                 gates += 1
-                gate, section, texts = f"when_{gates}", found.section, 0
+                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
                 note = instruction(pair.en, "en", notes) if lang == "en" else ""
-                parts.append(f'<j:conditional xml:id="{gate}">{note}{condition_xml(found.when)}</j:conditional>')
+                parts.append(conditional_open(gate, note, condition_xml(found.when)))
         elif isinstance(item, Heading):
-            if gate is not None and section and texts:
+            if gate is not None and section and until is None and texts:
                 close_gate()
             label = head_xml(item.pair, lang, notes, element="label")
             if label:
                 parts.append(label)
         elif isinstance(item, TextBlock):
-            if gate is not None and section and texts and item.head is not None:
+            if gate is not None and section and until is None and texts and item.head is not None:
                 close_gate()  # a text under a heading of its own begins the next section
             transclude = f'<j:transclude type="external" target="{attr(text_urns[id(item)])}"/>'
             if declarations.get(id(item)):
@@ -646,7 +722,15 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 xml_id = f"variants_{declared}"
                 transclude = (f'<j:declare xml:id="{xml_id}">{variant_fs(declarations[id(item)])}</j:declare>'
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
+            lead = leading.get(id(item))
+            found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
+            if found is not None and gate is None:
+                gates += 1
+                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                transclude = (conditional_open(f"when_{gates}", note, condition_xml(found.when))
+                              + f'{transclude}<j:endConditional target="#when_{gates}"/>')
             parts.append(transclude)
+            previous = len(parts) - 1
             texts += 1
             if gate is not None and not section:
                 close_gate()
@@ -654,18 +738,35 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
     return f'<tei:body><tei:div corresp="{attr(urn)}">{"".join(parts)}</tei:div></tei:body>'
 
 
-def node_body(urn: str, titles: tuple[str, str], children: list[str], lang: str) -> str:
-    """An inner node's division: its heading and a transclusion of each child."""
+def node_body(urn: str, titles: tuple[str, str], children: list[str], lang: str,
+              gates: dict[str, LeafGate] | None = None) -> str:
+    """An inner node's division: its heading and a transclusion of each child -- conditional,
+    for a child ``gates`` names (``conditions.yaml`` leaves)."""
     title = titles[1] if lang == "he" else titles[0]
     head = f'<tei:head xml:lang="{lang}">{_text(title, lang)}</tei:head>' if title else ""
-    transclusions = "".join(f'<j:transclude type="external" target="{attr(c)}"/>' for c in children)
+    transclusions = _transclusions(children, lang, gates)
     return f'<tei:body><tei:div corresp="{attr(urn)}">{head}{transclusions}</tei:div></tei:body>'
 
 
-def index_body(work: Work, children: list[str], lang: str) -> str:
+def _transclusions(children: list[str], lang: str, gates: dict[str, LeafGate] | None) -> str:
+    gates = gates or {}
+    parts = []
+    for n, child in enumerate(children, start=1):
+        transclude = f'<j:transclude type="external" target="{attr(child)}"/>'
+        gate = gates.get(child)
+        if gate is not None:
+            note = (f'<tei:note type="instruction" xml:lang="en">{esc(gate.note)}</tei:note>'
+                    if gate.note and lang == "en" else "")
+            transclude = (f'<j:conditional xml:id="leaf_{n}">{note}{condition_xml(gate.when)}</j:conditional>'
+                          f'{transclude}<j:endConditional target="#leaf_{n}"/>')
+        parts.append(transclude)
+    return "".join(parts)
+
+
+def index_body(work: Work, children: list[str], lang: str, gates: dict[str, LeafGate] | None = None) -> str:
     title = work.title_he if lang == "he" else work.title_en
     head = f'<tei:head xml:lang="{lang}">{_text(title, lang)}</tei:head>'
-    transclusions = "".join(f'<j:transclude type="external" target="{attr(c)}"/>' for c in children)
+    transclusions = _transclusions(children, lang, gates)
     return (f'<tei:body><tei:div corresp="{SIDDUR_PREFIX}siddur">{head}{transclusions}</tei:div>'
             "</tei:body>")
 
@@ -709,8 +810,9 @@ def _titles(work: Work, lang: str) -> str:
 
 def source_bibl(work: Work, lang: str, info: SourceInfo) -> str:
     version_title = work.versions[lang]
-    translator = (f'<tei:respStmt><tei:resp key="trl">Translated by</tei:resp>'
-                  f"<tei:name>{esc(work.translator)}</tei:name></tei:respStmt>")
+    # The translation is the book's own, as Birnbaum's is his: its translator is the bibl's
+    # author, not a contributor to the encoding (a tei:respStmt, which needs a contributor URN).
+    translator = f"<tei:author>{esc(work.translator)}</tei:author>"
     place = f"<tei:pubPlace>{esc(work.place)}</tei:pubPlace>" if work.place else ""
     accessed = info.last_export[:10]
     other = "en" if lang == "he" else "he"
@@ -726,6 +828,8 @@ def source_bibl(work: Work, lang: str, info: SourceInfo) -> str:
         f'<tei:idno type="url">{esc(info.version_url[lang])}</tei:idno>'
         f'<tei:idno type="sefaria">{esc(version_title)}</tei:idno>'
         f"<tei:note>Rite: {esc(work.rite)}</tei:note>"
+        f"<tei:note xml:lang=\"en\">The English is {esc(work.translator)}’s translation, printed in the "
+        "book’s linear layout opposite the Hebrew.</tei:note>"
         f"<tei:note>Digitized by Sefaria as the {'Hebrew' if lang == 'he' else 'English'} version "
         f"“{esc(version_title)}” of {esc(work.title)}; its "
         f"{'English translation' if lang == 'he' else 'Hebrew text'} is the project "
