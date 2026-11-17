@@ -36,7 +36,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from opensiddur.importer.sefaria.align import Pair
-from opensiddur.importer.sefaria.blocks import Heading, Item, Rubric, TextBlock, is_phrase
+from opensiddur.importer.sefaria.blocks import Heading, Item, Rubric, TextBlock, is_heading, is_phrase
 from opensiddur.importer.sefaria.markup import (
     Break,
     EnglishKind,
@@ -162,7 +162,9 @@ def rubric_xml(pair: Pair, lang: str, notes: Notes | None) -> str:
     nodes = pair.he if lang == "he" else pair.en
     if not plain_text(nodes):
         return ""
-    kind = "description" if lang == "en" and english_kind(nodes) is EnglishKind.HEADING else "instruction"
+    # A heading inside a text (the text joined across it) names the passage after it.
+    kind = ("description" if is_heading(pair) or (lang == "en" and english_kind(nodes) is EnglishKind.HEADING)
+            else "instruction")
     return instruction(nodes, lang, notes, kind=kind)
 
 

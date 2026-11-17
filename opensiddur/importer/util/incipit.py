@@ -193,6 +193,27 @@ class IncipitIndex:
             return {ranked[0]}
         return found
 
+    def open_with_parts(self) -> None:
+        """Index each text that opens by transcluding a part under that part's opening, not
+        under the words of its own that follow the transclusion (Birnbaum's Mourner's Kaddish is
+        not "יהא שלמא רבא")."""
+        if not self.opens_with:
+            return
+        collected = dict(self.incipit_of)
+        for urn in self.opens_with:
+            first = self.first_part(urn)
+            if urn in collected:
+                if first in collected:
+                    collected[urn] = collected[first]
+                else:
+                    del collected[urn]
+        order = list(self.incipit_of)
+        self.by_incipit, self.incipit_of, self.children = {}, {}, {}
+        for urn in order:
+            if urn in collected:
+                self.add(urn, list(collected[urn]))
+        self.length_of = {u: n for u, n in self.length_of.items() if u not in self.opens_with}
+
     def first_part(self, urn: str) -> str:
         """The text ``urn``'s words begin with: itself, or what it opens by transcluding."""
         seen = {urn}
@@ -225,6 +246,7 @@ class IncipitIndex:
         index.ends_with = dict(data.get("ends_with", {})) if "incipits" in data else {}
         index.includes = ({urn: set(targets) for urn, targets in data.get("includes", {}).items()}
                           if "incipits" in data else {})
+        index.open_with_parts()
         return index
 
 
@@ -375,6 +397,7 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
             continue
         for xml_file in sorted(project.glob("*.xml")):
             index_document(index, etree.parse(str(xml_file)).getroot())
+    index.open_with_parts()
     return index
 
 

@@ -38,6 +38,7 @@ from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import Alignment, align_work, load_decisions
 from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide
 from opensiddur.importer.sefaria.download import load_manifest
+from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
 from opensiddur.importer.sefaria.markup import plain_text
 from opensiddur.importer.sefaria.match import (
     URNS_PATH,
@@ -124,15 +125,19 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
               structure_path: Path | None = None,
               decisions_path: Path | None = None,
               spellings: Spellings | None = None,
-              own_phrases: dict[str, dict[int, str]] | None = None) -> WorkPlan:
+              own_phrases: dict[str, dict[int, str]] | None = None,
+              equivalents_path: Path | None = None,
+              registered: set[str] | None = None) -> WorkPlan:
     structure = load_structure(work, source, structure_path)
     alignments = align_work(work.key, source.leaves,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
-    items = {a.leaf.path: divide(a.pairs) for a in alignments if structure.get(a.leaf.path)}
+    equivalents = load_equivalents(equivalents_path) if equivalents_path else load_equivalents()
+    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs), equivalents)
+             for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
                             recorded_phrases=phrases, spellings=spellings,
                             places={path: place for path, place in structure.items() if place},
-                            own_phrases=own_phrases)
+                            own_phrases=own_phrases, equivalents=equivalents, registered=registered)
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
     # quoted by two texts is marked in the first.
     verses: dict[tuple[str, int], dict[int, str]] = {}
@@ -141,10 +146,13 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
         for block in leaf_items:
             if not isinstance(block, TextBlock):
                 continue
-            if decisions.records[(work.key, leaf, block.first_index)].kind not in ("existing", "new"):
+            record = decisions.records[(work.key, leaf, block.first_index)]
+            if record.kind not in ("existing", "new"):
                 continue
             found: dict[int, str] = {}
             for position, urn in sorted(scripture_verses(block, index).items()):
+                if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
+                    continue  # the text is that verse (or chapter): its URN is already on the division
                 if urn not in marked:  # a verse repeated, even within one text, is marked once
                     marked.add(urn)
                     found[position] = urn
@@ -362,7 +370,8 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                  structure_path: Path | None = None,
                  decisions_path: Path | None = None,
                  spellings: Spellings | None = None,
-                 works: dict[str, Work] | None = None) -> WorkPlan:
+                 works: dict[str, Work] | None = None,
+                 equivalents_path: Path | None = None) -> WorkPlan:
     directory = work.data_directory(sourcetexts_root)
     source = load_work_source(directory)
     info = source_info(work, directory)
@@ -379,6 +388,7 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     plan = plan_work(work, source, index=index, records=records, taken=taken,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
                      decisions_path=decisions_path, spellings=spellings,
+                     equivalents_path=equivalents_path, registered=registry_urns(registry_directory),
                      own_phrases=recorded_phrases([project_directory / work.projects["he"]]
                                                   if (project_directory / work.projects["he"]).exists() else []))
     check_phrase_paths({k: r for k, r in plan.decisions.records.items()
