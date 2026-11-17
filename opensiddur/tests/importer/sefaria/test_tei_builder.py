@@ -118,6 +118,128 @@ class TestTextBody(unittest.TestCase):
         self.assertEqual(out, to_nfkd("\u05e9\u05c1\u05b8"))  # shin, shin dot, qamatz, reordered
 
 
+TABLE = None
+
+
+def conditions():
+    from opensiddur.importer.sefaria.conditions import (
+        Conditions, LabelCondition, Replacement, RubricCondition)
+    import re as _re
+    from opensiddur.importer.util.incipit import words
+    aseret = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+    return Conditions(
+        rubrics=(RubricCondition(_re.compile("^During the Ten Days"), aseret),
+                 RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}),
+                 RubricCondition(_re.compile("^When the Chazzan repeats"), {"recitation": {"repetition": True}},
+                                 section=True)),
+        labels=(LabelCondition(tuple(words('לר"ח')), {"holiday": {"rosh-hodesh": True}}),),
+        inline=(LabelCondition(tuple(words('בעשי"ת')), aseret),),
+        replacements=(Replacement(tuple(words("הַשָּׁלוֹם")), tuple(words("שָׁלוֹם"))),
+                      Replacement(tuple(words("וּלְעֵלָּא מִכָּל")), tuple(words("מִן כָּל")))),
+    )
+
+
+class TestConditions(unittest.TestCase):
+    URN = T + "prayer:amidah/gevurot"
+    SEGMENTS = [
+        ("<b>אַתָּה גִבּוֹר</b> לְעוֹלָם", "You are mighty"),
+        ("", "<small><i>During the Ten Days of Penitence add:</i></small>"),
+        ("<small>מִי כָמוֹךָ אָב הָרַחֲמָן</small>", "Who is like You"),
+        ("<small>זוֹכֵר יְצוּרָיו</small>", "Who remembers"),
+        ("", "<small>If you forgot, see page 000.</small>"),
+        ("וְנֶאֱמָן אַתָּה", "And You are faithful"),
+    ]
+
+    def body(self, segments, numbers, lang):
+        (block,) = blocks(segments)
+        return parse(text_body(self.URN, block, numbers, lang, Notes("note"), conditions=conditions()))
+
+    def test_a_condition_rubric_governs_the_phrases_to_the_next_rubric(self):
+        for lang in ("he", "en"):
+            body = self.body(self.SEGMENTS, [1, 2, 3, 4], lang)
+            (conditional,) = body.xpath("//j:conditional", namespaces=NS)
+            self.assertEqual(conditional.xpath("tei:fs/tei:f/@name", namespaces=NS), ["aseret-ymei-tshuva"])
+            inside = body.xpath("//tei:milestone[@unit='phrase'][preceding-sibling::j:conditional]"
+                                "[following-sibling::j:endConditional]/@corresp", namespaces=NS)
+            self.assertEqual(inside, [T + "metsudah:amidah/gevurot/2", T + "metsudah:amidah/gevurot/3"])
+        en = self.body(self.SEGMENTS, [1, 2, 3, 4], "en")
+        self.assertEqual(en.xpath("string(//j:conditional/tei:note)", namespaces=NS),
+                         "During the Ten Days of Penitence add:")
+        self.assertEqual(self.body(self.SEGMENTS, [1, 2, 3, 4], "he").xpath("//j:conditional/tei:note",
+                                                                            namespaces=NS), [])
+        # The directive after the passage is not inside it.
+        self.assertEqual(len(en.xpath("//tei:note[@type='instruction'][preceding::j:endConditional]",
+                                      namespaces=NS)), 1)
+
+    def test_a_parenthesized_passage_ends_where_its_parenthesis_closes(self):
+        segments = [("<b>אַתָּה גִבּוֹר</b> לְעוֹלָם", "x"), ("", "<small>During the Ten Days add:</small>"),
+                    ("(מִי כָמוֹךָ)", "y"), ("וְנֶאֱמָן אַתָּה", "z")]
+        he = self.body(segments, [1, 2, 3], "he")
+        after = he.xpath("//tei:milestone[@unit='phrase'][preceding-sibling::j:endConditional]/@corresp",
+                         namespaces=NS)
+        self.assertEqual(after, [T + "metsudah:amidah/gevurot/3"])
+
+    def test_a_labelled_phrase_is_conditional_its_label_the_note(self):
+        segments = [("<b>יַעֲלֶה</b> וְיָבֹא", "May it rise"), ("<small>לְר\"ח:</small> רֹאשׁ הַחֹדֶשׁ הַזֶּה", "this Rosh Chodesh")]
+        he = self.body(segments, [1, 2], "he")
+        self.assertEqual(he.xpath("string(//j:conditional/tei:note)", namespaces=NS), 'לְר"ח:'.replace("ְ", "ְ"))
+        self.assertEqual(he.xpath("//j:conditional/tei:fs/tei:f/@name", namespaces=NS), ["rosh-hodesh"])
+        # The label is not printed again before the phrase.
+        self.assertEqual(len(he.xpath("//tei:note", namespaces=NS)), 1)
+
+    def test_an_inline_alternative_and_the_words_it_replaces(self):
+        segments = [("<b>עֹשֶׂה</b> (בעשי\"ת הַשָּׁלוֹם) שָׁלוֹם בִּמְרוֹמָיו", "He Who makes peace"),
+                    ("לְעֵלָּא (<small>בעשי\"ת</small> וּלְעֵלָּא מִכָּל) מִן־כָּל בִּרְכָתָא", "above")]
+        he = self.body(segments, [1, 2], "he")
+        marked = he.xpath("//j:conditional[@type='marked']", namespaces=NS)
+        self.assertEqual(len(marked), 2)
+        self.assertEqual([m.xpath("string(tei:note)", namespaces=NS) for m in marked], ['בעשי"ת', 'בעשי"ת'])
+        negated = he.xpath("//j:conditional[j:none]", namespaces=NS)
+        self.assertEqual(len(negated), 2)
+        text = "".join(he.itertext())
+        self.assertIn(to_nfkd("הַשָּׁלוֹם"), text)
+        self.assertNotIn("(", text)
+
+    def test_conditionals_nest_with_a_variants(self):
+        from opensiddur.importer.sefaria.tei_builder import VariantPrinting
+
+        (block,) = blocks(self.SEGMENTS)
+        (later,) = blocks(self.SEGMENTS[:3] + self.SEGMENTS[4:])
+        variant = VariantPrinting("musaf", later, [1, 2, 4])
+        he = text_body(self.URN, block, [1, 2, 3, 4], "he", Notes("note"), (variant,), conditions=conditions())
+        order = [(e.tag.split("}")[1], e.get("{http://www.w3.org/XML/1998/namespace}id") or e.get("target"))
+                 for e in parse(he).iter() if e.tag.endswith(("}conditional", "}endConditional"))]
+        stack = []
+        for kind, ident in order:
+            if kind == "conditional":
+                stack.append(ident)
+            else:
+                self.assertEqual("#" + stack.pop(), ident)
+        self.assertEqual(stack, [])
+
+
+class TestLeafGates(unittest.TestCase):
+    def test_a_condition_rubric_between_texts_gates_the_next_text_or_its_section(self):
+        from opensiddur.importer.sefaria.tei_builder import leaf_body
+
+        leaf = Leaf(("L",), (("L", "L"),), ("", "<b>מִזְמוֹר</b> לְדָוִד", "<b>שִׁיר</b> הַמַּעֲלוֹת",
+                                         "", "<b>קדושה</b>", "<b>נַקְדִּישָׁךְ</b> וְנַעֲרִיצָךְ", "<b>קָדוֹשׁ</b> קָדוֹשׁ",
+                                         "<b>תשובה</b>", "<b>הֲשִׁיבֵנוּ</b> אָבִינוּ"),
+                    ("<small>On Sunday:</small>", "A psalm", "A song", "<small>When the Chazzan repeats:</small>",
+                     "<b>Kedushah</b>", "We will hallow", "Holy", "<b>REPENTANCE</b>", "Bring us back"))
+        items = divide(align_leaf(leaf).pairs)
+        urns = {id(b): f"{T}prayer:t{n}" for n, b in enumerate(i for i in items if isinstance(i, TextBlock))}
+        en = parse(leaf_body(T + "siddur:x", ("L", "L"), items, urns, "en", Notes("n"), conditions=conditions()))
+        gates = en.xpath("//j:conditional", namespaces=NS)
+        self.assertEqual([g.xpath("string(tei:note)", namespaces=NS) for g in gates],
+                         ["On Sunday:", "When the Chazzan repeats:"])
+        inside = [[t.get("target").rsplit(":", 1)[-1] for t in en.xpath(
+            f"//j:transclude[preceding-sibling::j:conditional[@xml:id='{g.get('{http://www.w3.org/XML/1998/namespace}id')}']]"
+            f"[following-sibling::j:endConditional[@target='#{g.get('{http://www.w3.org/XML/1998/namespace}id')}']]",
+            namespaces=NS)] for g in gates]
+        self.assertEqual(inside, [["t0"], ["t2", "t3"]])
+
+
 class TestFileStem(unittest.TestCase):
     def test_stems(self):
         self.assertEqual(file_stem(T + "prayer:amidah/avot"), "amidah_avot")

@@ -299,6 +299,133 @@ class TestMint(unittest.TestCase):
         self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:zeh_teqst_chadash")
 
 
+def documents(*bodies: str) -> IncipitIndex:
+    """An index built as the collection's is, from synthetic documents."""
+    from lxml import etree
+
+    from opensiddur.importer.util.incipit import index_document
+
+    index = IncipitIndex()
+    for body in bodies:
+        index_document(index, etree.fromstring(
+            f'<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">'
+            f"<tei:text><tei:body>{body}</tei:body></tei:text></tei:TEI>"))
+    index.open_with_parts()
+    return index
+
+
+def div(urn: str, text: str) -> str:
+    return f'<tei:div corresp="{T}{urn}"><tei:p>{text}</tei:p></tei:div>'
+
+
+BINAH_OPEN = "אַתָּה חוֹנֵן לְאָדָם דַּעַת וּמְלַמֵּד לֶאֱנוֹשׁ בִּינָה"
+BINAH_END_ASHKENAZ = "חָנֵּנוּ מֵאִתְּךָ דֵּעָה בִּינָה וְהַשְׂכֵּל בָּרוּךְ אַתָּה יְיָ חוֹנֵן הַדָּעַת"
+BINAH_SEFARD = ["<b>אַתָּה חוֹנֵן</b> לְאָדָם דַּעַת", "וּמְלַמֵּד לֶאֱנוֹשׁ בִּינָה:", "חָנֵּנוּ מֵאִתְּךָ",
+                "חָכְמָה בִּינָה וָדָעַת", "בָּרוּךְ אַתָּה יְהֹוָה", "חוֹנֵן הַדָּעַת:"]
+BINAH = (f'<tei:div corresp="{T}prayer:amidah/binah"><tei:p>'
+         f'<tei:milestone unit="part" corresp="{T}prayer:amidah/binah/opening"/>{BINAH_OPEN} '
+         f'<tei:milestone unit="part" corresp="{T}prayer:amidah/binah/conclusion"/>{BINAH_END_ASHKENAZ}'
+         "</tei:p></tei:div>")
+
+
+class TestStageTwo(unittest.TestCase):
+    def test_a_blessing_is_known_by_its_closing_in_another_rites_words(self):
+        outcome = decide([("L", items(*BINAH_SEFARD))], documents(BINAH))
+        self.assertEqual([r.urn for r in outcome.decided], [T + "prayer:amidah/binah"])
+
+    def test_a_blessing_opened_otherwise_is_found_by_its_closing_alone(self):
+        sefard = ["<b>אַהֲבַת עוֹלָם</b> אֲהַבְתָּנוּ", "חֶמְלָה גְדוֹלָה", "בָּרוּךְ אַתָּה יְהֹוָה",
+                  "הַבּוֹחֵר בְּעַמּוֹ יִשְׂרָאֵל בְּאַהֲבָה:"]
+        index = documents(div("prayer:ahavah_rabbah",
+                              "אַהֲבָה רַבָּה אֲהַבְתָּנוּ חֶמְלָה גְדוֹלָה בָּרוּךְ אַתָּה יְיָ הַבּוֹחֵר בְּעַמּוֹ יִשְׂרָאֵל בְּאַהֲבָה"))
+        outcome = decide([("L", items(*sefard))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "prayer:ahavah_rabbah")
+
+    def test_a_block_that_runs_into_another_text_is_cut_there(self):
+        other = ("אֱלֹהַי נְשָׁמָה שֶׁנָּתַתָּ בִּי טְהוֹרָה הִיא אַתָּה בְרָאתָהּ אַתָּה יְצַרְתָּהּ "
+                 "אַתָּה נְפַחְתָּהּ בִּי וְאַתָּה מְשַׁמְּרָהּ בְּקִרְבִּי")
+        index = documents(div("prayer:elohai_neshamah", other))
+        outcome = decide([("L", items(*UNKNOWN, "אֱלֹהַי נְשָׁמָה שֶׁנָּתַתָּ בִּי טְהוֹרָה הִיא",
+                                      "אַתָּה בְרָאתָהּ אַתָּה יְצַרְתָּהּ אַתָּה נְפַחְתָּהּ בִּי",
+                                      "וְאַתָּה מְשַׁמְּרָהּ בְּקִרְבִּי"))], index)
+        self.assertEqual([r.kind for r in outcome.decided], ["new", "existing"])
+        self.assertEqual(outcome.decided[1].urn, T + "prayer:elohai_neshamah")
+
+    def test_a_line_quoted_from_the_end_of_another_text_does_not_cut(self):
+        line = "אָבִינוּ מַלְכֵּנוּ חָנֵּנוּ וַעֲנֵנוּ כִּי אֵין בָּנוּ מַעֲשִׂים עֲשֵׂה עִמָּנוּ צְדָקָה וָחֶסֶד וְהוֹשִׁיעֵנוּ"
+        index = documents(f'<tei:div corresp="{T}prayer:avinu_malkenu"><tei:p>'
+                          f'<tei:milestone unit="part" corresp="{T}prayer:avinu_malkenu/a"/>{" ".join(PART_A)} '
+                          f'<tei:milestone unit="part" corresp="{T}prayer:avinu_malkenu/chonnenu"/>{line}</tei:p></tei:div>')
+        outcome = decide([("L", items(*UNKNOWN, line, "וְעוֹד דְּבָרִים אֲחֵרִים שֶׁל הַתְּפִלָּה"))], index)
+        self.assertEqual(len(outcome.decided), 1)
+
+    def test_a_chapter_ends_at_its_last_verse(self):
+        verses = ["מִזְמוֹר לְתוֹדָה הָרִיעוּ לַיהוָה כָּל הָאָרֶץ", "עִבְדוּ אֶת יְהוָה בְּשִׂמְחָה בֹּאוּ לְפָנָיו"]
+        index = documents(f'<tei:div corresp="{T}bible:psalms/100"><tei:p>'
+                          f'<tei:milestone unit="verse" corresp="{T}bible:psalms/100/1"/>{verses[0]} '
+                          f'<tei:milestone unit="verse" corresp="{T}bible:psalms/100/2"/>{verses[1]}</tei:p></tei:div>')
+        outcome = decide([("L", items(*verses, *UNKNOWN))], index)
+        self.assertEqual([r.urn for r in outcome.decided][0], T + "bible:psalms/100")
+        self.assertEqual(len(outcome.decided), 2)
+
+    def test_a_block_that_is_one_whole_verse_is_that_verse(self):
+        verse = "וְעָרְבָה לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם כִּימֵי עוֹלָם וּכְשָׁנִים קַדְמֹנִיּוֹת"
+        index = documents(f'<tei:div corresp="{T}bible:malachi/3"><tei:p>'
+                          f'<tei:milestone unit="verse" corresp="{T}bible:malachi/3/4"/>{verse} '
+                          f'<tei:milestone unit="verse" corresp="{T}bible:malachi/3/5"/>{" ".join(UNKNOWN)}'
+                          "</tei:p></tei:div>")
+        outcome = decide([("L", items("<b>וְעָרְבָה</b> לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם",
+                                      "כִּימֵי עוֹלָם וּכְשָׁנִים קַדְמֹנִיּוֹת"))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "bible:malachi/3/4")
+
+    def test_a_later_printing_worded_otherwise_is_a_variant(self):
+        later = [MODEH[0], "מֶֽלֶךְ חַי וְקַיָּם וְנִצָּח", "שֶׁהֶחֱזַֽרְתָּ בִּי נִשְׁמָתִי",
+                 "רַבָּה אֱמוּנָתֶֽךָ לְעוֹלָם"]
+        outcome = decide_work("w", [("A", items(*MODEH)), ("B", items(*later))], IncipitIndex(), {}, set(),
+                              spellings=NO_SPELLINGS, places={"B": "b"})
+        first, second = outcome.decided
+        self.assertEqual((second.kind, second.urn), ("variant", first.urn))
+
+    def test_a_parenthesized_passage_is_an_insertion(self):
+        passage = [f"(אַתָּה חוֹנַנְתָּנוּ פָּסוּק {n} חָדָשׁ" if n == "א" else f"פָּסוּק {n} חָדָשׁ לְגַמְרֵי"
+                   for n in "אבגדהו"]
+        passage[-1] += ")"
+        outcome = decide_work("w", [("A", items(*MODEH)), ("B", items(*MODEH[:2], *passage, *MODEH[2:]))],
+                              IncipitIndex(), {}, set(), spellings=NO_SPELLINGS, places={"B": "b"})
+        self.assertEqual([r.kind for r in outcome.decided], ["new", "variant"])
+
+    def test_curated_choices_and_joins(self):
+        from opensiddur.importer.sefaria.equivalents import Choice, Equivalents, Join, apply_joins
+
+        table = Equivalents(texts=(Choice(tuple(words("זֶה טֶקְסְט")), T + "prayer:chosen_name"),),
+                            joins=(Join(tuple(words("וְעוֹד דָּבָר"))),))
+        leaf = apply_joins("L", items(*UNKNOWN, "", "<b>וְעוֹד דָּבָר</b> שׁוֹנֶה מְאֹד"), table)
+        outcome = decide_work("w", [("L", leaf)], IncipitIndex(), {}, set(), spellings=NO_SPELLINGS,
+                              equivalents=table, registered=set())
+        (record,) = outcome.decided
+        self.assertEqual((record.kind, record.urn), ("new", T + "prayer:chosen_name"))
+        self.assertIn("chosen in equivalents.yaml", record.evidence[0])
+
+    def test_the_next_part_of_the_same_text_is_preferred(self):
+        index = documents(div("prayer:yotzer_or/qadosh", "קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ יְיָ צְבָאוֹת מְלֹא כָל הָאָרֶץ כְּבוֹדוֹ"),
+                          div("prayer:amidah/qedushah/neqaddesh", " ".join(UNKNOWN)),
+                          div("prayer:amidah/qedushah/qadosh", "קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ יְיָ צְבָאוֹת מְלֹא כָל הָאָרֶץ כְּבוֹדוֹ"))
+        leaf = items(*UNKNOWN, "", "<b>קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ</b> יְהֹוָה צְבָאוֹת", "מְלֹא כָל הָאָֽרֶץ כְּבוֹדוֹ:")
+        outcome = decide([("L", leaf)], index)
+        self.assertEqual([r.urn for r in outcome.decided],
+                         [T + "prayer:amidah/qedushah/neqaddesh", T + "prayer:amidah/qedushah/qadosh"])
+
+
+class TestPetitionNames(unittest.TestCase):
+    def test_a_petition_is_named_past_its_formula(self):
+        text = "יְהִי רָצוֹן מִלְּפָנֶיךָ יְהֹוָה אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ שֶׁתִּשְׁלַח מְהֵרָה רְפוּאָה שְׁלֵמָה"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:yehi_ratzon_shetishlach_meherah")
+
+    def test_a_response_before_the_text_is_not_its_name(self):
+        text = "אָמֵן. כְּשֵׁם שֶׁנִּכְנַס לַבְּרִית כֵּן יִכָּנֵס לְתוֹרָה"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:keshem_shenikhnas_laberit")
+
+
 class TestRecords(unittest.TestCase):
     def test_round_trip(self):
         record = TextRecord("w", "A / B", 3, T + "prayer:x", "new", "אבג", "h", ["why"], [2, 1])

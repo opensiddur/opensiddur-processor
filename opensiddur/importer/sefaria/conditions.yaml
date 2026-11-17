@@ -1,0 +1,135 @@
+# The conditions the Metsudah volumes print (see conditions.py). A rubric is matched against its
+# English, whitespace collapsed; the first match wins. `section: true` lets a rubric before a
+# heading govern the whole section to the next heading (the Kedushah), not only the next text.
+
+rubrics:
+  # -- Seasons ----------------------------------------------------------------------------------
+  - match: "^\\(?\\*?During the Ten Days of Penitence(,)? (add|say|continue here)\\b|^\\*?During the Ten Days of Penitence:"
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+  - match: "^The following five prayers are said during the Ten Days of Penitence"
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+  - match: "^From the Musaf of the first day of Pesach until the Musaf of Shemini Atzeres"
+    when: {holiday-aggregate: {geshem: false}}
+  - match: "^From the Musaf of Shemini Atzeres until the Musaf of the first day of Pesach"
+    when: {holiday-aggregate: {geshem: true}}
+  - match: "^From the evening service \\[Maariv\\] on December 4"
+    when: {holiday-aggregate: {tal-umatar: true}}
+  - match: "^From the first (day|say) of Pesach until the evening service \\[Maariv\\] on December 4"
+    when: {holiday-aggregate: {tal-umatar: false}}
+  - match: "^The following psalm \\(27\\) is recited"
+    when: {any: [{hebrew-date: {month: 6}}, {hebrew-date: {month: 7, day: [1, 22]}}]}
+
+  # -- Days of the month and festivals ---------------------------------------------------------
+  - match: "On Rosh Chodesh and on Chol HaMoed,? the following prayer is added"
+    when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
+  - match: "^On Rosh Chodesh and Yom Tov add:"
+    when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {yom-tov: true}}]}
+  - match: "^On Rosh Chodesh (add|say):"
+    when: {holiday: {rosh-hodesh: true}}
+  - match: "^The following psalm \\(104\\) is recited in many synagogues on Rosh Chodesh"
+    when: {holiday: {rosh-hodesh: true}}
+  - match: "^As a segulah for long life, some people say the following verse on Rosh Chodesh"
+    when: {holiday: {rosh-hodesh: true}}
+  - match: "^On Rosh Chodesh and on the last six days of Pesach omit the following paragraph"
+    when: {none: [{holiday: {rosh-hodesh: true}}, {holiday: {pesah: [3, 8]}}]}
+  - match: "^\\(?On Chanukah and Purim (add|the following prayer is added)"
+    when: {any: [{holiday: {hanukkah: true}}, {holiday: {purim-observed: true}}]}
+  - match: "^On Chanukah:"
+    when: {holiday: {hanukkah: true}}
+  - match: "^The following blessing is said only on the first evening:"
+    when: {holiday: {hanukkah: 1}}
+  - match: "^On Purim:"
+    when: {holiday: {purim-observed: true}}
+  - match: "^\\(?On Shabbos and Yom Tov say:"
+    when: {any: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]}
+  - match: "^On Shabbos (add|say):"
+    when: {holiday-aggregate: {shabbat: true}}
+  - match: "^On (the )?Yom Tov say:"
+    when: {holiday-aggregate: {yom-tov: true}}
+  - match: "^On Rosh Hash(o|a)nah? say:"
+    when: {holiday: {rosh-hashana: true}}
+  - match: "^On Sukkos( say)?:"
+    when: {holiday: {sukkot: true}}
+  - match: "^On Pesach:"
+    when: {holiday: {pesah: true}}
+
+  # -- Fasts ------------------------------------------------------------------------------------
+  - match: "^During Mincha services on the Ninth of Av"
+    when: {all: [{holiday: {tisha-bav: true}}, {service-time: {minha: true}}]}
+  - match: "^On Fast days during Mincha"
+    when: {all: [{any: [{holiday-aggregate: {minor-fast: true}}, {holiday: {tisha-bav: true}}]}, {service-time: {minha: true}}]}
+  - match: "^On public fast-days, say:|^The following five prayers are said on public fast-days"
+    when: {holiday-aggregate: {minor-fast: true}}
+  - match: "^Birkas Kohanim is said by the Chazzan on public fast-days"
+    when: {any: [{holiday-aggregate: {minor-fast: true}}, {holiday: {tisha-bav: true}}]}
+
+  # -- Days of the week -------------------------------------------------------------------------
+  - match: "^On Sunday:"
+    when: {day-of-week: {hebrew-day: 1}}
+  - match: "^On Monday:"
+    when: {day-of-week: {hebrew-day: 2}}
+  - match: "^On Tuesday:"
+    when: {day-of-week: {hebrew-day: 3}}
+  - match: "^On Wednesday:"
+    when: {day-of-week: {hebrew-day: 4}}
+  - match: "^On Thursday:"
+    when: {day-of-week: {hebrew-day: 5}}
+  - match: "^On Friday:"
+    when: {day-of-week: {hebrew-day: 6}}
+  - match: "^The following prayers are added on Mondays and Thursday"
+    when: {any: [{day-of-week: {hebrew-day: 2}}, {day-of-week: {hebrew-day: 5}}]}
+  - match: "^On those Mondays and Thursdays when Tachanun is said"
+    when: {all: [{any: [{day-of-week: {hebrew-day: 2}}, {day-of-week: {hebrew-day: 5}}]}, {override: {omit-tahanun: false}}]}
+  - match: "^On days when Tachanun is said:"
+    when: {override: {omit-tahanun: false}}
+
+  # -- Who is praying, and how ------------------------------------------------------------------
+  - match: "^\\(When the Chazzan repeats the Shemoneh Esrei, the Kedushah is said here\\)"
+    when: {all: [{recitation: {repetition: true}}, {quorum: {minyan: true}}]}
+    section: true
+  - match: "^During the silent Shemoneh Esrei, continue here:"
+    when: {recitation: {silent: true}}
+  - match: "^The following three words should be said when praying without a minyan:"
+    when: {quorum: {minyan: false}}
+  - match: "^If there are at least 10 men, add:"
+    when: {quorum: {minyan: true}}
+  - match: "^If you are taking the lulav for the first time on Sukkos"
+    when: {practice: {lulav-first-use: true}}
+
+  # -- What was eaten (מעין שלש) ----------------------------------------------------------------
+  - match: "^The following blessing is said after eating cooked or baked foods prepared from any of the five species of grain|^After food prepared from the five grains, say:"
+    when: {meal-context: {meein-shalosh-food: cake}}
+  - match: "^After (drinking )?wine( say)?:"
+    when: {meal-context: {meein-shalosh-food: wine}}
+  - match: "^After (eating )?grapes, figs, (olives, dates or pomegranates|olives, dates, pomegranates)"
+    when: {meal-context: {meein-shalosh-food: fruit}}
+  - match: "^After (eating )?grain foods and (drinking )?wine"
+    when: {meal-context: {meein-shalosh-food: cake_wine}}
+
+labels:
+  - label: 'לר"ח'
+    when: {holiday: {rosh-hodesh: true}}
+  - label: 'לפסח'
+    when: {holiday: {pesah: true}}
+  - label: 'לסוכות'
+    when: {holiday: {sukkot: true}}
+  - label: 'לר"ה'
+    when: {holiday: {rosh-hashana: true}}
+  - label: 'לש"ע וש"ת'
+    when: {holiday: {shmini-atzeret: true}}
+  - label: 'בשנת העיבור עד חדש ניסן'
+    when: {hebrew-date: {leap-year: true, month: [7, 13]}}
+
+inline:
+  - label: 'בעשי"ת'
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+  - label: 'בעשרה'
+    when: {quorum: {minyan: true}}
+  - label: 'בשנת העיבור עד חדש ניסן'
+    when: {hebrew-date: {leap-year: true, month: [7, 13]}}
+
+replacements:
+  - alternative: 'הַשָּׁלוֹם'
+    replaces: 'שָׁלוֹם'
+  - alternative: 'וּלְעֵֽלָּא מִכָּל'
+    replaces: 'מִן כָּל'

@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -38,8 +39,9 @@ from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import Alignment, align_work, load_decisions
 from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide
 from opensiddur.importer.sefaria.download import load_manifest
+from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
 from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
-from opensiddur.importer.sefaria.markup import plain_text
+from opensiddur.importer.sefaria.markup import HebrewKind, plain_text
 from opensiddur.importer.sefaria.match import (
     URNS_PATH,
     Decisions,
@@ -114,6 +116,8 @@ class WorkPlan:
     verses: dict[tuple[str, int], dict[int, str]] = field(default_factory=dict)
     #: the length in words of each verse whose length the index knows
     verse_lengths: dict[str, int] = field(default_factory=dict)
+    #: the conditions the book prints (conditions.yaml)
+    conditions: Conditions = field(default_factory=Conditions)
 
     def record(self, leaf_path: str, block: TextBlock) -> TextRecord:
         return self.decisions.records[(self.work.key, leaf_path, block.first_index)]
@@ -127,7 +131,8 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
               spellings: Spellings | None = None,
               own_phrases: dict[str, dict[int, str]] | None = None,
               equivalents_path: Path | None = None,
-              registered: set[str] | None = None) -> WorkPlan:
+              registered: set[str] | None = None,
+              conditions_path: Path | None = None) -> WorkPlan:
     structure = load_structure(work, source, structure_path)
     alignments = align_work(work.key, source.leaves,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
@@ -160,7 +165,8 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                 verses[(leaf, block.first_index)] = found
     lengths = {urn: n for found in verses.values() for urn in found.values()
                if (n := verse_length(urn, index)) is not None}
-    return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths)
+    return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths,
+                    load_conditions(conditions_path) if conditions_path else load_conditions())
 
 
 @dataclass
@@ -247,13 +253,14 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             numbers = record.phrases or list(range(1, len(item.phrases) + 1))
             notes = Notes(prefix="note")
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
-                             plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths)
+                             plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths,
+                             plan.conditions)
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
-        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations)
+        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions)
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
     out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang), lang))
@@ -358,7 +365,36 @@ def report(plan: WorkPlan, written: dict[str, int], pruned: dict[str, list[Path]
     lines += ["", f"## Decisions that lapsed ({len(plan.decisions.lapsed)})", ""]
     for r in plan.decisions.lapsed:
         lines.append(f"- {r.leaf} @{r.block}: was `{r.urn}`")
+    matched, unmatched = condition_rubrics(plan)
+    lines += ["", f"## Condition rubrics ({sum(matched.values())} printed, {len(matched)} kinds)", ""]
+    lines += [f"- {n}× {text}" for text, n in sorted(matched.items())]
+    lines += ["", f"## Rubrics that read like conditions, not in conditions.yaml ({len(unmatched)})", "",
+              "Each stays an instruction. Add the ones that say when a passage is said to conditions.yaml.", ""]
+    lines += [f"- {n}× {text}" for text, n in sorted(unmatched.items())]
     return "\n".join(lines) + "\n"
+
+
+#: How a rubric that says when the passage after it is said begins.
+CONDITION_LIKE = re.compile(r"^\(?\*?(On |During |From |When |If there |Between |In a leap |After )")
+
+
+def condition_rubrics(plan: WorkPlan) -> tuple[dict[str, int], dict[str, int]]:
+    """The book's English rubrics the conditions table matches, and those that read like a
+    condition but it does not: text -> how often printed."""
+    matched: dict[str, int] = {}
+    unmatched: dict[str, int] = {}
+    for alignment in plan.alignments:
+        for pair in alignment.pairs:
+            if pair.he_kind is not HebrewKind.EMPTY:
+                continue
+            text = " ".join(plain_text(pair.en).split())
+            if not text:
+                continue
+            if plan.conditions.for_rubric(text) is not None:
+                matched[text[:120]] = matched.get(text[:120], 0) + 1
+            elif CONDITION_LIKE.match(text):
+                unmatched[text[:120]] = unmatched.get(text[:120], 0) + 1
+    return matched, unmatched
 
 
 def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
@@ -371,7 +407,8 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                  decisions_path: Path | None = None,
                  spellings: Spellings | None = None,
                  works: dict[str, Work] | None = None,
-                 equivalents_path: Path | None = None) -> WorkPlan:
+                 equivalents_path: Path | None = None,
+                 conditions_path: Path | None = None) -> WorkPlan:
     directory = work.data_directory(sourcetexts_root)
     source = load_work_source(directory)
     info = source_info(work, directory)
@@ -389,6 +426,7 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
                      decisions_path=decisions_path, spellings=spellings,
                      equivalents_path=equivalents_path, registered=registry_urns(registry_directory),
+                     conditions_path=conditions_path,
                      own_phrases=recorded_phrases([project_directory / work.projects["he"]]
                                                   if (project_directory / work.projects["he"]).exists() else []))
     check_phrase_paths({k: r for k, r in plan.decisions.records.items()

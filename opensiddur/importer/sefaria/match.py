@@ -1087,7 +1087,10 @@ class _Decider:
                                    introduced=introduced_phrases(block))
             earlier_length = repeat_length(earlier_skeletons, skeletons, VARIANT_COVERAGE)
             if (earlier_length is not None and earlier_length < len(earlier_skeletons)
-                    and skeletons == earlier_skeletons[:earlier_length] and urn not in self.chosen):
+                    and skeletons == earlier_skeletons[:earlier_length] and urn not in self.chosen
+                    and earlier_length not in introduced_phrases(earlier.block)):
+                # (Not where a rubric introduces what follows in the first printing: that is a
+                # passage inside the text -- the prayer for sustenance in שמע קולנו -- not its end.)
                 # The first printing ran on past this text: cut it where this one ends.
                 self.cut_earlier(urn, earlier_length)
                 kind, cut = "repeat", None

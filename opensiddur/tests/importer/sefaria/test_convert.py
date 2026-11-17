@@ -56,7 +56,8 @@ class TestVariants(unittest.TestCase):
                                 index=IncipitIndex(), output_directory=root / "out",
                                 structure_path=write_structure(root / "s.yaml", structure),
                                 decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
-                                works={WORK.key: WORK})
+                                works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
+                                conditions_path=root / "conditions.yaml")
             variant = [r for r in plan.decisions.records.values() if r.kind == "variant"]
             self.assertEqual(len(variant), 1)
             condition = "urn:x-opensiddur:condition:" + variant[0].urn.split(":", 3)[3] + "/chol_shacharit_again"
@@ -68,6 +69,36 @@ class TestVariants(unittest.TestCase):
             self.assertEqual(again.xpath("//j:declare//tei:binary/@value", namespaces=NS), ["true"])
             first = etree.parse(str(he / "siddur_chol_shacharit_upon_arising.xml"))
             self.assertEqual(first.xpath("//j:declare//tei:binary/@value", namespaces=NS), ["false"])
+
+
+class TestConditionsReachTheFiles(unittest.TestCase):
+    def test_a_condition_rubric_becomes_a_conditional_in_both_languages(self):
+        text = [MORNING[1], ("", "<small><i>On Rosh Chodesh add:</i></small>"),
+                ("יַעֲלֶה וְיָבוֹא", "May it rise"), MORNING[2]]
+        tree = {"Morning": {"Upon Arising": text}, "Blessings": BLESSINGS}
+        structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
+                     "Blessings": "berakhot/test"}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_work_dir(root / "sources" / "sefaria" / WORK.key, tree)
+            (root / "project").mkdir()
+            (root / "registry").mkdir()
+            (root / "decisions.yaml").write_text("{}\n")
+            (root / "conditions.yaml").write_text(
+                "rubrics:\n  - match: '^On Rosh Chodesh add:'\n    when: {holiday: {rosh-hodesh: true}}\n")
+            convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
+                         registry_directory=root / "registry", urns_path=root / "urns.jsonl",
+                         index=IncipitIndex(), output_directory=root / "out",
+                         structure_path=write_structure(root / "s.yaml", structure),
+                         decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
+                         works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
+                         conditions_path=root / "conditions.yaml")
+            for lang in ("he", "en"):
+                found = [etree.parse(str(f)).xpath("//j:conditional//tei:f/@name", namespaces=NS)
+                         for f in (root / "project" / WORK.projects[lang]).glob("*.xml")]
+                self.assertIn(["rosh-hodesh"], found)
+            report = (root / "out" / f"sefaria_{WORK.key}_report.md").read_text()
+            self.assertIn("1× On Rosh Chodesh add:", report)
 
 
 class TestConvertWork(unittest.TestCase):
@@ -89,9 +120,12 @@ class TestConvertWork(unittest.TestCase):
         self.index.add(T + "prayer:modeh_ani", words(" ".join(h for h, _ in MORNING[1:3])))
 
     def convert(self, **kwargs):
-        # Synthetic configuration throughout: no real spellings, decisions or works.
+        # Synthetic configuration throughout: no real spellings, decisions, works, equivalents
+        # or conditions (the paths below are not there, and so are empty).
         decisions = Path(self.tmp.name) / "decisions.yaml"
         decisions.write_text("{}\n")
+        kwargs.setdefault("equivalents_path", Path(self.tmp.name) / "equivalents.yaml")
+        kwargs.setdefault("conditions_path", Path(self.tmp.name) / "conditions.yaml")
         return convert_work(WORK, sourcetexts_root=self.sources, project_directory=self.projects,
                             registry_directory=self.registry, urns_path=self.urns, index=self.index,
                             output_directory=self.output, structure_path=self.structure,
