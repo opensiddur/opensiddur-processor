@@ -33,6 +33,8 @@ from __future__ import annotations
 
 import html
 import re
+
+from lxml import etree
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
@@ -258,33 +260,48 @@ class _TextWriter:
         self.phrase_open = False
         self.verse_open = False
         self.conditions = 0
-        #: the open condition rubric's conditional, whether its passage is in parentheses (None:
-        #: not known until its first phrase), and the conditionals opened since (closed with it)
-        self.calendar: str | None = None
-        self.calendar_paren: bool | None = None
-        #: the variant conditionals open, innermost last, and how many were open when the
-        #: condition rubric's conditional opened
+        #: the Hebrew document's inline conditionals, numbered apart, so that the two languages'
+        #: other conditionals have the same ids
+        self.inline = 0
+        #: the variant conditionals open, innermost last
         self.open_variants: list[str] = []
-        self.calendar_depth = 0
+        #: the condition rubrics' conditionals open, innermost last: [id, how many variant
+        #: conditionals were open when it opened, whether its passage is in parentheses (None:
+        #: not known until its first phrase), whether it is to close once it can]
+        self.calendars: list[list] = []
 
     def next_id(self, kind: str) -> str:
+        if kind == "inline":
+            self.inline += 1
+            return f"inline_{self.inline}"
         self.conditions += 1
         return f"{kind}_{self.conditions}"
+
+    @property
+    def calendar(self) -> list | None:
+        """The innermost condition rubric's conditional, when it was opened at this level."""
+        if self.calendars and self.calendars[-1][1] == len(self.open_variants):
+            return self.calendars[-1]
+        return None
 
     def open_calendar(self, pair: Pair, when) -> None:
         self.close_calendar()
         xml_id = self.next_id("when")
         note = instruction(pair.en, "en", self.notes) if self.lang == "en" else ""
         self.parts.append(f'<j:conditional xml:id="{xml_id}">{note}{condition_xml(when)}</j:conditional>')
-        self.calendar, self.calendar_paren = xml_id, None
-        self.calendar_depth = len(self.open_variants)
+        self.calendars.append([xml_id, len(self.open_variants), None, False])
 
-    def close_calendar(self) -> None:
-        if self.calendar is not None:
+    def close_calendar(self, *, everything: bool = False) -> None:
+        """Close the condition rubric's conditional opened at this level (or, with
+        ``everything``, every one): one opened outside a variant conditional that is open closes
+        when that one does, so that the conditionals nest."""
+        depth = len(self.open_variants)
+        while self.calendars and (everything or self.calendars[-1][1] >= depth):
             self.end_phrase()
             self.verse(None)
-            self.parts.append(f'<j:endConditional target="#{self.calendar}"/>')
-            self.calendar = self.calendar_paren = None
+            self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
+        if self.calendars and not everything:
+            self.calendars[-1][3] = True  # an outer one: to close when its level is reached
 
     def end_phrase(self) -> None:
         if self.phrase_open:
@@ -305,8 +322,9 @@ class _TextWriter:
         # leaves the phrase untranslated: the row is then set with an empty English cell,
         # rather than the Hebrew running on into the row before.
         hebrew = plain_text(pair.he)
-        if self.calendar is not None and self.calendar_paren is None:
-            self.calendar_paren = hebrew.lstrip().startswith("(")
+        current = self.calendar
+        if current is not None and current[2] is None:
+            current[2] = hebrew.lstrip().startswith("(")
         label, _ = leading_label(pair.he)
         labelled = self.table.for_label(plain_text((label,))) if label is not None else None
         xml_id = None
@@ -325,8 +343,10 @@ class _TextWriter:
         if xml_id is not None:
             self.end_phrase()
             self.parts.append(f'<j:endConditional target="#{xml_id}"/>')
-        if self.calendar is not None and self.calendar_paren and ")" in hebrew:
+        if current is not None and current[2] and ")" in hebrew:
             self.close_calendar()
+        elif self.calendars and self.calendars[-1][2] and ")" in hebrew:
+            self.calendars[-1][3] = True  # its passage ended inside a variant's conditional
 
     def inline_conditions(self, xml: str) -> str:
         """A phrase's parenthesized alternatives that open with an abbreviation the table knows
@@ -344,23 +364,35 @@ class _TextWriter:
             at = inner_xml.find(esc(label))
             alternative = inner_xml[at + len(esc(label)):] if at >= 0 else esc(" ".join(tokens[len(found.label):]))
             alternative = re.sub(r"<(tei:\w+)[^>]*></\1>", "", alternative.lstrip(":")).strip()
-            alternative = re.sub(r"^</tei:hi>\s*", "", alternative)
-            xml_id = self.next_id("when")
+            alternative = re.sub(r"^</tei:hi>\s*", "", alternative).lstrip(": ")
+            xml_id = self.next_id("inline")
             note = f'<tei:note type="instruction" xml:lang="he">{esc(label)}</tei:note>'
             return (f'<j:conditional xml:id="{xml_id}" type="marked">{note}{condition_xml(found.when)}</j:conditional>'
                     f'{alternative}<j:endConditional target="#{xml_id}"/>')
 
+        saved = self.inline
         out = re.sub(r"\(((?:[^()<]|<[^>]*>)*)\)", wrap, xml)
         for replacement in self.table.replacements:
-            out = self._replace(out, replacement)
+            while True:
+                again = self._replace(out, replacement)
+                if again == out:
+                    break
+                out = again
+        if out != xml and not _well_formed(out):
+            # Markup that straddles the parenthesis: the phrase is left as the book prints it.
+            self.inline = saved
+            return xml
         return out
 
     def _replace(self, xml: str, replacement) -> str:
         """The words an inline alternative replaces, beside it -- after it or before it --
         conditional on its condition being false."""
-        pattern = re.compile(r'(<j:conditional xml:id="(when_\d+)" type="marked">.*?</j:conditional>)'
+        pattern = re.compile(r'(<j:conditional xml:id="(inline_\d+)" type="marked">.*?</j:conditional>)'
                              r'(.*?)(<j:endConditional target="#\2"/>)')
         for match in pattern.finditer(xml):
+            if xml[match.end():].lstrip().startswith('<j:conditional xml:id="inline_') and "<j:none>" in \
+                    xml[match.end():match.end() + 400].split("</j:conditional>", 1)[0]:
+                continue  # its replaced words are conditional already
             alternative = html.unescape(re.sub(r"<[^>]*>", "", match.group(3)))
             if tuple(words(alternative)) != replacement.alternative:
                 continue
@@ -378,7 +410,7 @@ class _TextWriter:
         return xml
 
     def _negated(self, when: str, words_xml: str) -> str:
-        xml_id = self.next_id("when")
+        xml_id = self.next_id("inline")
         return (f'<j:conditional xml:id="{xml_id}"><j:none>{when}</j:none></j:conditional>'
                 f'{words_xml}<j:endConditional target="#{xml_id}"/>')
 
@@ -405,14 +437,30 @@ class _TextWriter:
         return xml_id
 
     def close_condition(self, xml_id: str) -> None:
-        if self.calendar is not None and self.calendar_depth >= len(self.open_variants):
-            # A condition rubric inside the variant's passage governs it to its end, and no
-            # further: the conditionals nest.
-            self.close_calendar()
+        # A condition rubric inside the variant's passage governs it to its end, and no further.
+        depth = len(self.open_variants)
+        while self.calendars and self.calendars[-1][1] >= depth:
+            self.end_phrase()
+            self.verse(None)
+            self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
         self.end_phrase()
         self.parts.append(f'<j:endConditional target="#{xml_id}"/>')
         if self.open_variants and self.open_variants[-1] == xml_id:
             self.open_variants.pop()
+        # One outside it whose passage ended inside it closes now.
+        if self.calendars and self.calendars[-1][3] and self.calendars[-1][1] == len(self.open_variants):
+            self.end_phrase()
+            self.verse(None)
+            self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
+
+
+def _well_formed(xml: str) -> bool:
+    try:
+        etree.fromstring(f'<x xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">'
+                         f"{xml}</x>")
+    except etree.XMLSyntaxError:
+        return False
+    return True
 
 
 def _leading_words(text: str, wanted: tuple[str, ...]) -> str | None:
@@ -536,7 +584,7 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
             writer.end_phrase()
             writer.verse(None)
         insert(number)
-    writer.close_calendar()
+    writer.close_calendar(everything=True)
     content = "\n".join(writer.parts)
     paragraph = f"<tei:p>{content}</tei:p>" if content else ""
     return f'<tei:body><tei:div corresp="{attr(urn)}">{head}{paragraph}</tei:div></tei:body>'

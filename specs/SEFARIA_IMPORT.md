@@ -305,7 +305,8 @@ become `j:conditional`, from a curated table:
   the opposite.
 - Conditions are written in the registry's types (`holiday`, `holiday-aggregate`,
   `day-of-week`, `service-time`, `hebrew-date`, `quorum`, `recitation`, `override`,
-  `practice`, `meal-context`), checked by `validate_features`. The report lists the condition
+  `practice`, `meal-context`). `conditions.yaml` is checked for its grammar when it is loaded,
+  and the projects written from it by `validate_features` against the registry. The report lists the condition
   rubrics found, and the rubrics that read like a condition ("On …", "During …", "From …")
   but are not in the table: they stay instructions until added.
 

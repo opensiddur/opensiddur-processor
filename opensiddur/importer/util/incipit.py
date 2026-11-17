@@ -367,11 +367,14 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
         corresp = element.get("corresp", "")
         if local == "milestone":
             unit = element.get("unit", "")
-            close(lambda end: end == ("unit", unit))
+            close(lambda end: end[:2] == ("unit", unit))
             if corresp.startswith(TEXT_PREFIX):
                 index.milestone_scoped.add(corresp.split("@", 1)[0])
-                pending.append([corresp.split("@", 1)[0], [], None, ("unit", unit)])
-                open_scopes.append([corresp.split("@", 1)[0], [], ("unit", unit), None])
+                holder = next((a for a in element.iterancestors() if isinstance(a.tag, str)
+                               and etree.QName(a).localname == "div"), None)
+                ends = ("unit", unit, id(holder))
+                pending.append([corresp.split("@", 1)[0], [], None, ends])
+                open_scopes.append([corresp.split("@", 1)[0], [], ends, None])
             feed(element.tail)
             return
         scoped = corresp.startswith(TEXT_PREFIX)
@@ -384,7 +387,9 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
             walk(child)
         if scoped:
             enclosing.pop()
-            close(lambda end: end == ("element", id(element)))
+        # A milestone's scope ends with the element it was set in, if no milestone of its unit
+        # ends it first: a last verse does not run on into the next text.
+        close(lambda end: end == ("element", id(element)) or (end[0] == "unit" and end[2] == id(element)))
         feed(element.tail)
 
     walk(root)
@@ -428,7 +433,8 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #:    recorded.
 #: 5: closings and transclusions; a conditional transclusion neither opens nor ends a text.
 #: 6: milestone-scoped texts.
-INDEX_VERSION = 6
+#: 7: a milestone's scope ends with the division it was set in.
+INDEX_VERSION = 7
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:

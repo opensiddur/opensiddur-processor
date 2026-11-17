@@ -218,6 +218,57 @@ class TestConditions(unittest.TestCase):
         self.assertEqual(stack, [])
 
 
+def assert_nested(test, xml):
+    stack = []
+    for e in parse(xml).iter():
+        if e.tag.endswith("}conditional"):
+            stack.append("#" + e.get("{http://www.w3.org/XML/1998/namespace}id"))
+        elif e.tag.endswith("}endConditional"):
+            test.assertEqual(stack.pop(), e.get("target"))
+    test.assertEqual(stack, [])
+
+
+class TestNestingAndMarkup(unittest.TestCase):
+    URN = T + "prayer:x"
+
+    def test_a_parenthesis_closing_in_a_phrase_a_variant_leaves_out(self):
+        from opensiddur.importer.sefaria.tei_builder import VariantPrinting
+
+        segments = [("<b>אַתָּה</b> גִבּוֹר", "a"), ("", "<small>During the Ten Days add:</small>"),
+                    ("(מִי כָמוֹךָ", "b"), ("זוֹכֵר יְצוּרָיו)", "c"), ("וְנֶאֱמָן אַתָּה", "d")]
+        (block,) = blocks(segments)
+        (later,) = blocks(segments[:3] + segments[4:])
+        variant = VariantPrinting("v", later, [1, 2, 4])
+        for lang in ("he", "en"):
+            assert_nested(self, text_body(self.URN, block, [1, 2, 3, 4], lang, Notes("n"), (variant,),
+                                          conditions=conditions()))
+
+    def test_a_rubric_in_a_variants_passage_inside_a_condition(self):
+        from opensiddur.importer.sefaria.tei_builder import VariantPrinting
+
+        segments = [("<b>אַתָּה</b> גִבּוֹר", "a"), ("", "<small>During the Ten Days add:</small>"),
+                    ("מִי כָמוֹךָ", "b"), ("וְנֶאֱמָן אַתָּה", "d")]
+        (block,) = blocks(segments)
+        (later,) = blocks(segments[:3] + [("", "<small>(bow)</small>"), ("פָּסוּק חָדָשׁ לְגַמְרֵי", "e")]
+                          + segments[3:])
+        variant = VariantPrinting("v", later, [1, 2, 4, 3])
+        for lang in ("he", "en"):
+            assert_nested(self, text_body(self.URN, block, [1, 2, 3], lang, Notes("n"), (variant,),
+                                          conditions=conditions()))
+
+    def test_markup_that_straddles_a_parenthesis_is_left_as_printed(self):
+        for segment in ("<b>עֹשֶׂה</b> <small>(בעשי\"ת</small> הַשָּׁלוֹם) שָׁלוֹם",
+                        "<b>עֹשֶׂה</b> (<small>בעשי\"ת הַשָּׁלוֹם</small>) שָׁלוֹם"):
+            (block,) = blocks([(segment, "x")])
+            parse(text_body(self.URN, block, [1], "he", Notes("n"), conditions=conditions()))
+
+    def test_a_label_in_small_type_leaves_no_colon(self):
+        (block,) = blocks([("<b>עֹשֶׂה</b> (<small>בעשי\"ת</small>: הַשָּׁלוֹם) שָׁלוֹם", "x")])
+        he = parse(text_body(self.URN, block, [1], "he", Notes("n"), conditions=conditions()))
+        self.assertNotIn(":", "".join(he.xpath("//j:conditional[@type='marked']/following-sibling::text()[1]",
+                                                namespaces=NS)))
+
+
 class TestLeafGates(unittest.TestCase):
     def test_a_condition_rubric_between_texts_gates_the_next_text_or_its_section(self):
         from opensiddur.importer.sefaria.tei_builder import leaf_body

@@ -289,8 +289,9 @@ def chatimah(block_words: list[str] | tuple[str, ...]) -> tuple[str, ...] | None
 def by_chatimah(index: IncipitIndex) -> dict[tuple[str, ...], set[str]]:
     """The texts the index holds, by their closing formula. Kept on the index, and rebuilt
     when it has grown."""
+    size = (len(index.closing_of), len(index.ends_with))
     cached = getattr(index, "_by_chatimah", None)
-    if cached is not None and cached[0] == len(index.closing_of):
+    if cached is not None and cached[0] == size:
         return cached[1]
     table: dict[tuple[str, ...], set[str]] = {}
     for urn in set(index.closing_of) | set(index.ends_with):
@@ -299,7 +300,7 @@ def by_chatimah(index: IncipitIndex) -> dict[tuple[str, ...], set[str]]:
         key = chatimah(index.closing(urn))
         if key is not None:
             table.setdefault(key, set()).add(urn)
-    index._by_chatimah = (len(index.closing_of), table)  # type: ignore[attr-defined]
+    index._by_chatimah = (size, table)  # type: ignore[attr-defined]
     return table
 
 
@@ -1060,9 +1061,10 @@ class _Decider:
             context = self.sibling(leaf, blocks, i, bw, pw)
             if context is not None:
                 return context
-            if len(bw) < SHORT_INCIPIT_WORDS and skeleton(" ".join(" ".join(p) for p in pw)) in self.short_printed:
+            short_key = skeleton(" ".join(plain_text(pair.he) for pair in block.phrases[:len(pw)]))
+            if len(bw) < SHORT_INCIPIT_WORDS and short_key in self.short_printed:
                 # Too short for the incipit index: a repeat is found by its words alone.
-                return Resolution(self.short_printed[skeleton(text)], ["the same words as an earlier text"])
+                return Resolution(self.short_printed[short_key], ["the same words as an earlier text"])
             found = resolve(lookup(self.own, bw, confirm=False), pw, self.own)
             if found.urn is None:
                 found = resolve(lookup(self.index, bw), pw, self.index)

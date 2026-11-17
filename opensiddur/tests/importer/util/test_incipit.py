@@ -48,6 +48,13 @@ class TestLengths(unittest.TestCase):
         self.assertIn(T + "prayer:g/a", index.milestone_scoped)
 
 
+    def test_a_milestone_scope_ends_with_its_division(self):
+        index = indexed(f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" corresp="{T}bible:ps/1/1"/>'
+                        f'{SHORT}</tei:p></tei:div><tei:div corresp="{T}prayer:next"><tei:p>{LONG}</tei:p></tei:div>')
+        self.assertEqual(index.length_of[T + "bible:ps/1/1"], 4)
+        self.assertEqual(index.closing(T + "bible:ps/1/1"), tuple(words(SHORT)))
+
+
 class TestTransclusions(unittest.TestCase):
     PARENT = (f'<tei:div corresp="{T}prayer:g"><j:transclude target="{T}prayer:g/first"/>'
               f'<tei:p>{SHORT}</tei:p><j:transclude target="{T}prayer:g/last"/></tei:div>')
