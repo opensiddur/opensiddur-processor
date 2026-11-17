@@ -995,10 +995,18 @@ class _Decider:
                        if j > 0 and pair.he_index in self.starts.get(leaf, ())
                        and self.opens_as_recorded(leaf, block, j)), None)
         if replay is None:
-            # A new blessing in the middle of a block is a text of its own.
+            # A new blessing in the middle of a block is a text of its own -- unless the block is
+            # one text that opens with a part of it and ends with its closing formula (Barukh
+            # She'amar: its litany, then its blessing).
             phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
             replay = next((j for j in range(1, len(phrase_words))
                            if _opens_at(phrase_words, j, BLESSING_FORMULA)), None)
+            if replay is not None:
+                matching = [matching_words(pair) for pair in block.phrases]
+                whole = resolve(lookup(self.index, [w for p in matching for w in p]), matching, self.index)
+                if whole.urn is not None and whole.urn == closing_text(
+                        [w for p in matching for w in p], self.index):
+                    replay = None
         if replay is not None:
             block = self.cut(leaf, blocks, i, replay)
         key = self.key(leaf, block)

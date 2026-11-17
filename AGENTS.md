@@ -119,7 +119,11 @@ uv run python -m opensiddur.importer.sefaria.update                   # monthly:
 ```
 URN decisions are recorded in `specs/sefaria/metsudah_urns.jsonl` (sticky: correct a line and rerun);
 leaves whose Hebrew and English cannot be paired automatically are decided in
-`opensiddur/importer/sefaria/alignment_decisions.yaml`. Phrases align through the `metsudah:` namespace
+`opensiddur/importer/sefaria/alignment_decisions.yaml`. Curated knowledge that applies to every
+Metsudah volume lives beside it: `equivalents.yaml` (the URN a text opening so is — another rite's
+words for a text the collection names, a collage's name — and blocks that continue the text before
+them) and `conditions.yaml` (the book's condition rubrics, labels and marked alternatives, as
+registry features; the report lists condition-like rubrics it does not hold). Phrases align through the `metsudah:` namespace
 (`specs/SIDDUR_URN_SCHEME.md`).
 
 **Download the Birnbaum siddur** — three sources for one book, all writing into

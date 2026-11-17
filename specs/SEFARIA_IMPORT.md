@@ -62,6 +62,18 @@ only. Seasonal and variant wording is in parentheses.
 - **Functionally the same is the same.** A text or phrase that is functionally the same and
   mostly the same in wording keeps the same URN, across volumes and across rites (the
   siddurim are Sefard, the machzorim Ashkenaz). Matching is fuzzy, not exact.
+  Parts that do the same job are the same part: Nusach Sefard's Kedushah opening נקדישך is
+  the Kedushah's opening, though Ashkenaz says נקדש.
+- **Near-identical printings are one text.** A later printing in the same volume that is mostly
+  the same keeps the text's URN as a variant, its own words a conditional insertion.
+- **Verse collages are named by function or incipit.** The six remembrances are
+  `shesh_zekhirot`; a collage with a common incipit is named by it (`yehi_khevod`, `hodu`,
+  `vayvarekh_david`). Each verse inside carries its `bible:` URN.
+- **One URN with opensiddur.org.** A text an opensiddur.org post also prints shares one URN
+  with it (see URNs).
+- **Calendar conditionals.** The book's seasonal and occasional passages are conditional on the
+  calendar (and on the quorum, the recitation, the food eaten), from its own rubrics and
+  labels (see Conditions).
 - **Rite.** "Sefard" is Nusach Sefard (Nusach haAri), the Chassidic variant of the Ashkenazi
   rite — not the rite of the Sefaradim or Edot haMizrach. The project headers say so.
 - **Licence.** Sefaria marks the Metsudah versions `CC-BY`, which Sefaria's own code maps to
@@ -145,34 +157,86 @@ Each text's URN, in order of preference:
      that is a text the collection names (Nachem is Birnbaum's
      `amidah/nachem_hashem_eloheinu`) carries that text's URN, part by part, on
      `tei:milestone unit="prayer"`.
-2. **An existing text.** The block's opening is looked up in the incipit index of the
+2. **A curated choice** (`equivalents.yaml`, found by a block's opening words, optionally in one
+   leaf): the URN the matcher cannot decide from the words alone. A text that does the same job
+   as one the collection names, and is mostly its words, is that text whatever rite prints it —
+   Nusach Sefard's Kedushah (נקדישך, and כתר at Musaf) is Birnbaum's `amidah/qedushah`, its
+   morning אהבת עולם is `ahavah_rabbah`, its separately printed מעין שלש openings are
+   `meein_shalosh`'s parts. A choice can also name a text the collection does not hold yet:
+   a verse collage by its function (`shesh_zekhirot`) or common incipit (`yehi_khevod`), or
+   the name an opensiddur.org post already has (`shirat_hayam`). `joins` make a block
+   continue the text before it in its leaf, the rubrics and headings between becoming pairs
+   inside it (the Shema's paragraphs; the six remembrances, their labels descriptions). The
+   choices apply to every Metsudah volume; they are knowledge about texts, not decisions about
+   one block. A text chosen this way is not cut by a shorter later printing, and a later
+   printing of it that differs is its variant.
+3. **The next part of the same text.** Where the block before it (rubrics apart) is a part of a
+   text, a block that one of its keys finds among that text's parts — and agrees with at least
+   as well as with any other candidate — is that part: the Kedushah's קדוש קדוש קדוש is
+   `amidah/qedushah/qadosh` there, not Yotzer's.
+4. **An existing text.** The block's opening is looked up in the incipit index of the
    collection's Hebrew projects (`util/incipit.py`, shared with the opensiddur.org importer).
    The opensiddur.org imports and the Sefaria imports themselves are left out: their openings
    are formulas that match unrelated texts. Words are compared as consonant skeletons, a maqaf
-   separating words. Every match must agree with the block over the candidate's whole collected
-   opening (sixteen words), not just the key that found it: many texts open "יהי רצון מלפניך"
-   and go on differently. The lookup goes in tiers, the first that finds a text winning:
-   six words (a blessing only by the words after its formula, which every blessing shares);
-   four words — for a blessing, two to five after the formula (פוקח עורים) — when one text
-   agrees clearly best, which finds another rite's wording (Sefard וְלִתְפִלָּתָם, Ashkenaz
-   וּבִתְפִלָּתָם); and the same a word or two out of step, past a label or heading word the
-   collection's text opens with (`א אזה מקמן`, `ישתבח ישתבח`) or one the book's block lacks
-   (`ואמונה`, its `אמת` ending the Shema). A match moves up to the whole text it is part of
-   only when the whole is encoded, opens with it, and the block holds three quarters of the
-   whole's other parts; otherwise it stays the part, and the block is cut where another part
-   opens (the Kaddish divides into its parts this way), or where a text the index holds whole
-   ends. A block is also cut before a blessing's formula in its middle: a new blessing is a
-   text of its own. Scripture is kept as a text only as a whole chapter opened at its first
-   verse; a block that opens mid-chapter (Hodu) is liturgy quoting scripture.
-3. **A new text**, `prayer:` plus at least three words of its Hebrew incipit romanized
+   separating words and הללו יה one word. Every match must agree with the block over the
+   candidate's collected opening (sixteen words; a short text's own words only), not just the
+   key that found it: many texts open "יהי רצון מלפניך" and go on differently. The lookup goes
+   in tiers, the first that finds a text winning: six words (a blessing only by the words after
+   its formula, which every blessing shares); four words — for a blessing, two to five after
+   the formula (פוקח עורים) — when one text agrees clearly best, which finds another rite's
+   wording (Sefard וְלִתְפִלָּתָם, Ashkenaz וּבִתְפִלָּתָם); and the same a word or two out of
+   step, past a label or heading word.
+   - **What the index records.** For each `@corresp` scope: its opening, collected past its end
+     so that a short part is found by its neighbours, and how many of those words are its own
+     (its scope ends at its element's end or the next milestone of its unit); its last words;
+     what it transcludes, and the part it opens or ends with by transcluding (a conditional
+     transclusion — Modim de-Rabbanan, said only in the repetition — neither opens nor ends
+     it); and whether it is a milestone inside another text's words. A text that opens by
+     transcluding a part is indexed by that part's opening, not by its own words after it.
+   - **Moving up.** A match moves up to the whole text it is part of when the whole opens with
+     it and the block holds three quarters of the whole's other parts (a part's own words, a
+     word or two for Ya'aleh Veyavo's occasions), or when the block ends with the whole's
+     closing formula (`ברוך אתה ה׳ חונן הדעת`) — a blessing in another rite's words. A block
+     that opens like nothing the index holds is still the blessing whose closing formula it
+     ends with, when one text has it.
+   - **Cuts.** Otherwise a match stays the part, and the block is cut where another part opens
+     (the Kaddish divides into its parts this way, the part going on agreeing past its first
+     six words), or where a text the index holds whole ends. A block is also cut where it runs
+     into another text the collection names (Vezot Hatorah, then Yehi Ratzon Milifnei Avinu):
+     a six-word match agreeing closely over its opening, not scripture, not a part of the same
+     text or something it transcludes, not a later stanza of a poem, not a verse the
+     collection quotes inside a text (a milestone), and — for a short text — followed here by
+     what follows it there (Adonai Sefatai is followed by the Amidah; a line quoted from the end
+     of Avinu Malkenu is not). The block is then decided again up to the cut. No cut leaves a
+     word on its own. A block is cut before a blessing's formula in its middle — a new blessing
+     is a text of its own — unless the block is one text that ends with the closing formula of
+     the text it opens like (Barukh She'amar's litany and blessing).
+   - **Scripture.** A block that opens a chapter at its first verse (its first half, `/1/a`,
+     will do) is that chapter, and ends where the chapter's last verse does; a block that is one
+     whole verse is that verse (`bible:malachi/3/4`); a block that opens mid-chapter is liturgy
+     quoting scripture, its verses marked inside it (below).
+   - **A later printing.** When this volume printed the text before and the block differs, it
+     is a variant where it opens as the first printing does; where it is only the part the text
+     opens with (Musaf's Retzeh, after the morning's whole Avodah), it is that part.
+5. **A new text**, `prayer:` plus at least three words of its Hebrew incipit romanized
    (`util/transliterate.py`, the JLPTEI-3 table) and respelled by `specs/naming/spellings.yaml`
    — two words ("yehi_ratzon") would claim an opening many texts share; unpointed and
-   parenthesized words (labels) are skipped, and a blessing is named after its formulas
-   (`al_mitzvat_tzitzit`, not `barukh_attah`). Lengthened until it is not taken.
+   parenthesized words (labels) are skipped, a blessing is named after its formulas
+   (`al_mitzvat_tzitzit`, not `barukh_attah`), a petition after "yehi_ratzon" and two words
+   past its formula (`yehi_ratzon_shetishlach_meherah`), and a response before a text is
+   dropped (`keshem_shenikhnas_laberit`, not `amen_…`). Lengthened until it is not taken.
+
+**Shared with opensiddur.org.** A Metsudah text that an opensiddur.org post also prints shares
+one URN with it: where a post as a whole is the text, its record in
+`specs/opensiddur_org/post_urns.jsonl` is `existing` with that URN (Ahavat Olam posts are
+`ahavah_rabbah`; Aleinu posts `aleinu`); where a row of a compilation is the text, its
+`rows` map it there (the Birkat Hamazon stanzas for a brit, Hanerot Halalu, Vehu Rachum). The
+post's own URNs are then gone from the registry, with no alias (before 1.0). The posts are
+reconverted (`opensiddur_org.convert --post …`) in the paired projects pull request.
 
 Every decision is recorded at once in `specs/sefaria/metsudah_urns.jsonl` — one line per text,
 keyed by work, leaf and the Hebrew index of its first phrase, with its kind
-(`existing`/`new`/`repeat`), incipit, evidence and a hash of its words (`as_of`). Records are
+(`existing`/`new`/`repeat`/`variant`), incipit, evidence and a hash of its words (`as_of`). Records are
 sticky: a reviewer may correct a URN in the file and rerun, and a rerun on an unchanged export
 decides nothing. A cut is recorded by the record of the text after it, and replayed from it.
 When a text's words change, its record lapses and is reported; the text keeps its URN (and its
@@ -212,18 +276,44 @@ Each language's project is laid out as the house style lays out a siddur:
 | the same beside an English rubric or nothing | `tei:note type="instruction"` |
 | English with no Hebrew | `tei:note type="instruction"`; printed whole in bold, `type="description"` |
 | small pointed Hebrew | `tei:hi rend="small"` |
-| `<small>לְר"ח:</small>` before the words it governs | `tei:note type="instruction"` |
+| `<small>לְר"ח:</small>` before the words it governs | the phrase a `j:conditional`, the label its note (see Conditions); a label `conditions.yaml` does not list, `tei:note type="instruction"` |
 | English italic | `tei:hi rend="italic"` |
 | `<big>` | `tei:hi rend="large"` |
 | `<span>` | `tei:foreign xml:lang="he"` |
 | `<br>` | a space |
 | footnote | `tei:anchor` + `tei:note type="commentary"` in `tei:standOff type="notes"` |
 
+**Conditions** (`conditions.yaml`, `conditions.py`). The book's calendar and other conditions
+become `j:conditional`, from a curated table:
+
+- **Condition rubrics.** An English rubric that says when the passage after it is said ("During
+  the Ten Days of Penitence add:", "From the Musaf of Shemini Atzeres until the Musaf of the
+  first day of Pesach you should say:", "On Sunday:", "If there are at least 10 men, add:") is
+  matched by a regular expression and becomes the conditional's note in English (the Hebrew,
+  which prints no rubric, carries the same conditional without one): a condition, not printed
+  once it is true. Inside a text it governs the phrases after it up to the next rubric, or,
+  where its passage opens with a parenthesis, to the phrase that closes it, or to the end of the
+  variant's passage it is in; the conditionals nest with the variants'. Between texts it gates
+  the next text's transclusion in the structure file — or, marked `section: true` (the
+  Kedushah, "When the Chazzan repeats the Shemoneh Esrei"), everything to the next heading.
+- **Labels.** A Hebrew label before a phrase (`<small>לְר"ח:</small> רֹאשׁ הַחֹדֶשׁ הַזֶּה`, לפסח,
+  לסכות, לר"ה, לש"ע וש"ת) makes the phrase conditional, the label its note.
+- **Inline alternatives.** A parenthesized alternative opening with an abbreviation the table
+  lists (`(בעשי"ת הַשָּׁלוֹם)`, `(בעשרה אֱלֺהֵינוּ)`) is a `type="marked"` conditional, the
+  abbreviation its note; where the table says it replaces words beside it in the same phrase
+  (`הַשָּׁלוֹם` for `שָׁלוֹם`, `וּלְעֵלָּא מִכָּל` for `מִן כָּל`), those words are conditional on
+  the opposite.
+- Conditions are written in the registry's types (`holiday`, `holiday-aggregate`,
+  `day-of-week`, `service-time`, `hebrew-date`, `quorum`, `recitation`, `override`,
+  `practice`, `meal-context`), checked by `validate_features`. The report lists the condition
+  rubrics found, and the rubrics that read like a condition ("On …", "During …", "From …")
+  but are not in the table: they stay instructions until added.
+
 Every file is validated (RelaxNG and Schematron) before it is written; a file an earlier run
 wrote that this run does not is removed. `--register` appends the new URNs — minted texts and
 `siddur:` places with their parents — to `specs/urn_registry/`. The run's report,
 `output/sefaria_<work>_report.md`, lists the leaves aligned by the trailing rule, the URNs
-decided and the decisions that lapsed.
+decided, the decisions that lapsed and the condition rubrics.
 
 Book settings: `settings/<he project>/linear.yaml` in opensiddur-projects sets the English
 beside the Hebrew.
@@ -254,13 +344,13 @@ With nothing to review, the work is converted with `--register`. The report,
 
 - The other four volumes: a `works.yaml` entry and a structure table each; their phrases
   reuse the Weekday Siddur's numbers where the text is shared.
-- **Conditions on the calendar.** A variant is selected by where it is printed, not yet by
-  the day: Nachem is printed at Minchah, conditional on that place, not on Tisha b'Av.
-  Seasonal insertions are marked in the book (`<small>לְר"ח:</small>`, "On
-  Chanukah:", "Ten Days of Penitence") and are text, with their rubric, in the pilot. They are
-  to become `j:conditional` — `type="marked"` where the book marks them
-  (see `schema/JLPTEI-3.md`, conditional presentation) — and the index's services gated by
-  occasion as Birnbaum's are.
+- **Conditions the table does not hold yet.** Rubrics that say when in words the table cannot
+  match without a decision (the days Tachanun is omitted; "the day before Yom Kippur"; whom a
+  passage is said by), and conditions that are not the calendar's ("A woman says:", "When
+  eating at your parents' table") stay instructions; the report lists them. An inline
+  alternative printed as a phrase of its own, whose replaced words are in the phrase beside it
+  (the Kaddish's `(בעשי"ת וּלְעֵלָּא מִכָּל)` before `מִן כָּל`), is marked conditional, but the
+  replaced words are not yet conditional on the opposite.
 - Kaddish responses and the reader's and congregation's parts as speaker roles
   (`instruction:role/…`).
 - Sefaria's `links/` (citations from the footnotes to Tanakh and Talmud) as `bible_hint`s for
