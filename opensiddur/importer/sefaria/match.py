@@ -43,6 +43,7 @@ from opensiddur.importer.sefaria.markup import is_pointed, plain_text
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
+    CLOSING_WORDS,
     COLLECTED_WORDS,
     INCIPIT_WORDS,
     SHORT_INCIPIT_WORDS,
@@ -262,6 +263,92 @@ def shifted_openings(index: IncipitIndex) -> dict[tuple[str, ...], list[tuple[st
     return table
 
 
+#: The words a blessing's closing formula opens with.
+CHATIMAH = tuple(words("ברוך אתה יהוה"))
+
+
+def chatimah(block_words: list[str] | tuple[str, ...]) -> tuple[str, ...] | None:
+    """A blessing's closing formula, from ``ברוך אתה ה׳`` among its last words to the end
+    (``ברוך אתה ה׳ חונן הדעת``), when it ends with one."""
+    tail = list(block_words[-CLOSING_WORDS:])
+    for k in range(len(tail) - len(CHATIMAH), -1, -1):
+        if tuple(tail[k:k + len(CHATIMAH)]) == CHATIMAH:
+            found = tuple(tail[k:])
+            return found if len(found) > len(CHATIMAH) else None
+    return None
+
+
+def by_chatimah(index: IncipitIndex) -> dict[tuple[str, ...], set[str]]:
+    """The texts the index holds, by their closing formula. Kept on the index, and rebuilt
+    when it has grown."""
+    cached = getattr(index, "_by_chatimah", None)
+    if cached is not None and cached[0] == len(index.closing_of):
+        return cached[1]
+    table: dict[tuple[str, ...], set[str]] = {}
+    for urn in set(index.closing_of) | set(index.ends_with):
+        if urn[len(TEXT_PREFIX):].startswith("bible:"):
+            continue
+        key = chatimah(index.closing(urn))
+        if key is not None:
+            table.setdefault(key, set()).add(urn)
+    index._by_chatimah = (len(index.closing_of), table)  # type: ignore[attr-defined]
+    return table
+
+
+def closing_text(block_words: list[str], index: IncipitIndex) -> str | None:
+    """The one text (a text and its last part counting as one, the text) whose closing formula
+    the block ends with, or None."""
+    key = chatimah(block_words)
+    if key is None:
+        return None
+    found = by_chatimah(index).get(key, set())
+    shallowest = {u for u in found if not any(u.startswith(o + "/") for o in found)}
+    return next(iter(shallowest)) if len(shallowest) == 1 else None
+
+
+#: How closely a text found inside a block must agree over its collected opening for the
+#: block to be cut there.
+LATER_TEXT_AGREEMENT = 0.8
+
+
+def _root(urn: str) -> str:
+    namespace, path = _namespace_and_path(urn)
+    return f"{namespace}:{path[0]}"
+
+
+def later_text(phrase_words: list[list[str]], urn: str | None, index: IncipitIndex, *,
+               before: int | None = None) -> tuple[int, str] | None:
+    """Where a block runs on into another text the collection names (Vezot Hatorah, then Yehi
+    Ratzon Milifnei Avinu): the 0-based phrase it opens at, before ``before``, and its URN.
+    Only a six-word match that agrees closely over the whole collected opening counts; scripture,
+    and texts of the same family as ``urn`` (``amidah/...``), do not."""
+    family = _root(urn) if urn else None
+    # What the collection's own encoding of the text, or of a text it is part of, transcludes
+    # is the text's own (Birnbaum's Birkat Kohanim in the Amidah transcludes the verses).
+    own: set[str] = set()
+    up = urn
+    while up:
+        own |= index.included(up)
+        up = parent(up)
+    end = len(phrase_words) if before is None else before
+    for start in range(1, end):
+        rest = [w for phrase in phrase_words[start:] for w in phrase]
+        if len(rest) < INCIPIT_WORDS:
+            break
+        found_here = sorted(index.lookup(rest))
+        verse = any(f[len(TEXT_PREFIX):].startswith("bible:")
+                    and opening_agreement(f, rest, index) >= LATER_TEXT_AGREEMENT for f in found_here)
+        for found in found_here:
+            if (found[len(TEXT_PREFIX):].startswith("bible:") or _root(found) == family
+                    or found in own or len(index.incipit_of.get(found, ())) < INCIPIT_WORDS):
+                continue
+            if verse and found in index.length_of:
+                continue  # a verse the collection quotes in a text of its own, not a text
+            if opening_agreement(found, rest, index) >= LATER_TEXT_AGREEMENT:
+                return start, found
+    return None
+
+
 @dataclass
 class Resolution:
     urn: str | None
@@ -306,7 +393,11 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     """
     evidence: list[str] = []
     block_words = [w for phrase in phrase_words for w in phrase]
+    closing = closing_text(block_words, index)
     if not candidates:
+        if closing is not None:
+            # Opened otherwise -- another rite's words -- but closed with a blessing's formula.
+            return Resolution(closing, [f"ends like {closing}, whose closing formula it shares"])
         return Resolution(None, evidence)
     liturgical = sorted(c for c in candidates if not c.startswith(TEXT_PREFIX + "bible:"))
     pool = liturgical or sorted(candidates)
@@ -314,6 +405,12 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     if len(pool) > 1:
         evidence.append(f"the opening matches {len(pool)} texts ({', '.join(pool[:4])}); took the first")
     joined = "".join(w for phrase in phrase_words for w in phrase)
+
+    def part_key(u: str) -> tuple[str, ...]:
+        # A part's opening, without words past its end -- unless it is too short to tell
+        # where it is (a heading word), when the words after it say.
+        own = index.own_opening(u)
+        return (own if len(own) >= MIN_PART_KEY_WORDS else index.incipit_of.get(u, ()))[:INCIPIT_WORDS]
 
     def other_parts(u: str) -> list[str]:
         # The index keeps parts in the order of the files they were found in, which is not
@@ -324,6 +421,9 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         # The parent is encoded, and the part's opening is at (or, past a heading caught in
         # the parent's opening, near) the start of it.
         up = parent(u)
+        if up in index.opens_with:
+            # The parent opens by transcluding a part: its words begin with that part's.
+            return index.opens_with[up] == u
         if up not in index.incipit_of:
             return False
         key = index.incipit_of[u][:SHORT_INCIPIT_WORDS]
@@ -334,7 +434,8 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         # The block holds most of the parent's other parts: it is the whole text, not one
         # part that happens to open it.
         others = other_parts(u)
-        found = sum(1 for s in others if "".join(index.incipit_of[s][:INCIPIT_WORDS]) in joined)
+        found = sum(1 for s in others
+                    if "".join(index.own_opening(s)[:INCIPIT_WORDS] or part_key(s)) in joined)
         return bool(others) and found >= max(1, math.ceil(MOVE_UP_COVERAGE * len(others)))
 
     while parent(urn):
@@ -345,6 +446,13 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
             break  # a part of the text: cut, below, where another part opens
         evidence.append(f"runs on past {urn.rsplit('/', 1)[-1]} through most of {parent(urn)}")
         urn = parent(urn)
+    if closing is not None and closing != urn and urn.startswith(closing + "/"):
+        # It opens like a part of a blessing and ends with the whole blessing's closing formula:
+        # the blessing, in another rite's words.
+        evidence.append(f"runs on to the closing formula of {closing}")
+        urn = closing
+        evidence.insert(0, f"opens like a part of {urn}")
+        return Resolution(urn, evidence)
     namespace, path = _namespace_and_path(urn)
     if namespace == "bible":
         if len(path) >= 3:
@@ -359,7 +467,7 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     evidence.insert(0, f"opens like {urn}")
     split_at = None
     for sibling in other_parts(urn) if parent(urn) else []:
-        incipit = index.incipit_of[sibling][:INCIPIT_WORDS]
+        incipit = part_key(sibling)
         for start in range(1, len(phrase_words)):
             if _opens_at(phrase_words, start, incipit):
                 if split_at is None or start < split_at:
@@ -368,8 +476,8 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     if split_at is not None:
         evidence.append(f"cut before phrase {split_at + 1}, where the next part of {parent(urn)} opens")
     # A text the index holds whole (shorter than its collected opening) ends where its words do.
-    whole = index.incipit_of.get(urn, ())
-    if 0 < len(whole) < COLLECTED_WORDS and len(block_words) > len(whole) + 2:
+    whole = index.own_opening(urn)
+    if 0 < len(whole) < COLLECTED_WORDS and len(block_words) > len(whole) + 2 and urn not in index.compound:
         count = 0
         for j, phrase in enumerate(phrase_words):
             count += len(phrase)
@@ -380,6 +488,9 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
                 break
     return Resolution(urn, evidence, split_at)
 
+
+#: The fewest words of a part's own that tell where it is in a block.
+MIN_PART_KEY_WORDS = 3
 
 #: Share of a text's other parts a block must hold to be the whole text rather than the part
 #: that opens it.
@@ -423,6 +534,16 @@ def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float 
     # Where the earlier printing ends in the block: once enough of it is matched, as far as the
     # matches run on without a gap. A phrase further on that happens to be like one of the
     # earlier printing's (a closing verse both texts end with) is not part of it.
+    if insertions:
+        # The passage may come early, before as much of the earlier printing as coverage asks
+        # (Attah Chonantanu, after the two phrases Binah opens with): the printing so far is the
+        # run of matches from the first.
+        head = 0
+        while head + 1 < len(matched) and matched[head + 1] - matched[head] <= REPEAT_GAP:
+            head += 1
+        inserted = _inserted_until(numbers, matched, head, len(earlier), introduced)
+        if inserted is not None:
+            return inserted
     end = needed - 1
     while end + 1 < len(matched) and matched[end + 1] - matched[end] <= REPEAT_GAP:
         end += 1
@@ -441,6 +562,24 @@ def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float 
     length = matched[end] + 1
     if (end + 1) / length >= coverage:
         return length
+    return None
+
+
+def _inserted_until(numbers: list[int], matched: list[int], head: int, count: int,
+                    introduced: frozenset[int]) -> int | None:
+    """Where a printing with a passage of its own after its ``head``-th match ends: the end of
+    the earlier printing's rest, when the passage is introduced and all of the rest follows it,
+    in order and without gaps. None otherwise."""
+    if head + 1 >= len(matched) or matched[head] + 1 not in introduced:
+        return None
+    seen = [numbers[i] for i in matched[:head + 1]]
+    rest = [numbers[i] for i in matched[head + 1:]]
+    rest_at = matched[head + 1:]
+    if (rest == sorted(rest) and min(rest) > max(seen)
+            and sorted(seen + rest) == list(range(1, count + 1))
+            and len(rest) >= max(2, math.ceil(INSERTION_REST * count))
+            and all(b - a <= REPEAT_GAP for a, b in zip(rest_at, rest_at[1:]))):
+        return matched[-1] + 1
     return None
 
 
@@ -470,13 +609,14 @@ BLESSING_DISTINCTIVE_WORDS = 3
 
 
 def introduced_phrases(block: TextBlock) -> frozenset[int]:
-    """The positions of a block's phrases that a rubric comes directly before."""
+    """The positions of a block's phrases that a rubric comes directly before, or that open a
+    parenthesis: the book sets the passage off (``(אַתָּה חוֹנַנְתָּֽנוּ`` at Maariv)."""
     found: set[int] = set()
     position = 0
     after_rubric = False
     for pair in block.pairs:
         if is_phrase(pair):
-            if after_rubric:
+            if after_rubric or plain_text(pair.he).lstrip().startswith("("):
                 found.add(position)
             position += 1
             after_rubric = False
@@ -584,6 +724,8 @@ class _Decider:
         self.candidate_cut: int | None = None
         #: the blocks decided (by ``id``)
         self.done: set[int] = set()
+        #: blocks a cut replaced, kept so that their ids are not reused
+        self.replaced: list[TextBlock] = []
         #: the phrases this work's own Hebrew project named on the last run, by text path
         self.own_phrases: dict[str, dict[int, str]] = {}
         self.index = index
@@ -689,6 +831,9 @@ class _Decider:
         self.outcome.decided.append(record)
 
     def cut(self, leaf: str, blocks: list[Item], i: int, at: int) -> TextBlock:
+        # The block cut stays referenced: :attr:`done` holds ids, which Python would otherwise
+        # give to a new block.
+        self.replaced.append(blocks[i])
         first, rest = split_block(blocks[i], at)
         blocks[i:i + 1] = [first, rest]
         return first
@@ -754,6 +899,10 @@ class _Decider:
         urn = resolution.urn
         evidence.extend(resolution.evidence)
         cut = resolution.split_at
+        later = later_text(phrase_words, urn, self.index, before=cut)
+        if later is not None:
+            cut, found = later
+            evidence.append(f"cut before phrase {cut + 1}, where {found} opens")
         if urn is not None and urn in self.printed and not same_blessing(
                 block_words, words(block_text(self.printed[urn].block))):
             evidence.append(f"a blessing other than {urn}, whose formula it shares")
@@ -925,15 +1074,23 @@ class _Decider:
         printing.block = first
         self.decide_anew(printing.leaf, printing.blocks, i + 1, self.records.get(
             self.key(printing.leaf, printing.blocks[i + 1])))
+        # Deciding the rest may cut it again, in a leaf already passed: decide every piece.
+        j = i + 2
+        while j < len(printing.blocks):
+            piece = printing.blocks[j]
+            if isinstance(piece, TextBlock) and id(piece) not in self.done:
+                self.decide_anew(printing.leaf, printing.blocks, j,
+                                 self.records.get(self.key(printing.leaf, piece)))
+            j += 1
 
 
 def verse_length(urn: str, index: IncipitIndex) -> int | None:
     """A verse's length in words, when the index holds it whole (shorter than its collected
     opening)."""
-    opening = index.incipit_of.get(urn) or index.incipit_of.get(f"{urn}/a")
-    if opening and len(opening) < COLLECTED_WORDS and urn in index.incipit_of:
-        return len(opening)
-    return None
+    if urn not in index.incipit_of:
+        return None
+    opening = index.own_opening(urn)
+    return len(opening) if len(opening) < COLLECTED_WORDS else None
 
 
 def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
