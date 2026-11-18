@@ -3903,7 +3903,11 @@ end
                       select="f:is-rtl-lang($note-lang) ne f:is-rtl-lang($text-lang)"/>
         <xsl:variable name="within" select="exists(ancestor::tei:p | ancestor::tei:l)"/>
         <xsl:text>\</xsl:text>
-        <xsl:value-of select="if (@f:parallel-block = 'true') then 'OSInstructionBlock'
+        <xsl:value-of select="if (@f:parallel-block = 'true'
+                                 or parent::j:conditional[not(f:is-inline-conditional(.))]
+                                 or (not($within) and descendant::tei:foreign
+                                     [f:is-rtl-lang(string(@xml:lang)) ne f:is-rtl-lang($text-lang)]))
+                              then 'OSInstructionBlock'
                               else if (not($crosses)) then 'instructionnote'
                               else if ($within) then 'OSInstructionLine'
                               else 'OSInstructionBlock'"/>
@@ -3976,6 +3980,18 @@ end
         </xsl:if>
     </xsl:template>
 
+    <!-- Adjacent notes share an anchor. Their interlinear marks have zero width,
+         so printing each separately would superimpose the serials. Print one
+         comma-separated mark at the first note while retaining every apparatus entry. -->
+    <xsl:function name="f:adjacent-notes" as="element(tei:note)+">
+        <xsl:param name="note" as="element(tei:note)"/>
+        <xsl:variable name="next" select="$note/following-sibling::node()
+            [not(self::text()[not(normalize-space())])][1]"/>
+        <xsl:sequence select="($note, if ($next/self::tei:note
+                [not(@type = ('instruction', 'description'))])
+            then f:adjacent-notes($next) else ())"/>
+    </xsl:function>
+
     <xsl:template name="os-b-footnote-emit">
         <xsl:param name="serial" as="xs:integer"/>
         <!-- In bidi/RTL contexts, empty-lemma \edtext{} can be fragile with reledmac's
@@ -3987,7 +4003,14 @@ end
              corrupts the catcode-group that controls [ ] delimiters when the .1
              file is re-read on the next pass. -->
         <xsl:text>\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{</xsl:text>
-        <xsl:value-of select="f:note-mark($serial)"/>
+        <xsl:variable name="previous" select="preceding-sibling::node()
+            [not(self::text()[not(normalize-space())])][1]"/>
+        <xsl:if test="not($previous/self::tei:note
+                [not(@type = ('instruction', 'description'))])">
+            <xsl:value-of select="string-join(
+                for $note in f:adjacent-notes(.)
+                return f:note-mark(f:note-serial($note)), ',')"/>
+        </xsl:if>
         <xsl:text>}}{\</xsl:text>
         <!-- A colophon division is set after the endnotes have been printed (see the root
              template), so its notes are footnotes whatever the placement. -->

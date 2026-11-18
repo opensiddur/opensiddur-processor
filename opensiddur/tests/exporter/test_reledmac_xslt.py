@@ -850,10 +850,12 @@ class TestNotesMapping(unittest.TestCase):
           </tei:p></tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml, **{"notes-mark": "symbol"})
-        self.assertIn(r"\OSInterlinearNotemark{\textparagraph}", out)
-        self.assertIn(
-            r"\OSInterlinearNotemark{\textasteriskcentered\textasteriskcentered}", out
-        )
+        # Adjacent notes share one in-text mark; the apparatus retains each symbol.
+        self.assertIn(r"\textparagraph,\textasteriskcentered\textasteriskcentered,"
+                      r"\textdagger\textdagger}", out)
+        for mark in (r"\textparagraph", r"\textasteriskcentered\textasteriskcentered",
+                     r"\textdagger\textdagger"):
+            self.assertIn(r"\OSFootnotemark{" + mark + r"}\notenote{", out)
 
     def test_instruction_note_is_inline(self):
         xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -1050,6 +1052,53 @@ class TestNotesMapping(unittest.TestCase):
         self.assertIn(r"\OSInterlinearNotemark{2}", out)
         self.assertEqual(out.count("First"), 1)
         self.assertEqual(out.count("Second"), 1)
+
+    def test_adjacent_notes_share_one_readable_mark_and_keep_every_note(self):
+        for series, label in (("arabic", "1,2,3"), ("alpha", "a,b,c"),
+                              ("roman", "i,ii,iii")):
+            with self.subTest(series=series):
+                xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+                  <tei:text><tei:body><tei:p>א<tei:note>First</tei:note>
+                    <tei:note xml:lang="en">Second</tei:note><tei:note>Third</tei:note>
+                    word<tei:note>Separate</tei:note></tei:p></tei:body></tei:text>
+                </tei:TEI>"""
+                out = _transform(xml, **{"notes-mark": series})
+                self.assertIn(r"\OSInterlinearNotemark{" + label + "}", out)
+                for word in ("First", "Second", "Third", "Separate"):
+                    self.assertEqual(out.count(word), 1)
+                self.assertEqual(len(re.findall(r"\\OSFootnotemark\{[^}]+\}\\notenote", out)), 4)
+                self.assertEqual(out.count(r"\OSInterlinearNotemark{}"), 2)
+
+    def test_instruction_between_notes_does_not_merge_their_marks(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+          <tei:text><tei:body><tei:p>א<tei:note>First</tei:note>
+            <tei:note type="instruction">Stand.</tei:note><tei:note>Second</tei:note>
+          </tei:p></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1}", out)
+        self.assertIn(r"\OSInterlinearNotemark{2}", out)
+        self.assertNotIn(r"\OSInterlinearNotemark{1,2}", out)
+
+    def test_mixed_direction_rubric_between_paragraphs_gets_a_block_line(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+          <tei:text><tei:body><tei:div><tei:note type="instruction">
+            <tei:foreign xml:lang="he">סוגרים הארון.</tei:foreign>
+            <tei:foreign xml:lang="en">The Holy Ark is closed.</tei:foreign>
+          </tei:note></tei:div><tei:p>א</tei:p></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInstructionBlock{", out)
+        self.assertNotIn(r"\instructionnote{", out)
+
+    def test_full_width_conditional_rubric_uses_the_block_measure(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+                   xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he">
+          <tei:text><tei:body><j:conditional>
+            <tei:note type="instruction" xml:lang="he">סוגרים הארון.
+              <tei:foreign xml:lang="en">The Holy Ark is closed.</tei:foreign>
+            </tei:note><tei:p>א</tei:p></j:conditional></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInstructionBlock{", out)
+        self.assertNotIn(r"\instructionnote{", out)
 
     def test_parallel_body_note_per_column(self):
         """Each parallel stream numbers its own editorial notes from 1."""
