@@ -61,3 +61,26 @@ class ConditionalInstructionSelectionTests(unittest.TestCase):
                 text,roots=self.compile('',cls)
                 self.assertEqual(text,'Before Included After')
                 self.assertFalse(any(n.findall('.//{'+TEI+'}note') for n in roots))
+
+
+class LocalRubricSelectionTests(unittest.TestCase):
+    def test_same_edition_keeps_each_local_wording_language_and_tail(self):
+        for cls in [CompilerProcessor, ExternalCompilerProcessor]:
+            for note_type in ['instruction','description']:
+                with self.subTest(processor=cls.__name__,kind=note_type):
+                    temp=tempfile.TemporaryDirectory();self.addCleanup(temp.cleanup)
+                    base=Path(temp.name);(base/'book').mkdir()
+                    wrapper=lambda content:f'<tei:TEI xmlns:tei="{TEI}" xmlns:j="{J}" xml:lang="he"><tei:text><tei:body>{content}</tei:body></tei:text></tei:TEI>'
+                    original=f'<tei:p><tei:note type="{note_type}" corresp="{URN}" xml:lang="he">קו״ח</tei:note> First tail <tei:note type="{note_type}" corresp="{URN}" xml:lang="he">ק׳</tei:note> Second tail</tei:p>'
+                    (base/'book/local.xml').write_text(wrapper(original))
+                    other=etree.fromstring(wrapper(f'<tei:note type="{note_type}" corresp="{URN}" xml:lang="en">Congregation:</tei:note>').encode())
+                    (base/'book/other.xml').write_bytes(etree.tostring(other));note=other.find('.//{'+TEI+'}note')
+                    db=MagicMock(spec=ReferenceDatabase);db.get_references_to.return_value=[]
+                    db.get_urn_mappings.return_value=[UrnMapping(urn=URN,project='book',file_name='other.xml',element_path=note.getroottree().getpath(note),element_tag=note.tag,element_type=note_type)]
+                    data=LinearData(instruction_priority=['book']);data.xml_cache.base_path=base
+                    result=cls('book','local.xml',linear_data=data,reference_database=db).process()
+                    roots=result if isinstance(result,list) else [result]
+                    notes=[n for root in roots for n in root.findall('.//{'+TEI+'}note')]
+                    self.assertEqual([''.join(n.itertext()) for n in notes],['קו״ח','ק׳'])
+                    self.assertEqual([n.get('{http://www.w3.org/XML/1998/namespace}lang') for n in notes],['he','he'])
+                    self.assertIn('First tail',''.join(''.join(root.itertext())for root in roots));self.assertIn('Second tail',''.join(''.join(root.itertext())for root in roots))
