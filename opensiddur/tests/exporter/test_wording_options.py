@@ -145,6 +145,24 @@ class WordingOptionTest(unittest.TestCase):
         self.assertNotIn('FIRSTTOKEN', text)
         self.assertIn('SECONDTOKEN', text)
 
+    def test_inline_selected_wording_keeps_divine_name_and_text_order(self):
+        choice = CHOICE.replace('SECONDTOKEN', '<j:divineName xml:lang="he">יְיָ</j:divineName>')
+        body = declaration(False, True)+'<tei:p>prefix '+choice+' suffix</tei:p><j:endDeclare target="#selection"/>'
+        result = self.compile('inline', body)
+        self.assertEqual(''.join(result.itertext()), 'prefix יְיָ suffix')
+        names = result.findall('.//{'+J+'}divineName')
+        self.assertEqual(len(names), 1)
+        self.assertEqual(names[0].get('{http://www.w3.org/XML/1998/namespace}lang'), 'he')
+        self.assertFalse(result.findall('.//{'+T+'}p'))
+
+    def test_inline_name_does_not_leak_outside_an_explicit_range(self):
+        body = ('<tei:p><j:divineName>BEFORE</j:divineName>'
+                '<tei:seg xml:id="literal">kept</tei:seg>'
+                '<j:divineName>AFTER</j:divineName></tei:p>')
+        result = self.compile('inline', body, start='literal', end='literal')
+        self.assertEqual(''.join(result.itertext()), 'kept')
+        self.assertFalse(result.findall('.//{'+J+'}divineName'))
+
     def test_pdf_and_html_emit_only_the_selected_wording(self):
         body = declaration(False, True)+'<tei:p>'+CHOICE+'</tei:p><j:endDeclare target="#selection"/>'
         compiled = self.compile('base', body)
