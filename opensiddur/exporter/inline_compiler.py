@@ -181,6 +181,8 @@ class InlineCompilerProcessor(CompilerProcessor):
             return empty
 
         context = self._update_processing_context_before(element)
+        preserve_name = (element.tag == f"{{{JLPTEI_NAMESPACE}}}divineName"
+                         and context["command"] == _ProcessingCommand.COPY_TEXT_AND_RECURSE)
 
         text_element = etree.Element(f"{{{PROCESSING_NAMESPACE}}}transcludeInline", nsmap=self.ns_map)
         text_element.text = ""
@@ -322,6 +324,13 @@ class InlineCompilerProcessor(CompilerProcessor):
                 self._insert_first_element(text_element, annotation)
 
         self._update_processing_context_after(element)
+        if preserve_name:
+            # Flatten source paragraphs, but keep the semantic name so later
+            # rendering can distinguish it from ordinary Hebrew words.
+            name = etree.Element(element.tag, attrib=dict(element.attrib), nsmap=self.ns_map)
+            name.text = text_element.text
+            name.extend(text_element)
+            return name
         return text_element
 
     def process(self, root: Optional[ElementBase] = None) -> ElementBase:
