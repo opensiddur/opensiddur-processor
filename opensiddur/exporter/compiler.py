@@ -1161,11 +1161,51 @@ class CompilerProcessor:
 
         return False, None
 
+    def _wording_options(self, element):
+        """Possible wordings at this choice, using occurrence-local variant settings.
+
+        Unknown alternates keep their existing display. A known selection is exclusive;
+        an explicit range inside an option still addresses that option's own words.
+        """
+        tag = f"{{{JLPTEI_NAMESPACE}}}option"
+        options = [child for child in element if child.tag == tag]
+        endpoints = (getattr(self, "start_element", None), getattr(self, "end_element", None))
+        addressed = [option for option in options
+                     if any(endpoint is not None and
+                            (endpoint is option or option in endpoint.iterancestors())
+                            for endpoint in endpoints)]
+        if len(addressed) > 1:
+            raise ValueError("A transclusion range crosses alternate wordings")
+        if addressed:
+            return addressed
+        context = self.linear_data.processing_context[-1] if self.linear_data.processing_context else {}
+        if context.get("before_start") or context.get("after_end"):
+            # Traverse pre-range controls without validating choices whose words
+            # are outside the requested passage.
+            return options
+        selected, possible = [], []
+        for option in options:
+            identity = option.get("corresp", "")
+            value = (self.get_active_setting("opensiddur:variant", identity)
+                     if identity.startswith("urn:x-opensiddur:condition:") else None)
+            if value is True:
+                selected.append(option)
+            if value is not False:
+                possible.append(option)
+        if len(selected) > 1:
+            raise ValueError(f"More than one alternate wording is selected in {self.project}/{self.file_name}")
+        if selected:
+            return selected
+        if not possible:
+            raise ValueError(f"No alternate wording is selected in {self.project}/{self.file_name}")
+        return possible
+
     def _reading_children(self, element):
         """Visit only the selected form of an abbreviation or an edition error; never flatten
         both readings.
 
-        Other TEI choices retain their existing behavior. Source XML is not mutated.
+        Named wording options use opensiddur:variant. Unknown options retain their
+        existing behavior. Source XML is not mutated.
         """
         tei = "{http://www.tei-c.org/ns/1.0}"
         if element.tag == tei + "choice":
@@ -1176,6 +1216,13 @@ class CompilerProcessor:
             sic, corr = element.find(tei + "sic"), element.find(tei + "corr")
             if sic is not None and corr is not None:
                 yield sic if self.linear_data.error_reading == "printed" else corr
+                return
+            option_tag = f"{{{JLPTEI_NAMESPACE}}}option"
+            if element.find(option_tag) is not None:
+                allowed = self._wording_options(element)
+                # Preserve controls and other global markup between alternatives.
+                yield from (child for child in element
+                            if child.tag != option_tag or child in allowed)
                 return
         yield from element
 

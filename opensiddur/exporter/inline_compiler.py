@@ -42,18 +42,19 @@ def _join(text: str, addition: str, boundary: bool) -> str:
     return text + addition
 
 
-def _unread_choices(element: ElementBase, keep: tuple = ()) -> set[ElementBase]:
+def _unread_choices(element: ElementBase, keep: tuple = (), options=None) -> set[ElementBase]:
     """The children of a tei:choice that inline text leaves out.
 
     Inline text has room for one reading of a word. A ketiv and a qere are two readings of one
     word, and the qere (j:read) is what is read; set side by side they would double the word.
-    A choice of wordings (j:option) has no one reading, and the first stands in, as it does
-    where sub-verse boundaries are measured (opensiddur/common/subverse.py).
+    If wording settings leave several j:options possible, the first remaining option
+    stands in, as it does where sub-verse boundaries are measured.
     """
     if element.tag != TEI_CHOICE:
         return set()
-    readings = [child for child in element if child.tag == J_READ] or [
-        child for child in element if child.tag == J_OPTION][:1]
+    if options is None:
+        options = [child for child in element if child.tag == J_OPTION]
+    readings = [child for child in element if child.tag == J_READ] or options[:1]
     if not readings:
         return set()
     # A reading that holds where the range starts or ends is read regardless: skipping it
@@ -261,8 +262,10 @@ class InlineCompilerProcessor(CompilerProcessor):
         # the command is some kind of recursion now, COPY_TEXT_AND_RECURSE or RECURSE
         context_lang = self._get_in_scope_language(element)
         previous_child = None
-        unread = _unread_choices(element, (self.start_element, self.end_element))
-        for child in self._reading_children(element):
+        children = list(self._reading_children(element))
+        unread = _unread_choices(element, (self.start_element, self.end_element),
+                                 [child for child in children if child.tag == J_OPTION])
+        for child in children:
             if child in unread:
                 continue
             processed = self._process_element(child, root)
