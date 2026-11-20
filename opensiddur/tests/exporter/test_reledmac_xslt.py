@@ -4852,9 +4852,9 @@ class TestKeepTogether(unittest.TestCase):
         self.assertEqual(body.count('Reader:'), 1)
 
     def test_block_rubric_separates_top_level_directions(self):
-        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he"><tei:text><tei:body><tei:div><j:conditional><tei:note type="instruction" xml:lang="he">הוראה<tei:foreign xml:lang="en">An English direction.</tei:foreign></tei:note></j:conditional></tei:div></tei:body></tei:text></tei:TEI>'
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he"><tei:text><tei:body><tei:div><j:conditional><tei:note type="instruction" xml:lang="he"><tei:foreign xml:lang="de-Hebr">הוראה</tei:foreign> <tei:foreign xml:lang="en">An English direction.</tei:foreign></tei:note></j:conditional></tei:div></tei:body></tei:text></tei:TEI>'
         body = self._body(_transform(xml))
-        self.assertIn(r"הוראה\newline \leavevmode", body)
+        self.assertIn(r"}\newline \leavevmode", body)
 
     def test_role_in_paragraph_or_heading_is_not_tagged_standalone(self):
         for wrapper in ('p', 'head'):
@@ -4877,6 +4877,13 @@ class TestKeepTogether(unittest.TestCase):
         xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en"><tei:text><tei:body><p:parallel><p:parallelItem role="primary" xml:lang="en"><tei:div><tei:p>Words:<tei:note type="instruction">Reader.</tei:note> More words.</tei:p></tei:div></p:parallelItem><p:parallelItem role="parallel" xml:lang="en"><tei:div><tei:p>Translation.</tei:p></tei:div></p:parallelItem></p:parallel></tei:body></tei:text></tei:TEI>'
         body = self._body(_transform(xml, layout="pairs"))
         self.assertIn(r"Words:\ \instructionnote{", body)
+
+    def test_block_instruction_keeps_an_embedded_foreign_word_inline(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he"><tei:text><tei:body><tei:div><j:conditional><tei:note type="instruction" xml:lang="en">In many congregations <tei:foreign xml:lang="he">תשגב</tei:foreign> is not said.</tei:note></j:conditional></tei:div></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn('In many congregations', body)
+        self.assertIn('is not said.', body)
+        self.assertNotIn(r"\newline", body)
 
     def test_same_language_inline_role_stays_run_in(self):
         xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p><tei:note type="description">Reader:</tei:note> Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'

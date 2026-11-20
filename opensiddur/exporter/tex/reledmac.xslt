@@ -4094,7 +4094,6 @@ end
                 <xsl:text>{{\textdir TRT\foreignlanguage{hebrew}{</xsl:text>
                 <xsl:call-template name="note-direction-runs">
                     <xsl:with-param name="separate" select="$separate-direction-runs"/>
-                    <xsl:with-param name="note-lang" select="$note-lang"/>
                 </xsl:call-template>
                 <xsl:text>}}}</xsl:text>
             </xsl:when>
@@ -4105,7 +4104,6 @@ end
                 <xsl:text>{{\textdir TLT\foreignlanguage{english}{</xsl:text>
                 <xsl:call-template name="note-direction-runs">
                     <xsl:with-param name="separate" select="$separate-direction-runs"/>
-                    <xsl:with-param name="note-lang" select="$note-lang"/>
                 </xsl:call-template>
                 <xsl:text>}}}</xsl:text>
             </xsl:otherwise>
@@ -4117,14 +4115,14 @@ end
          inline; only top-level runs in block instructions are separated. -->
     <xsl:template name="note-direction-runs">
         <xsl:param name="separate" as="xs:boolean"/>
-        <xsl:param name="note-lang" as="xs:string"/>
         <xsl:choose>
-            <xsl:when test="$separate">
-                <xsl:for-each-group select="node()[not(self::text()[not(normalize-space())])]"
-                    group-adjacent="f:is-rtl-lang(string((self::*[@xml:lang]/@xml:lang, $note-lang)[1]))">
+            <xsl:when test="$separate and empty(text()[normalize-space()])
+                            and exists(tei:foreign[@xml:lang])
+                            and empty(*[not(self::tei:foreign[@xml:lang])])">
+                <xsl:for-each select="tei:foreign">
                     <xsl:if test="position() gt 1"><xsl:text>\newline </xsl:text></xsl:if>
-                    <xsl:apply-templates select="current-group()" mode="emit"/>
-                </xsl:for-each-group>
+                    <xsl:apply-templates select="." mode="emit"/>
+                </xsl:for-each>
             </xsl:when>
             <xsl:otherwise><xsl:apply-templates mode="emit"/></xsl:otherwise>
         </xsl:choose>
