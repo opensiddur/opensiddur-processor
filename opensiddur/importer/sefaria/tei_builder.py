@@ -687,6 +687,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
     gate: str | None = None
     section = False
     until = None
+    until_included = False
     #: where in ``parts`` the last transclusion is, while nothing has followed it
     previous: int | None = None
     texts = 0
@@ -704,11 +705,15 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
             for pair in item.pairs:
                 found = table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
                 if found is None:
-                    if gate is not None and until is not None and until.search(" ".join(plain_text(pair.en).split())):
+                    ends = gate is not None and until is not None and bool(
+                        until.search(" ".join(plain_text(pair.en).split())))
+                    if ends and not until_included:
                         close_gate()  # the rubric the section's condition runs to
                     xml = rubric_xml(pair, lang, notes)
                     if xml:
                         parts.append(xml)
+                    if ends and until_included:
+                        close_gate()  # ... and ends with
                     continue
                 close_gate()
                 if found.instead_of_previous and previous is not None and all(
@@ -719,6 +724,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                                        f'{parts[previous]}<j:endConditional target="#when_{gates}"/>')
                 gates += 1
                 gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                until_included = found.until_included
                 note = instruction(pair.en, "en", notes) if lang == "en" else ""
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
         elif isinstance(item, Heading):
@@ -738,30 +744,33 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
             lead = leading.get(id(item))
             found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
+            # The rubric a section's condition runs to may open the next text's block.
+            ends = gate is not None and until is not None and any(
+                until.search(" ".join(plain_text(pair.en).split()))
+                for pair in item.pairs[:next((k for k, p in enumerate(item.pairs) if is_phrase(p)), 0)])
+            if ends and not until_included:
+                close_gate()
             if lead is not None:
                 # The rubrics before the condition the text opens with are the place's: they
-                # close the text before, inside its gate ("(Deliver us...; Mourner's Kaddish.)"
-                # after one day's psalm, before the next day's rubric).
+                # close the text before ("(Deliver us...; Mourner's Kaddish.)" after one day's
+                # psalm, before the next day's rubric).
                 for pair in item.pairs:
                     if pair is lead or is_phrase(pair):
                         break
+                    if pair.he_kind is HebrewKind.EMPTY and table.for_rubric(plain_text(pair.en)):
+                        continue  # an earlier condition, overridden by the one the text opens with
                     xml = rubric_xml(pair, lang, notes)
                     if xml:
                         parts.append(xml)
-            if gate is not None and until is not None:
-                # The rubric a section's condition runs to may open the next text's block.
-                for pair in item.pairs:
-                    if is_phrase(pair):
-                        break
-                    if until.search(" ".join(plain_text(pair.en).split())):
-                        close_gate()
-                        break
+            if ends and until_included:
+                close_gate()
             if found is not None and found.section:
                 # A condition over a section (one day's introduction and psalm) gates every text
                 # to its end, as the same rubric between texts does.
                 close_gate()
                 gates += 1
                 gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                until_included = found.until_included
                 note = instruction(lead.en, "en", notes) if lang == "en" else ""
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
             elif found is not None and gate is None:

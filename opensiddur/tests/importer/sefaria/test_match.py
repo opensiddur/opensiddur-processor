@@ -289,6 +289,25 @@ class TestDecide(unittest.TestCase):
         self.assertEqual(sorted((r.block, r.urn) for r in again.records.values()),
                          [(1, T + "prayer:barukh_sheamar"), (5, T + "prayer:mizmor")])
 
+    def test_a_text_ending_with_its_blessing_after_a_short_text_is_one_text(self):
+        # Hareini Mezammen, then Barukh She'amar in the same block: the block opens with the short
+        # text, which ends before Barukh She'amar's inner blessing; Barukh She'amar, judged on its
+        # own, opens like its litany (a part) and ends with its closing formula: one text.
+        hareini = "הֲרֵינִי מְזַמֵּן אֶת פִּי לְהוֹדוֹת וּלְהַלֵּל וּלְשַׁבֵּחַ אֶת בּוֹרְאִי"
+        litany = ["בָּרוּךְ שֶׁאָמַר וְהָיָה הָעוֹלָם בָּרוּךְ הוּא", "בָּרוּךְ עוֹשֶׂה בְרֵאשִׁית בָּרוּךְ אוֹמֵר וְעוֹשֶׂה"]
+        blessing = ["בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם הָאֵל הָאָב הָרַחֲמָן",
+                    "בָּרוּךְ אַתָּה יְהֹוָה מֶלֶךְ מְהֻלָּל בַּתִּשְׁבָּחוֹת"]
+        index = IncipitIndex()
+        index.add(T + "prayer:hareini", words(" ".join([hareini, *litany])))
+        index.length_of[T + "prayer:hareini"] = len(words(hareini))
+        index.add(T + "prayer:bsa", words(" ".join(litany + blessing)))
+        index.add(T + "prayer:bsa/barukh", words(" ".join(litany)))
+        index.children[T + "prayer:bsa"] = [T + "prayer:bsa/barukh"]
+        index.closing_of[T + "prayer:bsa"] = tuple(words(blessing[-1]))
+        outcome = decide([("L", items(hareini, *litany, *blessing))], index)
+        self.assertEqual([(r.block, r.urn) for r in outcome.records.values()],
+                         [(1, T + "prayer:hareini"), (2, T + "prayer:bsa")])
+
     def test_a_short_text_printed_again_is_a_repeat(self):
         short = ["<b>אָמֵן</b> סֶלָה"]
         outcome = decide([("A", items(*short)), ("B", items(*short))])

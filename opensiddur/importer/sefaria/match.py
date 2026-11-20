@@ -1212,7 +1212,14 @@ class _Decider:
             # closing formula: what follows that start is another text's.
             matching = [matching_words(pair) for pair in block.phrases[:replay]]
             whole = resolve(lookup(self.index, [w for p in matching for w in p]), matching, self.index)
-            if whole.urn is None or whole.urn != closing_text([w for p in matching for w in p], self.index):
+            closing = closing_text([w for p in matching for w in p], self.index)
+            if whole.split_at is not None and whole.split_at < blessing:
+                # The text the block opens with ends before the blessing (Hareini Mezammen,
+                # then Barukh She'amar): the block after it is judged on its own.
+                pass
+            elif whole.urn is None or closing is None or not (
+                    whole.urn == closing or whole.urn.startswith(closing + "/")):
+                # Not one text that ends with the blessing's closing formula.
                 replay = blessing
         if replay is not None:
             block = self.cut(leaf, blocks, i, replay)

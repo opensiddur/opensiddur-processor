@@ -337,8 +337,10 @@ become `j:conditional`, from a curated table:
   Shemoneh Esrei"), everything to the next heading, or, with `until`, to the rubric that matches
   it, past any heading (Tachanun, to "The Chazzan recites the following Kaddish"); either ends
   at the next condition rubric, and at the end of the leaf; a rubric `until` names may also
-  open the next text (each day's psalm ends "(Deliver us...; Mourner's Kaddish.)", before the
-  next day's rubric). A text that opens with a condition rubric keeps it in its own file only
+  open the next text. That rubric comes after the section, unless `until_included: true` makes
+  it the section's last (each day's psalm ends "(Deliver us...; Mourner's Kaddish.)", before
+  the next day's rubric; the Kaddish after Tachanun is said either way). The rubrics before the
+  condition a text opens with are the place's, before its gate. A text that opens with a condition rubric keeps it in its own file only
   when every printing of it opens with that rubric; otherwise each place that prints it is
   gated by its own rubric, and the text's file is unconditional (Psalm 130, said in the Ten
   Days after Yishtabach and among the winter psalms every Shabbos). A rubric over a section

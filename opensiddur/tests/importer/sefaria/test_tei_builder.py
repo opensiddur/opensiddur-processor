@@ -453,8 +453,10 @@ class TestLeafGates(unittest.TestCase):
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         deliver = _re.compile("^\\(Deliver us")
         table = Conditions(rubrics=(
-            RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}, section=True, until=deliver),
-            RubricCondition(_re.compile("^On Monday:"), {"day-of-week": {"hebrew-day": 2}}, section=True, until=deliver)))
+            RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}, section=True, until=deliver,
+                            until_included=True),
+            RubricCondition(_re.compile("^On Monday:"), {"day-of-week": {"hebrew-day": 2}}, section=True, until=deliver,
+                            until_included=True)))
         items, urns, _ = self.leaf(("", "<b>הַיּוֹם</b> יוֹם רִאשׁוֹן", "<b>לְדָוִד</b> מִזְמוֹר", "", "",
                                     "<b>הַיּוֹם</b> יוֹם שֵׁנִי", "<b>שִׁיר</b> מִזְמוֹר"),
                                    ("<small>On Sunday:</small>", "Today is Sunday", "A psalm of David",
@@ -475,6 +477,29 @@ class TestLeafGates(unittest.TestCase):
         deliver = [n for n in notes if "Deliver us" in "".join(n.itertext())]
         self.assertEqual(len(deliver), 1)
         following = deliver[0].xpath("following-sibling::*[1]", namespaces=NS)[0]
+        self.assertEqual((etree.QName(following).localname, following.get("target")), ("endConditional", "#when_1"))
+
+
+    def test_a_section_may_end_with_the_rubric_it_runs_to(self):
+        # Wednesday's psalm, then "(Deliver us...)" and Thursday's rubric between texts: the
+        # Kaddish rubric is Wednesday's, inside its gate.
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        deliver = _re.compile("^\\(Deliver us")
+        table = Conditions(rubrics=(
+            RubricCondition(_re.compile("^On Wednesday:"), {"day-of-week": {"hebrew-day": 4}}, section=True,
+                            until=deliver, until_included=True),
+            RubricCondition(_re.compile("^On Thursday:"), {"day-of-week": {"hebrew-day": 5}}, section=True,
+                            until=deliver, until_included=True)))
+        _, _, body = self.leaf(("", "<b>אֵל</b> נְקָמוֹת", "", "", "<b>לַמְנַצֵּחַ</b> עַל הַגִּתִּית"),
+                               ("<small>On Wednesday:</small>", "God of vengeance",
+                                "<small>(Deliver us...; Mourner's Kaddish.)</small>", "<small>On Thursday:</small>",
+                                "For the conductor"), table)
+        en = body("en")
+        self.assertEqual(self.gated(en), [["t0"], ["t1"]])
+        deliver_note = [n for n in en.xpath("//tei:note[@type='instruction']", namespaces=NS)
+                        if "Deliver us" in "".join(n.itertext())][0]
+        following = deliver_note.xpath("following-sibling::*[1]", namespaces=NS)[0]
         self.assertEqual((etree.QName(following).localname, following.get("target")), ("endConditional", "#when_1"))
 
 
