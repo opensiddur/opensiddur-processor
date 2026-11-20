@@ -6,6 +6,8 @@ from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.match import (
+    later_text,
+    verse_run,
     TextRecord,
     decide_work,
     load_records,
@@ -41,6 +43,82 @@ def index_of(**texts) -> IncipitIndex:
 def decide(leaves, index=None, records=None, phrases=None):
     return decide_work("w", leaves, index or IncipitIndex(), records or {}, set(),
                        recorded_phrases=phrases, spellings=NO_SPELLINGS)
+
+
+VERSES = ["אַשְׁרֵי הָאִישׁ אֲשֶׁר לֹא הָלַךְ בַּעֲצַת רְשָׁעִים", "כִּי אִם בְּתוֹרַת יְהֹוָה חֶפְצוֹ וּבְתוֹרָתוֹ יֶהְגֶּה",
+          "וְהָיָה כְּעֵץ שָׁתוּל עַל פַּלְגֵי מָיִם", "לֹא כֵן הָרְשָׁעִים כִּי אִם כַּמֹּץ"]
+
+
+def verses_index(count: int = len(VERSES)) -> IncipitIndex:
+    """Psalm 1 as the index holds a chapter: each verse's opening collected past its end."""
+    index = IncipitIndex()
+    for n in range(count):
+        index.add(f"{T}bible:psalms/1/{n + 1}", words(" ".join(VERSES[n:])))
+        index.length_of[f"{T}bible:psalms/1/{n + 1}"] = len(words(VERSES[n]))
+    return index
+
+
+class TestVerseRun(unittest.TestCase):
+    def test_consecutive_verses_to_the_end_of_the_block(self):
+        block = words(" ".join(VERSES[1:3]))
+        self.assertEqual(verse_run(T + "bible:psalms/1/2", block, verses_index()), T + "bible:psalms/1/2-3")
+
+    def test_the_first_verse_to_the_last_is_the_chapter(self):
+        block = words(" ".join(VERSES))
+        self.assertEqual(verse_run(T + "bible:psalms/1/1", block, verses_index()), T + "bible:psalms/1")
+
+    def test_verses_then_words_of_its_own_are_not_a_run(self):
+        block = words(" ".join(VERSES[1:3] + UNKNOWN))
+        self.assertIsNone(verse_run(T + "bible:psalms/1/2", block, verses_index()))
+
+    def test_a_word_the_source_splits_in_two_still_opens_its_verse(self):
+        split = VERSES[2].replace("וְהָיָה כְּעֵץ", "וְהָיָה כְּ עֵץ")
+        block = words(" ".join([VERSES[1], split, VERSES[3]]))
+        self.assertEqual(verse_run(T + "bible:psalms/1/2", block, verses_index()), T + "bible:psalms/1/2-4")
+
+    def test_a_chapter_ends_at_its_last_verse_not_where_the_next_text_quotes_it(self):
+        # Psalm 20, then Uva Letziyon, which quotes Psalm 20:10.
+        quoting = ["שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף", VERSES[3], "וְעוֹד דְּבָרִים אֲחֵרִים"]
+        outcome = decide([("L", items(*VERSES, *quoting))], verses_index())
+        self.assertEqual([(r.block, r.urn) for r in outcome.records.values()][0], (1, T + "bible:psalms/1"))
+        self.assertEqual(sorted(r.block for r in outcome.records.values()), [1, 5])
+
+    def test_a_single_verse_is_not_a_run(self):
+        self.assertIsNone(verse_run(T + "bible:psalms/1/2", words(VERSES[1]), verses_index()))
+
+
+VIHI_NOAM = "וִיהִי נֹעַם אֲדֹנָי אֱלֹהֵינוּ עָלֵינוּ וּמַעֲשֵׂה יָדֵינוּ כּוֹנְנָה עָלֵינוּ"
+
+
+class TestPsalmAfterAText(unittest.TestCase):
+    """A block that runs on into a whole psalm (Psalm 130 after Yishtabach) is cut before it."""
+
+    @staticmethod
+    def phrases(*hebrew: str) -> list[list[str]]:
+        return [words(h) for h in hebrew]
+
+    def test_a_whole_psalm_after_a_text_is_cut_off(self):
+        found = later_text(self.phrases(*UNKNOWN, *VERSES), None, verses_index())
+        self.assertEqual(found, (len(UNKNOWN), T + "bible:psalms/1"))
+
+    def test_part_of_a_psalm_is_not(self):
+        self.assertIsNone(later_text(self.phrases(*UNKNOWN, *VERSES[:2]), None, verses_index()))
+
+    def test_verses_then_a_psalm_are_one_text(self):
+        index = verses_index()
+        index.add(T + "bible:psalms/90/17", words(" ".join([VIHI_NOAM, *VERSES])))
+        self.assertIsNone(later_text(self.phrases(VIHI_NOAM, *VERSES), None, index))
+
+    def test_a_psalm_a_text_of_the_collection_is_made_of_stays_in_it(self):
+        index = verses_index()
+        index.add(T + "prayer:hallel/psalm_1", words(" ".join(VERSES)))
+        # The block is Hallel: the psalm, one of Hallel's parts, is not cut off as scripture.
+        self.assertIsNone(later_text(self.phrases(*UNKNOWN, *VERSES), T + "prayer:hallel", index))
+
+    def test_a_text_the_collection_prints_with_the_psalm_keeps_it(self):
+        index = verses_index()
+        index.add(T + "prayer:zeh", words(" ".join([*UNKNOWN, *VERSES])))
+        self.assertIsNone(later_text(self.phrases(*UNKNOWN, *VERSES), T + "prayer:zeh", index))
 
 
 class TestDecide(unittest.TestCase):
@@ -107,6 +185,31 @@ class TestDecide(unittest.TestCase):
         outcome = decide([("L", items(*UNKNOWN))], index)
         self.assertEqual(outcome.decided[0].urn, T + "bible:psalms/30")
 
+    def test_a_run_of_verses_is_named_by_its_range(self):
+        index = verses_index()
+        outcome = decide([("L", items(VERSES[1], VERSES[2]))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "bible:psalms/1/2-3")
+        self.assertEqual(outcome.decided[0].kind, "existing")  # scripture is named by its place
+
+    def test_texts_with_the_same_opening_are_told_apart_by_what_follows(self):
+        same = "הוֹדוּ לַיהֹוָה כִּי טוֹב כִּי לְעוֹלָם חַסְדּוֹ"
+        index = IncipitIndex()
+        index.add(T + "prayer:aaa", words(same + " " + UNKNOWN[1]))
+        index.add(T + "prayer:zzz", words(same + " " + PART_B[0]))
+        outcome = decide([("L", items(same, PART_B[0]))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "prayer:zzz")
+
+    def test_a_closing_that_goes_on_is_not_cut_off(self):
+        blessing = ["<b>זֶה טֶקְסְט</b> חָדָשׁ לְגַמְרֵי", "בָּרוּךְ אַתָּה מְקַדֵּשׁ הַשַּׁבָּת"]
+        index = IncipitIndex()
+        index.add(T + "prayer:shabbat_only", words(" ".join(blessing)))
+        index.length_of[T + "prayer:shabbat_only"] = len(words(" ".join(blessing)))
+        outcome = decide([("L", items(*blessing, "וְיִשְׂרָאֵל וְרָאשֵׁי חֳדָשִׁים"))], index)
+        self.assertEqual(len(outcome.decided), 1)
+        # ... but a text of its own after it is cut off
+        outcome = decide([("L", items(*blessing, "שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף", "וְעוֹד דְּבָרִים אֲחֵרִים"))], index)
+        self.assertEqual(len(outcome.decided), 2)
+
     def test_records_are_sticky_and_lapse_when_the_text_changes(self):
         first = decide([("L", items(*MODEH))])
         again = decide([("L", items(*MODEH))], records=first.records)
@@ -121,6 +224,89 @@ class TestDecide(unittest.TestCase):
         again = decide([("L", items(*corrected))], records=first.records)
         self.assertEqual(again.decided[0].urn, first.decided[0].urn)
         self.assertEqual(again.lapsed, [first.decided[0]])
+
+    def test_a_text_whose_block_now_runs_on_is_cut_again(self):
+        # Divided otherwise, the block runs on past the psalm: it is not the psalm with words
+        # changed, but the psalm and a text after it.
+        first = decide([("L", items(*VERSES))], verses_index())
+        self.assertEqual([r.urn for r in first.decided], [T + "bible:psalms/1"])
+        own = ["שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף", "וְעוֹד דְּבָרִים אֲחֵרִים"]
+        again = decide([("L", items(*VERSES, *own))], verses_index(), records=first.records)
+        self.assertEqual([r.urn for r in again.records.values()][0], T + "bible:psalms/1")
+        self.assertEqual(len(again.records), 2)
+
+    def test_a_run_of_verses_whose_block_now_runs_on_is_cut_again(self):
+        own = ["שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף אֶלָּא כָּאן", "וְעוֹד דְּבָרִים אֲחֵרִים"]
+        index = verses_index()
+        index.add(T + "prayer:zeh", words(" ".join(own)))
+        first = decide([("L", items(*VERSES[1:3]))], index)
+        self.assertEqual([r.urn for r in first.decided], [T + "bible:psalms/1/2-3"])
+        again = decide([("L", items(*VERSES[1:3], *own))], index, records=first.records)
+        self.assertEqual([r.urn for r in again.records.values()], [T + "bible:psalms/1/2-3", T + "prayer:zeh"])
+
+    def test_a_variants_last_words_lined_otherwise_stay_with_it(self):
+        first = [*MODEH, "שֶׁבָּעוֹלָם הַזֶּה וְאִמְרוּ אָמֵן"]
+        later = [MODEH[0], "מֶֽלֶךְ חַי וְקַיָּם וְנִצָּח", *MODEH[2:], "שֶׁבָּעוֹלָם הַזֶּה", "וְאִמְרוּ אָמֵן"]
+        outcome = decide_work("w", [("A", items(*first)), ("B", items(*later))], IncipitIndex(), {}, set(),
+                              spellings=NO_SPELLINGS, places={"B": "b"})
+        self.assertEqual([r.kind for r in outcome.decided], ["new", "variant"])
+
+    def test_a_blessing_is_cut_off_before_a_recorded_start_further_on(self):
+        modeh = [MODEH[0].replace("<b>", "").replace("</b>", ""), *MODEH[1:]]
+        leaf = ["זֶה טֶקְסְט חָדָשׁ לְגַמְרֵי", "שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף",
+                "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם", "שֶׁעָשָׂה לִי כָּל צָרְכִּי", *modeh]
+        index = index_of(prayer_c_modeh=" ".join(modeh))
+        first = decide([("L", items(*leaf))], index)
+        self.assertEqual(sorted(r.block for r in first.records.values()), [1, 3, 5])
+        # Only the record of the text the book prints last is left: its start is replayed, and
+        # the blessing before it is still a text of its own.
+        kept = {k: r for k, r in first.records.items() if r.block == 5}
+        again = decide([("L", items(*leaf))], index, records=kept)
+        self.assertEqual(sorted(r.block for r in again.records.values()), [1, 3, 5])
+
+    def test_a_recorded_first_printing_is_a_later_one_when_an_earlier_block_now_prints_the_text(self):
+        first = decide([("A", items(*UNKNOWN)), ("B", items(*MODEH))])
+        kept = {k: r for k, r in first.records.items() if r.leaf == "B"}
+        again = decide([("A", items(*MODEH)), ("B", items(*MODEH))], records=kept)
+        kinds = {r.leaf: r.kind for r in again.records.values()}
+        self.assertEqual(kinds["B"], "repeat")
+        self.assertNotEqual(kinds["A"], "repeat")
+
+    def test_a_text_ending_with_its_blessing_stays_whole_before_a_recorded_start(self):
+        # Barukh She'amar: a litany, then a blessing with its own closing formula; the text after
+        # it is recorded as starting where it does, in the same block.
+        litany = ["בָּרוּךְ שֶׁאָמַר וְהָיָה הָעוֹלָם בָּרוּךְ הוּא", "בָּרוּךְ עוֹשֶׂה בְרֵאשִׁית בָּרוּךְ אוֹמֵר וְעוֹשֶׂה",
+                  "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם הָאֵל הָאָב הָרַחֲמָן",
+                  "בָּרוּךְ אַתָּה יְהֹוָה מֶלֶךְ מְהֻלָּל בַּתִּשְׁבָּחוֹת"]
+        after = ["מִזְמוֹר לְתוֹדָה הָרִיעוּ לַיהֹוָה כָּל הָאָרֶץ", "עִבְדוּ אֶת יְהֹוָה בְּשִׂמְחָה"]
+        index = index_of(prayer_c_barukh_sheamar=" ".join(litany), prayer_c_mizmor=" ".join(after))
+        index.closing_of[T + "prayer:barukh_sheamar"] = tuple(words(litany[-1]))
+        first = decide([("L", items(*litany, "<b>" + after[0] + "</b>", after[1]))], index)
+        self.assertEqual(sorted((r.block, r.urn) for r in first.records.values()),
+                         [(1, T + "prayer:barukh_sheamar"), (5, T + "prayer:mizmor")])
+        kept = {k: r for k, r in first.records.items() if r.block == 5}
+        again = decide([("L", items(*litany, *after))], index, records=kept)
+        self.assertEqual(sorted((r.block, r.urn) for r in again.records.values()),
+                         [(1, T + "prayer:barukh_sheamar"), (5, T + "prayer:mizmor")])
+
+    def test_a_text_ending_with_its_blessing_after_a_short_text_is_one_text(self):
+        # Hareini Mezammen, then Barukh She'amar in the same block: the block opens with the short
+        # text, which ends before Barukh She'amar's inner blessing; Barukh She'amar, judged on its
+        # own, opens like its litany (a part) and ends with its closing formula: one text.
+        hareini = "הֲרֵינִי מְזַמֵּן אֶת פִּי לְהוֹדוֹת וּלְהַלֵּל וּלְשַׁבֵּחַ אֶת בּוֹרְאִי"
+        litany = ["בָּרוּךְ שֶׁאָמַר וְהָיָה הָעוֹלָם בָּרוּךְ הוּא", "בָּרוּךְ עוֹשֶׂה בְרֵאשִׁית בָּרוּךְ אוֹמֵר וְעוֹשֶׂה"]
+        blessing = ["בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם הָאֵל הָאָב הָרַחֲמָן",
+                    "בָּרוּךְ אַתָּה יְהֹוָה מֶלֶךְ מְהֻלָּל בַּתִּשְׁבָּחוֹת"]
+        index = IncipitIndex()
+        index.add(T + "prayer:hareini", words(" ".join([hareini, *litany])))
+        index.length_of[T + "prayer:hareini"] = len(words(hareini))
+        index.add(T + "prayer:bsa", words(" ".join(litany + blessing)))
+        index.add(T + "prayer:bsa/barukh", words(" ".join(litany)))
+        index.children[T + "prayer:bsa"] = [T + "prayer:bsa/barukh"]
+        index.closing_of[T + "prayer:bsa"] = tuple(words(blessing[-1]))
+        outcome = decide([("L", items(hareini, *litany, *blessing))], index)
+        self.assertEqual([(r.block, r.urn) for r in outcome.records.values()],
+                         [(1, T + "prayer:hareini"), (2, T + "prayer:bsa")])
 
     def test_a_short_text_printed_again_is_a_repeat(self):
         short = ["<b>אָמֵן</b> סֶלָה"]
@@ -368,6 +554,27 @@ class TestStageTwo(unittest.TestCase):
         self.assertEqual([r.urn for r in outcome.decided][0], T + "bible:psalms/100")
         self.assertEqual(len(outcome.decided), 2)
 
+    def test_a_chapter_whose_refrain_opens_an_earlier_verse_ends_at_its_last(self):
+        refrain = "רוֹמְמוּ יְהוָה אֱלֹהֵינוּ וְהִשְׁתַּחֲווּ"
+        verses = ["מִזְמוֹר לְתוֹדָה הָרִיעוּ לַיהוָה כָּל הָאָרֶץ", f"{refrain} לַהֲדֹם רַגְלָיו קָדוֹשׁ הוּא",
+                  "מֹשֶׁה וְאַהֲרֹן בְּכֹהֲנָיו וּשְׁמוּאֵל בְּקֹרְאֵי שְׁמוֹ", f"{refrain} לְהַר קָדְשׁוֹ כִּי קָדוֹשׁ"]
+        index = documents(f'<tei:div corresp="{T}bible:psalms/99"><tei:p>' + " ".join(
+            f'<tei:milestone unit="verse" corresp="{T}bible:psalms/99/{n}"/>{v}' for n, v in enumerate(verses, 1))
+            + "</tei:p></tei:div>")
+        outcome = decide([("L", items(*verses, *UNKNOWN))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "bible:psalms/99")
+        self.assertEqual(outcome.decided[1].block, len(verses) + 1)  # cut after the last verse
+
+    def test_a_whole_verse_is_the_verse_though_a_liturgical_text_is_it_too(self):
+        verse = "וְעָרְבָה לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם כִּימֵי עוֹלָם וּכְשָׁנִים קַדְמֹנִיּוֹת"
+        index = documents(f'<tei:div corresp="{T}bible:malachi/3"><tei:p>'
+                          f'<tei:milestone unit="verse" corresp="{T}bible:malachi/3/4"/>{verse} '
+                          f'<tei:milestone unit="verse" corresp="{T}bible:malachi/3/5"/>{" ".join(UNKNOWN)}'
+                          f'</tei:p></tei:div><tei:div corresp="{T}prayer:qorbanot/vearvah"><tei:p>{verse}</tei:p></tei:div>')
+        outcome = decide([("L", items(f"<b>וְעָרְבָה</b> לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם",
+                                      "כִּימֵי עוֹלָם וּכְשָׁנִים קַדְמֹנִיּוֹת"))], index)
+        self.assertEqual(outcome.decided[0].urn, T + "bible:malachi/3/4")
+
     def test_a_block_that_is_one_whole_verse_is_that_verse(self):
         verse = "וְעָרְבָה לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם כִּימֵי עוֹלָם וּכְשָׁנִים קַדְמֹנִיּוֹת"
         index = documents(f'<tei:div corresp="{T}bible:malachi/3"><tei:p>'
@@ -385,6 +592,20 @@ class TestStageTwo(unittest.TestCase):
                               spellings=NO_SPELLINGS, places={"B": "b"})
         first, second = outcome.decided
         self.assertEqual((second.kind, second.urn), ("variant", first.urn))
+
+    def test_a_variant_decided_before_a_kept_one_numbers_its_own_phrases_after_it(self):
+        later = [MODEH[0], "מֶֽלֶךְ חַי וְקַיָּם וְנִצָּח", *MODEH[2:]]
+        other = [*MODEH[:2], "שֶׁהֶחֱזַֽרְתָּ בִּי נִשְׁמָתִי בְּרַחֲמִים רַבִּים", MODEH[3]]
+        places = {"B": "b", "C": "c"}
+        first = decide_work("w", [("A", items(*MODEH)), ("C", items(*other))], IncipitIndex(), {}, set(),
+                            spellings=NO_SPELLINGS, places=places)
+        kept = first.decided[1]
+        again = decide_work("w", [("A", items(*MODEH)), ("B", items(*later)), ("C", items(*other))],
+                            IncipitIndex(), first.records, set(), spellings=NO_SPELLINGS, places=places)
+        (inserted,) = again.decided
+        own = set(inserted.phrases) - set(range(1, len(MODEH) + 1))
+        self.assertTrue(own)
+        self.assertFalse(own & set(kept.phrases))
 
     def test_a_parenthesized_passage_is_an_insertion(self):
         passage = [f"(אַתָּה חוֹנַנְתָּנוּ פָּסוּק {n} חָדָשׁ" if n == "א" else f"פָּסוּק {n} חָדָשׁ לְגַמְרֵי"

@@ -35,7 +35,7 @@ import html
 import re
 
 from lxml import etree
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -79,11 +79,14 @@ def siddur_urn(path: str) -> str:
     return f"{SIDDUR_PREFIX}{path}"
 
 
-def file_stem(urn: str) -> str:
+def file_stem(urn: str, clashes: Collection[str] = frozenset()) -> str:
     """A file named by a URN's path: ``prayer:amidah/avot`` -> ``amidah_avot``; a ``siddur:``
-    URN keeps the prefix ``siddur_`` so that it can never meet a text's file."""
+    URN keeps the prefix ``siddur_`` so that it can never meet a text's file. A path two text
+    namespaces use (``clashes``) is told apart as its phrases are: ``poem_hamavdil_...``."""
     namespace, _, path = urn[len(TEXT_PREFIX):].partition(":")
-    stem = path.replace("/", "_")
+    if path in clashes and namespace != "prayer":
+        path = f"{namespace}/{path}"
+    stem = path.replace("/", "_").replace("-", "_")  # a run of verses: psalms_3_2_9
     return f"siddur_{stem}" if namespace == "siddur" else stem
 
 
@@ -261,8 +264,11 @@ class _TextWriter:
     next rubric closes, or the end of the passage it is in -- or, where the passage opens with a
     parenthesis, the phrase that closes it."""
 
-    def __init__(self, urn: str, lang: str, notes: Notes, conditions: Conditions | None = None):
+    def __init__(self, urn: str, lang: str, notes: Notes, conditions: Conditions | None = None,
+                 clashes: Collection[str] = frozenset()):
         self.urn, self.lang, self.notes = urn, lang, notes
+        #: the paths more than one text namespace uses (``phrases.clashing_paths``)
+        self.clashes = clashes
         self.table = conditions or Conditions()
         self.parts: list[str] = []
         self.phrase_open = False
@@ -347,7 +353,7 @@ class _TextWriter:
             xml_id = self.next_id("when")
             note = instruction((label,), "he", self.notes) if self.lang == "he" else ""
             self.parts.append(conditional_open(xml_id, note, condition_xml(labelled.when)))
-        xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number), label=labelled is None)
+        xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number, self.clashes), label=labelled is None)
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
         self.parts.append(xml)
@@ -467,7 +473,14 @@ class _TextWriter:
         # languages, whichever the rubric is printed in, so that the two divide alike.
         self.end_phrase()
         self.verse(None)
-        found = self.table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
+        found = None
+        if pair.he_kind is HebrewKind.EMPTY:
+            found = self.table.for_rubric(plain_text(pair.en))
+        elif pair.he_kind is HebrewKind.LABEL:
+            # A label standing on its own line before the words it governs (<b>לפסח</b>, "On
+            # Pesach"): known by its Hebrew, or else by its English.
+            label = self.table.for_label(plain_text(pair.he))
+            found = label if label is not None else self.table.for_rubric(plain_text(pair.en))
         current = self.calendar
         if found is None and current is not None and current[2] is None:
             # A rubric between a condition rubric and the first words it governs ("Chazzan:",
@@ -479,7 +492,7 @@ class _TextWriter:
         self.close_calendar()
         self.pending = None
         if found is not None:
-            self.open_calendar(pair, found.when, found.through)
+            self.open_calendar(pair, found.when, getattr(found, "through", ()))
             return
         xml = rubric_xml(pair, self.lang, self.notes)
         if xml:
@@ -579,7 +592,8 @@ def _variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | No
 
 def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes,
               variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None,
-              verse_lengths: dict[str, int] | None = None, conditions: Conditions | None = None) -> str:
+              verse_lengths: dict[str, int] | None = None, conditions: Conditions | None = None,
+              clashes: Collection[str] = frozenset()) -> str:
     """A text's division: its heading, then its phrases and the rubrics among them.
 
     With ``variants``, the one text of every printing: the first printing's words, a phrase a
@@ -595,7 +609,7 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     verse_words = 0
     verse_length: int | None = None
     head = head_xml(block.head, lang, notes) if block.head is not None else ""
-    writer = _TextWriter(urn, lang, notes, conditions)
+    writer = _TextWriter(urn, lang, notes, conditions, clashes)
     base = set(phrase_numbers)
     passages = [(v, _variant_passages(v, base)) for v in variants]
     absent = {n: [v.name for v in variants if n not in set(v.numbers)] for n in phrase_numbers}
@@ -673,6 +687,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
     gate: str | None = None
     section = False
     until = None
+    until_included = False
     #: where in ``parts`` the last transclusion is, while nothing has followed it
     previous: int | None = None
     texts = 0
@@ -690,11 +705,15 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
             for pair in item.pairs:
                 found = table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
                 if found is None:
-                    if gate is not None and until is not None and until.search(" ".join(plain_text(pair.en).split())):
+                    ends = gate is not None and until is not None and bool(
+                        until.search(" ".join(plain_text(pair.en).split())))
+                    if ends and not until_included:
                         close_gate()  # the rubric the section's condition runs to
                     xml = rubric_xml(pair, lang, notes)
                     if xml:
                         parts.append(xml)
+                    if ends and until_included:
+                        close_gate()  # ... and ends with
                     continue
                 close_gate()
                 if found.instead_of_previous and previous is not None and all(
@@ -705,6 +724,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                                        f'{parts[previous]}<j:endConditional target="#when_{gates}"/>')
                 gates += 1
                 gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                until_included = found.until_included
                 note = instruction(pair.en, "en", notes) if lang == "en" else ""
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
         elif isinstance(item, Heading):
@@ -724,7 +744,36 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
             lead = leading.get(id(item))
             found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
-            if found is not None and gate is None:
+            # The rubric a section's condition runs to may open the next text's block.
+            ends = gate is not None and until is not None and any(
+                until.search(" ".join(plain_text(pair.en).split()))
+                for pair in item.pairs[:next((k for k, p in enumerate(item.pairs) if is_phrase(p)), 0)])
+            if ends and not until_included:
+                close_gate()
+            if lead is not None:
+                # The rubrics before the condition the text opens with are the place's: they
+                # close the text before ("(Deliver us...; Mourner's Kaddish.)" after one day's
+                # psalm, before the next day's rubric).
+                for pair in item.pairs:
+                    if pair is lead or is_phrase(pair):
+                        break
+                    if pair.he_kind is HebrewKind.EMPTY and table.for_rubric(plain_text(pair.en)):
+                        continue  # an earlier condition, overridden by the one the text opens with
+                    xml = rubric_xml(pair, lang, notes)
+                    if xml:
+                        parts.append(xml)
+            if ends and until_included:
+                close_gate()
+            if found is not None and found.section:
+                # A condition over a section (one day's introduction and psalm) gates every text
+                # to its end, as the same rubric between texts does.
+                close_gate()
+                gates += 1
+                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                until_included = found.until_included
+                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                parts.append(conditional_open(gate, note, condition_xml(found.when)))
+            elif found is not None and gate is None:
                 gates += 1
                 note = instruction(lead.en, "en", notes) if lang == "en" else ""
                 transclude = (conditional_open(f"when_{gates}", note, condition_xml(found.when))

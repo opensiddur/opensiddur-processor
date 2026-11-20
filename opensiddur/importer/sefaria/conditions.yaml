@@ -76,13 +76,14 @@ definitions:
 
 rubrics:
   # -- Seasons ----------------------------------------------------------------------------------
-  - match: "^\\(?\\*?During the Ten Days of Penitence(,)? (add|say|continue here)\\b|^\\*?During the Ten Days of Penitence:"
+  - match: "^\\(?\\*?During the Ten Days of Penitence(,)? (add|say|continue here)\\b|^\\*?During the Ten Days of Penitence:|^\\(?\\*?Between Rosh Hashanah and Yom Kippur,? (add|substitute)\\b"
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
   - match: "^The following five prayers are said during the Ten Days of Penitence"
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
-  - match: "^From the Musaf of the first day of Pesach until the Musaf of Shemini Atzeres"
+  - match: "^\\(?From ?the ?Musaf ?of the first day of Pesach until ?the ?Musaf ?of Shemini Atzeres|^\\(?On Pesach,? \\(?except (on the first day of Pesach in the silent Amidah\\)|for Shacharis of the first day),? (on )?Shavuos and Sukkos"
+    # (Sefaria's English sometimes runs "theMusafof" together)
     when: {holiday-aggregate: {geshem: false}}
-  - match: "^From the Musaf of Shemini Atzeres until the Musaf of the first day of Pesach"
+  - match: "^\\(?From ?the ?Musaf ?of Shemini Atzeres until ?the ?Musaf ?of the first day of Pesach|^\\(?From Mincha of Shemini Atzeres until after Shacharis on the first day of Pesach|^\\(?On Shemini Atzeres, Simchas Torah and on the first day of Pesach"
     when: {holiday-aggregate: {geshem: true}}
   - match: "^From the evening service \\[Maariv\\] on December 4"
     when: {holiday-aggregate: {tal-umatar: true}}
@@ -90,7 +91,7 @@ rubrics:
     when: {holiday-aggregate: {tal-umatar: false}}
   - match: "^The following psalm \\(27\\) is recited|^The following is recited here by some congregations from the first day of Elul"
     when: *elul_to_shemini_atzeret
-  - match: "^During the Ten Days of Penitence, continue at the asterisk"
+  - match: "^During the Ten Days of Penitence, continue at the asterisk|^Between Rosh Hashanah and Yom Kippur (the Chazzan )?continues? at the asterisk"
     # the ordinary closing it skips (הָאֵל הַקָּדוֹשׁ), to the rubric at the asterisk
     when: {none: [{holiday-aggregate: {aseret-ymei-tshuva: true}}]}
   - match: "^During the Ten Days of Penitence, Avinu Malkeinu is recited here"
@@ -99,7 +100,7 @@ rubrics:
   # -- Days of the month and festivals ---------------------------------------------------------
   - match: "On Rosh Chodesh and on Chol HaMoed,? the following prayer is added"
     when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
-  - match: "^On Rosh Chodesh and Yom Tov add:"
+  - match: "^On Rosh Chodesh and Yom Tov,? add:"
     when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {yom-tov: true}}]}
   - match: "^On Rosh Chodesh (add|say):"
     when: {holiday: {rosh-hodesh: true}}
@@ -111,7 +112,7 @@ rubrics:
     when: {none: [{holiday: {rosh-hodesh: true}}, {holiday: {pesah: [3, 8]}}]}
   - match: "^\\(?On Chanukah and Purim (add|the following prayer is added)"
     when: {any: [{holiday: {hanukkah: true}}, {holiday: {purim-observed: true}}]}
-  - match: "^On Chanukah:"
+  - match: "^\\(?On (Shabbos )?Chanukah( add)?:|^\\(?On (Shabbos )?Chanukah the following prayer is added"
     when: {holiday: {hanukkah: true}}
   - match: "^The following blessing is said only on the first evening:"
     when: {holiday: {hanukkah: 1}}
@@ -119,9 +120,9 @@ rubrics:
     when: {holiday: {purim-observed: true}}
   - match: "^\\(?On Shabbos and Yom Tov say:"
     when: {any: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]}
-  - match: "^On Shabbos (add|say):"
+  - match: "^\\(?On Shabbos,? (add|say):|^On Shabbos conclude with this berachah|^On Shabbos, the Chazzan begins here|^On Shabbos, before Borechu, the following selection from the Zohar is said|^The following three prayers are said only on Sabbath"
     when: {holiday-aggregate: {shabbat: true}}
-  - match: "^On (the )?Yom Tov say:"
+  - match: "^On (the )?Yom Tov say:|^On Yom Tov conclude with this berachah|^On Yom Tov, the Chazzan begins here"
     when: {holiday-aggregate: {yom-tov: true}}
   - match: "^On Rosh Hash(o|a)n(ah?|o) say:"
     when: {holiday: {rosh-hashana: true}}
@@ -129,6 +130,39 @@ rubrics:
     when: {holiday: {sukkot: true}}
   - match: "^On Pesach:"
     when: {holiday: {pesah: true}}
+
+  # -- The Sabbath and the festivals (the Shabbat siddur) ----------------------------------------
+  - match: "^On Pesach, Shavuos and Sukkos,? say:"
+    when: {any: [{holiday: {pesah: true}}, {holiday: {shavuot: true}}, {holiday: {sukkot: true}}]}
+  - match: "^On Shavuos:"
+    when: {holiday: {shavuot: true}}
+  - match: "^On Shemini Atseres and Simchas Torah:"
+    when: {holiday: {shmini-atzeret: true}}
+  - match: "^When Rosh Chodesh occurs on Shabbos:"
+    when: {all: [{holiday-aggregate: {shabbat: true}}, {holiday: {rosh-hodesh: true}}]}
+  - match: "^When Yom Tov occurs on Shabbos, begin here"
+    when: {all: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]}
+  - match: "^When Yom Tov occurs on (a )?[Ww]eekdays?(,)? (say|continue)\\b"
+    when: {all: [{holiday-aggregate: {yom-tov: true}}, {none: [{holiday-aggregate: {shabbat: true}}]}]}
+  - match: "^When the Festival falls on Motzoei Shabbos say:|^\\(?When Yom Tov occurs at the conclusion of Shabbos, the following two berachos are said"
+    when: {all: [{holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {motzaei-shabbat: true}}]}
+    # as Birnbaum's festival Kiddush conditions its Havdalah
+  - match: "^On Yom Tov and Chol Hamoed skip to"
+    # the stanzas before the one named, which the festivals leave out
+    when: {none: [{holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
+  - match: "^On weekdays say:"
+    when: {none: [*shabbat_or_yom_tov]}
+  - match: "^On a regular Shabbos the Chazzan recites the following Kaddish"
+    when: {all: [{holiday-aggregate: {shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {chol-hamoed: true}}, {holiday: {rosh-hodesh: true}}]}]}
+  - match: "^The following paragraph is omitted on occasions when the Tachanun prayer would be omitted on weekdays"
+    when: {none: [*tachanun_omitted_days]}
+  - match: "^\\(?On the last two nights of Pesach the following berachah is omitted"
+    when: {none: [{holiday: {pesah: [7, 8]}}]}
+  - match: "^On Fast-days the berachos end here"
+    # the blessings after the Haftarah that follow, which a fast day leaves out
+    when: {none: [{holiday-aggregate: {minor-fast: true}}, {holiday: {tisha-bav: true}}]}
+  - match: "^During Maariv the following is said by some in place of"
+    when: {service-time: {maariv: true}}
 
   # -- Fasts ------------------------------------------------------------------------------------
   - match: "^During Mincha services on the Ninth of Av"
@@ -143,16 +177,28 @@ rubrics:
   # -- Days of the week -------------------------------------------------------------------------
   - match: "^On Sunday:"
     when: {day-of-week: {hebrew-day: 1}}
+    until: "^\\(Deliver us"
+    until_included: true
   - match: "^On Monday:"
     when: {day-of-week: {hebrew-day: 2}}
+    until: "^\\(Deliver us"
+    until_included: true
   - match: "^On Tuesday:"
     when: {day-of-week: {hebrew-day: 3}}
+    until: "^\\(Deliver us"
+    until_included: true
   - match: "^On Wednesday:"
     when: {day-of-week: {hebrew-day: 4}}
+    until: "^\\(Deliver us"
+    until_included: true
   - match: "^On Thursday:"
     when: {day-of-week: {hebrew-day: 5}}
+    until: "^\\(Deliver us"
+    until_included: true
   - match: "^On Friday:"
     when: {day-of-week: {hebrew-day: 6}}
+    until: "^\\(Deliver us"
+    until_included: true
 
   # -- Tachanun, and the days the Torah is read --------------------------------------------------
   - match: "^The following prayers are added on Mondays and Thursday"
@@ -222,12 +268,12 @@ rubrics:
     when: {none: [*shabbat_or_yom_tov]}
 
   # -- Who is praying, and how ------------------------------------------------------------------
-  - match: "^\\(When the Chazzan repeats the Shemoneh Esrei, the Kedushah is said here\\)"
+  - match: "^\\(?When the Chazzan repeats the Shemoneh Esrei(,| during Shacharis,) the Kedushah is said here"
     when: {all: [{recitation: {repetition: true}}, {quorum: {minyan: true}}]}
     section: true
   - match: "^During the silent Shemoneh Esrei, continue here:"
     when: {recitation: {silent: true}}
-  - match: "^The following three words should be said when praying without a minyan:"
+  - match: "^The following three words should be said when praying without a minyan:|^When one is praying without a minyan, continue with the following"
     when: {quorum: {minyan: false}}
   - match: "^If there are at least 10 men, add:"
     when: {quorum: {minyan: true}}
@@ -244,7 +290,7 @@ rubrics:
     section: true
   - match: "^After Birkas Kohanim the congregation says:"
     when: *kohanim_bless
-  - match: "^When Kohanim are present, the Birkas Kohanim is recited here, If no Kohanim are present"
+  - match: "^When Kohanim are present, th?e Birkas Kohanim( \\(page 000\\))? is recited here, If no Kohanim are present"
     when: {all: [{quorum: {minyan: true}}, {recitation: {repetition: true}}, {none: [{practice: {birkat-kohanim: true}}]}]}
   - match: "^The following blessing is said by the father of a Bar Mitzvah"
     when: {person: {bar-mitzvah-father: true}}
@@ -253,7 +299,7 @@ rubrics:
     instead_of_previous: true
 
   # -- The meal -----------------------------------------------------------------------------------
-  - match: "^When three or more males, aged 13 or older eat together"
+  - match: "^When three or more males,? aged 13 or older eat together"
     when: {meal-context: {zimmun: true}}
   - match: "^Psalm 137 is recited before Birkas Hamazon on weekdays"
     when: {none: [*shabbat_or_yom_tov, {override: {wedding: true}}, {override: {sheva-brachot: true}}, {override: {brit-milah: true}}]}
@@ -288,6 +334,12 @@ labels:
     when: {holiday: {rosh-hashana: true}}
   - label: 'לש"ע וש"ת'
     when: {holiday: {shmini-atzeret: true}}
+  - label: 'לשמ"ע וש"ת'
+    when: {holiday: {shmini-atzeret: true}}
+  - label: 'לשבועות'
+    when: {holiday: {shavuot: true}}
+  - label: 'לשבת'
+    when: {holiday-aggregate: {shabbat: true}}
   - label: 'בשנת העיבור עד חדש ניסן'
     when: {hebrew-date: {leap-year: true, month: [7, 13]}}
 
@@ -316,6 +368,13 @@ leaves:
   - work: weekday_siddur_sefard_linear
     leaf: "The Morning Prayers / Psalm in the House of a Mourner"
     when: {override: {house-of-mourning: true}}
+  # Introductions, set only when the reader asks for the book's paratext.
+  - work: shabbat_siddur_sefard_linear
+    leaf: "Song of Songs / Preface to Shir Hashirim"
+    when: {paratext: {include: true}}
+  - work: shabbat_siddur_sefard_linear
+    leaf: "The Morning Prayers / Pesukei Dezimrah"
+    when: {paratext: {include: true}}
 
 # Rubrics that read like conditions, reviewed: stage directions, where to turn, an explanation,
 # or a choice among blessings no setting makes (what you see, smell or eat). They stay
@@ -346,3 +405,26 @@ directives:
   - "^When seeing "
   - "^When you smell "
   - "^When putting on a new suit"
+  # The Shabbat siddur: where to turn, what the service does next, explanations, and choices no
+  # setting makes (Kiddush over wine or over challah).
+  - "continue,? (“|\"|,).*on (p\\.|page) 000"
+  - "turn to page 000"
+  - "on page 000"
+  - "^\\(?When reciting Kiddush on (wine|challah?)"
+  - "^When Kiddush is said over wine"
+  - "^When time does not permit the recitition of the entire Shir Hashirim"
+  - "^On Shabbos and Yom Tov, you are forbidden to go more than"
+  - "^When Yom Tov occurs on Thursday and Friday, an eiruv tavshilin"
+  - "^After the Shemoneh Esrei has been said, the entire congregation repeats"
+  - "^During the Musaf Service of the Festivals, however"
+  - "^During the repetion of the Shemoneh Esreh, the Kohanim advance"
+  - "^After the Chazzan's recital of"
+  - "^After the Kohanim (pronounce|conclude)"
+  - "^\\(?After the Kohanim conclude their blessing"
+  - "^On the first night of Sukkos, the berachah"
+  - "^On the last day of Pesach, the second day of Shavuos"
+  - "^On the last days of Pesach and Shavuos, and on Shemini Atseres, the Yizkor"
+  - "^On Sukkos, לְדָוִד"
+  - "^When Yom Tov occurs on weekdays see pages"
+  - "^On Friday night, וַיְכֻלוּ , page 000"
+  - "^On the first day of Pesach, the prayer for dew, page 000"

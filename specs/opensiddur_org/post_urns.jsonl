@@ -254,7 +254,7 @@
 {"post_id": 14045, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:prayer_for_the_new_moon_of_tishrei_rappaport"}
 {"post_id": 14062, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:tkhine_for_a_mother_who_leads_their_child_for_the_first_time"}
 {"post_id": 14065, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:tkhine_for_a_mother_leading_their_child_to_religious_school"}
-{"post_id": 14104, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:kegavna_prager"}
+{"post_id": 14104, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:kegavna"}
 {"post_id": 14112, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:tkhine_for_a_babys_first_tooth"}
 {"post_id": 14121, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:a_tkhine_for_a_stepmother"}
 {"post_id": 14126, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:tkhine_receiving_the_yoke_of_the_kingdom_of_heaven"}
@@ -623,7 +623,7 @@
 {"post_id": 25379, "kind": "existing", "urn": "urn:x-opensiddur:text:bible:psalms", "rows": {"1": null, "2": null, "3": null, "4": "urn:x-opensiddur:text:bible:psalms/104/2/a", "5": null, "6": "urn:x-opensiddur:text:bible:psalms/104/5/a", "7": "urn:x-opensiddur:text:bible:psalms/104/11/a", "8": "urn:x-opensiddur:text:bible:psalms/104/12/a", "9": "urn:x-opensiddur:text:bible:psalms/104/13/a", "10": "urn:x-opensiddur:text:bible:psalms/104/14/a", "11": null, "12": "urn:x-opensiddur:text:bible:psalms/104/16/a", "13": "urn:x-opensiddur:text:bible:psalms/104/19/a", "14": "urn:x-opensiddur:text:bible:psalms/104/24/a", "15": null, "16": "urn:x-opensiddur:text:bible:psalms/148/2/a", "17": "urn:x-opensiddur:text:bible:psalms/148/3/a", "18": "urn:x-opensiddur:text:bible:psalms/148/5/a", "19": "urn:x-opensiddur:text:bible:psalms/148/7/a", "20": "urn:x-opensiddur:text:bible:psalms/148/8/a", "21": "urn:x-opensiddur:text:bible:psalms/148/9/a", "22": "urn:x-opensiddur:text:bible:psalms/148/10/a", "23": "urn:x-opensiddur:text:bible:psalms/148/11/a", "24": "urn:x-opensiddur:text:bible:psalms/148/12/a", "25": "urn:x-opensiddur:text:bible:psalms/148/13/a", "26": "urn:x-opensiddur:text:bible:psalms/104/31/a", "27": null, "28": null, "29": "urn:x-opensiddur:text:bible:psalms/65/12/a", "30": "urn:x-opensiddur:text:bible:psalms/65/13/a", "31": "urn:x-opensiddur:text:bible:psalms/65/14/a"}, "spans": {"1": "", "2": "", "3": "", "5": "", "11": "", "15": "", "27": "", "28": ""}}
 {"post_id": 25384, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:gods_goodness_steinberg_25384"}
 {"post_id": 25392, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:gods_goodness_steinberg_25392"}
-{"post_id": 25448, "kind": "new", "urn": "urn:x-opensiddur:text:poem:el_mistater_the_god_who_is_hidden_maimin"}
+{"post_id": 25448, "kind": "existing", "urn": "urn:x-opensiddur:text:poem:el_mistatter", "rows": {"1": "urn:x-opensiddur:text:poem:el_mistatter/1", "2": "urn:x-opensiddur:text:poem:el_mistatter/2", "3": "urn:x-opensiddur:text:poem:el_mistatter/3", "4": "urn:x-opensiddur:text:poem:el_mistatter/4", "5": "urn:x-opensiddur:text:poem:el_mistatter/5", "6": "urn:x-opensiddur:text:poem:el_mistatter/6", "7": "urn:x-opensiddur:text:poem:el_mistatter/7", "8": "urn:x-opensiddur:text:poem:el_mistatter/8", "9": "urn:x-opensiddur:text:poem:el_mistatter/9", "10": "urn:x-opensiddur:text:poem:el_mistatter/10", "11": "urn:x-opensiddur:text:poem:el_mistatter/11"}, "spans": {}}
 {"post_id": 25489, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:selichah_for_the_days_of_awe_uziel"}
 {"post_id": 25507, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:remember_the_shabbat_day_to_keep_it_holy"}
 {"post_id": 25524, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:remember_the_shabbat_day_to_keep_it_holy_varady"}
@@ -953,7 +953,7 @@
 {"post_id": 32207, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:priere_quand_on_se_met_en_voyage_ennery"}
 {"post_id": 32210, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:priere_pour_une_personne_qui_se_met_en_voyage_ennery"}
 {"post_id": 32214, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:service_for_destroying_idolatrous_statues_mayer"}
-{"post_id": 32227, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:kegavna_from_the_zohar_parashat_terumah_163_166"}
+{"post_id": 32227, "kind": "existing", "urn": "urn:x-opensiddur:text:prayer:kegavna", "rows": {"1": null, "2": null, "3": null, "4": null}, "spans": {"1": "", "2": "", "3": "", "4": ""}}
 {"post_id": 32233, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:priere_avant_linitiation_ennery"}
 {"post_id": 32238, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:priere_apres_linitiation_ennery"}
 {"post_id": 32245, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:priere_du_pere_et_de_la_mere_le_jour_de_linitiation_de_leur_ennery"}
@@ -1251,7 +1251,7 @@
 {"post_id": 37893, "kind": "existing", "urn": "urn:x-opensiddur:text:poem:hamavdil_bein_qodesh_lechol", "rows": {"1": "urn:x-opensiddur:text:poem:hamavdil_bein_qodesh_lechol/1", "2": "urn:x-opensiddur:text:poem:hamavdil_bein_qodesh_lechol/2", "3": null}, "spans": {"3": "urn:x-opensiddur:text:poem:hamavdil_bein_qodesh_lechol/3-9"}}
 {"post_id": 37898, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:hanaavah_babanot_neeman"}
 {"post_id": 37907, "kind": "new", "urn": "urn:x-opensiddur:text:poem:chavivi_yah_chavivi_mizrahi"}
-{"post_id": 37914, "kind": "new", "urn": "urn:x-opensiddur:text:poem:mah_yedidut_menuchatekh_saruq"}
+{"post_id": 37914, "kind": "new", "urn": "urn:x-opensiddur:text:poem:mah_yedidut"}
 {"post_id": 37918, "kind": "new", "urn": "urn:x-opensiddur:text:poem:shalom_lekh_dodi_gabirol"}
 {"post_id": 37921, "kind": "new", "urn": "urn:x-opensiddur:text:poem:shimru_shabtotai_rossi"}
 {"post_id": 37924, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:announcement_of_the_count_of_years_since_the_destruction_tsalach"}
@@ -1605,10 +1605,10 @@
 {"post_id": 43302, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:fur_gesetzes_freude_miro"}
 {"post_id": 43306, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:am_schlussfeste_miro"}
 {"post_id": 43335, "kind": "existing", "urn": "urn:x-opensiddur:text:bible:psalms/23", "rows": {"1": null, "2": "urn:x-opensiddur:text:bible:psalms/23/1/b", "3": "urn:x-opensiddur:text:bible:psalms/23/2/a", "4": "urn:x-opensiddur:text:bible:psalms/23/3", "5": "urn:x-opensiddur:text:bible:psalms/23/4/a", "6": null, "7": "urn:x-opensiddur:text:bible:psalms/23/5/a", "8": "urn:x-opensiddur:text:bible:psalms/23/6/a"}, "spans": {"1": "urn:x-opensiddur:text:bible:psalms/23/1/a", "6": ""}}
-{"post_id": 43361, "kind": "new", "urn": "urn:x-opensiddur:text:poem:azamer_bishvachin_luria"}
-{"post_id": 43365, "kind": "new", "urn": "urn:x-opensiddur:text:poem:asader_lisudata_luria"}
+{"post_id": 43361, "kind": "new", "urn": "urn:x-opensiddur:text:poem:azammer_bishvachin"}
+{"post_id": 43365, "kind": "new", "urn": "urn:x-opensiddur:text:poem:asader_lisudata"}
 {"post_id": 43369, "kind": "new", "urn": "urn:x-opensiddur:text:poem:bnei_heikhala_luria"}
-{"post_id": 43372, "kind": "new", "urn": "urn:x-opensiddur:text:poem:el_mistater_maimin"}
+{"post_id": 43372, "kind": "new", "urn": "urn:x-opensiddur:text:poem:el_mistatter"}
 {"post_id": 43385, "kind": "new", "urn": "urn:x-opensiddur:text:poem:qerovot_for_musaf_shabbat_sheqalim"}
 {"post_id": 43401, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:a_new_birkat_hamazon_blessing_after_the_meal_rosen"}
 {"post_id": 43415, "kind": "new", "urn": "urn:x-opensiddur:text:prayer:kaddish_derabbanan_rosen"}

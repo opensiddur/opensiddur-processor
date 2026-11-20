@@ -258,6 +258,14 @@ class TestConditions(unittest.TestCase):
         # The label is not printed again before the phrase.
         self.assertEqual(len(he.xpath("//tei:note", namespaces=NS)), 1)
 
+    def test_a_label_on_a_line_of_its_own_conditions_the_words_after_it(self):
+        segments = [("<b>וְאֶת</b> מוּסַף", "And the Musaf-offering of"),
+                    ("<small>לר\"ח</small>", "<small>On Rosh Chodesh:</small>"),
+                    ("רֹאשׁ הַחֹדֶשׁ הַזֶּה", "this Rosh Chodesh")]
+        for lang in ("he", "en"):
+            body = self.body(segments, [1, 2], lang)
+            self.assertEqual(body.xpath("//j:conditional/tei:fs/tei:f/@name", namespaces=NS), ["rosh-hodesh"])
+
     def test_an_inline_alternative_and_the_words_it_replaces(self):
         segments = [("<b>עֹשֶׂה</b> (בעשי\"ת הַשָּׁלוֹם) שָׁלוֹם בִּמְרוֹמָיו", "He Who makes peace"),
                     ("לְעֵלָּא (<small>בעשי\"ת</small> וּלְעֵלָּא מִכָּל) מִן־כָּל בִּרְכָתָא", "above")]
@@ -438,6 +446,63 @@ class TestLeafGates(unittest.TestCase):
         self.assertEqual(en.xpath("string(//j:conditional/tei:note)", namespaces=NS), "On Sunday:")
 
 
+    def test_a_section_rubric_a_text_opens_with_gates_the_texts_after_it_to_its_end(self):
+        # One day's introduction and psalm, cut apart, the day's rubric inside the first
+        # block; the next block opens with the rubric the day runs to, then the next day's.
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        deliver = _re.compile("^\\(Deliver us")
+        table = Conditions(rubrics=(
+            RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}, section=True, until=deliver,
+                            until_included=True),
+            RubricCondition(_re.compile("^On Monday:"), {"day-of-week": {"hebrew-day": 2}}, section=True, until=deliver,
+                            until_included=True)))
+        items, urns, _ = self.leaf(("", "<b>הַיּוֹם</b> יוֹם רִאשׁוֹן", "<b>לְדָוִד</b> מִזְמוֹר", "", "",
+                                    "<b>הַיּוֹם</b> יוֹם שֵׁנִי", "<b>שִׁיר</b> מִזְמוֹר"),
+                                   ("<small>On Sunday:</small>", "Today is Sunday", "A psalm of David",
+                                    "<small>(Deliver us...; Mourner's Kaddish.)</small>", "<small>On Monday:</small>",
+                                    "Today is Monday", "A song"), table)
+        intro1, psalm1, intro2, psalm2 = [i for i in items if isinstance(i, TextBlock)]
+        sunday, deliver_us, monday = [pair for i in items if not isinstance(i, TextBlock)
+                                      for pair in getattr(i, "pairs", ())]
+        intro1.pairs[:0] = [sunday]
+        intro2.pairs[:0] = [deliver_us, monday]
+        from opensiddur.importer.sefaria.tei_builder import leaf_body
+        en = parse(leaf_body(T + "siddur:x", ("L", "L"), [intro1, psalm1, intro2, psalm2], urns, "en", Notes("n"),
+                             conditions=table, leading={id(intro1): sunday, id(intro2): monday}))
+        self.assertEqual(self.gated(en), [["t0", "t1"], ["t2", "t3"]])
+        # The rubric that closes Sunday's psalm is written in the place, at the end of Sunday's
+        # gate, not in Monday's text.
+        notes = en.xpath("//tei:note[@type='instruction']", namespaces=NS)
+        deliver = [n for n in notes if "Deliver us" in "".join(n.itertext())]
+        self.assertEqual(len(deliver), 1)
+        following = deliver[0].xpath("following-sibling::*[1]", namespaces=NS)[0]
+        self.assertEqual((etree.QName(following).localname, following.get("target")), ("endConditional", "#when_1"))
+
+
+    def test_a_section_may_end_with_the_rubric_it_runs_to(self):
+        # Wednesday's psalm, then "(Deliver us...)" and Thursday's rubric between texts: the
+        # Kaddish rubric is Wednesday's, inside its gate.
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        deliver = _re.compile("^\\(Deliver us")
+        table = Conditions(rubrics=(
+            RubricCondition(_re.compile("^On Wednesday:"), {"day-of-week": {"hebrew-day": 4}}, section=True,
+                            until=deliver, until_included=True),
+            RubricCondition(_re.compile("^On Thursday:"), {"day-of-week": {"hebrew-day": 5}}, section=True,
+                            until=deliver, until_included=True)))
+        _, _, body = self.leaf(("", "<b>אֵל</b> נְקָמוֹת", "", "", "<b>לַמְנַצֵּחַ</b> עַל הַגִּתִּית"),
+                               ("<small>On Wednesday:</small>", "God of vengeance",
+                                "<small>(Deliver us...; Mourner's Kaddish.)</small>", "<small>On Thursday:</small>",
+                                "For the conductor"), table)
+        en = body("en")
+        self.assertEqual(self.gated(en), [["t0"], ["t1"]])
+        deliver_note = [n for n in en.xpath("//tei:note[@type='instruction']", namespaces=NS)
+                        if "Deliver us" in "".join(n.itertext())][0]
+        following = deliver_note.xpath("following-sibling::*[1]", namespaces=NS)[0]
+        self.assertEqual((etree.QName(following).localname, following.get("target")), ("endConditional", "#when_1"))
+
+
 class TestNodeGates(unittest.TestCase):
     def test_a_gated_child_is_transcluded_conditionally(self):
         from opensiddur.importer.sefaria.conditions import LeafGate
@@ -472,6 +537,9 @@ class TestFileStem(unittest.TestCase):
     def test_stems(self):
         self.assertEqual(file_stem(T + "prayer:amidah/avot"), "amidah_avot")
         self.assertEqual(file_stem(T + "siddur:chol/shacharit"), "siddur_chol_shacharit")
+        self.assertEqual(file_stem(T + "bible:psalms/3/2-9"), "psalms_3_2_9")
+        self.assertEqual(file_stem(T + "poem:hamavdil", frozenset({"hamavdil"})), "poem_hamavdil")
+        self.assertEqual(file_stem(T + "prayer:hamavdil", frozenset({"hamavdil"})), "hamavdil")
 
 
 if __name__ == "__main__":

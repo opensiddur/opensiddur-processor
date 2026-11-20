@@ -1,5 +1,6 @@
 # Curated URN choices for the Metsudah volumes (see equivalents.py). Each entry is found by the
-# opening words of a block, compared as consonant skeletons; `leaf` limits it to one leaf.
+# opening words of a block, compared as consonant skeletons; `leaf` limits it to one leaf, or to a
+# list of leaves (the same text where each volume prints it).
 #
 # texts: the URN a block opening so is -- the collection's text it does the same job as, in
 #        another rite's words, or the name a new text is given (a verse collage by its function or
@@ -9,7 +10,7 @@
 texts:
   # -- The Shema and its blessings -------------------------------------------------------------
   - opens: אהבת עולם אהבתנו
-    leaf: The Morning Prayers / The Blessings of Shema
+    leaf: ["The Morning Prayers / The Blessings of Shema", "The Morning Prayers / Eil Adon"]
     urn: urn:x-opensiddur:text:prayer:ahavah_rabbah
     note: "Nusach Sefard's morning second blessing before the Shema; Ashkenaz אהבה רבה, the same blessing and closing"
   - opens: תתברך לנצח צורנו
@@ -65,7 +66,7 @@ texts:
 
   # -- Verse collages and passages, by function or incipit -------------------------------------
   - opens: ברכי נפשי את יהוה יהוה אלהי גדלת מאד
-    leaf: The Morning Prayers / My Soul Bless
+    leaf: ["The Morning Prayers / My Soul Bless", "Mincha Service for Shabbos and Yom Tov / Psalms recited between Sukkos and Pesach"]
     urn: urn:x-opensiddur:text:bible:psalms/104
     note: "the whole psalm; the tallit's two verses before it are a part of it"
   - opens: למען תזכור את יום צאתך
@@ -105,6 +106,45 @@ texts:
     urn: urn:x-opensiddur:text:prayer:barukh_shem_kevod
     note: "the line said on its own (after אנא בכח, after the tefillin blessing)"
 
+  - opens: הודו ליהוה כי טוב כי לעולם חסדו יאמרו גאולי יהוה
+    urn: urn:x-opensiddur:text:bible:psalms/107
+    note: "the whole psalm; its first verse is word for word the first of Psalms 106, 118 and 136"
+
+  # -- The Sabbath and its songs ---------------------------------------------------------------
+  - opens: ברשות מרנן ורבותי
+    leaf: Order of Shabbos in the Home / Kiddush for Shabbos Eve
+    urn: urn:x-opensiddur:text:prayer:kiddush/savri
+    note: "the Kiddush's call to attention; Ashkenaz סברי מרנן"
+  - opens: יהללוך יהוה אלהינו כל מעשיך
+    urn: urn:x-opensiddur:text:prayer:hallel/yehalelukha
+    note: "Hallel's closing blessing, worded otherwise than Birnbaum's"
+  - opens: סברי מרנן ורבנן
+    urn: urn:x-opensiddur:text:prayer:kiddush/savri
+    note: "too short for the index to find"
+
+  # -- The festivals ---------------------------------------------------------------------------
+  - opens: בדעתו אביעה חידות
+    urn: urn:x-opensiddur:text:prayer:tefillat_tal
+    note: "the prayer for dew; Birnbaum names it but has not transcribed its words"
+  - opens: אף ברי אותת שם שר מטר
+    urn: urn:x-opensiddur:text:prayer:tefillat_geshem
+    note: "the prayer for rain; Birnbaum names it but has not transcribed its words"
+  - opens: עולו אושפיזין עילאין
+    urn: urn:x-opensiddur:text:prayer:ushpizin
+    note: "the invitation to the guests in the sukkah, with the day's invitation joined below"
+  - opens: יזכור אלהים נשמת אבא מורי
+    urn: urn:x-opensiddur:text:prayer:yizkor/father
+
+  # -- The Sabbath and its songs (continued) ---------------------------------------------------
+  - opens: ברכם טהרם רחמי צדקתך
+    urn: urn:x-opensiddur:text:poem:anna_bekhoach/4
+    note: "the fourth line of אנא בכח, which the lines before it do not find"
+  - opens: ידיד נפש אב הרחמן
+    urn: urn:x-opensiddur:text:prayer:yedid_nefesh
+  - opens: דרור יקרא לבן עם בת
+    urn: urn:x-opensiddur:text:poem:deror_yiqra_dunash
+    note: "the name the opensiddur.org post has"
+
   # -- Blessings and passages named once for the volumes ---------------------------------------
   - opens: ברוך אתה יהוה אלהינו מלך העולם אשר קדשנו במצותיו וצונו להפריש חלה
     urn: urn:x-opensiddur:text:prayer:lehafrish_challah
@@ -119,7 +159,7 @@ texts:
     urn: urn:x-opensiddur:text:prayer:meein_shalosh/begin_cake
     note: "Metsudah prints the opening for each food apart, then the body once"
   - opens: ברוך אתה יהוה אלהינו מלך העולם על הגפן ועל פרי הגפן
-    leaf: Concluding Blessings
+    leaf: ["Concluding Blessings", "Birchas Hamazon / Concluding Blessings"]
     urn: urn:x-opensiddur:text:prayer:meein_shalosh/begin_wine
   - opens: ברוך אתה יהוה אלהינו מלך העולם על העץ ועל פרי העץ
     urn: urn:x-opensiddur:text:prayer:meein_shalosh/begin_fruit
@@ -129,23 +169,49 @@ texts:
     urn: urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun
     note: "the whole zimmun, joined below; Ashkenaz opens רבותי מיר וועלן בענטשן"
   - opens: ברשות מרנן ורבנן ורבותי נברך
-    leaf: Birkas Hamzon for Bris Milah
+    leaf: ["Birkas Hamzon for Bris Milah", "Birchas Hamazon / Birchas Hamozon for Bris Milah"]
     urn: urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/nevarekh
     note: "at a circumcision the zimmun's parts stand around the poem בִּרְשׁוּת אֵל אָיוֹם"
   - opens: ברוך שאכלנו משלו ובטובו חיינו
-    leaf: Birkas Hamzon for Bris Milah
+    leaf: ["Birkas Hamzon for Bris Milah", "Birchas Hamazon / Birchas Hamozon for Bris Milah"]
     urn: urn:x-opensiddur:text:prayer:birkat_hamazon/zimmun/barukh_sheakhalnu
   - opens: ברשות הכהנים והלוים אקרא
     urn: urn:x-opensiddur:text:poem:birshut_el_ayom/3
   - opens: ברשות מרנן ורבנן ורבותי אפתח
     urn: urn:x-opensiddur:text:poem:birshut_el_ayom/4
 
+  # -- Shabbat songs and Kiddush -----------------------------------------------------------------
+  - opens: ובכן ישתבח שמך לעד מלכנו
+    leaf: The Morning Prayers / Yishtabach
+    urn: urn:x-opensiddur:text:prayer:yishtabbach
+    note: "Yishtabach, which the Shabbat volume opens with ובכן"
+  - opens: אתקינו סעודתא דמהימנותא
+    leaf: Order of Shabbos in the Home / Eishes Chayil
+    urn: urn:x-opensiddur:text:prayer:atqinu_seudata/leil_shabbat
+    note: "the three meals' Atkinu are parts of one text"
+  - opens: אתקינו סעודתא דמהימנותא
+    leaf: Kiddush for Shabbos day
+    urn: urn:x-opensiddur:text:prayer:atqinu_seudata/yom_shabbat
+  - opens: אתקינו סעודתא דמהימנותא
+    leaf: Songs for Seudah Shelishis
+    urn: urn:x-opensiddur:text:prayer:atqinu_seudata/seudah_shelishit
+  - opens: אסדר לסעודתא בצפרא דשבתא
+    urn: urn:x-opensiddur:text:poem:asader_lisudata
+    note: "shared with the opensiddur.org post"
+  - opens: זכור את יום השבת לקדשו ששת ימים תעבד
+    leaf: Kiddush for Shabbos day
+    urn: urn:x-opensiddur:text:bible:exodus/20/8-11
+    note: "the index's Exodus 20:8 opens with a section letter, so the verses are not found by their words"
+  - opens: חי יהוה וברוך צורי
+    urn: urn:x-opensiddur:text:poem:chai_adonai_uvarukh_tzuri
+    note: "a song: poem:"
+
 joins:
   # The Shema's paragraphs, and the verse said silently after its first, are one text.
   - opens: ברוך שם כבוד מלכותו לעולם ועד
     leaf: The Morning Prayers / Recitation of Shema
   - opens: ברוך שם כבוד מלכותו לעולם ועד
-    leaf: Maariv / Shema
+    leaf: ["Maariv / Shema", "Maariv Service for Shabbos and Yom Tov / Borechu", "Maariv Service for the Conclusion of Shabbos / Borechu"]
   - opens: ברוך שם כבוד מלכותו לעולם ועד
     leaf: Prayer Before Retiring at Night
   - opens: ברוך שם כבוד מלכותו לעולם ועד
@@ -168,20 +234,20 @@ joins:
     leaf: The Morning Prayers / Six Verses of Remembrance
   # Uva Letziyon's verses, its Targum, and its closing petitions.
   - opens: וקרא זה אל זה ואמר
-    leaf: The Morning Prayers / Ashrei U'va L'Tzion
+    leaf: ["The Morning Prayers / Ashrei U'va L'Tzion", "Mincha Service for Shabbos and Yom Tov / Uvah L'tzion"]
   - opens: קדוש קדוש קדוש יהוה צבאות
-    leaf: The Morning Prayers / Ashrei U'va L'Tzion
+    leaf: ["The Morning Prayers / Ashrei U'va L'Tzion", "Mincha Service for Shabbos and Yom Tov / Uvah L'tzion"]
   - opens: ומקבלין דין מן דין
   - opens: לעלם ולעלמי עלמיא
   - opens: יהוה צבאות עמנו משגב לנו
-    leaf: The Morning Prayers / Ashrei U'va L'Tzion
+    leaf: ["The Morning Prayers / Ashrei U'va L'Tzion", "Mincha Service for Shabbos and Yom Tov / Uvah L'tzion"]
   - opens: יהי רצון מלפניך יהוה אלהינו ואלהי אבותינו שנשמור חקיך
   - opens: וקרא זה אל זה ואמר
-    leaf: Maariv / Motzei Shabbos Prayers
+    leaf: ["Maariv / Motzei Shabbos Prayers", "Maariv Service for the Conclusion of Shabbos / Veyiten Lecha"]
   - opens: קדוש קדוש קדוש יהוה צבאות
-    leaf: Maariv / Motzei Shabbos Prayers
+    leaf: ["Maariv / Motzei Shabbos Prayers", "Maariv Service for the Conclusion of Shabbos / Veyiten Lecha"]
   - opens: יהוה צבאות עמנו משגב לנו
-    leaf: Maariv / Motzei Shabbos Prayers
+    leaf: ["Maariv / Motzei Shabbos Prayers", "Maariv Service for the Conclusion of Shabbos / Veyiten Lecha"]
   # A text the book sets out in more than one block.
   - opens: אז ישיר משה ובני ישראל
     leaf: The Morning Prayers / Shiras Hayam
@@ -193,16 +259,31 @@ joins:
   - opens: כי אל מלך רופא נאמן ורחמן
   - opens: אתה הוא יהוה האלהים הזן ומפרנס
     note: "the prayer for sustenance, inside ברך עלינו"
+  # The congregation's refrains in the prayers for dew and rain, and each day's invitation to
+  # the guests in the sukkah.
+  - opens: לברכה ולא לקללה
+  - opens: לחיים ולא למות
+  - opens: לשבע ולא לרזון
+  - opens: במטו מנך
+    leaf: Prayers for Yom Tov / Ushpizin
+  # Seasonal words the Shabbat siddur prints in bold, after the rubric that conditions them:
+  # inside the blessing, not texts of their own.
+  - opens: מוריד הטל
+  - opens: משיב הרוח ומוריד הגשם
+  - opens: ברכה
+    leaf: ["Mincha Service for Erev Shabbos / Shemoneh Esrei", "Maariv Service for the Conclusion of Shabbos / Amidah"]
+  - opens: טל ומטר לברכה
+    leaf: ["Mincha Service for Erev Shabbos / Shemoneh Esrei", "Maariv Service for the Conclusion of Shabbos / Amidah"]
   # The zimmun, and at Sheva Berakhot the poem and the words it adds.
   - opens: יהי שם יהוה מבורך מעתה ועד עולם
-    leaf: Birkas Hamazon
+    leaf: ["Birkas Hamazon", "Birchas Hamazon / Birchas Hamazon"]
   - opens: יהי שם יהוה מבורך מעתה ועד עולם
-    leaf: Birchas Hamazon for Sheva Berachos
+    leaf: ["Birchas Hamazon for Sheva Berachos", "Birchas Hamazon / Birchas Hamazon for Sheva Berachos"]
   - opens: ברשות מרנן ורבנן ורבותי נברך
-    leaf: Birkas Hamazon
+    leaf: ["Birkas Hamazon", "Birchas Hamazon / Birchas Hamazon"]
   - opens: ברשות מרנן ורבנן ורבותי נברך
-    leaf: Birchas Hamazon for Sheva Berachos
+    leaf: ["Birchas Hamazon for Sheva Berachos", "Birchas Hamazon / Birchas Hamazon for Sheva Berachos"]
   - opens: ברוך שאכלנו משלו
-    leaf: Birkas Hamazon
+    leaf: ["Birkas Hamazon", "Birchas Hamazon / Birchas Hamazon"]
   - opens: דוי הסר וגם חרון
   - opens: ברוך אלהינו שהשמחה במעונו

@@ -5,6 +5,8 @@ layout within the text whose URN path is ``<text path>`` -- ``metsudah:modeh_ani
 second phrase of ``prayer:modeh_ani``. It never names a volume, so a text Metsudah prints in
 several volumes (Ashrei in the Weekday and the Shabbat Siddur and in the machzorim) has its
 phrases named once, and the volumes align with each other as well as Hebrew with English.
+A path the registry has in two namespaces keeps the namespace of the text that is not
+``prayer:`` (``metsudah:poem/hamavdil_bein_qodesh_lechol/1``); see :func:`text_path`.
 
 The number is Metsudah's own division (``specs/SIDDUR_URN_SCHEME.md``, "Sub-division
 numbering"): it pairs Metsudah's Hebrew with Metsudah's English, and a text whose phrases were
@@ -16,7 +18,7 @@ numbered after the last one recorded.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Collection, Iterable, Sequence
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -34,18 +36,47 @@ TEXT_NAMESPACES = ("prayer", "poem", "bible")
 SAME_PHRASE = 0.75
 
 
-def text_path(text_urn: str) -> str:
-    """``urn:x-opensiddur:text:prayer:amidah/avot`` -> ``amidah/avot``."""
+def _split(text_urn: str) -> tuple[str, str]:
     if not text_urn.startswith(TEXT_PREFIX):
         raise ValueError(f"{text_urn} is not a text URN")
     namespace, _, path = text_urn[len(TEXT_PREFIX):].partition(":")
     if namespace not in TEXT_NAMESPACES or not path:
         raise ValueError(f"{text_urn}: phrases are named only in {TEXT_NAMESPACES}")
-    return path.split("@", 1)[0]
+    return namespace, path.split("@", 1)[0]
 
 
-def phrase_urn(text_urn: str, number: int) -> str:
-    return f"{PREFIX}{text_path(text_urn)}/{number}"
+def clashing_paths(urns: Iterable[str]) -> frozenset[str]:
+    """The paths that more than one of :data:`TEXT_NAMESPACES` uses (``prayer:`` and ``poem:``
+    both have ``hamavdil_bein_qodesh_lechol``), from the URNs given -- the registry's."""
+    namespaces: dict[str, set[str]] = {}
+    for urn in urns:
+        try:
+            namespace, path = _split(urn)
+        except ValueError:
+            continue
+        namespaces.setdefault(path, set()).add(namespace)
+    return frozenset(path for path, found in namespaces.items() if len(found) > 1)
+
+
+def text_path(text_urn: str, clashes: Collection[str] = frozenset()) -> str:
+    """``urn:x-opensiddur:text:prayer:amidah/avot`` -> ``amidah/avot``.
+
+    A path in ``clashes`` (:func:`clashing_paths`) is kept by ``prayer:``; the other namespace's
+    text has its namespace before it: ``poem:hamavdil_bein_qodesh_lechol`` ->
+    ``poem/hamavdil_bein_qodesh_lechol``.
+
+    A run of verses is spelled with ``_``, not ``-``: in a URN path ``-`` is a range, and
+    ``metsudah:proverbs/31/10-31/2`` would read as one (``bible:proverbs/31/10-31`` ->
+    ``proverbs/31/10_31``)."""
+    namespace, path = _split(text_urn)
+    path = path.replace("-", "_")
+    if path in clashes and namespace != "prayer":
+        return f"{namespace}/{path}"
+    return path
+
+
+def phrase_urn(text_urn: str, number: int, clashes: Collection[str] = frozenset()) -> str:
+    return f"{PREFIX}{text_path(text_urn, clashes)}/{number}"
 
 
 def split_phrase_urn(urn: str) -> tuple[str, int]:

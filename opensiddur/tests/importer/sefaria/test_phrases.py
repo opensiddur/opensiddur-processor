@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from opensiddur.importer.sefaria.phrases import (
+    clashing_paths,
     map_phrases,
     phrase_urn,
     recorded_phrases,
@@ -19,6 +20,22 @@ class TestPhraseUrns(unittest.TestCase):
         self.assertEqual(phrase_urn(T + "prayer:amidah/avot", 3), T + "metsudah:amidah/avot/3")
         self.assertEqual(phrase_urn(T + "bible:psalms/145", 1), T + "metsudah:psalms/145/1")
         self.assertEqual(text_path(T + "poem:adon_olam@some-project"), "adon_olam")
+
+    def test_a_run_of_verses_is_not_spelled_as_a_range(self):
+        from opensiddur.exporter.urn import split_range
+        urn = phrase_urn(T + "bible:proverbs/31/10-31", 2)
+        self.assertEqual(urn, T + "metsudah:proverbs/31/10_31/2")
+        self.assertIsNone(split_range(urn))
+
+    def test_a_path_two_namespaces_use_is_kept_by_prayer(self):
+        clashes = clashing_paths([T + "prayer:hamavdil", T + "poem:hamavdil", T + "poem:adon_olam",
+                                  T + "siddur:hamavdil", "urn:x-opensiddur:contributor:x/hamavdil"])
+        self.assertEqual(clashes, frozenset({"hamavdil"}))
+        self.assertEqual(phrase_urn(T + "prayer:hamavdil", 2, clashes), T + "metsudah:hamavdil/2")
+        self.assertEqual(phrase_urn(T + "poem:hamavdil", 2, clashes), T + "metsudah:poem/hamavdil/2")
+        # a poem whose path no other namespace uses keeps the bare path
+        self.assertEqual(phrase_urn(T + "poem:adon_olam", 1, clashes), T + "metsudah:adon_olam/1")
+        self.assertEqual(split_phrase_urn(T + "metsudah:poem/hamavdil/2"), ("poem/hamavdil", 2))
 
     def test_only_text_namespaces(self):
         with self.assertRaises(ValueError):

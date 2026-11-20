@@ -45,7 +45,7 @@ REUSE = {'sefatai': 'urn:x-opensiddur:text:prayer:amidah/adonai_sefatai',
  'wine': 'urn:x-opensiddur:text:prayer:borei_peri_hagafen'}
 # Unique liturgical paragraphs have prayer addresses; edition-specific variants
 # retain local addresses and point to the common passage using source.
-UNIQUE = {'eruv_blessing':PRAYER+'eruv_tavshilin/blessing',
+UNIQUE = {'eruv_blessing':PRAYER+'eruv/blessing',
           'eruv_declaration':PRAYER+'eruv_tavshilin/declaration',
           'candles':PRAYER+'hadlaqat_ner_yom_tov',
           'shehecheyanu':PRAYER+'shehecheyanu',

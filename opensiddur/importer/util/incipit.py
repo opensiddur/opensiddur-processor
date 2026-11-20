@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Collection
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -49,11 +50,29 @@ HEBREW_LANGUAGES = ("he", "arc", "jpa", "tmr")
 DIVINE_NAME_SPELLINGS = frozenset({"יהוה", "יי", "ייי", "ה", "יקוק", "ידוד", "השם"})
 
 
+#: The spellings that are the divine name also behind a prefix letter: ``לַייָ`` and
+#: ``לַיהוָה`` are one word. Not ``ה`` or ``השם``, which with a prefix are other words (לה, בהשם).
+_PREFIXED_DIVINE_NAME = re.compile(r"(ו?ש?[בכלמ]?)(יהוה|ייי|יי|יקוק|ידוד)")
+
+
+#: Elements a word never runs across: the start of a scope, a transclusion or a condition.
+#: Words of their own: each alternative of a kri and ketiv, a marked word.
+WORD_ELEMENTS = frozenset({"choice", "written", "read", "w"})
+BOUNDARY_ELEMENTS = frozenset({"milestone", "transclude", "conditional", "endConditional"}) | WORD_ELEMENTS
+#: Elements whose end ends a word.
+BLOCK_ELEMENTS = frozenset({"p", "div", "head", "l", "lg", "ab", "item", "list", "seg", "table", "row",
+                            "cell"}) | WORD_ELEMENTS
+
+
 def _key_word(skeleton: str) -> str:
-    """A word as compared: the divine name made one spelling, and every ו and י after the
-    first letter dropped, so that full and defective spellings (כרות, כרת) agree."""
+    """A word as compared: the divine name made one spelling, with any prefix letters kept
+    before it, and every ו and י after the first letter dropped, so that full and defective
+    spellings (כרות, כרת) agree."""
     if skeleton in DIVINE_NAME_SPELLINGS:
         return "יהוה"
+    prefixed = _PREFIXED_DIVINE_NAME.fullmatch(skeleton)
+    if prefixed and prefixed.group(1):
+        return prefixed.group(1) + "יהוה"
     return skeleton[:1] + skeleton[1:].replace("ו", "").replace("י", "")
 
 
@@ -62,10 +81,11 @@ _JOINED_WORDS = {("הלל", "יה"): "הללה"}
 
 
 def _words(text: str) -> list[str]:
-    """A text as compared: word by word, a maqaf separating words as a space does
+    """A text as compared: word by word, a maqaf or a paseq separating words as a space does
     (``אֶת־צֶמַח`` is ``אֶת צֶמַח``), each word a key word, and a word some sources split in
     two (``הַֽלְלוּ יָהּ``, ``הַלְלוּיָהּ``) made one."""
-    found = [_key_word(w) for w in (normalize_hebrew(word) for word in text.replace("\u05be", " ").split()) if w]
+    text = text.replace("\u05be", " ").replace("\u05c0", " ")  # a maqaf or a paseq between words
+    found = [_key_word(w) for w in (normalize_hebrew(word) for word in text.split()) if w]
     joined: list[str] = []
     for word in found:
         if joined and (joined[-1], word) in _JOINED_WORDS:
@@ -289,7 +309,28 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
                 still.append(scope)
         open_scopes[:] = still
 
+    # A word may run across elements (``לַ<j:divineName>יהוה</j:divineName>``): text that does
+    # not end in a space is held until the next text, or a boundary, completes its last word.
+    carry = [""]
+
     def feed(text: str | None) -> None:
+        if not text:
+            return
+        text = carry[0] + text
+        carry[0] = ""
+        if not text[-1].isspace():
+            head, _, last = text.rpartition(" ")
+            if not any(c.isspace() for c in text):
+                head, last = "", text
+            carry[0] = last
+            text = head
+        _feed_words(text)
+
+    def end_word() -> None:
+        text, carry[0] = carry[0], ""
+        _feed_words(text)
+
+    def _feed_words(text: str) -> None:
         if not text or not (pending or open_scopes):
             return
         words = _words(text)
@@ -348,8 +389,15 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
             return
         local = etree.QName(element).localname
         if local in ("teiHeader", "standOff", "note"):
+            end_word()
             feed(element.tail)
             return
+        if (local in BOUNDARY_ELEMENTS or element.get("corresp", "").startswith(TEXT_PREFIX)
+                or (len(element) == 0 and not element.text)):
+            # An empty element (a note's anchor, a page break) stands between words, though
+            # some sources set it with no space; only an element with words in it
+            # (j:divineName) can be inside one.
+            end_word()
         if local == "transclude":
             transclusion(element.get("target", ""))
             feed(element.tail)
@@ -387,12 +435,15 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
             walk(child)
         if scoped:
             enclosing.pop()
+        if scoped or local in BLOCK_ELEMENTS:
+            end_word()
         # A milestone's scope ends with the element it was set in, if no milestone of its unit
         # ends it first: a last verse does not run on into the next text.
         close(lambda end: end == ("element", id(element)) or (end[0] == "unit" and end[2] == id(element)))
         feed(element.tail)
 
     walk(root)
+    end_word()
     flush()
 
 
@@ -434,7 +485,9 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #: 5: closings and transclusions; a conditional transclusion neither opens nor ends a text.
 #: 6: milestone-scoped texts.
 #: 7: a milestone's scope ends with the division it was set in.
-INDEX_VERSION = 7
+#: 8: a word split across elements is one word; a prefixed divine name keeps its prefix; a
+#:    paseq separates words.
+INDEX_VERSION = 8
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:

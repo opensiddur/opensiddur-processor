@@ -30,7 +30,7 @@ import hashlib
 import json
 import math
 import re
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from dataclasses import asdict, dataclass, field
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -369,7 +369,8 @@ def later_text(phrase_words: list[list[str]], urn: str | None, index: IncipitInd
     """Where a block runs on into another text the collection names (Vezot Hatorah, then Yehi
     Ratzon Milifnei Avinu): the 0-based phrase it opens at, before ``before``, and its URN.
     Only a six-word match that agrees closely over the whole collected opening counts; scripture,
-    and texts of the same family as ``urn`` (``amidah/...``), do not."""
+    and texts of the same family as ``urn`` (``amidah/...``), do not -- except a whole psalm,
+    said after a text that does not open with a verse, from its first verse to its last."""
     if urn is not None and urn[len(TEXT_PREFIX):].startswith("bible:"):
         return None  # a chapter ends where its last verse does (_chapter_end), not at a verse in it
     family = _root(urn) if urn else None
@@ -381,6 +382,13 @@ def later_text(phrase_words: list[list[str]], urn: str | None, index: IncipitInd
         own |= index.included(up)
         up = parent(up)
     end = len(phrase_words) if before is None else before
+    # Verses, then a psalm, are a collage, one text (Vihi Noam: Psalms 90:17, then Psalm 91).
+    block_words = [w for phrase in phrase_words for w in phrase]
+    collage = any(f[len(TEXT_PREFIX):].startswith("bible:")
+                  and opening_agreement(f, block_words, index) >= LATER_TEXT_AGREEMENT
+                  for f in index.lookup(block_words))
+    # Where the collection prints the text going on into the psalm, the psalm is the text's.
+    printed = index.incipit_of.get(urn, ()) if urn else ()
     for start in range(1, end):
         if sum(len(p) for p in phrase_words[:start]) < 2:
             continue  # not a word on its own (וְאָמְרוּ:) before the text it leads into
@@ -388,6 +396,9 @@ def later_text(phrase_words: list[list[str]], urn: str | None, index: IncipitInd
         if len(rest) < INCIPIT_WORDS:
             break
         found_here = sorted(index.lookup(rest))
+        if not collage and (psalm := _psalm_opening(found_here, phrase_words[start:], own, index)) is not None \
+                and not _contains(printed, rest[:INCIPIT_WORDS // 2]):
+            return start, psalm
         verse = any(f[len(TEXT_PREFIX):].startswith("bible:")
                     and opening_agreement(f, rest, index) >= LATER_TEXT_AGREEMENT for f in found_here)
         for found in found_here:
@@ -410,6 +421,14 @@ def later_text(phrase_words: list[list[str]], urn: str | None, index: IncipitInd
 def _chapter_end(chapter: str, phrase_words: list[list[str]], index: IncipitIndex) -> int | None:
     """Where a block that is a chapter of scripture runs on past it (Psalm 20, then Uva
     Letziyon): the 0-based phrase after the one that ends its last verse, or None."""
+    end = _chapter_span(chapter, phrase_words, index)
+    return end if end is not None and end < len(phrase_words) else None
+
+
+def _chapter_span(chapter: str, phrase_words: list[list[str]], index: IncipitIndex) -> int | None:
+    """The phrases that run through ``chapter`` to the end of its last verse: the 0-based
+    phrase after the one that ends it (the number of phrases, where it ends the block), or None
+    where its last verse is not there."""
     verses = [u for u in index.children.get(chapter, []) if u.rsplit("/", 1)[-1].isdigit()]
     if not verses:
         return None
@@ -418,14 +437,54 @@ def _chapter_end(chapter: str, phrase_words: list[list[str]], index: IncipitInde
     length = index.length_of.get(last)
     if len(key) < 2 or length is None:
         return None
-    for start in range(len(phrase_words)):
+    # Where it opens after the verse before it: an earlier verse may open alike (Psalm 99's
+    # refrain, verses 5 and 9), and the text after the chapter may quote it (Uva Letziyon,
+    # Psalm 20:10).
+    after = 0
+    ordered = sorted(verses, key=lambda u: int(u.rsplit("/", 1)[-1]))
+    if len(ordered) > 1:
+        before = index.own_opening(ordered[-2])[:SHORT_INCIPIT_WORDS]
+        found = next((k for k in range(len(phrase_words)) if len(before) >= 2
+                      and _opens_at(phrase_words, k, tuple(before))), None)
+        after = found + 1 if found is not None else 0
+    for start in range(after, len(phrase_words)):
         if _opens_at(phrase_words, start, tuple(key)):
             count = 0
             for j in range(start, len(phrase_words)):
                 count += len(phrase_words[j])
                 if count >= length:
-                    return j + 1 if j + 1 < len(phrase_words) else None
+                    return j + 1
             return None
+    return None
+
+
+#: The first verse of a psalm, which a block may run on into: the psalm is said whole after
+#: the text (Psalm 130 after Yishtabach in the Ten Days of Repentance).
+PSALM_OPENING = re.compile(r"^(bible:psalms/\d+)/1(?:/[a-z])?$")
+
+
+def _contains(words_: Iterable[str], run: list[str]) -> bool:
+    """Whether ``run`` is found, in order and together, in ``words_``."""
+    words_ = list(words_)
+    return bool(run) and any(words_[k:k + len(run)] == run for k in range(len(words_) - len(run) + 1))
+
+
+def _psalm_opening(found_here: list[str], following: list[list[str]], own: set[str],
+                   index: IncipitIndex) -> str | None:
+    """The psalm a block runs on into, said whole from its first verse, where only scripture
+    opens so (Hallel's psalms are Hallel's) and the text the block is does not include it."""
+    if any(not f[len(TEXT_PREFIX):].startswith("bible:") for f in found_here):
+        return None
+    rest = [w for phrase in following for w in phrase]
+    for found in found_here:
+        match = PSALM_OPENING.match(found[len(TEXT_PREFIX):])
+        if match is None:
+            continue
+        chapter = TEXT_PREFIX + match.group(1)
+        if chapter in own or opening_agreement(found, rest, index) < LATER_TEXT_AGREEMENT:
+            continue
+        if _chapter_span(chapter, following, index) is not None:
+            return chapter
     return None
 
 
@@ -503,11 +562,27 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
             # Opened otherwise -- another rite's words -- but closed with a blessing's formula.
             return Resolution(closing, [f"ends like {closing}, whose closing formula it shares"])
         return Resolution(None, evidence)
+    for candidate in sorted(candidates):
+        # A block that is one whole verse is that verse, whatever liturgical text also is it
+        # (Malachi 3:4 after the Amidah; Birnbaum's Korbanot name it as one of their parts).
+        namespace, path = _namespace_and_path(candidate)
+        if namespace == "bible" and len(path) >= 3:
+            verse = candidate if len(path) == 3 else parent(candidate)
+            if _whole_verse(verse, block_words, index):
+                return Resolution(verse, [f"the verse {verse}, whole"])
     liturgical = sorted(c for c in candidates if not c.startswith(TEXT_PREFIX + "bible:"))
     pool = liturgical or sorted(candidates)
+    if len(pool) > 1:
+        # Texts that open with the same words (הודו ליהוה כי טוב opens four psalms) are told
+        # apart by what follows: the collected opening runs on past a short text's end.
+        def agreement(u: str) -> float:
+            opening = list(index.incipit_of.get(u, ()))
+            return SequenceMatcher(None, opening, block_words[:len(opening)], autojunk=False).ratio()
+        pool = sorted(pool, key=lambda u: (-round(agreement(u), 6), u))
     urn = pool[0]
     if len(pool) > 1:
-        evidence.append(f"the opening matches {len(pool)} texts ({', '.join(pool[:4])}); took the first")
+        evidence.append(f"the opening matches {len(pool)} texts ({', '.join(pool[:4])}); took the one "
+                        "that agrees best past it")
     joined = "".join(w for phrase in phrase_words for w in phrase)
 
     def part_key(u: str) -> tuple[str, ...]:
@@ -564,10 +639,25 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     if namespace == "bible":
         if len(path) >= 3:
             verse = urn if len(path) == 3 else parent(urn)
-            own = list(index.own_opening(verse)) if verse in index.length_of else []
-            if (own and abs(len(block_words) - len(own)) <= 1
-                    and SequenceMatcher(None, own, block_words, autojunk=False).ratio() >= WHOLE_VERSE_AGREEMENT):
+            if _whole_verse(verse, block_words, index):
                 return Resolution(verse, [f"the verse {verse}, whole"])
+            run = verse_run(verse, block_words, index)
+            if run is not None:
+                return Resolution(run, [f"the verses {run}, whole"])
+            walked = _walk_verses(verse, block_words, index)
+            if walked is not None:
+                # The verses, then another text the collection names (Vayechulu, then Magen
+                # Avot): cut where it opens.
+                run, end = walked
+                count = 0
+                for j, phrase in enumerate(phrase_words[:-1]):
+                    count += len(phrase)
+                    if abs(count - end) <= VERSE_RUN_SLACK and any(
+                            not u.startswith(TEXT_PREFIX + "bible:") for u in lookup(index, block_words[count:])):
+                        # (Not more verses: verses after verses are a collage, one text.)
+                        return Resolution(run, [f"the verses {run}, then another text"], j + 1)
+                    if count > end + VERSE_RUN_SLACK:
+                        break
             evidence.append(f"opens with the verse {urn}; a liturgical text, not that verse")
             return Resolution(None, evidence)
         first_verse = (index.incipit_of.get(f"{urn}/1") or index.incipit_of.get(f"{urn}/1/a") or ())[:INCIPIT_WORDS]
@@ -603,6 +693,8 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         for j, phrase in enumerate(phrase_words):
             count += len(phrase)
             if count >= len(whole):
+                if continues_closing(phrase_words[j + 1:]):
+                    break  # "... and Rosh Chodesh": the closing goes on, not another text
                 if 0 < j + 1 < len(phrase_words) and (split_at is None or j + 1 < split_at):
                     split_at = j + 1
                     evidence.append(f"cut before phrase {j + 2}, where {urn.rsplit(':', 1)[-1]} ends")
@@ -610,8 +702,112 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
     return Resolution(urn, evidence, split_at)
 
 
+#: The most words a last phrase opening "and" may add to a text the index holds whole and still
+#: be its continuation (מקדש השבת / וישראל וראשי חדשים), not a text of its own.
+CONTINUED_CLOSING_WORDS = 4
+def _whole_verse(verse: str, block_words: list[str], index: IncipitIndex) -> bool:
+    """Whether the block is the verse, whole: its own words, a word more or less."""
+    own = list(index.own_opening(verse)) if verse in index.length_of else []
+    return bool(own) and abs(len(block_words) - len(own)) <= 1 and SequenceMatcher(
+        None, own, block_words, autojunk=False).ratio() >= WHOLE_VERSE_AGREEMENT
+
+
+def continues_closing(rest: list[list[str]]) -> bool:
+    """Whether the phrases after a text's end only carry its closing on: one short phrase opening
+    "and" (מקדש השבת / וישראל וראשי חדשים), not a text of its own."""
+    return len(rest) == 1 and 0 < len(rest[0]) <= CONTINUED_CLOSING_WORDS and rest[0][0].startswith("ו")
+
+
 #: How closely a block must agree with a verse to be that verse, whole.
 WHOLE_VERSE_AGREEMENT = 0.85
+#: How far (in words) a verse may open from where the verses before it end, in another
+#: source's spelling (a word printed joined or apart); and how many of its opening words must
+#: agree there.
+VERSE_DRIFT, VERSE_OPENING_WORDS, VERSE_OPENING_AGREEMENT = 3, 4, 0.75
+#: How far the last verse of a run may end from the end of the block.
+VERSE_RUN_SLACK = 2
+
+
+def verse_run(first: str, block_words: list[str], index: IncipitIndex) -> str | None:
+    """The run of verses a block is, whole: ``bible:proverbs/31/10-31`` -- or its chapter, when
+    it runs from the first verse to the last -- when the block opens at ``first`` and goes on
+    through the verses after it, in order, to its end. ``None`` when it is a single verse, or
+    leaves the verses for words of its own."""
+    walked = _walk_verses(first, block_words, index)
+    if walked is None or abs(walked[1] - len(block_words)) > VERSE_RUN_SLACK:
+        return None
+    return walked[0]
+
+
+#: How far past a long verse's opening its last words are looked for.
+MAX_VERSE_WORDS = 80
+
+
+def _words_end(closing: list[str], block_words: list[str], start: int) -> int | None:
+    """Where ``closing`` ends in the block, looking from ``start``: the first place it agrees."""
+    if len(closing) < VERSE_OPENING_WORDS:
+        return None
+    for at in range(start, min(len(block_words), start + MAX_VERSE_WORDS) - len(closing) + 1):
+        if SequenceMatcher(None, closing, block_words[at:at + len(closing)],
+                           autojunk=False).ratio() >= VERSE_OPENING_AGREEMENT:
+            return at + len(closing)
+    return None
+
+
+def _verse_opens_at(opening: list[str], block_words: list[str], at: int) -> bool:
+    """Whether the block has a verse's opening words at ``at``: word by word, or letter by
+    letter when the source splits a word in two (Metsudah's ``שִׁלְּ֒ חָה``, Proverbs 31:19)."""
+    here = block_words[at:at + len(opening)]
+    if len(here) < len(opening):
+        return False
+    if SequenceMatcher(None, opening, here, autojunk=False).ratio() >= VERSE_OPENING_AGREEMENT:
+        return True
+    letters = "".join(opening)
+    found = "".join(block_words[at:at + len(opening) + 1])[:len(letters)]
+    return SequenceMatcher(None, letters, found, autojunk=False).ratio() >= VERSE_OPENING_AGREEMENT
+
+
+def _walk_verses(first: str, block_words: list[str], index: IncipitIndex) -> tuple[str, int] | None:
+    """The run of two or more verses the block opens with, from ``first`` (:func:`verse_run`),
+    and the word where it ends."""
+    chapter, _, number = first.rpartition("/")
+    if not number.isdigit():
+        return None
+    start = int(number)
+    pos, verse = 0, start
+    while True:
+        urn = f"{chapter}/{verse}"
+        length = index.length_of.get(urn)
+        opening = list(index.own_opening(urn))[:VERSE_OPENING_WORDS]
+        if len(opening) < min(VERSE_OPENING_WORDS, length or VERSE_OPENING_WORDS):
+            break
+        best = None
+        for drift in sorted(range(-VERSE_DRIFT, VERSE_DRIFT + 1), key=abs):
+            at = pos + drift
+            if at < 0 or (verse == start and drift):
+                continue
+            if _verse_opens_at(opening, block_words, at):
+                best = at
+                break
+        if best is None:
+            break
+        if length is None:
+            # A verse longer than the index's collected opening: it ends where its last words do.
+            end = _words_end(list(index.closing(urn))[-VERSE_OPENING_WORDS:], block_words,
+                             best + len(opening))
+            if end is None:
+                break
+            pos, verse = end, verse + 1
+        else:
+            pos, verse = best + length, verse + 1
+        if pos >= len(block_words) - VERSE_RUN_SLACK:
+            break
+    last = verse - 1
+    if last <= start:
+        return None
+    if start == 1 and f"{chapter}/{last + 1}" not in index.incipit_of:
+        return chapter, pos
+    return f"{chapter}/{start}-{last}", pos
 
 #: How closely a block must open like a chapter's first verse to be that chapter (two sources
 #: of scripture spell לה׳ differently).
@@ -818,6 +1014,7 @@ def decide_work(
     own_phrases: dict[str, dict[int, str]] | None = None,
     equivalents: Equivalents | None = None,
     registered: set[str] | None = None,
+    clashes: Collection[str] = frozenset(),
 ) -> Decisions:
     """Decide the URN of every block of ``work_key`` that has no current record.
 
@@ -838,6 +1035,7 @@ def decide_work(
     decider.own_phrases = own_phrases or {}
     decider.equivalents = equivalents or Equivalents()
     decider.registered = taken if registered is None else registered
+    decider.clashes = clashes
     return decider.run(leaves)
 
 
@@ -858,6 +1056,11 @@ class _Decider:
         self.places = places
         #: the highest phrase number each text has used, its variants' included
         self.numbers_used: dict[str, int] = {}
+        # A later printing's record, kept when its block is reached, has numbered its own
+        # phrases already: a variant decided before it must not reuse them.
+        for record in records.values():
+            if record.work == work_key and record.phrases:
+                self.note_numbers(record.urn, record.phrases)
         #: the variant names each text has
         self.variant_names: dict[str, set[str]] = {}
         #: texts the collection names that a variant's own words are, each used once
@@ -876,6 +1079,8 @@ class _Decider:
         self.chosen: set[str] = set()
         #: the phrases this work's own Hebrew project named on the last run, by text path
         self.own_phrases: dict[str, dict[int, str]] = {}
+        #: the paths more than one text namespace uses (``phrases.clashing_paths``)
+        self.clashes: Collection[str] = frozenset()
         self.index = index
         self.records = records
         self.taken = taken
@@ -950,7 +1155,7 @@ class _Decider:
         count is the same, else 1, 2, 3..."""
         from opensiddur.importer.sefaria.phrases import text_path
 
-        named = self.own_phrases.get(text_path(record.urn))
+        named = self.own_phrases.get(text_path(record.urn, self.clashes))
         if named:
             numbers = map_phrases(skeletons, named)
         elif record.phrases and len(record.phrases) == len(skeletons):
@@ -995,19 +1200,27 @@ class _Decider:
         replay = next((j for j, pair in enumerate(block.phrases)
                        if j > 0 and pair.he_index in self.starts.get(leaf, ())
                        and self.opens_as_recorded(leaf, block, j)), None)
-        if replay is None:
-            # A new blessing in the middle of a block is a text of its own -- unless the block is
-            # one text that opens with a part of it and ends with its closing formula (Barukh
-            # She'amar: its litany, then its blessing).
-            phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
-            replay = next((j for j in range(1, len(phrase_words))
-                           if _opens_at(phrase_words, j, BLESSING_FORMULA)), None)
-            if replay is not None:
-                matching = [matching_words(pair) for pair in block.phrases]
-                whole = resolve(lookup(self.index, [w for p in matching for w in p]), matching, self.index)
-                if whole.urn is not None and whole.urn == closing_text(
-                        [w for p in matching for w in p], self.index):
-                    replay = None
+        # A new blessing in the middle of a block is a text of its own -- unless the block is
+        # one text that opens with a part of it and ends with its closing formula (Barukh
+        # She'amar: its litany, then its blessing). It is cut there even where a recorded start
+        # lies further on (Kiddush Levanah's blessing, after Psalm 148, before Psalm 67's verse).
+        phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
+        blessing = next((j for j in range(1, replay if replay is not None else len(phrase_words))
+                         if _opens_at(phrase_words, j, BLESSING_FORMULA)), None)
+        if blessing is not None:
+            # Whether the block up to the recorded start is one text ending with the blessing's
+            # closing formula: what follows that start is another text's.
+            matching = [matching_words(pair) for pair in block.phrases[:replay]]
+            whole = resolve(lookup(self.index, [w for p in matching for w in p]), matching, self.index)
+            closing = closing_text([w for p in matching for w in p], self.index)
+            if whole.split_at is not None and whole.split_at < blessing:
+                # The text the block opens with ends before the blessing (Hareini Mezammen,
+                # then Barukh She'amar): the block after it is judged on its own.
+                pass
+            elif whole.urn is None or closing is None or not (
+                    whole.urn == closing or whole.urn.startswith(closing + "/")):
+                # Not one text that ends with the blessing's closing formula.
+                replay = blessing
         if replay is not None:
             block = self.cut(leaf, blocks, i, replay)
         key = self.key(leaf, block)
@@ -1015,13 +1228,15 @@ class _Decider:
         text = block_text(block)
         record = self.records.get(key)
         if record is not None and record.as_of == block_hash(block) and (
-                record.kind in ("existing", "new") or record.urn in self.printed):
-            # A repeat or variant is current only while its first printing is.
+                record.urn not in self.printed if record.kind in ("existing", "new") else record.urn in self.printed):
+            # A repeat or variant is current only while its first printing is; a first printing,
+            # only while no block before it now prints the text (a text cut off earlier in the
+            # book, Psalm 67 in Kiddush Levanah before the counting of the Omer).
             self.keep(record, leaf, blocks, block)
             return
         if record is not None and record.kind in ("existing", "new") and record.urn not in self.printed and (
                 similarity(skeleton(record.incipit), skeleton(" ".join(text.split()[:INCIPIT_WORDS])))
-                >= SAME_PHRASE):
+                >= SAME_PHRASE) and not self.runs_on(record.urn, block):
             # The words changed, but it is still the text it was: it keeps its URN, and its
             # phrases their numbers.
             skeletons = phrase_skeletons(block)
@@ -1035,6 +1250,26 @@ class _Decider:
             self.remember(record.urn, leaf, blocks, block, phrases)
             return
         self.decide_anew(leaf, blocks, i, record)
+
+    def runs_on(self, urn: str, block: TextBlock) -> bool:
+        """Whether a block runs on past the text ``urn`` into another (a chapter ends, a text the
+        collection names opens): its words changed because it was divided otherwise, not
+        because the text did, and it is decided again (and cut)."""
+        phrase_words = [matching_words(pair) for pair in block.phrases]
+        namespace, path = _namespace_and_path(urn)
+        if namespace == "bible" and len(path) == 2:
+            return _chapter_end(urn, phrase_words, self.index) is not None
+        if namespace == "bible":
+            # A verse, or a run of verses: the block must still be that, whole.
+            block_words = [w for phrase in phrase_words for w in phrase]
+            head, _, last = urn.rpartition("/")
+            first = f"{head}/{last.split('-', 1)[0]}"
+            return not ((first == urn and _whole_verse(urn, block_words, self.index))
+                        or verse_run(first, block_words, self.index) == urn)
+        if urn not in self.index.incipit_of:
+            return False
+        split = resolve({urn}, phrase_words, self.index).split_at
+        return split is not None or later_text(phrase_words, urn, self.index) is not None
 
     def decide_anew(self, leaf: str, blocks: list[Item], i: int, record: TextRecord | None) -> None:
         block = blocks[i]
@@ -1113,6 +1348,12 @@ class _Decider:
                 # text. Its further words are its own.
                 kind = "variant"
                 evidence.append("its first printing in this volume, and more: a variant of it")
+            elif (length is not None and skeletons[:length] == earlier_skeletons
+                  and length < len(skeletons) and continues_closing(phrase_words[length:])):
+                # The first printing's words and a closing that goes on ("... and Yom Tov"):
+                # the same blessing, its further words its own.
+                kind = "variant"
+                evidence.append("its first printing in this volume, its closing going on: a variant of it")
             elif length is not None and skeletons[:length] == earlier_skeletons:
                 kind = "repeat"
                 cut = length if length < len(skeletons) else None
@@ -1124,7 +1365,16 @@ class _Decider:
                 # otherwise: the text's URN, its own words a variant of it, conditional where
                 # the text is printed.
                 kind = "variant"
-                cut = length if length < len(skeletons) else None
+                end = cut if cut is not None and cut > length else len(skeletons)
+                tail = [w for p in phrase_words[length:end] for w in p]
+                if length >= len(skeletons) or continues_closing(phrase_words[length:]):
+                    cut = None
+                elif len(tail) <= CONTINUED_CLOSING_WORDS and not self.names_text(tail):
+                    # A few last words lined otherwise than the first printing's (דאמירן
+                    # בעלמא, then ואמרו אמן): the variant's own, not a text of their own.
+                    cut = end if end < len(skeletons) else None
+                else:
+                    cut = length
                 evidence.append("the text of its first printing in this volume, with words of its own: "
                                 "a variant of it")
             elif choice is not None:
@@ -1162,8 +1412,11 @@ class _Decider:
         if urn is None:
             urn = mint(text, self.taken, self.spellings)
             kind = "new"
-        elif kind == "existing" and urn not in self.index.incipit_of and urn not in self.registered:
-            kind = "new"  # a name chosen for a text the collection does not hold yet
+        elif (kind == "existing" and urn not in self.index.incipit_of and urn not in self.registered
+              and not urn.startswith(TEXT_PREFIX + "bible:")):
+            # A name chosen for a text the collection does not hold yet. Scripture is named by
+            # its place, not chosen (a run of verses, ``bible:proverbs/31/10-31``).
+            kind = "new"
         self.taken.add(urn)
         phrases = None
         variant_name = None
@@ -1311,7 +1564,7 @@ class _Decider:
     def phrase_numbers(self, urn: str, skeletons: list[str], evidence: list[str]) -> list[int] | None:
         from opensiddur.importer.sefaria.phrases import text_path
 
-        numbers = map_phrases(skeletons, self.recorded_phrases.get(text_path(urn), {}))
+        numbers = map_phrases(skeletons, self.recorded_phrases.get(text_path(urn, self.clashes), {}))
         if numbers == list(range(1, len(numbers) + 1)):
             return None
         evidence.append("phrase numbers follow the phrases an earlier volume named")

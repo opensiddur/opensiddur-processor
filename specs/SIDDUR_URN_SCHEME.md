@@ -409,8 +409,17 @@ alignment key on every phrase, and the compiler aligns only on shared `@corresp`
 fourth phrase of `bible:psalms/145`. It never names a volume, so a text Metsudah prints in
 several volumes — Ashrei in the weekday and the Shabbat siddur and in both machzorim — has its
 phrases named once, and those volumes align with each other as well as Hebrew with English.
-Another edition that follows Metsudah's phrasing can align to it the same way. A `prayer:` and
-a `poem:` with the same path would share their phrases' URNs, so the importer refuses one.
+Another edition that follows Metsudah's phrasing can align to it the same way. A run of
+verses is spelled with `_` in its phrases' path, since `-` in a URN path is a range:
+`bible:proverbs/31/10-31` has the phrases `metsudah:proverbs/31/10_31/<n>`.
+
+**A path two namespaces use.** The registry may hold the same path in `prayer:` and `poem:`
+(`prayer:hamavdil_bein_qodesh_lechol` is the closing blessing of Havdalah,
+`poem:hamavdil_bein_qodesh_lechol` the zemer). Only then is the namespace kept: `prayer:` has the
+bare path, and the other text's phrases are `metsudah:poem/hamavdil_bein_qodesh_lechol/<n>`.
+Registering a `prayer:` beside a `poem:` whose phrases are already named renames them (there
+are no aliases before 1.0). A text minted beside another namespace's in the same run, before
+the registry holds both, is refused by the importer until it is registered.
 
 **`<n>` is Metsudah's own division** (see [Sub-division numbering](#sub-division-numbering)):
 the *n*th phrase as Metsudah divides the text. That is why the phrases have a namespace of

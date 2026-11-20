@@ -8,7 +8,7 @@ The first works are the five CC-BY Metsudah linear volumes of Rabbi Avrohom Davi
 | Sefaria title | volume | status |
 |---|---|---|
 | Weekday Siddur Sefard Linear | weekday siddur, 1981 | **pilot, imported** |
-| Shabbat Siddur Sefard Linear | Shabbat siddur, 1981 | later |
+| Shabbat Siddur Sefard Linear | Shabbat siddur, 1981 | **imported** |
 | Machzor Rosh Hashanah Ashkenaz Linear | Rosh Hashanah machzor | later |
 | Machzor Yom Kippur Ashkenaz Linear | Yom Kippur machzor | later |
 | Selichot Nusach Lita Linear | Selichos, 1986 | later |
@@ -115,7 +115,10 @@ Pairs each leaf's Hebrew and English segments:
 - otherwise a decision in `alignment_decisions.yaml`, naming by 1-based index the Hebrew with
   no English (`he_only`) and the English with no Hebrew (`en_only`), with the hashes of the
   leaf it was made for (`as_of`). A decision lapses when its leaf changes. An undecided
-  mismatch is an error.
+  mismatch is an error. A decision may also name, in `opens`, Hebrew segments that begin a
+  text the book does not mark (untranslated songs printed one after another; the day's Kiddush,
+  whose songs and verses have no bold openings); a leaf whose counts agree may have a decision
+  for this alone.
 
 ### 3. Texts and rubrics (`blocks.py`, `markup.py`)
 
@@ -125,8 +128,11 @@ first words in bold, or a heading — so a leaf is divided into:
 - **texts**: from one opening to the next. A bold opening continues the text before it when
   that text has only its heading, or when the segment before was printed whole in bold (the
   two lines of the Shema's first verse). An unpointed label in parentheses (`(פלוני/פלונית)`)
-  is a placeholder inside the text;
-- **rubrics between texts**, which belong to the book's running order;
+  is a placeholder inside the text, and an unpointed response beside its English (`אמן`,
+  "Amein.", between the lines of the prayer for rain) is words of the text;
+- **rubrics between texts**, which belong to the book's running order. An unpointed label
+  that `conditions.yaml` holds as a condition (`<b>לפסח</b>`, "On Pesach", in the festival
+  Musaf) is a rubric inside the text it governs, however boldly it is printed, not a heading;
 - **headings** with no text before the next.
 
 Pointing tells a heading from text that happens to be bold: Metsudah's headings (`<b>אבות</b>`)
@@ -160,7 +166,7 @@ Each text's URN, in order of preference:
      `amidah/nachem_hashem_eloheinu`) carries that text's URN, part by part, on
      `tei:milestone unit="prayer"`.
 2. **A curated choice** (`equivalents.yaml`, found by a block's opening words, optionally in one
-   leaf): the URN the matcher cannot decide from the words alone. A text that does the same job
+   leaf, or any of a list of leaves): the URN the matcher cannot decide from the words alone. A text that does the same job
    as one the collection names, and is mostly its words, is that text whatever rite prints it —
    Nusach Sefard's Kedushah (נקדישך, and כתר at Musaf) is Birnbaum's `amidah/qedushah`, its
    morning אהבת עולם is `ahavah_rabbah`, its separately printed מעין שלש openings are
@@ -178,8 +184,12 @@ Each text's URN, in order of preference:
    `amidah/qedushah/qadosh` there, not Yotzer's.
 4. **An existing text.** The block's opening is looked up in the incipit index of the
    collection's Hebrew projects (`util/incipit.py`, shared with the opensiddur.org importer).
-   The opensiddur.org imports and the Sefaria imports themselves are left out: their openings
-   are formulas that match unrelated texts. Words are compared as consonant skeletons, a maqaf
+   The opensiddur.org imports and this work's own projects are left out: their openings
+   are formulas that match unrelated texts. The other Metsudah volumes' Hebrew projects are
+   in it, so that a text one volume minted is found by the next rather than minted again.
+   The index reads a word across inline elements (`לַ<j:divineName>יהוה</j:divineName>`) but
+   not across an empty one (a note's anchor) or a kri and ketiv; a paseq separates words as a
+   maqaf does; and the divine name behind a prefix is one spelling (`לַייָ`, `לַיהֹוָה`). Words are compared as consonant skeletons, a maqaf
    separating words and הללו יה one word. Every match must agree with the block over the
    candidate's collected opening (sixteen words; a short text's own words only), not just the
    key that found it: many texts open "יהי רצון מלפניך" and go on differently. The lookup goes
@@ -205,7 +215,8 @@ Each text's URN, in order of preference:
      (the Kaddish divides into its parts this way, the part going on agreeing past its first
      six words), or where a text the index holds whole ends. A block is also cut where it runs
      into another text the collection names (Vezot Hatorah, then Yehi Ratzon Milifnei Avinu):
-     a six-word match agreeing closely over its opening, not scripture, not a part of the same
+     a six-word match agreeing closely over its opening, not scripture (save a whole psalm,
+     below), not a part of the same
      text or something it transcludes, not a later stanza of a poem, not a verse the
      collection quotes inside a text (a milestone), and — for a short text — followed here by
      what follows it there (Adonai Sefatai is followed by the Amidah; a line quoted from the end
@@ -213,10 +224,30 @@ Each text's URN, in order of preference:
      word on its own. A block is cut before a blessing's formula in its middle — a new blessing
      is a text of its own — unless the block is one text that ends with the closing formula of
      the text it opens like (Barukh She'amar's litany and blessing).
+   - **A psalm after a text.** A block that runs on into a whole psalm, its first verse to its
+     last, is cut before it (Psalm 130 after Yishtabach; Psalms 121 and 150 in Kiddush
+     Levanah; each day's psalm after its introduction) — unless the block opens with a verse
+     (Vihi Noam, Psalms 90:17 and then Psalm 91, is one collage), the psalm is a part of the
+     text the collection names it as (Hallel's), or the collection prints the text going on
+     into it.
    - **Scripture.** A block that opens a chapter at its first verse (its first half, `/1/a`,
-     will do) is that chapter, and ends where the chapter's last verse does; a block that is one
-     whole verse is that verse (`bible:malachi/3/4`); a block that opens mid-chapter is liturgy
-     quoting scripture, its verses marked inside it (below).
+     will do) is that chapter, and ends where the chapter's last verse does — where that verse
+     opens after the verse before it, since a refrain may open an earlier verse alike (Psalm 99,
+     verses 5 and 9) and the text after the chapter may quote it (Uva Letziyon, Psalm 20:10); a block that is one whole verse is that verse (`bible:malachi/3/4`); a block that is
+     two or more verses in order, whole, is that run, named by its range
+     (`bible:proverbs/31/10-31`, `bible:psalms/148/1-6`; a long verse ends where its last words
+     do; a word the source splits in two still opens its verse, the letters agreeing), and a
+     run followed by a text the collection names that is not scripture (Vayechulu,
+     then Magen Avot; the Musaf verses, then ומנחתם ונסכיהם) is cut there. Verses followed by
+     more verses not in order are a collage, one text (below). Scripture is named by its
+     place, so a range is `existing`, never minted. Any other block that opens mid-chapter is
+     liturgy quoting scripture, its verses marked inside it (below).
+   - **The same opening.** Texts that open with the same words (הודו ליהוה כי טוב כי לעולם
+     חסדו opens Psalms 106, 107, 118 and 136) are told apart by what follows: the candidate
+     whose collected opening agrees best over all of it is taken.
+   - **A closing that goes on.** A last phrase of at most four words opening "and" after the
+     words of a known text (מקדש השבת / וישראל וראשי חדשים; להדליק נר של שבת / ושל יום טוב)
+     carries the closing on; it is not cut off as a text of its own.
    - **A later printing.** When this volume printed the text before and the block differs, it
      is a variant where it opens as the first printing does; where it is only the part the text
      opens with (Musaf's Retzeh, after the morning's whole Avodah), it is that part.
@@ -240,7 +271,10 @@ Every decision is recorded at once in `specs/sefaria/metsudah_urns.jsonl` — on
 keyed by work, leaf and the Hebrew index of its first phrase, with its kind
 (`existing`/`new`/`repeat`/`variant`), incipit, evidence and a hash of its words (`as_of`). Records are
 sticky: a reviewer may correct a URN in the file and rerun, and a rerun on an unchanged export
-decides nothing. A cut is recorded by the record of the text after it, and replayed from it.
+decides nothing. A first printing's record is current only while no block before it prints
+the text, so a text a later rule cuts off earlier in the book (Psalm 67 in Kiddush Levanah,
+before the counting of the Omer) makes the later record a later printing. A cut is recorded by
+the record of the text after it, and replayed from it — after any new blessing before it.
 When a text's words change, its record lapses and is reported; the text keeps its URN (and its
 phrases their numbers) when its opening still agrees, and is decided again otherwise.
 
@@ -302,9 +336,16 @@ become `j:conditional`, from a curated table:
   structure file — or, marked `section: true` (the Kedushah, "When the Chazzan repeats the
   Shemoneh Esrei"), everything to the next heading, or, with `until`, to the rubric that matches
   it, past any heading (Tachanun, to "The Chazzan recites the following Kaddish"); either ends
-  at the next condition rubric, and at the end of the leaf. A text printed before, whose
-  file is its first printing's, keeps the condition rubric it opens with: it gates the
-  transclusion, unless the first printing opens with the same rubric (which its file gives). `instead_of_previous: true` makes the text before the rubric the alternative,
+  at the next condition rubric, and at the end of the leaf; a rubric `until` names may also
+  open the next text. That rubric comes after the section, unless `until_included: true` makes
+  it the section's last (each day's psalm ends "(Deliver us...; Mourner's Kaddish.)", before
+  the next day's rubric; the Kaddish after Tachanun is said either way). The rubrics before the
+  condition a text opens with are the place's, before its gate. A text that opens with a condition rubric keeps it in its own file only
+  when every printing of it opens with that rubric; otherwise each place that prints it is
+  gated by its own rubric, and the text's file is unconditional (Psalm 130, said in the Ten
+  Days after Yishtabach and among the winter psalms every Shabbos). A rubric over a section
+  is always the place's: it opens there as it would between texts (each day's introduction
+  and its psalm, cut apart). `instead_of_previous: true` makes the text before the rubric the alternative,
   conditional on the opposite ("A woman says:": שלא עשני אשה unless female, שעשני כרצונו if so).
 - **Conditions follow Birnbaum.** A condition Birnbaum already encodes is written as Birnbaum
   writes it, so that the two books agree: the days Tachanun is omitted (Birnbaum's list, with

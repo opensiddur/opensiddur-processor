@@ -5,9 +5,73 @@
 #     as_of: {he: <segments hash>, en: <segments hash>}   # the leaf the decision was made for
 #     he_only: [<1-based Hebrew index>, ...]               # Hebrew with no English
 #     en_only: [<1-based English index>, ...]              # English with no Hebrew
+#     opens: [<1-based Hebrew index>, ...]                 # Hebrew that opens a new text unmarked
 #     note: why
 #
 # A decision lapses when either version of its leaf changes; align.py then refuses the leaf
 # until it is decided again. Leaves with equal counts, or whose extras are trailing rubrics or
 # untranslated Hebrew, need no entry.
-{}
+shabbat_siddur_sefard_linear:
+  "Song of Songs / Preface to Shir Hashirim":
+    as_of: {he: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945, en: 75b111c9d8af6ff62f0e979c005e4596567207e191ca962a715b4e3464d6cc9b}
+    en_only: [1, 2, 3]
+    note: "an English preface with no Hebrew"
+  "Kiddush for Shabbos day":
+    as_of: {he: 54c4da52b8fce762455db97686ec255c4a02e342cb0530dc91b4d295c63008d6, en: 7931bce3f44cf51e9663eba35094b2b736140cb60d5893b48b90c3cb7d7af078}
+    opens: [3, 13, 29, 30, 31, 42, 59]
+    note: "Atkinu, Asader Lis'udasa, Chai Hashem, Psalm 23, Im Tashiv, Veshamru, Zachor and the blessing, none of them in bold"
+  "Prayers for Yom Tov / Musaf for Yom Tov / Birkas Kohanim":
+    as_of: {he: b7a5d9bedb109443915fed4d63d499a985595f9cee976d77567c088aeee5d324, en: daca66f69613d438bdaa5398cdfc1f298c37d3a60907fac69e459f8068d1dbb5}
+    opens: [44, 48, 82, 88, 122, 130, 165, 172]
+    note: "the Kohanim's verses, word by word, with Ribbono shel Olam (for dreams) after each, then Adir Bamarom and Ribbono shel Olam Asinu, none of them in bold"
+  "Hallel":
+    as_of: {he: 197ef441f9f714e9420e6a05c9511d7765129be6c748abab6ebe1b7a1e654ca8, en: 010cdc6c15a51ab91e24e887f016219af264f634d72afc8f206afd12995894ed}
+    opens: [248, 265, 273]
+    note: "Yehalelucha after Psalm 118, the verse some say on Rosh Chodesh, and the Kaddish after Hallel, not in bold"
+  "The Morning Prayers / Mizmor Shir":
+    as_of: {he: d621d3835415f2299e9929e6c499857b038aea77f9d564f8af2d5ea8961ef227, en: 9039c34836b41f99779d64ac6d252ca150356c9d7a12ec571abd0fa1733e178b}
+    opens: [550]
+    note: "Ha'aderes Veha'emunah after Psalm 136, not in bold"
+  "Kiddush Levanah":
+    as_of: {he: 9907abba7761356bc3d5bef41f7caee86cd8a3f72a9b9b90d671d1639e5d0f03, en: 96d2e50329e304882963a5de7627c0998c5b49f1b0ef20e3ea62b498a38335fb}
+    en_only: [157]
+    opens: [39, 138]
+    note: "the greetings after the blessing (Baruch Yotzreich ...), and Psalm 67, not in bold"
+  "Musaf Service / Ashrei":
+    as_of: {he: 7bbf8f6fc2d4df97d85717c606c2f9d06a8a5c909f12e25434d52c276a7d441a, en: 31d2104463b54459c7a1fd569621b5cd6af447364173d75b52d7189b7288bdbc}
+    opens: [59, 70, 98]
+    note: "returning the Torah: Yehalelu, then Psalm 29 (on Shabbos) or Psalm 24, not in bold"
+  "Order of Shabbos in the Home / Eishes Chayil":
+    as_of: {he: 7d2a85094e48307a01c9096c85be8893b1972b715a8558f6b27aada9a243137f, en: 813e9c04c8b9bdfb817c7ff6ff0764dc12a3b6da702701b7bf13ade18c445606}
+    he_only: [52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69]
+    opens: [52, 53, 69]
+    note: "after Eishes Chayil the book prints Askinu Seudasa, Azamer Bishvachin and Vihei Ra'ava whole, untranslated"
+  "Songs for Shabbos Eve / Menucha Vesimcha":
+    as_of: {he: 150372a74cb0a1fd6fb800f62da9baef9d4325a4eb0d497d26577bea53bf1233, en: 177f659d6e233135caf2c73dea01dd5152302a9cf5b297ff10a4a6a274b5932f}
+    he_only: [36, 37, 38, 39, 40, 41, 42]
+    opens: [36]
+    note: "Mah Yedidus follows, untranslated, a stanza to a segment"
+  "Songs for Shabbos Morning / Yom Zeh Mechubod":
+    as_of: {he: b27ec888f372bc4f40b56b200d7778a8c85260d30832cef6dea730ab4042bff0, en: 5502890c5ca0377ad6ed424c7f366df7b6b007017984209551ae764b8b4621c1}
+    he_only: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60]
+    note: "the songs after the refrain (Yom Shabbason and others) are untranslated"
+  "Songs for Seudah Shelishis":
+    as_of: {he: 671aaa923444d14ec7a1a903310c6ed2ff6c8536f58ef845aff6741935376747, en: 4a7452f6dcdb962b8e9c6aa1dc324a97b1aba3829393ba4a2f89d4fd89259ad7}
+    he_only: [64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74]
+    opens: [64]
+    note: "the songs after Yedid Nefesh (Eil Mistater and others) are untranslated"
+  "Songs for Motzoei Shabbos":
+    as_of: {he: 55b5f3635e929083771700aac05c05839dec6a90f3fa1fd5fb01b52add834aa3, en: 2f57df4fbe01a0c91b8a14c9c5dd59ecc8d505bbe861e97ecf18ef75f34f436e}
+    he_only: [47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
+    opens: [47, 48, 49, 50, 72]
+    note: "the songs after Hamavdil (Bemotzaei Yom Menuchah, Adir Ayom and others) are untranslated"
+
+weekday_siddur_sefard_linear:
+  "Hallel":
+    as_of: {he: 6efb8b20fecc94d63bea9c2cab2cdb9a9c4e46deac211b9326dc09c2864e73bb, en: 5713d25def9f050eff5eb8b32451db8d5e4c8257b2eac83415d4578ae1f44a41}
+    opens: [144, 242, 259]
+    note: "Psalm 118, Yehalelucha, and the verse some say on Rosh Chodesh, not in bold"
+  "The Morning Prayers / Psalm of the Day":
+    as_of: {he: 3dfb05395243cac8279978f2b8c1fd96748fd3dd29044111fc7add8a428e0ee9, en: 6e7accb31acd81cff30d85837c5218910687916757ee0504cdd4c32e34572ae2}
+    opens: [278]
+    note: "Thursday's introduction, after Wednesday's psalm ends with Psalms 95:1-3, not in bold"

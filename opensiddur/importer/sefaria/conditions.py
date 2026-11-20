@@ -106,6 +106,9 @@ class RubricCondition:
     instead_of_previous: bool = False
     #: inside a text, the passage ends with the phrase whose words end so (``through``)
     through: tuple[str, ...] = ()
+    #: the rubric ``until`` matches is the section's last, inside its gate (each day's psalm
+    #: ends "(Deliver us...; Mourner's Kaddish.)"), not the first words after it
+    until_included: bool = False
 
 
 @dataclass(frozen=True)
@@ -178,7 +181,8 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
         section = bool(entry.get("section")) or until is not None
         rubrics.append(RubricCondition(pattern, entry["when"], section, until,
                                        bool(entry.get("instead_of_previous")),
-                                       tuple(words(str(entry.get("through") or "")))))
+                                       tuple(words(str(entry.get("through") or ""))),
+                                       bool(entry.get("until_included"))))
     labels, inline = [], []
     for kind, found in (("labels", labels), ("inline", inline)):
         for n, entry in enumerate(data.get(kind) or (), start=1):

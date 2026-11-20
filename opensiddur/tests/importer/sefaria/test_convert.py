@@ -111,6 +111,44 @@ class TestConditionsReachTheFiles(unittest.TestCase):
                                              namespaces=NS), ["urn:x-opensiddur:text:siddur:berakhot/test"])
 
 
+    def test_a_text_printed_elsewhere_without_its_condition_is_gated_where_it_is_printed(self):
+        # Psalm 130: in the Ten Days after Yishtabach, and among the winter psalms always.
+        own = ["שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף", "אֶלָּא כָּאן וְעוֹד דְּבָרִים"]
+        once = [MORNING[1], MORNING[2], ("", "<small><i>On Rosh Chodesh add:</i></small>"),
+                (own[0], "which has no source"), (own[1], "but here")]
+        again = [("<b>" + own[0] + "</b>", "which has no source"), (own[1], "but here")]
+        tree = {"Morning": {"Upon Arising": once, "Again": again}, "Blessings": BLESSINGS}
+        structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
+                     "Morning / Again": "chol/shacharit/again", "Blessings": "berakhot/test"}
+        index = IncipitIndex()
+        index.add("urn:x-opensiddur:text:prayer:zeh", words(" ".join(own)))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_work_dir(root / "sources" / "sefaria" / WORK.key, tree)
+            (root / "project").mkdir()
+            (root / "registry").mkdir()
+            (root / "decisions.yaml").write_text("{}\n")
+            (root / "conditions.yaml").write_text(
+                "rubrics:\n  - match: '^On Rosh Chodesh add:'\n    when: {holiday: {rosh-hodesh: true}}\n")
+            plan = convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
+                                registry_directory=root / "registry", urns_path=root / "urns.jsonl",
+                                index=index, output_directory=root / "out",
+                                structure_path=write_structure(root / "s.yaml", structure),
+                                decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
+                                works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
+                                conditions_path=root / "conditions.yaml")
+            self.assertEqual(sorted(r.urn.rsplit(":", 1)[1] for r in plan.decisions.records.values()
+                                    if r.kind != "repeat"), ["haleluyah_haleli_nafshi", "modeh_ani_lefanekha", "zeh"])
+            he = root / "project" / WORK.projects["he"]
+            text = etree.parse(str(he / "zeh.xml"))
+            self.assertEqual(text.xpath("//j:conditional", namespaces=NS), [])
+            first = etree.parse(str(he / "siddur_chol_shacharit_upon_arising.xml"))
+            self.assertEqual(first.xpath("//j:transclude[preceding-sibling::j:conditional]/@target", namespaces=NS),
+                             ["urn:x-opensiddur:text:prayer:zeh"])
+            second = etree.parse(str(he / "siddur_chol_shacharit_again.xml"))
+            self.assertEqual(second.xpath("//j:conditional", namespaces=NS), [])
+
+
 class TestConvertWork(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

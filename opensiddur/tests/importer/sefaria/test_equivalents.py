@@ -51,6 +51,17 @@ class TestEquivalents(unittest.TestCase):
         self.assertEqual(table.choice("Other", opening).urn, T + "prayer:shesh_zekhirot")
         self.assertIsNone(table.choice("Six", words("דָּבָר אַחֵר")))
 
+    def test_a_list_of_leaves_finds_the_text_where_each_volume_prints_it(self):
+        table = equivalents(f"""
+texts:
+  - opens: למען תזכור
+    leaf: [Six, "Morning / Six"]
+    urn: {T}prayer:shesh_zekhirot
+""")
+        opening = words("לְמַעַן תִּזְכֹּר אֶת יוֹם")
+        self.assertEqual(table.choice("Morning / Six", opening).urn, T + "prayer:shesh_zekhirot")
+        self.assertIsNone(table.choice("Other", opening))
+
     def test_a_joined_block_continues_the_text_before_it(self):
         found = apply_joins("Six", items(SIX), equivalents())
         (text,) = [i for i in found if isinstance(i, TextBlock)]
