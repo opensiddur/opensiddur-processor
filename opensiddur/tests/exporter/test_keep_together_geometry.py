@@ -136,7 +136,8 @@ _HEAD_BOTTOM = 85.0
 
 def _typeset(parallel: bool, typography: dict, protected: bool = True,
              primary: str = "en", document: str | None = None,
-             tex_replacements: dict[str, str] | None = None) -> tuple[dict[str, tuple[int, int]], str]:
+             tex_replacements: dict[str, str] | None = None,
+             fail_on_overfull: bool = False) -> tuple[dict[str, tuple[int, int]], str]:
     """Each word's (page, rounded yMin), and the ``.tex`` it was set from."""
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
@@ -163,6 +164,8 @@ def _typeset(parallel: bool, typography: dict, protected: bool = True,
         if not (work / "t.pdf").exists():
             raise AssertionError(f"lualatex produced no PDF:\n{done.stdout[-2000:]}")
         log = (work / "t.log").read_text(errors="replace")
+        if fail_on_overfull and "Overfull \\hbox" in log:
+            raise AssertionError("The conditional rule overflows its measured line")
         if "could not patch" in log:
             raise AssertionError("a reledmac or reledpar patch did not apply")
         errors = re.findall(r"^! .*", log, re.MULTILINE)
@@ -431,7 +434,7 @@ class TestConditionalRuleOwnLine(unittest.TestCase):
                 body = ('<p:parallel><p:parallelItem role="primary" xml:lang="en"><tei:div>' + inner + '</tei:div></p:parallelItem><p:parallelItem role="parallel" xml:lang="en"><tei:p>Counterpart.</tei:p></p:parallelItem></p:parallel>') if parallel else inner
                 document = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:p="http://jewishliturgy.org/ns/processing" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="en"><tei:text><tei:body>' + body + '</tei:body></tei:text></tei:TEI>'
                 where, _ = _typeset(parallel, {'parallel': {'layout': 'pairs'}}, document=document,
-                                    tex_replacements={'RULEHERE': r'\OSCondEndBlock{}'})
+                                    tex_replacements={'RULEHERE': r'\OSCondEndBlock{}'}, fail_on_overfull=True)
                 self.assertIn('CloseArk.', where)
                 self.assertIn('AfterRule.', where)
                 self.assertEqual(where['CloseArk.'][0], where['AfterRule.'][0])
