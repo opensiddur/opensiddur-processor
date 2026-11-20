@@ -135,7 +135,9 @@ _HEAD_BOTTOM = 85.0
 
 
 def _typeset(parallel: bool, typography: dict, protected: bool = True,
-             primary: str = "en", document: str | None = None) -> tuple[dict[str, tuple[int, int]], str]:
+             primary: str = "en", document: str | None = None,
+             tex_replacements: dict[str, str] | None = None,
+             fail_on_overfull: bool = False) -> tuple[dict[str, tuple[int, int]], str]:
     """Each word's (page, rounded yMin), and the ``.tex`` it was set from."""
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
@@ -147,6 +149,10 @@ def _typeset(parallel: bool, typography: dict, protected: bool = True,
             distribution=NO_NOTICES,
         )
         tex = (work / "t.tex").read_text()
+        if tex_replacements:
+            for before, after in tex_replacements.items():
+                tex = tex.replace(before, after)
+            (work / "t.tex").write_text(tex)
         if not protected:
             (work / "t.tex").write_text(
                 tex.replace(r"\begin{document}", _UNPROTECTED + r"\begin{document}", 1))
@@ -158,6 +164,8 @@ def _typeset(parallel: bool, typography: dict, protected: bool = True,
         if not (work / "t.pdf").exists():
             raise AssertionError(f"lualatex produced no PDF:\n{done.stdout[-2000:]}")
         log = (work / "t.log").read_text(errors="replace")
+        if fail_on_overfull and "Overfull \\hbox" in log:
+            raise AssertionError("The conditional rule overflows its measured line")
         if "could not patch" in log:
             raise AssertionError("a reledmac or reledpar patch did not apply")
         errors = re.findall(r"^! .*", log, re.MULTILINE)
@@ -377,6 +385,60 @@ class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
         # Otherwise there is no last line to lose, and the test above proves nothing.
         lines = {y for w, y in self.y.items() if w.startswith("RHw")}
         self.assertGreater(len(lines), 1)
+
+
+@_NEEDS_TEX
+class TestStandaloneRoleBeforeColumns(unittest.TestCase):
+    """A role-only division between bilingual transclusions must not end a page."""
+
+    def test_role_stays_with_the_next_prayer_without_moving_inline_text(self):
+        sections = []
+        count = 60
+        for n in range(count):
+            length = _LENGTHS[n % len(_LENGTHS)] * 2 + 7
+            sections.append(f"""<p:parallel column-order="primary_first">
+              <p:parallelItem role="primary" xml:lang="en"><tei:p>{_words(f'LF{n}', length)}</tei:p></p:parallelItem>
+              <p:parallelItem role="parallel" xml:lang="en"><tei:p>{_words(f'RF{n}', length)}</tei:p></p:parallelItem>
+            </p:parallel>
+            <tei:div><tei:note type="description">Reader{n}</tei:note></tei:div>
+            <p:parallel column-order="primary_first">
+              <p:parallelItem role="primary" xml:lang="en"><tei:p>Prayer{n} {_words(f'LP{n}', 9)}</tei:p></p:parallelItem>
+              <p:parallelItem role="parallel" xml:lang="en"><tei:p>Counterpart{n} {_words(f'RP{n}', 9)}</tei:p></p:parallelItem>
+            </p:parallel>""")
+        document = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" '
+                    'xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en">'
+                    '<tei:text><tei:body>' + ''.join(sections) + '</tei:body></tei:text></tei:TEI>')
+        where, _ = _typeset(True, {'parallel': {'layout': 'pairs'}}, document=document)
+        control, _ = _typeset(True, {'parallel': {'layout': 'pairs'}}, protected=False, document=document)
+        stranded = []
+        for n in range(count):
+            with self.subTest(section=n):
+                for key in (f'Reader{n}', f'Prayer{n}', f'Counterpart{n}'):
+                    self.assertIn(key, where)
+                    self.assertIn(key, control)
+                self.assertEqual(where[f'Reader{n}'][0], where[f'Prayer{n}'][0])
+                self.assertEqual(where[f'Reader{n}'][0], where[f'Counterpart{n}'][0])
+                if control[f'Reader{n}'][0] != control[f'Prayer{n}'][0]:
+                    stranded.append(n)
+        self.assertTrue(stranded, 'The unprotected control must reach a page edge')
+
+
+@_NEEDS_TEX
+class TestConditionalRuleOwnLine(unittest.TestCase):
+    def test_rule_between_words_keeps_both_words_on_separate_lines(self):
+        for parallel in (False, True):
+            with self.subTest(parallel=parallel):
+                # Exercise the actual block-rule macro independently of whether
+                # a synthetic one-paragraph condition would be classified inline.
+                inner = '<tei:p>CloseArk.RULEHEREAfterRule.</tei:p>'
+                body = ('<p:parallel><p:parallelItem role="primary" xml:lang="en"><tei:div>' + inner + '</tei:div></p:parallelItem><p:parallelItem role="parallel" xml:lang="en"><tei:p>Counterpart.</tei:p></p:parallelItem></p:parallel>') if parallel else inner
+                document = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:p="http://jewishliturgy.org/ns/processing" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="en"><tei:text><tei:body>' + body + '</tei:body></tei:text></tei:TEI>'
+                where, _ = _typeset(parallel, {'parallel': {'layout': 'pairs'}}, document=document,
+                                    tex_replacements={'RULEHERE': r'\OSCondEndBlock{}'}, fail_on_overfull=True)
+                self.assertIn('CloseArk.', where)
+                self.assertIn('AfterRule.', where)
+                self.assertEqual(where['CloseArk.'][0], where['AfterRule.'][0])
+                self.assertGreater(where['AfterRule.'][1] - where['CloseArk.'][1], 15)
 
 
 if __name__ == "__main__":

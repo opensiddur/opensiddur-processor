@@ -584,11 +584,18 @@ def _styles_section(config: TypographyConfig) -> list[str]:
     # prints nothing, so the stylesheet need not know.
     if markers.verse_numbers is Visibility.HIDDEN:
         lines.append(r"\newcommand{\vno}[1]{}")
+        lines.append(r"\newcommand{\vnoint}[1]{}")
     else:
         define(
             "verse_number",
-            lambda s: r"\newcommand{\vno}[1]{\textsuperscript{{\textdir TLT"
-            r"\foreignlanguage{english}{" + tokens(s) + r"#1}}}\,}",
+            lambda s: r"\newcommand{\vno}[1]{\if\relax\detokenize{#1}\relax\else\textsuperscript{{\textdir TLT"
+            r"\foreignlanguage{english}{" + tokens(s) + r"#1}}}\,\fi}",
+        )
+    if markers.verse_numbers is not Visibility.HIDDEN:
+        define(
+            "verse_number",
+            lambda s: r"\newcommand{\vnoint}[1]{\textsuperscript{{\textdir TLT"
+            r"\foreignlanguage{english}{" + tokens(s) + r"#1}}}}",
         )
     if markers.chapter_numbers is Visibility.HIDDEN:
         lines.append(r"\newcommand{\chno}[1]{}")
@@ -837,7 +844,7 @@ def _markers_section(config: TypographyConfig) -> list[str]:
         + "}}"
     )
     lines.append(
-        r"\newcommand{\OSCondEndInline}{{\bfseries"
+        r"\newcommand{\OSCondEndInline}{" + (r"\unskip" if conditional.inline_close else "") + r"{\bfseries"
         + escape_tex(conditional.inline_close)
         + "}}"
     )
@@ -849,11 +856,12 @@ def _markers_section(config: TypographyConfig) -> list[str]:
     # rule outside the column it belongs to. \OSMeasure is \hsize less the
     # paragraph's own indents.
     lines.append(
-        r"\newcommand{\OSCondRule}{\leavevmode\hbox to \OSMeasure{\hss\rule{"
+        r"\newcommand{\OSCondRule}{\ifhmode\unskip\strut\newline\fi"
+        r"\leavevmode\strut\hbox to \OSMeasure{\hss\rule{"
         + width
         + "}{"
         + conditional.rule_thickness
-        + r"}\hss}}"
+        + r"}\hss}\newline\ignorespaces}"
     )
     if conditional.block is ConditionalBlock.RULE:
         lines.append(r"\newcommand{\OSCondStartBlock}{\OSCondRule}")
