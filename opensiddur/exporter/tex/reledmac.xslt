@@ -2274,7 +2274,13 @@ end
                             <xsl:if test="not($in-pstart)">
                                 <xsl:call-template name="pstart"/>
                             </xsl:if>
-                            <xsl:text>\vno{</xsl:text>
+                            <!-- A quotation can begin after an attached prefix,
+                                 such as Hebrew bet. Keep the number tight there. -->
+                            <xsl:text>\</xsl:text>
+                            <xsl:value-of select="if (ancestor::tei:seg[@type='quotation']
+                                [preceding-sibling::node()[1][self::text()][matches(., '\S$')]])
+                                then 'vnoint' else 'vno'"/>
+                            <xsl:text>{</xsl:text>
                             <xsl:value-of select="f:verse-number-label(string(@n))"/>
                             <xsl:text>}</xsl:text>
                             <xsl:next-iteration>
@@ -3919,6 +3925,10 @@ end
                               else if (not($crosses)) then 'instructionnote'
                               else if ($within) then 'OSInstructionLine'
                               else 'OSInstructionBlock'"/>
+        <xsl:if test="$within and $command = 'instructionnote'
+                      and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')">
+            <xsl:text>\ </xsl:text>
+        </xsl:if>
         <xsl:if test="$standalone and $command = 'instructionnote'">
             <xsl:text>{\OSKeepAttr=3\relax </xsl:text>
         </xsl:if>

@@ -4863,6 +4863,16 @@ class TestKeepTogether(unittest.TestCase):
                 body = self._body(_transform(xml))
                 self.assertNotIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
 
+    def test_inline_role_after_punctuation_gets_a_word_space(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p>Words:<tei:note type="instruction">Reader.</tei:note></tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"Words:\ \instructionnote{", body)
+
+    def test_quoted_verse_number_does_not_space_an_attached_prefix(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he"><tei:text><tei:body><tei:p>בְּ<tei:seg type="quotation"><tei:milestone unit="verse" n="14"/>אֶהְיֶה<tei:milestone unit="verse"/></tei:seg>:</tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"בְּ\vnoint{14}אֶהְיֶה", body)
+
     def test_same_language_inline_role_stays_run_in(self):
         xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p><tei:note type="description">Reader:</tei:note> Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
         body = self._body(_transform(xml))
