@@ -275,6 +275,7 @@ opensiddur:rite:
     value: binary
   features:
     ashkenaz: binary
+    german: binary
     sepharad: binary
     edot_hamizrach: binary
     teimani_baladi: binary

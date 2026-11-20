@@ -770,13 +770,13 @@
           <constraint>
             <sch:rule context="tei:milestone[@unit = 'half-verse']"
                       xmlns:sch="http://purl.oclc.org/dsdl/schematron">
-              <sch:assert test="@n = 'a' or @n = 'b'">
+              <sch:assert test="not(@corresp) or @n = 'a' or @n = 'b'">
                 A milestone with unit="half-verse" must carry @n of "a" or "b": a verse has a
                 first half and a second, divided at the etnachta.
               </sch:assert>
-              <sch:assert test="@corresp">
-                A milestone with unit="half-verse" must carry @corresp. A half no URN names
-                is a division nothing can refer to, which is the whole point of marking it.
+              <sch:assert test="@corresp or not(@n)">
+                A numbered half-verse must carry @corresp. A bare half-verse milestone
+                with neither @n nor @corresp is a terminator and opens no scope.
               </sch:assert>
               <sch:assert test="not(@corresp) or ends-with(@corresp, concat('/', @n))">
                 A half-verse's @corresp must be the verse's URN with "/a" or "/b" after it,
@@ -785,8 +785,9 @@
             </sch:rule>
             <sch:rule context="tei:milestone[@unit = 'verse-part']"
                       xmlns:sch="http://purl.oclc.org/dsdl/schematron">
-              <sch:assert test="@corresp">
-                A milestone with unit="verse-part" must carry @corresp.
+              <sch:assert test="@corresp or not(@n)">
+                A named verse-part must carry @corresp. A bare verse-part milestone
+                with neither @n nor @corresp is a terminator and opens no scope.
               </sch:assert>
               <sch:assert test="not(@corresp) or not(contains(tokenize(@corresp, '/')[last()], '-'))">
                 A verse part's name may not contain "-": a dash in the last component of a

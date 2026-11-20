@@ -122,6 +122,12 @@ class AuthoringTests(unittest.TestCase):
         self.assertEqual([('oppessors', 'oppressors'), ('vi.', 'lvi.')], self.choices(root))
         self.assertEqual('the oppessors fled; Isaiah vi. 7.firstinner” after(When, &c.(When, &c.)', a.printed_text(root))
 
+    def test_printed_text_excludes_an_abbreviations_editorial_expansion(self):
+        root = etree.fromstring(f'<p xmlns="{a.TEI}">Before <choice>'
+                                '<abbr>ב״א</abbr><expan>ברוך אתה</expan>'
+                                '</choice> after.</p>')
+        self.assertEqual(a.printed_text(root), 'Before ב״א after.')
+
     def test_a_correction_can_follow_an_element_or_match_a_whole_text(self):
         root = self.correctable()
         a.apply_corrections({'x/y.xml': root}, [
@@ -136,6 +142,21 @@ class AuthoringTests(unittest.TestCase):
                            {'id': 'nofile', 'file': 'x/z.xml', 'sic': 'fled', 'corr': 'x'}]:
             with self.subTest(correction=correction['id']), self.assertRaises(ValueError):
                 a.apply_corrections({'x/y.xml': self.correctable()}, [correction])
+
+    def test_duplicate_passage_can_be_corrected_at_one_explicit_occurrence(self):
+        root = etree.fromstring(f'<div xmlns="{a.TEI}"><p>same words</p><p>same words</p></div>')
+        spec = {'id': 'duplicate', 'file': 'x/y.xml', 'sic': 'same words', 'corr': '',
+                'xpath': './tei:p[2]', 'exact': True}
+        a.apply_corrections({'x/y.xml': root}, [spec])
+        self.assertEqual(root[0].text, 'same words')
+        self.assertEqual(self.choices(root), [('same words', None)])
+        self.assertEqual(a.printed_text(root), 'same wordssame words')
+        for selector in ['./tei:p', './tei:missing', 'string(.)', 'true()']:
+            with self.subTest(selector=selector), self.assertRaises(ValueError):
+                a.apply_corrections({'x/y.xml': root}, [dict(spec, xpath=selector)])
+        root[1].tail = 'outside'
+        with self.assertRaises(ValueError):
+            a.apply_corrections({'x/y.xml': root}, [dict(spec, sic='outside')])
 
     def test_a_misspelt_note_emphasis_phrase_is_refused(self):
         with self.assertRaisesRegex(ValueError, 'Missing printed emphasis'):
