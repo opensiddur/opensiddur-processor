@@ -4873,6 +4873,11 @@ class TestKeepTogether(unittest.TestCase):
         body = self._body(_transform(xml))
         self.assertIn(r"בְּ\vnoint{14}אֶהְיֶה", body)
 
+    def test_parallel_inline_role_keeps_its_preceding_word_space_after_copying(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en"><tei:text><tei:body><p:parallel><p:parallelItem role="primary" xml:lang="en"><tei:div><tei:p>Words:<tei:note type="instruction">Reader.</tei:note> More words.</tei:p></tei:div></p:parallelItem><p:parallelItem role="parallel" xml:lang="en"><tei:div><tei:p>Translation.</tei:p></tei:div></p:parallelItem></p:parallel></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml, layout="pairs"))
+        self.assertIn(r"Words:\ \instructionnote{", body)
+
     def test_same_language_inline_role_stays_run_in(self):
         xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p><tei:note type="description">Reader:</tei:note> Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
         body = self._body(_transform(xml))

@@ -3128,6 +3128,9 @@ end
             <xsl:copy-of select="@*"/>
             <xsl:attribute name="f:note-lang" select="$note-lang"/>
             <xsl:attribute name="f:text-lang" select="$text-lang"/>
+            <xsl:attribute name="f:needs-space"
+                select="exists(ancestor::tei:p | ancestor::tei:l)
+                        and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')"/>
             <!-- A block rubric introduces a new paragraph in both parallel
                  columns, even when its language matches one column. Otherwise
                  the translation runs onto the rubric's last line while the
@@ -3925,8 +3928,8 @@ end
                               else if (not($crosses)) then 'instructionnote'
                               else if ($within) then 'OSInstructionLine'
                               else 'OSInstructionBlock'"/>
-        <xsl:if test="$within and $command = 'instructionnote'
-                      and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')">
+        <xsl:if test="$command = 'instructionnote' and (@f:needs-space = 'true'
+                      or ($within and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')))">
             <xsl:text>\ </xsl:text>
         </xsl:if>
         <xsl:if test="$standalone and $command = 'instructionnote'">
