@@ -736,9 +736,26 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 xml_id = f"variants_{declared}"
                 transclude = (f'<j:declare xml:id="{xml_id}">{variant_fs(declarations[id(item)])}</j:declare>'
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
+            if gate is not None and until is not None:
+                # The rubric a section's condition runs to may open the next text's block (the
+                # Kaddish rubric after one day's psalm, before the next day's).
+                for pair in item.pairs:
+                    if is_phrase(pair):
+                        break
+                    if until.search(" ".join(plain_text(pair.en).split())):
+                        close_gate()
+                        break
             lead = leading.get(id(item))
             found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
-            if found is not None and gate is None:
+            if found is not None and found.section:
+                # A condition over a section (one day's introduction and psalm) gates every text
+                # to its end, as the same rubric between texts does.
+                close_gate()
+                gates += 1
+                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                parts.append(conditional_open(gate, note, condition_xml(found.when)))
+            elif found is not None and gate is None:
                 gates += 1
                 note = instruction(lead.en, "en", notes) if lang == "en" else ""
                 transclude = (conditional_open(f"when_{gates}", note, condition_xml(found.when))

@@ -23271,5 +23271,8 @@
 {"urn": "urn:x-opensiddur:text:prayer:ribbono_shel_olam_ani", "status": "canonical", "label_he": "רִבּוֹנוֹ שֶׁל עוֹלָם אֲנִי שֶׁלָּךְ וַחֲלוֹמוֹתַי", "label_en": "ribbono shel olam ani"}
 {"urn": "urn:x-opensiddur:text:prayer:addir_bamarom_shokhen", "status": "canonical", "label_he": "אַדִּיר בַּמָּרוֹם שׁוֹכֵן בִּגְבוּרָה אַתָּה שָׁלוֹם", "label_en": "addir bamarom shokhen"}
 {"urn": "urn:x-opensiddur:text:prayer:ribbono_shel_olam_asinu", "status": "canonical", "label_he": "רִבּוֹנוֹ שֶׁל עוֹלָם עָשִֽׂינוּ מַה שֶּׁגָּזַֽרְתָּ", "label_en": "ribbono shel olam asinu"}
+{"urn": "urn:x-opensiddur:text:prayer:haadderet_vehaemunah_lechay", "status": "canonical", "label_he": "הָאֲדֶּֽרֶת וְהָאֱמוּנָה לְחַי עוֹלָמִים: הַבִּינָה וְהַבְּרָכָה", "label_en": "haadderet vehaemunah lechay"}
+{"urn": "urn:x-opensiddur:text:prayer:uvenuchoh_yomar_shuvah", "status": "canonical", "label_he": "וּבְנֻחֹה יֹאמַר שׁוּבָה יְהֹוָה רִבְבוֹת אַלְפֵי", "label_en": "uvenuchoh yomar shuvah"}
 {"urn": "urn:x-opensiddur:text:prayer:asher_bemaamaro_bara", "status": "canonical", "label_he": "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם", "label_en": "asher bemaamaro bara"}
+{"urn": "urn:x-opensiddur:text:prayer:barukh_yotzerekh_barukh", "status": "canonical", "label_he": "בָּרוּךְ יוֹצְ֒רֵךְ בָּרוּךְ עוֹשֵׂךְ בָּרוּךְ קוֹנֵךְ", "label_en": "barukh yotzerekh barukh"}
 {"urn": "urn:x-opensiddur:text:prayer:tana_devei_rabbi", "status": "canonical", "label_he": "תָּנָא דְבֵי רַבִּי יִשְׁמָעֵאל אִלְמָלֵא לֹא", "label_en": "tana devei rabbi"}

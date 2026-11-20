@@ -24,6 +24,23 @@ shabbat_siddur_sefard_linear:
     as_of: {he: b7a5d9bedb109443915fed4d63d499a985595f9cee976d77567c088aeee5d324, en: daca66f69613d438bdaa5398cdfc1f298c37d3a60907fac69e459f8068d1dbb5}
     opens: [44, 48, 82, 88, 122, 130, 165, 172]
     note: "the Kohanim's verses, word by word, with Ribbono shel Olam (for dreams) after each, then Adir Bamarom and Ribbono shel Olam Asinu, none of them in bold"
+  "Hallel":
+    as_of: {he: 197ef441f9f714e9420e6a05c9511d7765129be6c748abab6ebe1b7a1e654ca8, en: 010cdc6c15a51ab91e24e887f016219af264f634d72afc8f206afd12995894ed}
+    opens: [273]
+    note: "the Kaddish after Hallel, not in bold"
+  "The Morning Prayers / Mizmor Shir":
+    as_of: {he: d621d3835415f2299e9929e6c499857b038aea77f9d564f8af2d5ea8961ef227, en: 9039c34836b41f99779d64ac6d252ca150356c9d7a12ec571abd0fa1733e178b}
+    opens: [550]
+    note: "Ha'aderes Veha'emunah after Psalm 136, not in bold"
+  "Kiddush Levanah":
+    as_of: {he: 9907abba7761356bc3d5bef41f7caee86cd8a3f72a9b9b90d671d1639e5d0f03, en: 96d2e50329e304882963a5de7627c0998c5b49f1b0ef20e3ea62b498a38335fb}
+    en_only: [157]
+    opens: [39, 138]
+    note: "the greetings after the blessing (Baruch Yotzreich ...), and Psalm 67, not in bold"
+  "Musaf Service / Ashrei":
+    as_of: {he: 7bbf8f6fc2d4df97d85717c606c2f9d06a8a5c909f12e25434d52c276a7d441a, en: 31d2104463b54459c7a1fd569621b5cd6af447364173d75b52d7189b7288bdbc}
+    opens: [59, 70, 98]
+    note: "returning the Torah: Yehalelu, then Psalm 29 (on Shabbos) or Psalm 24, not in bold"
   "Order of Shabbos in the Home / Eishes Chayil":
     as_of: {he: 7d2a85094e48307a01c9096c85be8893b1972b715a8558f6b27aada9a243137f, en: 813e9c04c8b9bdfb817c7ff6ff0764dc12a3b6da702701b7bf13ade18c445606}
     he_only: [52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69]

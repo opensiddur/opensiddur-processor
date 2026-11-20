@@ -21,6 +21,12 @@ class TestPhraseUrns(unittest.TestCase):
         self.assertEqual(phrase_urn(T + "bible:psalms/145", 1), T + "metsudah:psalms/145/1")
         self.assertEqual(text_path(T + "poem:adon_olam@some-project"), "adon_olam")
 
+    def test_a_run_of_verses_is_not_spelled_as_a_range(self):
+        from opensiddur.exporter.urn import split_range
+        urn = phrase_urn(T + "bible:proverbs/31/10-31", 2)
+        self.assertEqual(urn, T + "metsudah:proverbs/31/10_31/2")
+        self.assertIsNone(split_range(urn))
+
     def test_a_path_two_namespaces_use_is_kept_by_prayer(self):
         clashes = clashing_paths([T + "prayer:hamavdil", T + "poem:hamavdil", T + "poem:adon_olam",
                                   T + "siddur:hamavdil", "urn:x-opensiddur:contributor:x/hamavdil"])

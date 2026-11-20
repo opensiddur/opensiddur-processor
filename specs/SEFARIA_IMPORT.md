@@ -231,9 +231,9 @@ Each text's URN, in order of preference:
      text the collection names it as (Hallel's), or the collection prints the text going on
      into it.
    - **Scripture.** A block that opens a chapter at its first verse (its first half, `/1/a`,
-     will do) is that chapter, and ends where the chapter's last verse does — the last place
-     that verse opens, since a refrain may open an earlier verse alike (Psalm 99, verses 5 and
-     9); a block that is one whole verse is that verse (`bible:malachi/3/4`); a block that is
+     will do) is that chapter, and ends where the chapter's last verse does — where that verse
+     opens after the verse before it, since a refrain may open an earlier verse alike (Psalm 99,
+     verses 5 and 9) and the text after the chapter may quote it (Uva Letziyon, Psalm 20:10); a block that is one whole verse is that verse (`bible:malachi/3/4`); a block that is
      two or more verses in order, whole, is that run, named by its range
      (`bible:proverbs/31/10-31`, `bible:psalms/148/1-6`; a long verse ends where its last words
      do; a word the source splits in two still opens its verse, the letters agreeing), and a
@@ -271,7 +271,10 @@ Every decision is recorded at once in `specs/sefaria/metsudah_urns.jsonl` — on
 keyed by work, leaf and the Hebrew index of its first phrase, with its kind
 (`existing`/`new`/`repeat`/`variant`), incipit, evidence and a hash of its words (`as_of`). Records are
 sticky: a reviewer may correct a URN in the file and rerun, and a rerun on an unchanged export
-decides nothing. A cut is recorded by the record of the text after it, and replayed from it.
+decides nothing. A first printing's record is current only while no block before it prints
+the text, so a text a later rule cuts off earlier in the book (Psalm 67 in Kiddush Levanah,
+before the counting of the Omer) makes the later record a later printing. A cut is recorded by
+the record of the text after it, and replayed from it — after any new blessing before it.
 When a text's words change, its record lapses and is reported; the text keeps its URN (and its
 phrases their numbers) when its opening still agrees, and is decided again otherwise.
 
@@ -333,9 +336,14 @@ become `j:conditional`, from a curated table:
   structure file — or, marked `section: true` (the Kedushah, "When the Chazzan repeats the
   Shemoneh Esrei"), everything to the next heading, or, with `until`, to the rubric that matches
   it, past any heading (Tachanun, to "The Chazzan recites the following Kaddish"); either ends
-  at the next condition rubric, and at the end of the leaf. A text printed before, whose
-  file is its first printing's, keeps the condition rubric it opens with: it gates the
-  transclusion, unless the first printing opens with the same rubric (which its file gives). `instead_of_previous: true` makes the text before the rubric the alternative,
+  at the next condition rubric, and at the end of the leaf; a rubric `until` names may also
+  open the next text (each day's psalm ends "(Deliver us...; Mourner's Kaddish.)", before the
+  next day's rubric). A text that opens with a condition rubric keeps it in its own file only
+  when every printing of it opens with that rubric; otherwise each place that prints it is
+  gated by its own rubric, and the text's file is unconditional (Psalm 130, said in the Ten
+  Days after Yishtabach and among the winter psalms every Shabbos). A rubric over a section
+  is always the place's: it opens there as it would between texts (each day's introduction
+  and its psalm, cut apart). `instead_of_previous: true` makes the text before the rubric the alternative,
   conditional on the opposite ("A woman says:": שלא עשני אשה unless female, שעשני כרצונו if so).
 - **Conditions follow Birnbaum.** A condition Birnbaum already encodes is written as Birnbaum
   writes it, so that the two books agree: the days Tachanun is omitted (Birnbaum's list, with

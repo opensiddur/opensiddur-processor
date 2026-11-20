@@ -177,16 +177,22 @@ rubrics:
   # -- Days of the week -------------------------------------------------------------------------
   - match: "^On Sunday:"
     when: {day-of-week: {hebrew-day: 1}}
+    until: "^\\(Deliver us"
   - match: "^On Monday:"
     when: {day-of-week: {hebrew-day: 2}}
+    until: "^\\(Deliver us"
   - match: "^On Tuesday:"
     when: {day-of-week: {hebrew-day: 3}}
+    until: "^\\(Deliver us"
   - match: "^On Wednesday:"
     when: {day-of-week: {hebrew-day: 4}}
+    until: "^\\(Deliver us"
   - match: "^On Thursday:"
     when: {day-of-week: {hebrew-day: 5}}
+    until: "^\\(Deliver us"
   - match: "^On Friday:"
     when: {day-of-week: {hebrew-day: 6}}
+    until: "^\\(Deliver us"
 
   # -- Tachanun, and the days the Torah is read --------------------------------------------------
   - match: "^The following prayers are added on Mondays and Thursday"

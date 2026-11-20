@@ -76,6 +76,13 @@ class TestVerseRun(unittest.TestCase):
         block = words(" ".join([VERSES[1], split, VERSES[3]]))
         self.assertEqual(verse_run(T + "bible:psalms/1/2", block, verses_index()), T + "bible:psalms/1/2-4")
 
+    def test_a_chapter_ends_at_its_last_verse_not_where_the_next_text_quotes_it(self):
+        # Psalm 20, then Uva Letziyon, which quotes Psalm 20:10.
+        quoting = ["שֶׁאֵין לוֹ מָקוֹר בָּאוֹסֶף", VERSES[3], "וְעוֹד דְּבָרִים אֲחֵרִים"]
+        outcome = decide([("L", items(*VERSES, *quoting))], verses_index())
+        self.assertEqual([(r.block, r.urn) for r in outcome.records.values()][0], (1, T + "bible:psalms/1"))
+        self.assertEqual(sorted(r.block for r in outcome.records.values()), [1, 5])
+
     def test_a_single_verse_is_not_a_run(self):
         self.assertIsNone(verse_run(T + "bible:psalms/1/2", words(VERSES[1]), verses_index()))
 
@@ -256,6 +263,14 @@ class TestDecide(unittest.TestCase):
         kept = {k: r for k, r in first.records.items() if r.block == 5}
         again = decide([("L", items(*leaf))], index, records=kept)
         self.assertEqual(sorted(r.block for r in again.records.values()), [1, 3, 5])
+
+    def test_a_recorded_first_printing_is_a_later_one_when_an_earlier_block_now_prints_the_text(self):
+        first = decide([("A", items(*UNKNOWN)), ("B", items(*MODEH))])
+        kept = {k: r for k, r in first.records.items() if r.leaf == "B"}
+        again = decide([("A", items(*MODEH)), ("B", items(*MODEH))], records=kept)
+        kinds = {r.leaf: r.kind for r in again.records.values()}
+        self.assertEqual(kinds["B"], "repeat")
+        self.assertNotEqual(kinds["A"], "repeat")
 
     def test_a_short_text_printed_again_is_a_repeat(self):
         short = ["<b>אָמֵן</b> סֶלָה"]

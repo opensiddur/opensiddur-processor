@@ -229,15 +229,31 @@ def leading_condition(plan: WorkPlan, item: TextBlock) -> Pair | None:
 
 
 def first_printing_rubrics(plan: WorkPlan) -> dict[str, str]:
-    """For each text written from its first printing, the condition rubric it opens with."""
-    found: dict[str, str] = {}
+    """For each text whose file may open with its condition rubric, that rubric: every printing
+    of the text opens with it. A text printed elsewhere without it (Psalm 130, said in the Ten
+    Days after Yishtabach and among the winter psalms on any Shabbat) is gated where it is
+    printed instead, its own file unconditional."""
+    rubrics: dict[str, set[str | None]] = {}
     for leaf_path, items in plan.items.items():
         for item in items:
             if isinstance(item, TextBlock):
                 record = plan.record(leaf_path, item)
-                if record.kind not in ("repeat", "variant") and (pair := leading_condition(plan, item)):
-                    found[record.urn] = _norm(plain_text(pair.en))
-    return found
+                pair = leading_condition(plan, item)
+                if pair is not None and plan.conditions.for_rubric(plain_text(pair.en)).section:
+                    # A condition over a section gates more than this text: it is the place's.
+                    rubrics.setdefault(record.urn, set()).add(None)
+                    continue
+                rubrics.setdefault(record.urn, set()).add(_norm(plain_text(pair.en)) if pair else None)
+    return {urn: next(iter(found)) for urn, found in rubrics.items() if len(found) == 1 and None not in found}
+
+
+def without_leading_condition(plan: WorkPlan, item: TextBlock) -> TextBlock:
+    """``item`` without the condition rubrics it opens with, for a text gated where it is printed."""
+    pairs = list(item.pairs)
+    first = next((k for k, pair in enumerate(pairs) if is_phrase(pair)), len(pairs))
+    kept = [pair for pair in pairs[:first]
+            if not (pair.he_kind is HebrewKind.EMPTY and plan.conditions.for_rubric(plain_text(pair.en)))]
+    return TextBlock(item.head, kept + pairs[first:])
 
 
 def text_printings(plan: WorkPlan) -> dict[str, list[VariantPrinting]]:
@@ -290,12 +306,14 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
                 # Which of the text's variants this place prints, and which it does not.
                 declarations[id(item)] = [(variant_urn(record.urn, v.name), v.name == record.variant)
                                           for v in variants]
+            # Its condition rubric gates it here, unless the text's own file opens with it.
+            pair = leading_condition(plan, item)
+            if pair is not None and _norm(plain_text(pair.en)) != opened.get(record.urn):
+                leading[id(item)] = pair
             if record.kind in ("repeat", "variant"):
-                # Its condition rubric, unless the first printing's file opens with it too.
-                pair = leading_condition(plan, item)
-                if pair is not None and _norm(plain_text(pair.en)) != opened.get(record.urn):
-                    leading[id(item)] = pair
                 continue
+            if id(item) in leading:
+                item = without_leading_condition(plan, item)
             numbers = record.phrases or list(range(1, len(item.phrases) + 1))
             notes = Notes(prefix="note")
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),

@@ -446,6 +446,31 @@ class TestLeafGates(unittest.TestCase):
         self.assertEqual(en.xpath("string(//j:conditional/tei:note)", namespaces=NS), "On Sunday:")
 
 
+    def test_a_section_rubric_a_text_opens_with_gates_the_texts_after_it_to_its_end(self):
+        # One day's introduction and psalm, cut apart, the day's rubric inside the first
+        # block; the next block opens with the rubric the day runs to, then the next day's.
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        deliver = _re.compile("^\\(Deliver us")
+        table = Conditions(rubrics=(
+            RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}, section=True, until=deliver),
+            RubricCondition(_re.compile("^On Monday:"), {"day-of-week": {"hebrew-day": 2}}, section=True, until=deliver)))
+        items, urns, _ = self.leaf(("", "<b>הַיּוֹם</b> יוֹם רִאשׁוֹן", "<b>לְדָוִד</b> מִזְמוֹר", "", "",
+                                    "<b>הַיּוֹם</b> יוֹם שֵׁנִי", "<b>שִׁיר</b> מִזְמוֹר"),
+                                   ("<small>On Sunday:</small>", "Today is Sunday", "A psalm of David",
+                                    "<small>(Deliver us...; Mourner's Kaddish.)</small>", "<small>On Monday:</small>",
+                                    "Today is Monday", "A song"), table)
+        intro1, psalm1, intro2, psalm2 = [i for i in items if isinstance(i, TextBlock)]
+        sunday, deliver_us, monday = [pair for i in items if not isinstance(i, TextBlock)
+                                      for pair in getattr(i, "pairs", ())]
+        intro1.pairs[:0] = [sunday]
+        intro2.pairs[:0] = [deliver_us, monday]
+        from opensiddur.importer.sefaria.tei_builder import leaf_body
+        en = parse(leaf_body(T + "siddur:x", ("L", "L"), [intro1, psalm1, intro2, psalm2], urns, "en", Notes("n"),
+                             conditions=table, leading={id(intro1): sunday, id(intro2): monday}))
+        self.assertEqual(self.gated(en), [["t0", "t1"], ["t2", "t3"]])
+
+
 class TestNodeGates(unittest.TestCase):
     def test_a_gated_child_is_transcluded_conditionally(self):
         from opensiddur.importer.sefaria.conditions import LeafGate

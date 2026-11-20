@@ -63,8 +63,13 @@ def text_path(text_urn: str, clashes: Collection[str] = frozenset()) -> str:
 
     A path in ``clashes`` (:func:`clashing_paths`) is kept by ``prayer:``; the other namespace's
     text has its namespace before it: ``poem:hamavdil_bein_qodesh_lechol`` ->
-    ``poem/hamavdil_bein_qodesh_lechol``."""
+    ``poem/hamavdil_bein_qodesh_lechol``.
+
+    A run of verses is spelled with ``_``, not ``-``: in a URN path ``-`` is a range, and
+    ``metsudah:proverbs/31/10-31/2`` would read as one (``bible:proverbs/31/10-31`` ->
+    ``proverbs/31/10_31``)."""
     namespace, path = _split(text_urn)
+    path = path.replace("-", "_")
     if path in clashes and namespace != "prayer":
         return f"{namespace}/{path}"
     return path

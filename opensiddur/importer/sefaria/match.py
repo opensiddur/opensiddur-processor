@@ -437,8 +437,17 @@ def _chapter_span(chapter: str, phrase_words: list[list[str]], index: IncipitInd
     length = index.length_of.get(last)
     if len(key) < 2 or length is None:
         return None
-    # The last place it opens: an earlier verse may open alike (Psalm 99's refrain, verses 5 and 9).
-    for start in reversed(range(len(phrase_words))):
+    # Where it opens after the verse before it: an earlier verse may open alike (Psalm 99's
+    # refrain, verses 5 and 9), and the text after the chapter may quote it (Uva Letziyon,
+    # Psalm 20:10).
+    after = 0
+    ordered = sorted(verses, key=lambda u: int(u.rsplit("/", 1)[-1]))
+    if len(ordered) > 1:
+        before = index.own_opening(ordered[-2])[:SHORT_INCIPIT_WORDS]
+        found = next((k for k in range(len(phrase_words)) if len(before) >= 2
+                      and _opens_at(phrase_words, k, tuple(before))), None)
+        after = found + 1 if found is not None else 0
+    for start in range(after, len(phrase_words)):
         if _opens_at(phrase_words, start, tuple(key)):
             count = 0
             for j in range(start, len(phrase_words)):
@@ -1199,7 +1208,9 @@ class _Decider:
         blessing = next((j for j in range(1, replay if replay is not None else len(phrase_words))
                          if _opens_at(phrase_words, j, BLESSING_FORMULA)), None)
         if blessing is not None:
-            matching = [matching_words(pair) for pair in block.phrases]
+            # Whether the block up to the recorded start is one text ending with the blessing's
+            # closing formula: what follows that start is another text's.
+            matching = [matching_words(pair) for pair in block.phrases[:replay]]
             whole = resolve(lookup(self.index, [w for p in matching for w in p]), matching, self.index)
             if whole.urn is None or whole.urn != closing_text([w for p in matching for w in p], self.index):
                 replay = blessing
@@ -1210,8 +1221,10 @@ class _Decider:
         text = block_text(block)
         record = self.records.get(key)
         if record is not None and record.as_of == block_hash(block) and (
-                record.kind in ("existing", "new") or record.urn in self.printed):
-            # A repeat or variant is current only while its first printing is.
+                record.urn not in self.printed if record.kind in ("existing", "new") else record.urn in self.printed):
+            # A repeat or variant is current only while its first printing is; a first printing,
+            # only while no block before it now prints the text (a text cut off earlier in the
+            # book, Psalm 67 in Kiddush Levanah before the counting of the Omer).
             self.keep(record, leaf, blocks, block)
             return
         if record is not None and record.kind in ("existing", "new") and record.urn not in self.printed and (
