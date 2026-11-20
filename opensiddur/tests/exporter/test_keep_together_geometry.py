@@ -381,3 +381,39 @@ class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@_NEEDS_TEX
+class TestStandaloneRoleBeforeColumns(unittest.TestCase):
+    """A role-only division between bilingual transclusions must not end a page."""
+
+    def test_role_stays_with_the_next_prayer_without_moving_inline_text(self):
+        sections = []
+        count = 60
+        for n in range(count):
+            length = _LENGTHS[n % len(_LENGTHS)] * 2 + 7
+            sections.append(f"""<p:parallel column-order="primary_first">
+              <p:parallelItem role="primary" xml:lang="en"><tei:p>{_words(f'LF{n}', length)}</tei:p></p:parallelItem>
+              <p:parallelItem role="parallel" xml:lang="en"><tei:p>{_words(f'RF{n}', length)}</tei:p></p:parallelItem>
+            </p:parallel>
+            <tei:div><tei:note type="description">Reader{n}</tei:note></tei:div>
+            <p:parallel column-order="primary_first">
+              <p:parallelItem role="primary" xml:lang="en"><tei:p>Prayer{n} {_words(f'LP{n}', 9)}</tei:p></p:parallelItem>
+              <p:parallelItem role="parallel" xml:lang="en"><tei:p>Counterpart{n} {_words(f'RP{n}', 9)}</tei:p></p:parallelItem>
+            </p:parallel>""")
+        document = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" '
+                    'xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en">'
+                    '<tei:text><tei:body>' + ''.join(sections) + '</tei:body></tei:text></tei:TEI>')
+        where, _ = _typeset(True, {'parallel': {'layout': 'pairs'}}, document=document)
+        control, _ = _typeset(True, {'parallel': {'layout': 'pairs'}}, protected=False, document=document)
+        stranded = []
+        for n in range(count):
+            with self.subTest(section=n):
+                for key in (f'Reader{n}', f'Prayer{n}', f'Counterpart{n}'):
+                    self.assertIn(key, where)
+                    self.assertIn(key, control)
+                self.assertEqual(where[f'Reader{n}'][0], where[f'Prayer{n}'][0])
+                self.assertEqual(where[f'Reader{n}'][0], where[f'Counterpart{n}'][0])
+                if control[f'Reader{n}'][0] != control[f'Prayer{n}'][0]:
+                    stranded.append(n)
+        self.assertTrue(stranded, 'The unprotected control must reach a page edge')

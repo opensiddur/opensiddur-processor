@@ -1254,7 +1254,7 @@ class TestSourceWhitespaceIsNotAParagraphBreak(unittest.TestCase):
         body = self._document_body(out)
         self.assertIn(r"\instructionnote{", body)
         self.assertNotRegex(body, r"\n[ \t]*\n[ \t]*\\instructionnote")
-        self.assertRegex(body, r"\\notenote\{.*?\}{4,}\n\\instructionnote\{")
+        self.assertRegex(body, r"\\notenote\{.*?\}{4,}\n(?:\{\\OSKeepAttr=3\\relax )?\\instructionnote\{")
 
     def test_no_blank_line_survives_anywhere_in_a_stream(self):
         """The guard for the whole class, not just the note case."""
@@ -4843,6 +4843,19 @@ class TestKeepTogether(unittest.TestCase):
         run_in = next(line for line in out.splitlines()
                       if line.startswith(r"\newcommand{\instructionnote}"))
         self.assertNotIn("OSKeepAttr", run_in)
+
+    def test_standalone_same_language_role_is_kept_without_forcing_a_line_break(self):
+        source = '<tei:div><tei:note type="description">Reader:</tei:note></tei:div>'
+        xml = f'<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body>{source}<tei:p>Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
+        self.assertEqual(body.count('Reader:'), 1)
+
+    def test_same_language_inline_role_stays_run_in(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p><tei:note type="description">Reader:</tei:note> Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"\instructionnote{", body)
+        self.assertNotIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
 
     def test_a_keep_reaches_a_heading_set_across_the_page(self):
         body = self._body(_transform(self._parallel("Same", "Same"), layout="pairs"))
