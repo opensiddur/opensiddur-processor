@@ -272,6 +272,23 @@ class TestDecide(unittest.TestCase):
         self.assertEqual(kinds["B"], "repeat")
         self.assertNotEqual(kinds["A"], "repeat")
 
+    def test_a_text_ending_with_its_blessing_stays_whole_before_a_recorded_start(self):
+        # Barukh She'amar: a litany, then a blessing with its own closing formula; the text after
+        # it is recorded as starting where it does, in the same block.
+        litany = ["בָּרוּךְ שֶׁאָמַר וְהָיָה הָעוֹלָם בָּרוּךְ הוּא", "בָּרוּךְ עוֹשֶׂה בְרֵאשִׁית בָּרוּךְ אוֹמֵר וְעוֹשֶׂה",
+                  "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם הָאֵל הָאָב הָרַחֲמָן",
+                  "בָּרוּךְ אַתָּה יְהֹוָה מֶלֶךְ מְהֻלָּל בַּתִּשְׁבָּחוֹת"]
+        after = ["מִזְמוֹר לְתוֹדָה הָרִיעוּ לַיהֹוָה כָּל הָאָרֶץ", "עִבְדוּ אֶת יְהֹוָה בְּשִׂמְחָה"]
+        index = index_of(prayer_c_barukh_sheamar=" ".join(litany), prayer_c_mizmor=" ".join(after))
+        index.closing_of[T + "prayer:barukh_sheamar"] = tuple(words(litany[-1]))
+        first = decide([("L", items(*litany, "<b>" + after[0] + "</b>", after[1]))], index)
+        self.assertEqual(sorted((r.block, r.urn) for r in first.records.values()),
+                         [(1, T + "prayer:barukh_sheamar"), (5, T + "prayer:mizmor")])
+        kept = {k: r for k, r in first.records.items() if r.block == 5}
+        again = decide([("L", items(*litany, *after))], index, records=kept)
+        self.assertEqual(sorted((r.block, r.urn) for r in again.records.values()),
+                         [(1, T + "prayer:barukh_sheamar"), (5, T + "prayer:mizmor")])
+
     def test_a_short_text_printed_again_is_a_repeat(self):
         short = ["<b>אָמֵן</b> סֶלָה"]
         outcome = decide([("A", items(*short)), ("B", items(*short))])

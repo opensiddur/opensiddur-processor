@@ -115,6 +115,9 @@ texts:
     leaf: Order of Shabbos in the Home / Kiddush for Shabbos Eve
     urn: urn:x-opensiddur:text:prayer:kiddush/savri
     note: "the Kiddush's call to attention; Ashkenaz סברי מרנן"
+  - opens: יהללוך יהוה אלהינו כל מעשיך
+    urn: urn:x-opensiddur:text:prayer:hallel/yehalelukha
+    note: "Hallel's closing blessing, worded otherwise than Birnbaum's"
   - opens: סברי מרנן ורבנן
     urn: urn:x-opensiddur:text:prayer:kiddush/savri
     note: "too short for the index to find"

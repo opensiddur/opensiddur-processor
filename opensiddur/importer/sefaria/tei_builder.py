@@ -736,17 +736,26 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 xml_id = f"variants_{declared}"
                 transclude = (f'<j:declare xml:id="{xml_id}">{variant_fs(declarations[id(item)])}</j:declare>'
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
+            lead = leading.get(id(item))
+            found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
+            if lead is not None:
+                # The rubrics before the condition the text opens with are the place's: they
+                # close the text before, inside its gate ("(Deliver us...; Mourner's Kaddish.)"
+                # after one day's psalm, before the next day's rubric).
+                for pair in item.pairs:
+                    if pair is lead or is_phrase(pair):
+                        break
+                    xml = rubric_xml(pair, lang, notes)
+                    if xml:
+                        parts.append(xml)
             if gate is not None and until is not None:
-                # The rubric a section's condition runs to may open the next text's block (the
-                # Kaddish rubric after one day's psalm, before the next day's).
+                # The rubric a section's condition runs to may open the next text's block.
                 for pair in item.pairs:
                     if is_phrase(pair):
                         break
                     if until.search(" ".join(plain_text(pair.en).split())):
                         close_gate()
                         break
-            lead = leading.get(id(item))
-            found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
             if found is not None and found.section:
                 # A condition over a section (one day's introduction and psalm) gates every text
                 # to its end, as the same rubric between texts does.

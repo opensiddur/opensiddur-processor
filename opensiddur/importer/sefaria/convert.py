@@ -248,12 +248,13 @@ def first_printing_rubrics(plan: WorkPlan) -> dict[str, str]:
 
 
 def without_leading_condition(plan: WorkPlan, item: TextBlock) -> TextBlock:
-    """``item`` without the condition rubrics it opens with, for a text gated where it is printed."""
+    """``item`` without its condition rubric and what comes before it, for a text gated where it
+    is printed: the place gives them (a rubric before the condition belongs to the text before,
+    "(Deliver us...; Mourner's Kaddish.)" after one day's psalm, before the next day's)."""
+    lead = leading_condition(plan, item)
     pairs = list(item.pairs)
-    first = next((k for k, pair in enumerate(pairs) if is_phrase(pair)), len(pairs))
-    kept = [pair for pair in pairs[:first]
-            if not (pair.he_kind is HebrewKind.EMPTY and plan.conditions.for_rubric(plain_text(pair.en)))]
-    return TextBlock(item.head, kept + pairs[first:])
+    at = next(k for k, pair in enumerate(pairs) if pair is lead)
+    return TextBlock(item.head, pairs[at + 1:])
 
 
 def text_printings(plan: WorkPlan) -> dict[str, list[VariantPrinting]]:

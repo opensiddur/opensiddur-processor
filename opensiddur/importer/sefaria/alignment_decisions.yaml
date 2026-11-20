@@ -26,8 +26,8 @@ shabbat_siddur_sefard_linear:
     note: "the Kohanim's verses, word by word, with Ribbono shel Olam (for dreams) after each, then Adir Bamarom and Ribbono shel Olam Asinu, none of them in bold"
   "Hallel":
     as_of: {he: 197ef441f9f714e9420e6a05c9511d7765129be6c748abab6ebe1b7a1e654ca8, en: 010cdc6c15a51ab91e24e887f016219af264f634d72afc8f206afd12995894ed}
-    opens: [273]
-    note: "the Kaddish after Hallel, not in bold"
+    opens: [248, 265, 273]
+    note: "Yehalelucha after Psalm 118, the verse some say on Rosh Chodesh, and the Kaddish after Hallel, not in bold"
   "The Morning Prayers / Mizmor Shir":
     as_of: {he: d621d3835415f2299e9929e6c499857b038aea77f9d564f8af2d5ea8961ef227, en: 9039c34836b41f99779d64ac6d252ca150356c9d7a12ec571abd0fa1733e178b}
     opens: [550]
@@ -67,6 +67,10 @@ shabbat_siddur_sefard_linear:
     note: "the songs after Hamavdil (Bemotzaei Yom Menuchah, Adir Ayom and others) are untranslated"
 
 weekday_siddur_sefard_linear:
+  "Hallel":
+    as_of: {he: 6efb8b20fecc94d63bea9c2cab2cdb9a9c4e46deac211b9326dc09c2864e73bb, en: 5713d25def9f050eff5eb8b32451db8d5e4c8257b2eac83415d4578ae1f44a41}
+    opens: [144, 242, 259]
+    note: "Psalm 118, Yehalelucha, and the verse some say on Rosh Chodesh, not in bold"
   "The Morning Prayers / Psalm of the Day":
     as_of: {he: 3dfb05395243cac8279978f2b8c1fd96748fd3dd29044111fc7add8a428e0ee9, en: 6e7accb31acd81cff30d85837c5218910687916757ee0504cdd4c32e34572ae2}
     opens: [278]

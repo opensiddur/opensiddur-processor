@@ -469,6 +469,13 @@ class TestLeafGates(unittest.TestCase):
         en = parse(leaf_body(T + "siddur:x", ("L", "L"), [intro1, psalm1, intro2, psalm2], urns, "en", Notes("n"),
                              conditions=table, leading={id(intro1): sunday, id(intro2): monday}))
         self.assertEqual(self.gated(en), [["t0", "t1"], ["t2", "t3"]])
+        # The rubric that closes Sunday's psalm is written in the place, at the end of Sunday's
+        # gate, not in Monday's text.
+        notes = en.xpath("//tei:note[@type='instruction']", namespaces=NS)
+        deliver = [n for n in notes if "Deliver us" in "".join(n.itertext())]
+        self.assertEqual(len(deliver), 1)
+        following = deliver[0].xpath("following-sibling::*[1]", namespaces=NS)[0]
+        self.assertEqual((etree.QName(following).localname, following.get("target")), ("endConditional", "#when_1"))
 
 
 class TestNodeGates(unittest.TestCase):
