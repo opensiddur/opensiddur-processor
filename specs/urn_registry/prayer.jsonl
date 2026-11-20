@@ -723,7 +723,8 @@
 {"urn": "urn:x-opensiddur:text:prayer:amidah/rashei_chodashim", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:amidah"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/vattodienu", "status": "canonical", "label_en": "amidah / vatodienu", "parent": "urn:x-opensiddur:text:prayer:amidah"}
 {"urn": "urn:x-opensiddur:text:prayer:eruv_tavshilin", "status": "canonical", "label_en": "eruv tavshilin"}
-{"urn": "urn:x-opensiddur:text:prayer:eruv_tavshilin/blessing", "status": "canonical", "label_en": "eruv tavshilin / blessing", "parent": "urn:x-opensiddur:text:prayer:eruv_tavshilin"}
+{"urn": "urn:x-opensiddur:text:prayer:eruv", "status": "canonical", "label_en": "eruv"}
+{"urn": "urn:x-opensiddur:text:prayer:eruv/blessing", "status": "canonical", "label_en": "eruv / blessing", "parent": "urn:x-opensiddur:text:prayer:eruv"}
 {"urn": "urn:x-opensiddur:text:prayer:eruv_tavshilin/declaration", "status": "canonical", "label_en": "eruv tavshilin / declaration", "parent": "urn:x-opensiddur:text:prayer:eruv_tavshilin"}
 {"urn": "urn:x-opensiddur:text:prayer:hadlaqat_ner_yom_tov", "status": "canonical", "label_en": "hadlakat ner yom tov"}
 {"urn": "urn:x-opensiddur:text:prayer:hamavdil_bein_qodesh_leqodesh", "status": "canonical", "label_en": "hamavdil bein kodesh lekodesh"}
