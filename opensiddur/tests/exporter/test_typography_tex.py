@@ -529,6 +529,13 @@ class TestMarkers(unittest.TestCase):
         self.assertIn(r"\newcommand{\vno}[1]{}", tex)
         self.assertIn(r"\newcommand{\chno}[1]{}", tex)
 
+    def test_conditional_rule_occupies_its_own_measured_line(self):
+        tex = _tex({})
+        rule = next(line for line in tex.splitlines() if line.startswith(r"\newcommand{\OSCondRule}"))
+        self.assertIn(r"\ifhmode\unskip\strut\newline\fi", rule)
+        self.assertIn(r"\leavevmode\strut\hbox to \OSMeasure", rule)
+        self.assertTrue(rule.endswith(r"\newline\ignorespaces}"))
+
     def test_shown_numbers_are_set_in_their_style(self):
         tex = _tex({"markers": {"verse_numbers": "shown"}})
         self.assertIn(r"\newcommand{\vno}[1]{\if\relax\detokenize{#1}\relax\else\textsuperscript{", tex)

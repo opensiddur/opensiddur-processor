@@ -4097,8 +4097,8 @@ class TestConditionalRuleWidth(unittest.TestCase):
         </tei:TEI>"""
         out = _transform(xml)
         self.assertIn(
-            r"\newcommand{\OSCondRule}{\leavevmode\hbox to \OSMeasure"
-            r"{\hss\rule{0.25\hsize}{0.4pt}\hss}}",
+            r"\hbox to \OSMeasure"
+            r"{\hss\rule{0.25\hsize}{0.4pt}\hss}\newline\ignorespaces}",
             out,
         )
         self.assertIn(

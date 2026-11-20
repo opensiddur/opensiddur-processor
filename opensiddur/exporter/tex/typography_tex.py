@@ -856,11 +856,12 @@ def _markers_section(config: TypographyConfig) -> list[str]:
     # rule outside the column it belongs to. \OSMeasure is \hsize less the
     # paragraph's own indents.
     lines.append(
-        r"\newcommand{\OSCondRule}{\leavevmode\hbox to \OSMeasure{\hss\rule{"
+        r"\newcommand{\OSCondRule}{\ifhmode\unskip\strut\newline\fi"
+        r"\leavevmode\strut\hbox to \OSMeasure{\hss\rule{"
         + width
         + "}{"
         + conditional.rule_thickness
-        + r"}\hss}}"
+        + r"}\hss}\newline\ignorespaces}"
     )
     if conditional.block is ConditionalBlock.RULE:
         lines.append(r"\newcommand{\OSCondStartBlock}{\OSCondRule}")

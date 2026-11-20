@@ -135,7 +135,8 @@ _HEAD_BOTTOM = 85.0
 
 
 def _typeset(parallel: bool, typography: dict, protected: bool = True,
-             primary: str = "en", document: str | None = None) -> tuple[dict[str, tuple[int, int]], str]:
+             primary: str = "en", document: str | None = None,
+             tex_replacements: dict[str, str] | None = None) -> tuple[dict[str, tuple[int, int]], str]:
     """Each word's (page, rounded yMin), and the ``.tex`` it was set from."""
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
@@ -147,6 +148,10 @@ def _typeset(parallel: bool, typography: dict, protected: bool = True,
             distribution=NO_NOTICES,
         )
         tex = (work / "t.tex").read_text()
+        if tex_replacements:
+            for before, after in tex_replacements.items():
+                tex = tex.replace(before, after)
+            (work / "t.tex").write_text(tex)
         if not protected:
             (work / "t.tex").write_text(
                 tex.replace(r"\begin{document}", _UNPROTECTED + r"\begin{document}", 1))
@@ -413,6 +418,24 @@ class TestStandaloneRoleBeforeColumns(unittest.TestCase):
                 if control[f'Reader{n}'][0] != control[f'Prayer{n}'][0]:
                     stranded.append(n)
         self.assertTrue(stranded, 'The unprotected control must reach a page edge')
+
+
+@_NEEDS_TEX
+class TestConditionalRuleOwnLine(unittest.TestCase):
+    def test_rule_between_words_keeps_both_words_on_separate_lines(self):
+        for parallel in (False, True):
+            with self.subTest(parallel=parallel):
+                # Exercise the actual block-rule macro independently of whether
+                # a synthetic one-paragraph condition would be classified inline.
+                inner = '<tei:p>CloseArk.RULEHEREAfterRule.</tei:p>'
+                body = ('<p:parallel><p:parallelItem role="primary" xml:lang="en"><tei:div>' + inner + '</tei:div></p:parallelItem><p:parallelItem role="parallel" xml:lang="en"><tei:p>Counterpart.</tei:p></p:parallelItem></p:parallel>') if parallel else inner
+                document = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:p="http://jewishliturgy.org/ns/processing" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="en"><tei:text><tei:body>' + body + '</tei:body></tei:text></tei:TEI>'
+                where, _ = _typeset(parallel, {'parallel': {'layout': 'pairs'}}, document=document,
+                                    tex_replacements={'RULEHERE': r'\OSCondEndBlock{}'})
+                self.assertIn('CloseArk.', where)
+                self.assertIn('AfterRule.', where)
+                self.assertEqual(where['CloseArk.'][0], where['AfterRule.'][0])
+                self.assertGreater(where['AfterRule.'][1] - where['CloseArk.'][1], 15)
 
 
 if __name__ == "__main__":
