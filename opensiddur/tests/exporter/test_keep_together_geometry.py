@@ -379,10 +379,6 @@ class TestColumnHeadingStaysInItsColumn(unittest.TestCase):
         self.assertGreater(len(lines), 1)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 @_NEEDS_TEX
 class TestStandaloneRoleBeforeColumns(unittest.TestCase):
     """A role-only division between bilingual transclusions must not end a page."""
@@ -417,3 +413,7 @@ class TestStandaloneRoleBeforeColumns(unittest.TestCase):
                 if control[f'Reader{n}'][0] != control[f'Prayer{n}'][0]:
                     stranded.append(n)
         self.assertTrue(stranded, 'The unprotected control must reach a page edge')
+
+
+if __name__ == "__main__":
+    unittest.main()

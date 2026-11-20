@@ -3924,7 +3924,9 @@ end
         </xsl:if>
         <xsl:text>\</xsl:text><xsl:value-of select="$command"/>
         <xsl:text>{</xsl:text>
-        <xsl:call-template name="note-content"/>
+        <xsl:call-template name="note-content">
+            <xsl:with-param name="separate-direction-runs" select="$command = 'OSInstructionBlock'"/>
+        </xsl:call-template>
         <xsl:text>}</xsl:text>
         <xsl:if test="$standalone and $command = 'instructionnote'"><xsl:text>}</xsl:text></xsl:if>
         </xsl:if>
@@ -4060,6 +4062,7 @@ end
     </xsl:template>
 
     <xsl:template name="note-content">
+        <xsl:param name="separate-direction-runs" as="xs:boolean" select="false()"/>
         <!-- The same language the macro was chosen by, computed the same way, so the two
              cannot disagree about one note. @f:note-lang because pairing the columns copies
              a rubric out of its tree to stamp it, and a rubric written in the language
@@ -4076,7 +4079,10 @@ end
                      Use {{\textdir TRT ...}} (regular braces) to avoid leaking
                      \begingroup/\endgroup into reledmac's aux-file write machinery. -->
                 <xsl:text>{{\textdir TRT\foreignlanguage{hebrew}{</xsl:text>
-                <xsl:apply-templates mode="emit"/>
+                <xsl:call-template name="note-direction-runs">
+                    <xsl:with-param name="separate" select="$separate-direction-runs"/>
+                    <xsl:with-param name="note-lang" select="$note-lang"/>
+                </xsl:call-template>
                 <xsl:text>}}}</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -4084,11 +4090,33 @@ end
                      in an RTL (Hebrew) context. This avoids visual reversal of
                      LTR runs like \"note\" rendering backwards. -->
                 <xsl:text>{{\textdir TLT\foreignlanguage{english}{</xsl:text>
-                <xsl:apply-templates mode="emit"/>
+                <xsl:call-template name="note-direction-runs">
+                    <xsl:with-param name="separate" select="$separate-direction-runs"/>
+                    <xsl:with-param name="note-lang" select="$note-lang"/>
+                </xsl:call-template>
                 <xsl:text>}}}</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <!-- A full-width bilingual rubric must not start its translation halfway
+         through a line in the other direction. Inline foreign phrases remain
+         inline; only top-level runs in block instructions are separated. -->
+    <xsl:template name="note-direction-runs">
+        <xsl:param name="separate" as="xs:boolean"/>
+        <xsl:param name="note-lang" as="xs:string"/>
+        <xsl:choose>
+            <xsl:when test="$separate">
+                <xsl:for-each-group select="node()[not(self::text()[not(normalize-space())])]"
+                    group-adjacent="f:is-rtl-lang(string((self::*[@xml:lang]/@xml:lang, $note-lang)[1]))">
+                    <xsl:if test="position() gt 1"><xsl:text>\newline </xsl:text></xsl:if>
+                    <xsl:apply-templates select="current-group()" mode="emit"/>
+                </xsl:for-each-group>
+            </xsl:when>
+            <xsl:otherwise><xsl:apply-templates mode="emit"/></xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
 
     <!-- A list inside a note. tei:note is emitted whole by pass 1 (xsl:sequence, so its
          children never reach mode="leaves"), which means a list nested in one — the JPS

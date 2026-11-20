@@ -1254,7 +1254,7 @@ class TestSourceWhitespaceIsNotAParagraphBreak(unittest.TestCase):
         body = self._document_body(out)
         self.assertIn(r"\instructionnote{", body)
         self.assertNotRegex(body, r"\n[ \t]*\n[ \t]*\\instructionnote")
-        self.assertRegex(body, r"\\notenote\{.*?\}{4,}\n(?:\{\\OSKeepAttr=3\\relax )?\\instructionnote\{")
+        self.assertRegex(body, r"\\notenote\{.*?\}{4,}\n\{\\OSKeepAttr=3\\relax \\instructionnote\{")
 
     def test_no_blank_line_survives_anywhere_in_a_stream(self):
         """The guard for the whole class, not just the note case."""
@@ -4850,6 +4850,18 @@ class TestKeepTogether(unittest.TestCase):
         body = self._body(_transform(xml))
         self.assertIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
         self.assertEqual(body.count('Reader:'), 1)
+
+    def test_block_rubric_separates_top_level_directions(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he"><tei:text><tei:body><tei:div><j:conditional><tei:note type="instruction" xml:lang="he">הוראה<tei:foreign xml:lang="en">An English direction.</tei:foreign></tei:note></j:conditional></tei:div></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"הוראה\newline \leavevmode", body)
+
+    def test_role_in_paragraph_or_heading_is_not_tagged_standalone(self):
+        for wrapper in ('p', 'head'):
+            with self.subTest(wrapper=wrapper):
+                xml = f'<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:div><tei:{wrapper}>Words <tei:note type="instruction">Stand.</tei:note></tei:{wrapper}></tei:div></tei:body></tei:text></tei:TEI>'
+                body = self._body(_transform(xml))
+                self.assertNotIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
 
     def test_same_language_inline_role_stays_run_in(self):
         xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p><tei:note type="description">Reader:</tei:note> Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
