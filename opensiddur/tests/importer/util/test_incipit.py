@@ -87,6 +87,26 @@ class TestWords(unittest.TestCase):
     def test_halleluyah_is_one_word_however_it_is_printed(self):
         self.assertEqual(words("הַֽלְלוּ יָהּ"), words("הַלְלוּיָהּ"))
 
+    def test_the_divine_name_behind_a_prefix_is_one_word_however_it_is_spelled(self):
+        self.assertEqual(words("הָבוּ לַייָ בְּנֵי"), words("הָבוּ לַיהֹוָה בְּנֵי"))
+        self.assertEqual(words("וַייָ")[0], words("וַיהוָה")[0])
+        # with a prefix, ה is another word: לָהּ is "to her"
+        self.assertNotEqual(words("לָהּ"), words("לַיהוָה"))
+
+    def test_a_word_split_across_elements_is_one_word(self):
+        index = indexed(f'<tei:div><tei:p><tei:milestone unit="verse" corresp="{T}bible:ps/136/1"/>'
+                        f'הוֹדוּ לַ<j:divineName>יהוה</j:divineName> כִּי טוֹב כִּי לְעוֹלָם חַסְדּוֹ'
+                        f'<tei:milestone unit="verse" corresp="{T}bible:ps/136/2"/>'
+                        'הוֹדוּ לֵאלֹהֵי הָאֱלֹהִים כִּי לְעוֹלָם חַסְדּוֹ</tei:p></tei:div>')
+        self.assertEqual(index.own_opening(T + "bible:ps/136/1"),
+                         tuple(words("הוֹדוּ לַיהוָה כִּי טוֹב כִּי לְעוֹלָם חַסְדּוֹ")))
+        # ... but an empty element between words ends one, spaced or not
+        anchored = indexed(f'<tei:div corresp="{T}bible:ps/112/1"><tei:p>אֶת־יְהוָה<tei:anchor/>בְּמִצְוֹתָיו חָפֵץ מְאֹד'
+                           '</tei:p></tei:div>')
+        self.assertEqual(anchored.own_opening(T + "bible:ps/112/1"), tuple(words("אֶת יְהוָה בְּמִצְוֹתָיו חָפֵץ מְאֹד")))
+        # ... and a milestone between two texts still ends a word
+        self.assertEqual(index.own_opening(T + "bible:ps/136/2")[0], words("הוֹדוּ")[0])
+
 
 class TestJson(unittest.TestCase):
     def test_round_trip_keeps_what_the_index_records(self):

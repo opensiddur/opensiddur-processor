@@ -1,0 +1,175 @@
+# Where each node of Sefaria's schema for the Shabbat Siddur sits in the book's running order:
+# its siddur: URN (specs/SIDDUR_URN_SCHEME.md), scoped to the Metsudah projects by @project.
+#
+# A node is named by its English keys joined by " / ". An inner node names the division that
+# holds its children; a leaf names the structure file that holds its text's transclusions and
+# rubrics. A leaf Sefaria has left empty (Mah Yedidus, the Song of the Day, the preface to
+# Pirkei Avos) is listed with no path and is skipped; any other node missing here is an error.
+#
+# Places the Weekday Siddur also has keep its names (berakhot/..., lifecycle/..., hallel,
+# sefirat_haomer); places Birnbaum's Sabbath and festival volumes named are reused where they
+# are the same place (shabbat/qabbalat_shabbat, shabbat/arvit, shabbat/leil_shabbat, ...).
+# The Sabbath services serve the festivals too, as the book's own titles say.
+
+Eiruv Tavshilin: regalim/eruv_tavshilin
+Eiruvei Chatzeiros: shabbat/eruv_chatzerot
+Eiruvei Techumin: shabbat/eruv_techumin
+Candle Lighting: shabbat/candles
+Candle Lighting / Candle Lighting for Shabbos: shabbat/candles/shabbat
+Candle Lighting / Candle Lighting for Yom Tov: shabbat/candles/yom_tov
+Candle Lighting / Candle Lighting when Shabbos occurs on Yom Tov: shabbat/candles/shabbat_yom_tov
+Song of Songs: shabbat/shir_hashirim
+Song of Songs / Preface to Shir Hashirim: shabbat/shir_hashirim/preface
+Song of Songs / 1: shabbat/shir_hashirim/1
+Song of Songs / 2: shabbat/shir_hashirim/2
+Song of Songs / 3: shabbat/shir_hashirim/3
+Song of Songs / 4: shabbat/shir_hashirim/4
+Song of Songs / 5: shabbat/shir_hashirim/5
+Song of Songs / 6: shabbat/shir_hashirim/6
+Song of Songs / 7: shabbat/shir_hashirim/7
+Song of Songs / 8: shabbat/shir_hashirim/8
+Song of Songs / Short Version: shabbat/shir_hashirim/short
+Mincha Service for Erev Shabbos: shabbat/erev_minchah
+Mincha Service for Erev Shabbos / Psalm 107: shabbat/erev_minchah/psalm_107
+Mincha Service for Erev Shabbos / Yedid Nefesh: shabbat/erev_minchah/yedid_nefesh
+Mincha Service for Erev Shabbos / Ashrei: shabbat/erev_minchah/ashrei
+Mincha Service for Erev Shabbos / Shemoneh Esrei: shabbat/erev_minchah/shemoneh_esreh
+Mincha Service for Erev Shabbos / Aleinu: shabbat/erev_minchah/aleinu
+Mincha Service for Erev Shabbos / Mourner's Kaddish: shabbat/erev_minchah/kaddish_yatom
+Kabbalas Shabbos: shabbat/qabbalat_shabbat
+Kabbalas Shabbos / Psalm 95: shabbat/qabbalat_shabbat/psalm_95
+Kabbalas Shabbos / Psalm 96: shabbat/qabbalat_shabbat/psalm_96
+Kabbalas Shabbos / Psalm 97: shabbat/qabbalat_shabbat/psalm_97
+Kabbalas Shabbos / Psalm 98: shabbat/qabbalat_shabbat/psalm_98
+Kabbalas Shabbos / Psalm 99: shabbat/qabbalat_shabbat/psalm_99
+Kabbalas Shabbos / Psalm 29: shabbat/qabbalat_shabbat/psalm_29
+Kabbalas Shabbos / Lecha Dodi: shabbat/qabbalat_shabbat/lekha_dodi
+Kabbalas Shabbos / Psalm 92: shabbat/qabbalat_shabbat/psalm_92
+Kabbalas Shabbos / Psalm 93: shabbat/qabbalat_shabbat/psalm_93
+Kabbalas Shabbos / Mourner's Kaddish: shabbat/qabbalat_shabbat/kaddish
+Maariv Service for Shabbos and Yom Tov: shabbat/arvit
+Maariv Service for Shabbos and Yom Tov / Borechu: shabbat/arvit/barekhu
+Maariv Service for Shabbos and Yom Tov / Amidah for Shabbos Eve: shabbat/arvit/amidah
+Maariv Service for Shabbos and Yom Tov / Vayechulu: shabbat/arvit/vaykhulu
+Maariv Service for Shabbos and Yom Tov / Magein Avos: shabbat/arvit/magen_avot
+Maariv Service for Shabbos and Yom Tov / Aleinu: shabbat/arvit/aleinu
+Maariv Service for Shabbos and Yom Tov / Mourner's Kaddish: shabbat/arvit/kaddish_yatom
+Order of Shabbos in the Home: shabbat/leil_shabbat
+Order of Shabbos in the Home / Blessing the Children: shabbat/leil_shabbat/birkat_habanim
+Order of Shabbos in the Home / Sholom Aleichem: shabbat/leil_shabbat/shalom_aleikhem
+Order of Shabbos in the Home / Eishes Chayil: shabbat/leil_shabbat/eshet_chayil
+Order of Shabbos in the Home / Kiddush for Shabbos Eve: shabbat/leil_shabbat/kiddush
+Songs for Shabbos Eve: shabbat/leil_shabbat/zemirot
+Songs for Shabbos Eve / Kol Mekadesh: shabbat/leil_shabbat/zemirot/kol_meqaddesh
+Songs for Shabbos Eve / Menucha Vesimcha: shabbat/leil_shabbat/zemirot/menuchah_vesimchah
+Songs for Shabbos Eve / Mah Yedidut:
+Songs for Shabbos Eve / Yah Ribbon: shabbat/leil_shabbat/zemirot/yah_ribbon
+Songs for Shabbos Eve / Tzur Mishelo: shabbat/leil_shabbat/zemirot/tzur_mishello
+Birchas Hamazon: berakhot
+Birchas Hamazon / Birchas Hamazon: berakhot/birkat_hamazon
+Birchas Hamazon / Concluding Blessings: berakhot/berakhah_meein_shalosh
+Birchas Hamazon / Berachos Said Before Eating or Drinking: berakhot/birkhot_hanehenin
+Birchas Hamazon / Birchas Hamazon for Sheva Berachos: lifecycle/sheva_berakhot_birkat_hamazon
+Birchas Hamazon / The Seven Marriage Blessings: lifecycle/sheva_berakhot
+Birchas Hamazon / Birchas Hamozon for Bris Milah: lifecycle/berit_milah_birkat_hamazon
+Berachos Said Upon Witnessing Phenomenal Sights: berakhot/birkhot_hareiyah
+Various Other Berachos: berakhot/various
+The Morning Prayers: shabbat/shacharit
+The Morning Prayers / Upon Arising in the Morning: shabbat/shacharit/upon_arising
+The Morning Prayers / Putting On the Tallis: shabbat/shacharit/tallit
+The Morning Prayers / Ma Tovu: shabbat/shacharit/mah_tovu
+The Morning Prayers / Adon Olam: shabbat/shacharit/adon_olam
+The Morning Prayers / Yigdal: shabbat/shacharit/yigdal
+The Morning Prayers / Blessings Upon Arising: shabbat/shacharit/birkhot_hashkamah
+The Morning Prayers / Blessings of the Torah: shabbat/shacharit/birkhot_hatorah
+The Morning Prayers / Morning Blessings: shabbat/shacharit/birkhot_hashachar
+The Morning Prayers / Akeidah (The Binding of Isaac): shabbat/shacharit/aqedah
+The Morning Prayers / Morning Supplications: shabbat/shacharit/baqqashot
+The Morning Prayers / Korbanos (Sacrificial Offerings): shabbat/shacharit/qorbanot
+The Morning Prayers / Korban Tamid (Daily Offering): shabbat/shacharit/qorban_tamid
+The Morning Prayers / Ketores (Incense Offering): shabbat/shacharit/qetoret
+The Morning Prayers / Kaddish d'Rabanan: shabbat/shacharit/kaddish_derabbanan
+The Morning Prayers / Pesukei Dezimrah: shabbat/shacharit/pesuqei_dezimrah
+The Morning Prayers / Hodu: shabbat/shacharit/hodu
+The Morning Prayers / Mizmor Shir: shabbat/shacharit/mizmor_shir
+The Morning Prayers / Baruch She'amar: shabbat/shacharit/barukh_sheamar
+The Morning Prayers / Psalm 92: shabbat/shacharit/psalm_92
+The Morning Prayers / Psalm 93: shabbat/shacharit/psalm_93
+The Morning Prayers / Yehi Chevod: shabbat/shacharit/yehi_khevod
+The Morning Prayers / Ashrei: shabbat/shacharit/ashrei
+The Morning Prayers / Shiras Hayam: shabbat/shacharit/shirat_hayam
+The Morning Prayers / Nishmas: shabbat/shacharit/nishmat
+The Morning Prayers / Yishtabach: shabbat/shacharit/yishtabbach
+The Morning Prayers / Eil Adon: shabbat/shacharit/el_adon
+The Morning Prayers / Recitation of Shema: shabbat/shacharit/shema
+The Morning Prayers / Amidah for Shabbos Morning: shabbat/shacharit/amidah
+The Morning Prayers / Song of the Day:
+Reading of the Torah: shabbat/shacharit/torah
+Reading of the Torah / Va'yehi Binsoa: shabbat/shacharit/torah/vayehi_binsoa
+Reading of the Torah / Berich Shemei: shabbat/shacharit/torah/berikh_shemeh
+Reading of the Torah / Prayer on Behalf of the Oleh to Torah: shabbat/shacharit/torah/mi_sheberakh_oleh
+Reading of the Torah / Prayer on Behalf of a Sick Person: shabbat/shacharit/torah/mi_sheberakh_choleh
+Reading of the Torah / Birchas Hagomeil: shabbat/shacharit/torah/birkat_hagomel
+Reading of the Torah / Berachos for the Haftarah: shabbat/shacharit/torah/haftarah
+Reading of the Torah / Yekum Purkon: shabbat/shacharit/torah/yequm_purqan
+Reading of the Torah / Prayer for the Government: shabbat/shacharit/torah/government
+Reading of the Torah / Blessings of the New Month: shabbat/shacharit/torah/birkat_hachodesh
+Reading of the Torah / Av Horachamim: shabbat/shacharit/torah/av_harachamim
+Musaf Service: shabbat/musaf
+Musaf Service / Ashrei: shabbat/musaf/ashrei
+Musaf Service / Amidah: shabbat/musaf/amidah
+Musaf Service / Ein Keiloheinu: shabbat/musaf/ein_keloheinu
+Musaf Service / Kaddish d'Rabanan: shabbat/musaf/study_kaddish
+Musaf Service / Aleinu: shabbat/musaf/aleinu
+Musaf Service / Mourner's Kaddish: shabbat/musaf/aleinu_kaddish
+Musaf Service / Hymn of Glory: shabbat/musaf/anim_zemirot
+Musaf Service / Adon Olam: shabbat/musaf/adon_olam
+Kiddush for Shabbos day: shabbat/day_meal/kiddush
+Songs for Shabbos Morning: shabbat/day_meal/zemirot
+Songs for Shabbos Morning / Baruch Hashem Yom Yom: shabbat/day_meal/zemirot/barukh_adonai_yom_yom
+Songs for Shabbos Morning / Baruch El Elyon: shabbat/day_meal/zemirot/barukh_el_elyon
+Songs for Shabbos Morning / Yom Zeh Mechubod: shabbat/day_meal/zemirot/yom_zeh_mekhubbad
+Songs for Shabbos Morning / Dror Yikra: shabbat/day_meal/zemirot/deror_yiqra
+Songs for Shabbos Morning / Shabbos Hayom: shabbat/day_meal/zemirot/shabbat_hayom
+Mincha Service for Shabbos and Yom Tov: shabbat/minchah
+Mincha Service for Shabbos and Yom Tov / Korbanos (Sacrificial Offerings): shabbat/minchah/qorbanot
+Mincha Service for Shabbos and Yom Tov / Korban Tamid (Daily Offering): shabbat/minchah/qorban_tamid
+Mincha Service for Shabbos and Yom Tov / Ketores (Incense Offering): shabbat/minchah/qetoret
+Mincha Service for Shabbos and Yom Tov / Ashrei: shabbat/minchah/ashrei
+Mincha Service for Shabbos and Yom Tov / Uvah L'tzion: shabbat/minchah/uva_letziyyon
+Mincha Service for Shabbos and Yom Tov / Reading of the Torah: shabbat/minchah/torah
+Mincha Service for Shabbos and Yom Tov / Berich Shemei: shabbat/minchah/berikh_shemeh
+Mincha Service for Shabbos and Yom Tov / Amidah: shabbat/minchah/amidah
+Mincha Service for Shabbos and Yom Tov / Aleinu: shabbat/minchah/aleinu
+Mincha Service for Shabbos and Yom Tov / Mourner's Kaddish: shabbat/minchah/mourners_kaddish
+Mincha Service for Shabbos and Yom Tov / Psalms recited between Sukkos and Pesach: shabbat/minchah/psalms
+Mincha Service for Shabbos and Yom Tov / Pirkei Avos: pirqei_avot
+Mincha Service for Shabbos and Yom Tov / Pirkei Avos / Preface:
+Songs for Seudah Shelishis: shabbat/seudah_shelishit
+Maariv Service for the Conclusion of Shabbos: shabbat/conclusion
+Maariv Service for the Conclusion of Shabbos / Borechu: shabbat/conclusion/barekhu
+Maariv Service for the Conclusion of Shabbos / Amidah: shabbat/conclusion/amidah
+Maariv Service for the Conclusion of Shabbos / Aleinu: shabbat/conclusion/aleinu
+Maariv Service for the Conclusion of Shabbos / Mourner's Kaddish: shabbat/conclusion/kaddish
+Maariv Service for the Conclusion of Shabbos / Veyiten Lecha: shabbat/conclusion/veyitten_lekha
+Kiddush Levanah: berakhot/birkat_halevanah
+Havdalah: shabbat/conclusion/havdalah
+Songs for Motzoei Shabbos: shabbat/conclusion/zemirot
+Hallel: hallel
+Prayers for Yom Tov: regalim
+Prayers for Yom Tov / Blessings on the Lulav: sukkot/netilat_lulav
+Prayers for Yom Tov / Ushpizin: sukkot/ushpizin
+Prayers for Yom Tov / Kiddush for Yom Tov Evenings: regalim/kiddush
+Prayers for Yom Tov / Amidah for Yom Tov Maariv, Shacharis and Minchah: regalim/amidah
+Prayers for Yom Tov / Kah Keili: regalim/kah_eli
+Prayers for Yom Tov / Yizkor: regalim/yizkor
+Prayers for Yom Tov / Musaf for Yom Tov: regalim/musaf
+Prayers for Yom Tov / Musaf for Yom Tov / Amidah: regalim/musaf/amidah
+Prayers for Yom Tov / Musaf for Yom Tov / Kedusha for Chol Hamoed: regalim/musaf/qedushah_chol_hamoed
+Prayers for Yom Tov / Musaf for Yom Tov / Divine Sanctification: regalim/musaf/qedushat_hayom
+Prayers for Yom Tov / Musaf for Yom Tov / Birkas Kohanim: regalim/birkat_kohanim
+Prayers for Yom Tov / Musaf for Yom Tov / Prayer for Dew: regalim/musaf/tal
+Prayers for Yom Tov / Musaf for Yom Tov / Prayer for Rain: regalim/musaf/geshem
+Service at a Circumcision: lifecycle/berit_milah
+Counting the Omer: sefirat_haomer
+Prayer Before Retiring at Night: chol/keriat_shema_al_hamittah

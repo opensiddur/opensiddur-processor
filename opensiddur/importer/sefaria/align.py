@@ -14,6 +14,8 @@ number of segments, that is the alignment. Where they do not, it is decided:
   segments with no English (``he_only``) and the English with no Hebrew (``en_only``); the rest
   pair in order. A decision records the hashes of the leaf it was made for (``as_of``) and
   lapses when either version of the leaf changes: it is then an error until decided again.
+  It may also name the Hebrew segments that open a new text (``opens``): untranslated texts
+  the book prints after a translated one, with no bold opening to mark where each begins.
 
 Any other mismatch is an error that names the leaf, for a decision to be recorded.
 """
@@ -73,6 +75,8 @@ class LeafDecision:
     he_only: frozenset[int]
     en_only: frozenset[int]
     note: str = ""
+    #: Hebrew segments that open a new text although nothing in the markup says so
+    opens: frozenset[int] = frozenset()
 
 
 def load_decisions(path: Path = DECISIONS_FILE) -> dict[str, dict[str, LeafDecision]]:
@@ -90,6 +94,7 @@ def load_decisions(path: Path = DECISIONS_FILE) -> dict[str, dict[str, LeafDecis
                 he_only=frozenset(entry.get("he_only") or ()),
                 en_only=frozenset(entry.get("en_only") or ()),
                 note=entry.get("note", ""),
+                opens=frozenset(entry.get("opens") or ()),
             )
     return decisions
 
@@ -100,6 +105,8 @@ class Alignment:
     pairs: tuple[Pair, ...]
     #: how it was decided: "equal", "trailing" or "decision"
     policy: str
+    #: Hebrew segments a decision says open a new text
+    opens: frozenset[int] = frozenset()
 
 
 def _merge(leaf: Leaf, he_only: frozenset[int], en_only: frozenset[int]) -> Iterator[Pair]:
@@ -149,7 +156,11 @@ def align_leaf(leaf: Leaf, decision: LeafDecision | None = None) -> Alignment:
             raise AlignmentError(
                 f"{leaf.path}: the alignment decision was made for an earlier version of this leaf; "
                 "review it and record its new as_of hashes")
-        return Alignment(leaf, tuple(_merge(leaf, decision.he_only, decision.en_only)), "decision")
+        for index in decision.opens:
+            if not 1 <= index <= len(leaf.he):
+                raise AlignmentError(f"{leaf.path}: opens names segment {index} of {len(leaf.he)}")
+        return Alignment(leaf, tuple(_merge(leaf, decision.he_only, decision.en_only)), "decision",
+                         decision.opens)
     if len(leaf.he) == len(leaf.en):
         return Alignment(leaf, tuple(_merge(leaf, frozenset(), frozenset())), "equal")
     trailing = _trailing(leaf)

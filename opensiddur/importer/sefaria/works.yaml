@@ -31,3 +31,22 @@ weekday_siddur_sefard_linear:
   place: New York
   translator: Avrohom Davis
   date: "1981"
+
+shabbat_siddur_sefard_linear:
+  title: Shabbat Siddur Sefard Linear
+  versions:
+    he: "The Metsudah Siddur, Metsudah Publications, 1981 - HE"
+    en: "The Metsudah Siddur, Metsudah Publications, 1981 - EN"
+  projects:
+    he: metsudah_siddur_shabbat-davis-1981-he
+    en: metsudah_siddur_shabbat-davis-1981-en
+  title_en: "The Metsudah Siddur: A New Linear Siddur (Shabbat)"
+  title_he: "סידור ספרד לשבת"
+  rite: >-
+    Nusach Sefard (Nusach haAri), the Chassidic variant of the Ashkenazi rite; not the rite of
+    the Sefaradim or Edot haMizrach.
+  licence: https://creativecommons.org/licenses/by/3.0/
+  publisher: Metsudah Publications
+  place: New York
+  translator: Avrohom Davis
+  date: "1981"

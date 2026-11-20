@@ -49,6 +49,23 @@ class TestAlign(unittest.TestCase):
         self.assertEqual(result.policy, "decision")
         self.assertEqual([(p.he_index, p.en_index) for p in result.pairs], [(1, 1), (None, 2), (2, 3)])
 
+    def test_a_decision_names_the_segments_that_open_texts(self):
+        he, en = ["<b>א</b> א", "ב", "ג"], ["a"]
+        decision = LeafDecision(segments_hash(tuple(he)), segments_hash(tuple(en)),
+                                frozenset({2, 3}), frozenset(), opens=frozenset({3}))
+        result = align_leaf(leaf(he, en), decision)
+        self.assertEqual(result.opens, frozenset({3}))
+        # untranslated texts with no bold opening run on, unless the decision opens one
+        self.assertEqual([len(b.phrases) for b in divide(result.pairs)], [3])
+        self.assertEqual([len(b.phrases) for b in divide(result.pairs, opens=result.opens)], [2, 1])
+
+    def test_opens_must_name_a_segment(self):
+        he, en = ["א", "ב"], ["a"]
+        decision = LeafDecision(segments_hash(tuple(he)), segments_hash(tuple(en)),
+                                frozenset({2}), frozenset(), opens=frozenset({5}))
+        with self.assertRaisesRegex(AlignmentError, "opens names segment 5"):
+            align_leaf(leaf(he, en), decision)
+
     def test_a_decision_lapses_when_the_leaf_changes(self):
         decision = LeafDecision("old", "old", frozenset(), frozenset({2}))
         with self.assertRaisesRegex(AlignmentError, "earlier version"):
@@ -127,6 +144,27 @@ class TestDivide(unittest.TestCase):
         ]))
         self.assertEqual(len(items), 1)
         self.assertEqual(len(items[0].phrases), 3)
+
+    def test_a_response_label_is_part_of_the_text(self):
+        items = divide(pairs_of([
+            ("<b>לִבְרָכָה</b> וְלֹא לִקְלָלָה:", "For blessing and not for curse."),
+            ("<small>אמן</small>", "Amein."),
+            ("לְחַיִּים וְלֹא לַמָּֽוֶת:", "For life and not for death."),
+        ]))
+        self.assertEqual(len(items), 1)
+        self.assertEqual(len(items[0].phrases), 3)
+
+    def test_a_condition_label_is_a_rubric_inside_the_text(self):
+        segments = [
+            ("<b>וְאֶת</b> מוּסַף יוֹם", "And the Musaf-offering of:"),
+            ("<b>לפסח</b>", "<b>On Pesach</b>"),
+            ("חַג הַמַּצּוֹת הַזֶּה", "this Festival of Matzos"),
+        ]
+        # without the conditions table, a bold label is a heading that opens a new text
+        self.assertEqual(len(divide(pairs_of(segments))), 2)
+        items = divide(pairs_of(segments), lambda pair: plain_text(pair.he) == "לפסח")
+        self.assertEqual([type(i) for i in items], [TextBlock])
+        self.assertEqual(len(items[0].phrases), 2)
 
     def test_a_heading_with_no_text_is_a_heading(self):
         items = divide(pairs_of([("<b>אבות</b>", "<b>FOREFATHERS</b>"), ("", "<small>Say:</small>")]))

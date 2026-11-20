@@ -1,7 +1,8 @@
 """Curated URN choices: what the matcher cannot decide by the words alone.
 
 ``equivalents.yaml`` holds two lists, each entry found by the opening words of a block (compared
-as :func:`util.incipit.words` compares them), optionally only in one leaf:
+as :func:`util.incipit.words` compares them), optionally only in one leaf, or in any of a list
+of leaves (the same text where each volume prints it):
 
 - ``texts``: the URN a block opening so is. A text that does the same job as one the collection
   names, and is mostly its words, is that text, whatever rite it is printed in (Sefard
@@ -37,21 +38,21 @@ class EquivalentsError(ValueError):
 class Choice:
     opens: tuple[str, ...]
     urn: str
-    leaf: str | None = None
+    leaf: str | tuple[str, ...] | None = None
     note: str = ""
 
     def matches(self, leaf: str, block_words: list[str]) -> bool:
-        return (self.leaf is None or self.leaf == leaf) and tuple(block_words[:len(self.opens)]) == self.opens
+        return _in_leaf(self.leaf, leaf) and tuple(block_words[:len(self.opens)]) == self.opens
 
 
 @dataclass(frozen=True)
 class Join:
     opens: tuple[str, ...]
-    leaf: str | None = None
+    leaf: str | tuple[str, ...] | None = None
     note: str = ""
 
     def matches(self, leaf: str, block_words: list[str]) -> bool:
-        return (self.leaf is None or self.leaf == leaf) and tuple(block_words[:len(self.opens)]) == self.opens
+        return _in_leaf(self.leaf, leaf) and tuple(block_words[:len(self.opens)]) == self.opens
 
 
 @dataclass(frozen=True)
@@ -66,6 +67,17 @@ class Equivalents:
 
     def joins_previous(self, leaf: str, block_words: list[str]) -> bool:
         return any(j.matches(leaf, block_words) for j in self.joins)
+
+
+def _in_leaf(wanted: str | tuple[str, ...] | None, leaf: str) -> bool:
+    if wanted is None:
+        return True
+    return leaf == wanted if isinstance(wanted, str) else leaf in wanted
+
+
+def _leaf(entry: dict) -> str | tuple[str, ...] | None:
+    leaf = entry.get("leaf")
+    return tuple(str(item) for item in leaf) if isinstance(leaf, list) else leaf
 
 
 def _opens(entry: dict, where: str) -> tuple[str, ...]:
@@ -84,9 +96,9 @@ def load_equivalents(path: Path = EQUIVALENTS_FILE) -> Equivalents:
         urn = str(entry.get("urn", ""))
         if not urn.startswith(TEXT_PREFIX):
             raise EquivalentsError(f"{path.name} texts #{n}: {urn!r} is not a text URN")
-        texts.append(Choice(_opens(entry, f"{path.name} texts #{n}"), urn, entry.get("leaf"),
+        texts.append(Choice(_opens(entry, f"{path.name} texts #{n}"), urn, _leaf(entry),
                             entry.get("note", "")))
-    joins = [Join(_opens(entry, f"{path.name} joins #{n}"), entry.get("leaf"), entry.get("note", ""))
+    joins = [Join(_opens(entry, f"{path.name} joins #{n}"), _leaf(entry), entry.get("note", ""))
              for n, entry in enumerate(data.get("joins") or (), start=1)]
     return Equivalents(tuple(texts), tuple(joins))
 

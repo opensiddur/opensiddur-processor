@@ -258,6 +258,14 @@ class TestConditions(unittest.TestCase):
         # The label is not printed again before the phrase.
         self.assertEqual(len(he.xpath("//tei:note", namespaces=NS)), 1)
 
+    def test_a_label_on_a_line_of_its_own_conditions_the_words_after_it(self):
+        segments = [("<b>וְאֶת</b> מוּסַף", "And the Musaf-offering of"),
+                    ("<small>לר\"ח</small>", "<small>On Rosh Chodesh:</small>"),
+                    ("רֹאשׁ הַחֹדֶשׁ הַזֶּה", "this Rosh Chodesh")]
+        for lang in ("he", "en"):
+            body = self.body(segments, [1, 2], lang)
+            self.assertEqual(body.xpath("//j:conditional/tei:fs/tei:f/@name", namespaces=NS), ["rosh-hodesh"])
+
     def test_an_inline_alternative_and_the_words_it_replaces(self):
         segments = [("<b>עֹשֶׂה</b> (בעשי\"ת הַשָּׁלוֹם) שָׁלוֹם בִּמְרוֹמָיו", "He Who makes peace"),
                     ("לְעֵלָּא (<small>בעשי\"ת</small> וּלְעֵלָּא מִכָּל) מִן־כָּל בִּרְכָתָא", "above")]
@@ -472,6 +480,9 @@ class TestFileStem(unittest.TestCase):
     def test_stems(self):
         self.assertEqual(file_stem(T + "prayer:amidah/avot"), "amidah_avot")
         self.assertEqual(file_stem(T + "siddur:chol/shacharit"), "siddur_chol_shacharit")
+        self.assertEqual(file_stem(T + "bible:psalms/3/2-9"), "psalms_3_2_9")
+        self.assertEqual(file_stem(T + "poem:hamavdil", frozenset({"hamavdil"})), "poem_hamavdil")
+        self.assertEqual(file_stem(T + "prayer:hamavdil", frozenset({"hamavdil"})), "hamavdil")
 
 
 if __name__ == "__main__":

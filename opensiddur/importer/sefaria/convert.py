@@ -28,6 +28,7 @@ import json
 import logging
 import re
 import sys
+from collections.abc import Collection
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -54,7 +55,7 @@ from opensiddur.importer.sefaria.match import (
     scripture_verses,
     verse_length,
 )
-from opensiddur.importer.sefaria.phrases import recorded_phrases, text_path
+from opensiddur.importer.sefaria.phrases import clashing_paths, recorded_phrases, text_path
 from opensiddur.importer.sefaria.source import PATH_SEPARATOR, WorkSource, load_work_source
 from opensiddur.importer.sefaria.tei_builder import (
     Notes,
@@ -118,6 +119,9 @@ class WorkPlan:
     verse_lengths: dict[str, int] = field(default_factory=dict)
     #: the conditions the book prints (conditions.yaml)
     conditions: Conditions = field(default_factory=Conditions)
+    #: the paths more than one text namespace uses, whose phrases are named apart
+    #: (``phrases.clashing_paths``)
+    clashes: frozenset[str] = frozenset()
 
     def record(self, leaf_path: str, block: TextBlock) -> TextRecord:
         return self.decisions.records[(self.work.key, leaf_path, block.first_index)]
@@ -134,15 +138,22 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
               registered: set[str] | None = None,
               conditions_path: Path | None = None) -> WorkPlan:
     structure = load_structure(work, source, structure_path)
+    clashes = clashing_paths(taken if registered is None else registered)
     alignments = align_work(work.key, source.leaves,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
     equivalents = load_equivalents(equivalents_path) if equivalents_path else load_equivalents()
-    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs), equivalents)
+    conditions = load_conditions(conditions_path) if conditions_path else load_conditions()
+
+    def is_condition_label(pair: Pair) -> bool:
+        return conditions.for_label(plain_text(pair.he)) is not None
+
+    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs, is_condition_label, a.opens), equivalents)
              for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
                             recorded_phrases=phrases, spellings=spellings,
                             places={path: place for path, place in structure.items() if place},
-                            own_phrases=own_phrases, equivalents=equivalents, registered=registered)
+                            own_phrases=own_phrases, equivalents=equivalents, registered=registered,
+                            clashes=clashes)
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
     # quoted by two texts is marked in the first.
     verses: dict[tuple[str, int], dict[int, str]] = {}
@@ -166,7 +177,7 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
     lengths = {urn: n for found in verses.values() for urn in found.values()
                if (n := verse_length(urn, index)) is not None}
     return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths,
-                    load_conditions(conditions_path) if conditions_path else load_conditions())
+                    conditions, clashes)
 
 
 @dataclass
@@ -289,10 +300,10 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             notes = Notes(prefix="note")
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
                              plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths,
-                             plan.conditions)
+                             plan.conditions, plan.clashes)
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
-            out.add(file_stem(record.urn), document(document_header(work, lang, title), body, lang, notes))
+            out.add(file_stem(record.urn, plan.clashes), document(document_header(work, lang, title), body, lang, notes))
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
         body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions,
@@ -329,12 +340,14 @@ def write_project(files: ProjectFiles, project_dir: Path) -> list[Path]:
     return prune_stale_files(project_dir, set(files.files))
 
 
-def check_phrase_paths(records: dict[tuple[str, str, int], TextRecord]) -> None:
-    """A ``metsudah:`` path names one text: a ``prayer:`` and a ``poem:`` with the same path
-    would share their phrases' URNs."""
+def check_phrase_paths(records: dict[tuple[str, str, int], TextRecord],
+                       clashes: Collection[str] = frozenset()) -> None:
+    """A ``metsudah:`` path names one text. A path the registry has in two namespaces is named
+    apart (``phrases.text_path``); one that is not -- a text minted this run beside another
+    namespace's -- would share its phrases' URNs."""
     by_path: dict[str, set[str]] = {}
     for record in records.values():
-        by_path.setdefault(text_path(record.urn), set()).add(record.urn)
+        by_path.setdefault(text_path(record.urn, clashes), set()).add(record.urn)
     clashes = {p: sorted(u) for p, u in by_path.items() if len(u) > 1}
     if clashes:
         raise ConvertError("texts that would share metsudah: phrase URNs: " + "; ".join(
@@ -454,12 +467,15 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
     taken = registry_urns(registry_directory) | {r.urn for r in records.values()}
     own = {project_directory / work.projects[lang] for lang in LANGUAGES}
     excluded = excluded_projects(project_directory)
-    if index is None:
-        index = load_incipit_index(INCIPIT_CACHE, project_directory, excluded | own)
-    # The Hebrew projects of the other Sefaria works, whose phrases this one may share.
+    # The Hebrew projects of the other Sefaria works, whose texts and phrases this one shares:
+    # unlike the importer's other output, they are matched against, so that a text another
+    # volume minted is found again rather than minted twice.
     hebrew_projects = {w.projects["he"] for w in (load_works() if works is None else works).values()
                        if w.key != work.key}
-    other_volumes = [d for d in excluded if d.name in hebrew_projects]
+    other_volumes = sorted(d for d in excluded if d.name in hebrew_projects)
+    if index is None:
+        index = load_incipit_index(INCIPIT_CACHE, project_directory,
+                                   (excluded - set(other_volumes)) | own)
     plan = plan_work(work, source, index=index, records=records, taken=taken,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
                      decisions_path=decisions_path, spellings=spellings,
@@ -468,7 +484,7 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                      own_phrases=recorded_phrases([project_directory / work.projects["he"]]
                                                   if (project_directory / work.projects["he"]).exists() else []))
     check_phrase_paths({k: r for k, r in plan.decisions.records.items()
-                        if r.kind in ("existing", "new") and r.work == work.key})
+                        if r.kind in ("existing", "new") and r.work == work.key}, plan.clashes)
     written: dict[str, int] = {}
     pruned: dict[str, list[Path]] = {}
     for lang in LANGUAGES:

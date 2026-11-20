@@ -35,7 +35,7 @@ import html
 import re
 
 from lxml import etree
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -79,11 +79,14 @@ def siddur_urn(path: str) -> str:
     return f"{SIDDUR_PREFIX}{path}"
 
 
-def file_stem(urn: str) -> str:
+def file_stem(urn: str, clashes: Collection[str] = frozenset()) -> str:
     """A file named by a URN's path: ``prayer:amidah/avot`` -> ``amidah_avot``; a ``siddur:``
-    URN keeps the prefix ``siddur_`` so that it can never meet a text's file."""
+    URN keeps the prefix ``siddur_`` so that it can never meet a text's file. A path two text
+    namespaces use (``clashes``) is told apart as its phrases are: ``poem_hamavdil_...``."""
     namespace, _, path = urn[len(TEXT_PREFIX):].partition(":")
-    stem = path.replace("/", "_")
+    if path in clashes and namespace != "prayer":
+        path = f"{namespace}/{path}"
+    stem = path.replace("/", "_").replace("-", "_")  # a run of verses: psalms_3_2_9
     return f"siddur_{stem}" if namespace == "siddur" else stem
 
 
@@ -261,8 +264,11 @@ class _TextWriter:
     next rubric closes, or the end of the passage it is in -- or, where the passage opens with a
     parenthesis, the phrase that closes it."""
 
-    def __init__(self, urn: str, lang: str, notes: Notes, conditions: Conditions | None = None):
+    def __init__(self, urn: str, lang: str, notes: Notes, conditions: Conditions | None = None,
+                 clashes: Collection[str] = frozenset()):
         self.urn, self.lang, self.notes = urn, lang, notes
+        #: the paths more than one text namespace uses (``phrases.clashing_paths``)
+        self.clashes = clashes
         self.table = conditions or Conditions()
         self.parts: list[str] = []
         self.phrase_open = False
@@ -347,7 +353,7 @@ class _TextWriter:
             xml_id = self.next_id("when")
             note = instruction((label,), "he", self.notes) if self.lang == "he" else ""
             self.parts.append(conditional_open(xml_id, note, condition_xml(labelled.when)))
-        xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number), label=labelled is None)
+        xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number, self.clashes), label=labelled is None)
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
         self.parts.append(xml)
@@ -467,7 +473,14 @@ class _TextWriter:
         # languages, whichever the rubric is printed in, so that the two divide alike.
         self.end_phrase()
         self.verse(None)
-        found = self.table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
+        found = None
+        if pair.he_kind is HebrewKind.EMPTY:
+            found = self.table.for_rubric(plain_text(pair.en))
+        elif pair.he_kind is HebrewKind.LABEL:
+            # A label standing on its own line before the words it governs (<b>לפסח</b>, "On
+            # Pesach"): known by its Hebrew, or else by its English.
+            label = self.table.for_label(plain_text(pair.he))
+            found = label if label is not None else self.table.for_rubric(plain_text(pair.en))
         current = self.calendar
         if found is None and current is not None and current[2] is None:
             # A rubric between a condition rubric and the first words it governs ("Chazzan:",
@@ -479,7 +492,7 @@ class _TextWriter:
         self.close_calendar()
         self.pending = None
         if found is not None:
-            self.open_calendar(pair, found.when, found.through)
+            self.open_calendar(pair, found.when, getattr(found, "through", ()))
             return
         xml = rubric_xml(pair, self.lang, self.notes)
         if xml:
@@ -579,7 +592,8 @@ def _variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | No
 
 def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes,
               variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None,
-              verse_lengths: dict[str, int] | None = None, conditions: Conditions | None = None) -> str:
+              verse_lengths: dict[str, int] | None = None, conditions: Conditions | None = None,
+              clashes: Collection[str] = frozenset()) -> str:
     """A text's division: its heading, then its phrases and the rubrics among them.
 
     With ``variants``, the one text of every printing: the first printing's words, a phrase a
@@ -595,7 +609,7 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     verse_words = 0
     verse_length: int | None = None
     head = head_xml(block.head, lang, notes) if block.head is not None else ""
-    writer = _TextWriter(urn, lang, notes, conditions)
+    writer = _TextWriter(urn, lang, notes, conditions, clashes)
     base = set(phrase_numbers)
     passages = [(v, _variant_passages(v, base)) for v in variants]
     absent = {n: [v.name for v in variants if n not in set(v.numbers)] for n in phrase_numbers}
