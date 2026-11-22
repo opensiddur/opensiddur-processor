@@ -286,6 +286,8 @@ html { overflow-anchor: none; }
   border-top: 1px solid var(--line);
   color: var(--muted);
   font: 0.85rem/1.5 system-ui, sans-serif;
+  /* Long source identifiers and URLs must fit narrow displays. */
+  overflow-wrap: anywhere;
 }
 .os-about h2 { font-size: 1rem; color: var(--ink); }
 .os-back-notice { margin-top: 2rem; }
