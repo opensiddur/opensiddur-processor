@@ -4243,6 +4243,16 @@ class TestHeadingNotes(unittest.TestCase):
         self.assertIn(self.EDTEXT, title)
         self.assertLess(title.index("Section"), title.index(self.EDTEXT))
 
+    def test_a_note_targeting_a_body_anchor_is_not_hoisted_to_the_heading(self):
+        xml = self._single('<tei:p>Text<tei:note>Earlier note.</tei:note></tei:p>'
+                           '<tei:note target="#ending">Ending note.</tei:note>'
+                           '<tei:anchor xml:id="ending"/>')
+        body = self._body(xml)
+        self.assertNotIn("Ending note.", self._arg(body, r"\OSheadA"))
+        self.assertLess(body.index("Earlier note."), body.index("Ending note."))
+        self.assertEqual(["1", "2", "3"],
+                         re.findall(r"OSInterlinearNotemark\{(\d+)\}", body))
+
     def test_a_division_of_heading_and_rubric_alone_still_carries_it(self):
         """The haggadah has sections with no text to anchor on."""
         body = self._body(self._single(

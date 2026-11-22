@@ -2885,7 +2885,13 @@ end
         <xsl:param name="node" as="node()?"/>
         <xsl:variable name="note" select="$node/self::tei:note[not(@type = ('instruction', 'description'))]
                                                               [not(ancestor::tei:standOff)]"/>
-        <xsl:sequence select="($note/parent::tei:div[tei:head],
+        <!-- A compiled standoff note targeting an explicit anchor is a sibling
+             of that anchor. It stays at that point in the body, even when the
+             containing division also has a heading. -->
+        <xsl:variable name="anchor-targets" as="xs:string*"
+                      select="$note/parent::tei:div/tei:anchor/@xml:id ! concat('#', .)"/>
+        <xsl:sequence select="($note[not(tokenize(normalize-space(@target), '\s+') = $anchor-targets)]
+                                   /parent::tei:div[tei:head],
                                $note/ancestor::tei:head[1]/parent::tei:div)[1]"/>
     </xsl:function>
 
