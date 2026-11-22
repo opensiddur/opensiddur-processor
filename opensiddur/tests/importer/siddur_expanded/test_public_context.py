@@ -47,7 +47,8 @@ class TestPublicContext(unittest.TestCase):
                     result=self.compile(''.join(serialize(e) for e in tree),quorum)
                     prayers=result.xpath('.//tei:p/text()',namespaces=NS)
                     for part in ['yitgaddal','yehe_shemeh','yitbarakh','al_yisrael','yehe_shelama','oseh_shalom']:
-                        self.assertEqual('kaddish_derabbanan_'+part in prayers,quorum is not False)
+                        name='kaddish_yehe_shemeh' if part=='yehe_shemeh' else 'kaddish_derabbanan_'+part
+                        self.assertEqual(name in prayers,quorum is not False)
                     self.assertEqual(bool(result.xpath('.//tei:head[contains(.,"KADDISH") or contains(.,"קַדִּישׁ")]',namespaces=NS)),quorum is not False)
                     self.assertIn('ishmael_yehi_ratzon',prayers)
 

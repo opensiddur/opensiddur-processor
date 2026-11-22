@@ -416,7 +416,7 @@ ISHMAEL_ORDER = (
     ("head", "קַדִּישׁ דְּרַבָּנָן", "KADDISH D\u2019RABBANAN"),
     ("mourners", None),
     "kaddish_derabbanan_yitgaddal",
-    "kaddish_derabbanan_yehe_shemeh",
+    "kaddish_yehe_shemeh",
     "kaddish_derabbanan_yitbarakh",
     "kaddish_derabbanan_al_yisrael",
     "kaddish_derabbanan_yehe_shelama",

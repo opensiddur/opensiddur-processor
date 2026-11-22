@@ -45,7 +45,7 @@ RANGES = {
  'qabbalat_psalm_92':[(419,421)],'conclusion_psalm_27':[(421,421)],
  'poem_adon_olam':[(423,423)], 'amar_rabbi_elazar':[(409,411)],
  'kaddish_derabbanan_yitgaddal':[(405,405),(411,411),(413,413)],
- 'kaddish_derabbanan_yehe_shemeh':[(405,405),(411,411),(413,413)],
+ 'kaddish_yehe_shemeh':[(405,405),(411,411),(413,413)],
  'kaddish_derabbanan_yitbarakh':[(405,405),(411,411),(415,415)],
  'kaddish_derabbanan_al_yisrael':[(411,411)],'kaddish_derabbanan_oseh_shalom':[(411,411)],
  'kaddish_yatom':[(405,405),(415,415)],
@@ -209,7 +209,7 @@ def units(project,by_name):
     kad=instruction('Mourners:')
     for key in ('yitgaddal','yehe_shemeh','yitbarakh','al_yisrael','yehe_shelama','oseh_shalom'):
         if key=='yehe_shelama':kad+=transclude(SIDDUR+'shabbat/qabbalat_shabbat/study_kaddish/yehe_shelama')
-        else:kad+=p('kaddish/derabbanan/'+key)
+        else:kad+=p('kaddish/yehe_shemeh' if key=='yehe_shemeh' else 'kaddish/derabbanan/'+key)
     add('study_kaddish','קדיש דרבנן','KADDISH D’RABBANAN',411,411,conditional('study_kaddish','When a minyan holds service:',MINYAN,kad),printed=True)
     add('aleinu','עלינו','ALENU',413,413,tr('conclusion_aleinu'))
     def mourner(key,page):

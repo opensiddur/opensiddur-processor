@@ -109,8 +109,8 @@ emit("#: Kaddish d'Rabbanan. `יִתְבָּרַךְ` runs across the page turn 
 KADDISH = [
     ("kaddish_derabbanan_yitgaddal", "יִתְגַּדַּל וְיִתְקַדַּשׁ", "kaddish/derabbanan/yitgaddal",
      45, 45, para(45, 2), ""),
-    ("kaddish_derabbanan_yehe_shemeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ",
-     "kaddish/derabbanan/yehe_shemeh", 45, 45, para(45, 3), ""),
+    ("kaddish_yehe_shemeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ",
+     "kaddish/yehe_shemeh", 45, 45, para(45, 3), ""),
     ("kaddish_derabbanan_yitbarakh", "יִתְבָּרַךְ וְיִשְׁתַּבַּח",
      "kaddish/derabbanan/yitbarakh", 47, 47, para(47, 0), "{pb(47)}"),
     ("kaddish_derabbanan_al_yisrael", "עַל יִשְׂרָאֵל וְעַל רַבָּנָן",

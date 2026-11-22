@@ -11,6 +11,11 @@ TALMUD = 'urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar'
 ROOT = SIDDUR+'shabbat/qabbalat_shabbat'
 SIGIL = '1949 shabbat/qabbalat_shabbat'
 KADDISH_PARTS = ('yitgaddal','yehe_shemeh','yitbarakh','al_yisrael','yehe_shelama','oseh_shalom')
+
+
+def kaddish_part(part):
+    """The URN path of a Kaddish d'Rabbanan part: the response is every Kaddish's."""
+    return 'kaddish/'+part if part=='yehe_shemeh' else 'kaddish/derabbanan/'+part
 RUBRIC = 'The following chapter is omitted on festivals.'
 
 
@@ -57,7 +62,7 @@ def prayers(lang):
 def shared(lang, prayers):
     result=[dict(p) for p in prayers]
     for p in result:
-        if p['name'] in {'kaddish_derabbanan_'+part for part in KADDISH_PARTS}:
+        if p['name'] in {kaddish_part(part).replace('/','_') for part in KADDISH_PARTS}:
             # The English peace petition here says "a happy life", unlike p. 48.
             if lang=='en' and p['name']=='kaddish_derabbanan_yehe_shelama': continue
             page=255+int(lang=='en')
@@ -86,7 +91,7 @@ def units(project):
             if side: text=text.replace('and life', 'and a happy life')
             kad+='<tei:p>'+marked(ROOT+'/study_kaddish/yehe_shelama',
                 f'<tei:seg source="{PRAYER}kaddish/derabbanan/yehe_shelama">'+text+'</tei:seg>')+'</tei:p>'
-        else: kad+=transclude(PRAYER+'kaddish/derabbanan/'+part)
+        else: kad+=transclude(PRAYER+kaddish_part(part))
     kad=(pb(255+side,sigil=SIGIL)+f'<tei:div corresp="{ROOT}/study_kaddish">'
          +f'<tei:head xml:lang="{lang}">'+('קַדִּישׁ דְּרַבָּנָן' if not side else 'KADDISH D’RABBANAN')+'</tei:head>'
          +conditional('study_minyan','When a minyan holds service:',MINYAN,instruction('Mourners:')+kad)+'</tei:div>')

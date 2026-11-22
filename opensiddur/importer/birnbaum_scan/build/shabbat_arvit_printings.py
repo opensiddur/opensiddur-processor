@@ -19,7 +19,7 @@ def apply(lang,prayers):
     side=int(lang=='en'); by_name={p['name']:p for p in prayers}
     for name,(first,last) in RANGES.items():
         p=by_name[name];p['printings']=(*p.get('printings',()),(first+side,last+side))
-    for name in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh','kaddish_yatom'):
+    for name in ('kaddish_derabbanan_yitgaddal','kaddish_yehe_shemeh','kaddish_derabbanan_yitbarakh','kaddish_yatom'):
         p=by_name[name]
         pages=(275,279) if name=='kaddish_yatom' else (263,275,279)
         p['printings']=(*p.get('printings',()),*((n+side,n+side) for n in pages))

@@ -53,7 +53,7 @@ def shared(lang,prayers):
         if p['name'] in RANGES:
             first,last=RANGES[p['name']]
             p['printings']=(*p.get('printings',()),(first+side,last+side))
-        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh'):
+        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_yehe_shemeh','kaddish_derabbanan_yitbarakh'):
             p['printings']=(*p.get('printings',()),(373+side,373+side),(389+side,389+side))
         turns=[]
         if p['name']=='ashrei':

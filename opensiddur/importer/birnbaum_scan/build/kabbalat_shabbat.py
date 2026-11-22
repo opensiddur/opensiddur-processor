@@ -55,7 +55,7 @@ def shared(lang, prayers):
             p['body']=re.sub(r'<tei:l>(.*?)</tei:l>',line,p['body'],flags=re.S)
             if count!=7: raise ValueError('Expected seven Ana Bekoach lines')
         page={'poem_anna_bekhoach':243, 'conclusion_psalm_93':249,
-              'kaddish_derabbanan_yitgaddal':249, 'kaddish_derabbanan_yehe_shemeh':249,
+              'kaddish_derabbanan_yitgaddal':249, 'kaddish_yehe_shemeh':249,
               'kaddish_derabbanan_yitbarakh':249, 'kaddish_yatom':249}.get(p['name'])
         if page:
             page+=int(lang=='en')

@@ -54,7 +54,7 @@ def shared(lang,prayers):
         if p['name'].startswith('amidah_qedushah_'):
             a=453 if p['name'].endswith(('ledor_vador','hael_haqadosh','hamelekh_haqadosh')) else 451
             p['printings']=(*p.get('printings',()),(a+side,a+side))
-        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh','kaddish_yatom'):
+        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_yehe_shemeh','kaddish_derabbanan_yitbarakh','kaddish_yatom'):
             p['printings']=(*p.get('printings',()),*((a+side,a+side) for a in (441,449,461,463)))
     turns = {
       'ashrei':(('פּוֹתֵחַ','Thou openest'),439),

@@ -57,7 +57,7 @@ def shared(lang,prayers):
             if count!=1:raise ValueError(f'Expected one earlier {source} in {p["name"]}')
         if p['name'] in RANGES:
             a,b=RANGES[p['name']];p['printings']=(*p.get('printings',()),(a+side,b+side))
-        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_derabbanan_yehe_shemeh','kaddish_derabbanan_yitbarakh'):
+        if p['name'] in ('kaddish_derabbanan_yitgaddal','kaddish_yehe_shemeh','kaddish_derabbanan_yitbarakh'):
             p['printings']=(*p.get('printings',()),(299+side,299+side),(335+side,335+side))
     by_name={p['name']:p for p in result}
     def before(name,he,en,page):

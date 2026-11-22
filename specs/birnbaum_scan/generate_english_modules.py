@@ -255,8 +255,8 @@ I.append(block("ishmael_yehi_ratzon", "May it be thy will, that the Temple be re
 for name, title, slug, page, index in [
     ("kaddish_derabbanan_yitgaddal", "Glorified and sanctified",
      "kaddish/derabbanan/yitgaddal", 46, 2),
-    ("kaddish_derabbanan_yehe_shemeh", "May his great name be blessed",
-     "kaddish/derabbanan/yehe_shemeh", 46, 3),
+    ("kaddish_yehe_shemeh", "May his great name be blessed",
+     "kaddish/yehe_shemeh", 46, 3),
     ("kaddish_derabbanan_yitbarakh", "Blessed and praised",
      "kaddish/derabbanan/yitbarakh", 48, 0),
     ("kaddish_derabbanan_al_yisrael", "We pray for Israel",

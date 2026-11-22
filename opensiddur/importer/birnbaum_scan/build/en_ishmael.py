@@ -134,11 +134,9 @@ prayer("kaddish_derabbanan_yitgaddal", "Glorified and sanctified", "kaddish/dera
          "Israel, speedily and soon; and say, Amen."
          '<tei:milestone unit="prayer-part"/>'))
 
-prayer("kaddish_derabbanan_yehe_shemeh", "May his great name be blessed", "kaddish/derabbanan/yehe_shemeh", 46, 46,
-       d(U + "kaddish/derabbanan/yehe_shemeh",
-         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yehe_shemeh"/>'
-         "May his great name be blessed forever and to all eternity."
-         '<tei:milestone unit="prayer-part"/>'))
+prayer("kaddish_yehe_shemeh", "May his great name be blessed", "kaddish/yehe_shemeh", 46, 46,
+       d(U + "kaddish/yehe_shemeh",
+         "May his great name be blessed forever and to all eternity."))
 
 prayer("kaddish_derabbanan_yitbarakh", "Blessed and praised", "kaddish/derabbanan/yitbarakh", 48, 48,
        d(U + "kaddish/derabbanan/yitbarakh",

@@ -27,7 +27,7 @@ RANGES = {'amidah_adonai_sefatai':(349,349),'amidah_avot':(349,349),
           'amidah_shalom':(359,359),'amidah_shalom_hamevarekh':(359,359),
           'amidah_shalom_besefer_chayyim':(359,359),'amidah_elohai_netzor':(359,359),
           'amidah_yehi_ratzon':(359,359),'conclusion_titqabbal':(361,361),
-          'kaddish_derabbanan_yitgaddal':(361,361),'kaddish_derabbanan_yehe_shemeh':(361,361),
+          'kaddish_derabbanan_yitgaddal':(361,361),'kaddish_yehe_shemeh':(361,361),
           'kaddish_derabbanan_yitbarakh':(361,361),'kaddish_yatom':(361,361)}
 
 

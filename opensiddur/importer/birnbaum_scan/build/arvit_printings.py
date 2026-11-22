@@ -28,7 +28,7 @@ def apply(lang, prayers):
     # Kaddish has several distinct occurrences in this service.
     for name, ranges in {
         'kaddish_derabbanan_yitgaddal':((189,189),(199,199),(211,211),(215,215),(219,219)),
-        'kaddish_derabbanan_yehe_shemeh':((189,189),(199,199),(211,211),(215,215),(219,219)),
+        'kaddish_yehe_shemeh':((189,189),(199,199),(211,211),(215,215),(219,219)),
         'kaddish_derabbanan_yitbarakh':((189,189),(199,199),(211,211),(215,215),(219,219)),
         'kaddish_yatom':((213,213),(215,215),(217,217),(219,219)),
     }.items():

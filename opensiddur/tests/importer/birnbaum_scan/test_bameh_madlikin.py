@@ -44,3 +44,16 @@ class TestBamehMadlikin(unittest.TestCase):
         self.assertEqual(result[1]['body'],sample[1]['body'])
         self.assertEqual(result[1]['printings'],((256,256),))
         self.assertNotIn('printings',sample[1])
+
+    def test_study_kaddish_response_is_every_kaddish_response(self):
+        from opensiddur.importer.birnbaum_scan.build.common import PRAYER
+        xml=''.join(u['body'] for u in units(PROJECT_HE))
+        self.assertIn('corresp="'+ROOT+'/study_kaddish"',xml)
+        self.assertIn('target="'+PRAYER+'kaddish/yehe_shemeh"',xml)
+        self.assertNotIn('derabbanan/yehe_shemeh',xml)
+        sample=[dict(name='kaddish_yehe_shemeh',body='Response.')]
+        self.assertEqual(shared('he',sample)[0]['printings'],((255,255),))
+
+
+if __name__ == '__main__':
+    unittest.main()

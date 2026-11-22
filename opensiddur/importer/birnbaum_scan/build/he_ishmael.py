@@ -125,11 +125,9 @@ prayer("kaddish_derabbanan_yitgaddal", "יִתְגַּדַּל וְיִתְקַ�
          "וְאִמְרוּ אָמֵן."
          '<tei:milestone unit="prayer-part"/>'))
 
-prayer("kaddish_derabbanan_yehe_shemeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ", "kaddish/derabbanan/yehe_shemeh", 45, 45,
-       d(U + "kaddish/derabbanan/yehe_shemeh",
-         f'<tei:milestone unit="prayer-part" corresp="{U}kaddish/yehe_shemeh"/>'
-         "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא."
-         '<tei:milestone unit="prayer-part"/>'))
+prayer("kaddish_yehe_shemeh", "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ", "kaddish/yehe_shemeh", 45, 45,
+       d(U + "kaddish/yehe_shemeh",
+         "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא."))
 
 prayer("kaddish_derabbanan_yitbarakh", "יִתְבָּרַךְ וְיִשְׁתַּבַּח", "kaddish/derabbanan/yitbarakh", 47, 47,
        d(U + "kaddish/derabbanan/yitbarakh",
