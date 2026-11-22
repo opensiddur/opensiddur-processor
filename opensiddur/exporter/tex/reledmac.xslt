@@ -2143,6 +2143,9 @@ end
                 </xsl:for-each-group>
             </xsl:map>
         </xsl:variable>
+        <xsl:variable name="note-anchor-leaves" as="node()*"
+                      select="$leaves[not(f:is-head-note(.)
+                          and generate-id(f:head-note-div(.)) = $head-divs)]"/>
         <xsl:iterate select="$leaves">
             <xsl:param name="in-pstart" as="xs:boolean" select="$single-pstart"/>
             <xsl:on-completion>
@@ -2611,7 +2614,12 @@ end
                             <xsl:text>\OSListItemPar </xsl:text>
                         </xsl:if>
                     </xsl:if>
-                    <xsl:apply-templates select="." mode="emit"/>
+                    <xsl:apply-templates select="." mode="emit">
+                        <!-- Wrappers disappear when a stream is flattened. Notes from
+                             different wrappers can therefore share one printed anchor. -->
+                        <xsl:with-param name="note-anchor-leaves" tunnel="yes"
+                            select="$note-anchor-leaves"/>
+                    </xsl:apply-templates>
                     <xsl:next-iteration>
                         <xsl:with-param name="in-pstart" select="true()"/>
                     </xsl:next-iteration>
@@ -4017,17 +4025,49 @@ end
     <!-- Adjacent notes share an anchor. Their interlinear marks have zero width,
          so printing each separately would superimpose the serials. Print one
          comma-separated mark at the first note while retaining every apparatus entry. -->
+    <xsl:function name="f:note-neighbor" as="node()?">
+        <xsl:param name="note" as="element(tei:note)"/>
+        <xsl:param name="leaves" as="node()*"/>
+        <xsl:param name="forward" as="xs:boolean"/>
+        <xsl:variable name="position" select="(for $i in 1 to count($leaves)
+            return if ($leaves[$i] is $note) then $i else ())[1]"/>
+        <xsl:variable name="candidates" as="node()*" select="if (exists($position))
+            then (if ($forward) then subsequence($leaves, $position + 1)
+                  else reverse(subsequence($leaves, 1, $position - 1)))
+            else (if ($forward) then $note/following-sibling::node()
+                  else reverse($note/preceding-sibling::node()))"/>
+        <!-- An empty anchor has no emitted text. A populated anchor may contain
+             a materialized note, so it must remain a boundary here. -->
+        <xsl:sequence select="$candidates[not(self::text()[not(normalize-space())]
+            or self::tei:anchor[empty(node())] or self::comment()
+            or self::processing-instruction())][1]"/>
+    </xsl:function>
+
+    <xsl:function name="f:same-note-location" as="xs:boolean">
+        <xsl:param name="note" as="element(tei:note)"/>
+        <xsl:param name="other" as="element(tei:note)?"/>
+        <xsl:variable name="heading" select="f:head-note-div($note)"/>
+        <xsl:variable name="other-heading" select="if ($other) then f:head-note-div($other) else ()"/>
+        <!-- A hoisted heading note and an explicit body-anchor note may be XML
+             siblings, but are printed in different places. -->
+        <xsl:sequence select="exists($other) and
+            ((empty($heading) and empty($other-heading))
+             or (exists($heading) and exists($other-heading) and $heading is $other-heading))"/>
+    </xsl:function>
+
     <xsl:function name="f:adjacent-notes" as="element(tei:note)+">
         <xsl:param name="note" as="element(tei:note)"/>
-        <xsl:variable name="next" select="$note/following-sibling::node()
-            [not(self::text()[not(normalize-space())])][1]"/>
+        <xsl:param name="leaves" as="node()*"/>
+        <xsl:variable name="next" select="f:note-neighbor($note, $leaves, true())"/>
         <xsl:sequence select="($note, if ($next/self::tei:note
-                [not(@type = ('instruction', 'description'))])
-            then f:adjacent-notes($next) else ())"/>
+                [not(@type = ('instruction', 'description'))]
+                and f:same-note-location($note, $next/self::tei:note))
+            then f:adjacent-notes($next, $leaves) else ())"/>
     </xsl:function>
 
     <xsl:template name="os-b-footnote-emit">
         <xsl:param name="serial" as="xs:integer"/>
+        <xsl:param name="note-anchor-leaves" as="node()*" tunnel="yes" select="()"/>
         <!-- In bidi/RTL contexts, empty-lemma \edtext{} can be fragile with reledmac's
              aux-file writes. Use an explicit visible-but-zero-width lemma via
              \OSInterlinearNotemark. \Bfootnote routes content to the B-series apparatus.
@@ -4037,12 +4077,12 @@ end
              corrupts the catcode-group that controls [ ] delimiters when the .1
              file is re-read on the next pass. -->
         <xsl:text>\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{</xsl:text>
-        <xsl:variable name="previous" select="preceding-sibling::node()
-            [not(self::text()[not(normalize-space())])][1]"/>
+        <xsl:variable name="previous" select="f:note-neighbor(., $note-anchor-leaves, false())"/>
         <xsl:if test="not($previous/self::tei:note
-                [not(@type = ('instruction', 'description'))])">
+                [not(@type = ('instruction', 'description'))])
+                or not(f:same-note-location(., $previous/self::tei:note))">
             <xsl:value-of select="string-join(
-                for $note in f:adjacent-notes(.)
+                for $note in f:adjacent-notes(., $note-anchor-leaves)
                 return f:note-mark(f:note-serial($note)), ',')"/>
         </xsl:if>
         <xsl:text>}}{\</xsl:text>

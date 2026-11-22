@@ -1069,6 +1069,66 @@ class TestNotesMapping(unittest.TestCase):
                 self.assertEqual(len(re.findall(r"\\OSFootnotemark\{[^}]+\}\\notenote", out)), 4)
                 self.assertEqual(out.count(r"\OSInterlinearNotemark{}"), 2)
 
+    def test_notes_in_flattened_wrappers_share_one_mark(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+            xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
+          <tei:text><tei:body><tei:div><tei:div>
+            <tei:note xml:lang="he">First</tei:note><tei:anchor xml:id="first"/>
+          </tei:div></tei:div><p:transclude><tei:div>
+            <tei:note xml:lang="en">Second</tei:note><tei:anchor xml:id="second"/>
+          </tei:div></p:transclude><tei:p>Following words.</tei:p></tei:body></tei:text>
+        </tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1,2}", out)
+        self.assertEqual(out.count(r"\OSInterlinearNotemark{}"), 1)
+        self.assertEqual(out.count(r"\OSFootnotemark{1}\notenote"), 1)
+        self.assertEqual(out.count(r"\OSFootnotemark{2}\notenote"), 1)
+
+    def test_paragraph_between_flattened_notes_keeps_separate_marks(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en">
+          <tei:text><tei:body><tei:div><tei:note>First</tei:note></tei:div>
+            <tei:p>Words between.</tei:p>
+            <tei:div><tei:note>Second</tei:note></tei:div>
+          </tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1}", out)
+        self.assertIn(r"\OSInterlinearNotemark{2}", out)
+        self.assertNotIn(r"\OSInterlinearNotemark{1,2}", out)
+
+    def test_flattened_note_groups_stay_in_their_parallel_stream(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+            xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
+          <tei:text><tei:body><p:parallel>
+            <p:parallelItem role="primary" xml:lang="he"><tei:div>
+              <tei:p>א</tei:p><tei:div><tei:note>First</tei:note></tei:div>
+              <tei:div><tei:note>Second</tei:note></tei:div><tei:p>ב</tei:p>
+            </tei:div></p:parallelItem>
+            <p:parallelItem role="parallel" xml:lang="en"><tei:div>
+              <tei:p>One</tei:p><tei:div><tei:note>Third</tei:note></tei:div>
+              <tei:div><tei:note>Fourth</tei:note></tei:div><tei:p>Two</tei:p>
+            </tei:div></p:parallelItem>
+          </p:parallel></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        groups = re.findall(r"\\OSInterlinearNotemark\{([0-9]+,[0-9]+)\}", out)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(sorted(int(n) for group in groups for n in group.split(',')), [1, 2, 3, 4])
+        for text in ('First', 'Second', 'Third', 'Fourth'):
+            self.assertEqual(out.count(text), 1)
+
+    def test_hoisted_heading_note_does_not_hide_body_note_mark(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en">
+          <tei:text><tei:body><tei:div><tei:head>Title</tei:head>
+            <tei:note>Heading note.</tei:note>
+            <tei:note target="#body">Body note.</tei:note><tei:anchor xml:id="body"/>
+            <tei:p>Words.</tei:p>
+          </tei:div></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1}", out)
+        self.assertIn(r"\OSInterlinearNotemark{2}", out)
+        self.assertNotIn(r"\OSInterlinearNotemark{1,2}", out)
+        self.assertEqual(out.count('Heading note.'), 1)
+        self.assertEqual(out.count('Body note.'), 1)
+
     def test_instruction_between_notes_does_not_merge_their_marks(self):
         xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
           <tei:text><tei:body><tei:p>א<tei:note>First</tei:note>
