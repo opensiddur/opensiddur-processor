@@ -101,11 +101,16 @@ def similarity(a: str, b: str) -> float:
 
 def map_phrases(new: Sequence[str], recorded: dict[int, str]) -> list[int]:
     """Numbers for the phrases ``new`` (skeletons, in order), given the phrases already
-    recorded for the text (number -> skeleton). The best order-keeping pairing of the same
-    phrases keeps their numbers; the rest are numbered after the highest recorded."""
+    recorded for the text (number -> skeleton), in the order the text prints them. The best
+    order-keeping pairing of the same phrases keeps their numbers; the rest are numbered after
+    the highest recorded.
+
+    The order is the printing's, not the numbers': a text printed after another volume's has its
+    own phrases numbered after that volume's, wherever in the text they stand (the Sefard full
+    Kaddish's וְיַצְמַח פּוּרְקָנֵהּ, after the Lita one's last phrase)."""
     if not recorded:
         return list(range(1, len(new) + 1))
-    old_numbers = sorted(recorded)
+    old_numbers = list(recorded)
     old = [recorded[n] for n in old_numbers]
     rows, cols = len(new), len(old)
     # Longest order-keeping pairing of same phrases, weighted by similarity.

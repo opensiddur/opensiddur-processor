@@ -75,3 +75,93 @@ weekday_siddur_sefard_linear:
     as_of: {he: 3dfb05395243cac8279978f2b8c1fd96748fd3dd29044111fc7add8a428e0ee9, en: 6e7accb31acd81cff30d85837c5218910687916757ee0504cdd4c32e34572ae2}
     opens: [278]
     note: "Thursday's introduction, after Wednesday's psalm ends with Psalms 95:1-3, not in bold"
+
+selichot_nusach_lita_linear:
+  "Second Day / 7":
+    as_of: {he: 32720ea2ed4ffb4b1d591ef499e4517a37a3d00bcade60970873c90befe04e2c, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Third Day / 7":
+    as_of: {he: 32720ea2ed4ffb4b1d591ef499e4517a37a3d00bcade60970873c90befe04e2c, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fourth Day / 7":
+    as_of: {he: 32720ea2ed4ffb4b1d591ef499e4517a37a3d00bcade60970873c90befe04e2c, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fifth Day / 7":
+    as_of: {he: 32720ea2ed4ffb4b1d591ef499e4517a37a3d00bcade60970873c90befe04e2c, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Sixth Day / 7":
+    as_of: {he: 01c497d7a1575d49a4ac0cbbce363d23c8e52f2b054b661f55ccfd4b48293f35, en: 32c433f918b6316448e29683ed219fd2bb8a8421be4310399f6db17bcbbcdce4}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Seventh Day / 7":
+    as_of: {he: 32720ea2ed4ffb4b1d591ef499e4517a37a3d00bcade60970873c90befe04e2c, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Erev Rosh Hashana / 28":
+    as_of: {he: dd11d19fb2b85529dc2ea93f6bf6be0ecb9e97ac229380299ff52d096f0c4d7e, en: af2a8668a5a3f1cf2eef0a8173fe499838d16819decd15056b29c910befcbc02}
+    he_only: [87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Erev Rosh Hashana / 30":
+    as_of: {he: b147e9daa125367aff0147ce03954b28c0475c364ede46dff8ce36000d835f05, en: 486f1785bd4b8c5614757ab367c80336aac8a9501ca387158c7e8da68add0fbd}
+    he_only: [186, 187, 188, 189, 190, 191, 192]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Erev Rosh Hashana / 31":
+    as_of: {he: 688b7e5d0c91b62e48b8c3b83967873f9ef68bb259b003f1a28921c7d1c003d4, en: 97dbfb954c89ab2c3b2a6044d80ecd06a32443fee166fdb74745de183a543254}
+    he_only: [93, 94, 95, 96, 97, 98, 99, 100]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fast of Gedaliah / 14":
+    as_of: {he: 39b3cede829f6345f4cffbb2b1c2e481efdf209123ea7c0525b6faf4f84e7e41, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fast of Gedaliah / 15":
+    as_of: {he: eba98e84844efdeb781d7ae508c50a0bdbd1f3f00cf836a18ed49c3898b6d4c7, en: 46bf45e641d8864235ad79bc796d8753581d71b6808b4b718348dc662d355551}
+    he_only: [92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fast of Gedaliah / 16":
+    as_of: {he: 4279c159ed6cd9788abdc3fce6606817149dc9ada8b628407be2ba7bc6bbdd5e, en: ab23394c9aef7a814b345d9fd8d6c176cdf148809aa0fd107cd1fad8599386b7}
+    he_only: [101, 102, 103, 104, 105, 106, 107, 108]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fast of Gedaliah / 17":
+    as_of: {he: 277eb1afb810ab6a5ffc38e78563c97326f3291a32bb6a87960c143c70249ce4, en: 8d5e640e0e0970f79ddc378bea513c74cc604cc4c98baca892a21b80aa1077aa}
+    he_only: [114, 115, 116, 117, 118, 119, 120]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Second Day of the Ten Days of Penitence / 11":
+    as_of: {he: 9a4dfa20c2c159d602399180eb9a45927196e3748149fcefa883ac8092f9e979, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Second Day of the Ten Days of Penitence / 12":
+    as_of: {he: 21c29da4e0d073ebdb22bef81d88b51033c6c48944a2b3c16d4f3a1c4596e07a, en: 4aecb7fa11f12fca47af41970ff6dcae9a5654d7d907ff043eddb7e4ea165346}
+    he_only: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Third Day of the Ten Days of Penitence / 11":
+    as_of: {he: 9a4dfa20c2c159d602399180eb9a45927196e3748149fcefa883ac8092f9e979, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Third Day of the Ten Days of Penitence / 12":
+    as_of: {he: 641dd776bd511d9df166227e25f4cece43a1d9429d99dfe1395c7311ca889ed0, en: aa114e656e8ac847316131bbfecafab4847e8f5b77176eb3b5cae64dc4354506}
+    he_only: [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fourth Day of the Ten Days of Penitence / 11":
+    as_of: {he: 9a4dfa20c2c159d602399180eb9a45927196e3748149fcefa883ac8092f9e979, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fourth Day of the Ten Days of Penitence / 12":
+    as_of: {he: 9a5dda2ec4ba7376167ad52afd1189b124619e4e24bbe04b86bc96749a93a382, en: 23e4ac178d3ae261f12bc5bfc8429c8b849c8341e83e46792a2f445d4e67e6c2}
+    he_only: [45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fifth Day of the Ten Days of Penitence / 13":
+    as_of: {he: 9a4dfa20c2c159d602399180eb9a45927196e3748149fcefa883ac8092f9e979, en: 9632e49f05b944c65f1d286d7ed1250f57103bd8f5c31a9b84a6cd29893eaced}
+    he_only: [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Fifth Day of the Ten Days of Penitence / 14":
+    as_of: {he: 00009b43eee3c88afb9e2c1dc419585f4de3c7300a41804363123ef71bb61152, en: d449a6952d733b78b4ba5aa2b271c48bc4d8fb5c1fe014577e0a7751bc57978e}
+    he_only: [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+  "Yom Kippur Eve / 6":
+    as_of: {he: 02778b2ddf670dac830be312d391bf2d0d92b98dfb9cb3f09c76bd3af6b3b3c8, en: 0c8e7397e5972ebc38354a1b12006c26c16d5eea31f560a2a3a0e45d9a2e93ee}
+    he_only: [68, 69, 70, 71, 72, 73, 74, 75, 76]
+    note: "the rest of the service, printed in Hebrew paragraphs without a translation"

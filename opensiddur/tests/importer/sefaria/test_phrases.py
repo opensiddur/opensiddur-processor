@@ -70,6 +70,13 @@ class TestMapPhrases(unittest.TestCase):
                skeleton("מֶֽלֶךְ חַי וְקַיָּם")]
         self.assertEqual(map_phrases(new, old), [1, 3, 2])
 
+    def test_the_order_is_the_printings_not_the_numbers(self):
+        # Phrase 3 was added after the first printing's own (an earlier volume named 1 and 2),
+        # between them: a later printing in the same words keeps every number.
+        old = {1: skeleton("מוֹדֶה אֲנִי לְפָנֶֽיךָ"), 3: skeleton("שֶׁהֶחֱזַֽרְתָּ בִּי נִשְׁמָתִי"),
+               2: skeleton("מֶֽלֶךְ חַי וְקַיָּם")}
+        self.assertEqual(map_phrases(list(old.values()), old), [1, 3, 2])
+
 
 class TestRecordedPhrases(unittest.TestCase):
     def test_reads_phrase_milestones_and_their_words(self):

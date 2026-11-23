@@ -71,6 +71,63 @@ class TestVariants(unittest.TestCase):
             self.assertEqual(first.xpath("//j:declare//tei:binary/@value", namespaces=NS), ["false"])
 
 
+class TestOpeningTransclusion(unittest.TestCase):
+    """A text that opens with another the volume prints (the full Kaddish, with the half
+    Kaddish): its file transcludes that text and holds only its own words."""
+
+    HALF = [("<b>אֵין כֵּאלֹהֵינוּ</b> אֵין כַּאדוֹנֵינוּ", "None like our God"),
+            ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ", "none like our King")]
+    OWN = [("מִי כֵאלֹהֵינוּ מִי כַאדוֹנֵינוּ", "Who is like our God")]
+    TABLE = f"""
+texts:
+  - opens: אין כאלהינו
+    ends: אין כמלכנו אין כמושיענו
+    urn: {T}prayer:half_text
+  - opens: אין כאלהינו
+    with: [מי כאלהינו]
+    ends: מי כאלהינו מי כאדונינו
+    urn: {T}prayer:full_text
+    transcludes: {T}prayer:half_text
+"""
+
+    def convert(self, full):
+        tree = {"Morning": {"Upon Arising": self.HALF, "Again": full}, "Blessings": BLESSINGS}
+        structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
+                     "Morning / Again": "chol/shacharit/again", "Blessings": "berakhot/test"}
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        write_work_dir(root / "sources" / "sefaria" / WORK.key, tree)
+        (root / "project").mkdir()
+        (root / "registry").mkdir()
+        (root / "decisions.yaml").write_text("{}\n")
+        (root / "equivalents.yaml").write_text(self.TABLE, encoding="utf-8")
+        convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
+                     registry_directory=root / "registry", urns_path=root / "urns.jsonl",
+                     index=IncipitIndex(), output_directory=root / "out",
+                     structure_path=write_structure(root / "s.yaml", structure),
+                     decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
+                     works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
+                     conditions_path=root / "conditions.yaml")
+        return {lang: etree.parse(str(root / "project" / WORK.projects[lang] / "full_text.xml"))
+                for lang in ("he", "en")}
+
+    def test_the_text_it_opens_with_is_transcluded(self):
+        for lang, text in self.convert(self.HALF + self.OWN).items():
+            with self.subTest(lang=lang):
+                div = text.find(".//tei:body/tei:div", namespaces=NS)
+                self.assertEqual(div[0].tag, f"{{{NS['j']}}}transclude")
+                self.assertEqual(div[0].get("target"), T + "prayer:half_text")
+                self.assertEqual(text.xpath("//tei:milestone[@unit='phrase']/@corresp", namespaces=NS),
+                                 [T + "metsudah:full_text/3"])
+
+    def test_in_words_of_its_own_it_is_written_in_full(self):
+        changed = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ אַחֵר", "none like our King"), *self.OWN]
+        for text in self.convert(changed).values():
+            self.assertEqual(text.xpath("//j:transclude", namespaces=NS), [])
+            self.assertEqual(len(text.xpath("//tei:milestone[@unit='phrase']/@corresp", namespaces=NS)), 3)
+
+
 class TestConditionsReachTheFiles(unittest.TestCase):
     def test_a_condition_rubric_becomes_a_conditional_in_both_languages(self):
         text = [MORNING[1], ("", "<small><i>On Rosh Chodesh add:</i></small>"),

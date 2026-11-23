@@ -12,6 +12,7 @@ from .first_day import poetic_lines, words_with_notes, mixed_words, expansion_sc
 from .erev_rosh_hashanah import printed as ordinary_printed, targets
 from .penitential_second_day import wrap_hebrew
 from .identities import project_name
+from .printings import is_declaration, printing, text_urn
 
 SERVICE_PREFIX = 'urn:x-opensiddur:text:siddur:selichot/penitential_'
 DAYS = ('third', 'fourth', 'fifth')
@@ -246,13 +247,13 @@ def verify_readings(source,project_directory,day):
         project=project_directory/project_name(lang)
         service=etree.parse(str(project/(service_filename(day)))).find(f'.//{{{TEI}}}body/{{{TEI}}}div')
         if normalize(service.find(f'{{{TEI}}}head').text)!=normalize(manifest['heading'][lang]):raise ValueError('penitential day heading changed')
-        nodes=[n for n in service if n.tag not in [f'{{{TEI}}}head',f'{{{TEI}}}pb']]
+        nodes=[n for n in service if n.tag not in [f'{{{TEI}}}head',f'{{{TEI}}}pb'] and not is_declaration(n)]
         if len(nodes)!=len(units):raise ValueError('penitential day source order changed')
         for reading,node in zip(units,nodes):
             context=spelled_urn(reading.get('urn',context_urn+'/'+reading['id']))
             if reading.get('filename'):
-                if node.get('target')!=context:raise ValueError('penitential day module order changed')
-                node=etree.parse(str(project/(spelled_name(reading['filename'])+'.xml'))).find(f'.//{{{TEI}}}body/{{{TEI}}}div')
+                if node.get('target')!=text_urn(context):raise ValueError('penitential day module order changed')
+                node=printing(project,spelled_name(reading['filename']))
             elif node.get('corresp')!=context:raise ValueError('penitential day inline order changed')
             node=copy.deepcopy(node)
             for item in reading.get('interleaved_rubrics',[]):

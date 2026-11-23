@@ -13,7 +13,12 @@ from .identities import TEXTS, text_urn, project_name
 
 FIRST_DAY = 'urn:x-opensiddur:text:siddur:selichot/first_day'
 OBSOLETE_ASSEMBLIES = ('first_day_opening', 'first_day_preface',
-                       'first_day_before_piyyut', 'first_day_closing', 'first_day_expanded')
+                       'first_day_before_piyyut', 'first_day_closing', 'first_day_expanded',
+                       # renamed texts: Vayaavor is one text, and El Erekh Appayim Attah is
+                       # not Tachanun's El Erekh Appayim
+                       'vayaavor_preliminary', 'el_erekh_appayim')
+#: Texts build.py writes from their full printing (pp. 11-12): a printing elsewhere transcludes them.
+PRINTED_IN_FULL = ('el_melekh_yoshev', 'vayaavor')
 
 
 def verify_half_kaddish(service, ten_days):
@@ -237,6 +242,8 @@ def documents(source):
                 div.remove(unit)
                 transclusion = element(div, 'j:transclude', target=urn)
                 div.remove(transclusion); div.insert(position, transclusion)
+                if filename in PRINTED_IN_FULL:
+                    continue
                 module, module_text = document(lang, project, group.get('incipit_he', filename.replace('_', ' ')), urn)
                 if group.get('incipit_he'):
                     module.find(f'.//{{{TEI}}}title').set(XML+'lang', 'he')

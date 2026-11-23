@@ -184,5 +184,41 @@ class TestDivide(unittest.TestCase):
             split_block(block, 0)
 
 
+
+class TestJoinChapters(unittest.TestCase):
+    """A leaf of depth 2 placed whole (a day of the Selichot): its chapters, aligned one by one,
+    are one leaf, numbered on, each opening a text."""
+
+    def chapters(self):
+        def chapter(n, he, en):
+            return Leaf(("Day", str(n)), (("Day", "יום"), (str(n), str(n))), tuple(he), tuple(en), chapter=n)
+        first = chapter(1, ["<b>אַשְׁרֵי</b> יוֹשְׁבֵי", "בֵיתֶֽךָ"], ["Fortunate", "in Your house"])
+        second = chapter(2, ["א. <small>פתיחה</small>", "אֵיךְ נִפְתַּח פֶּה", "דַּר מְתוּחִים", "פִּסְקָה בְּלִי תַרְגּוּם"],
+                         ["<small><i>A selichah</i></small>", "How can we open", "One Who dwells"])
+        return (first, second)
+
+    def test_chapters_are_joined_and_numbered_on(self):
+        from opensiddur.importer.sefaria.align import join_chapters
+        leaves = self.chapters()
+        decisions = {"Day / 2": LeafDecision(segments_hash(leaves[1].he), segments_hash(leaves[1].en),
+                                             frozenset({4}), frozenset())}
+        alignments = align_work("w", leaves, {"w": decisions})
+        (day,), (joined,) = join_chapters(leaves, alignments, {"Day"})
+        self.assertEqual((day.path, day.chapter, len(day.he), len(day.en)), ("Day", 0, 6, 5))
+        self.assertEqual([(p.he_index, p.en_index) for p in joined.pairs],
+                         [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, None)])
+        # Each chapter opens a text: the first's first phrase, the second's label and phrase.
+        self.assertEqual(joined.opens, frozenset({1, 3, 4}))
+        blocks = [i for i in divide(joined.pairs, opens=joined.opens) if isinstance(i, TextBlock)]
+        self.assertEqual([b.first_index for b in blocks], [1, 4])
+
+    def test_chapters_placed_one_by_one_pass_through(self):
+        from opensiddur.importer.sefaria.align import join_chapters
+        leaves = self.chapters()
+        alignments = align_work("w", leaves[:1], {})
+        joined_leaves, joined = join_chapters(leaves[:1], alignments, set())
+        self.assertEqual(joined_leaves, leaves[:1])
+        self.assertEqual(joined, alignments)
+
 if __name__ == "__main__":
     unittest.main()

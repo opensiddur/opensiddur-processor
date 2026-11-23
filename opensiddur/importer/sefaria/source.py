@@ -5,7 +5,10 @@ each with an English ``key`` and English and Hebrew titles) whose leaves are jag
 strings. A version's ``text`` is the same tree as nested objects keyed by the English keys.
 The Metsudah linear volumes have leaves of depth 1 ("Paragraph"), each string one phrase of
 the linear layout, Hebrew segment *n* translated by English segment *n*. A leaf of depth 2
-("Chapter", "Paragraph") is read as one leaf per chapter.
+("Chapter", "Paragraph") is read as one leaf per chapter, each marking its ``chapter``; the
+chapters are aligned one by one and then joined into one leaf (``align.join_chapters``), whose
+chapters each open a text. The Metsudah Selichot is such a work: a leaf is a day, and each of
+its chapters a selichah or a run of the service.
 """
 
 from __future__ import annotations
@@ -30,6 +33,8 @@ class Leaf:
     titles: tuple[tuple[str, str], ...]
     he: tuple[str, ...]
     en: tuple[str, ...]
+    #: the chapter's number, for a chapter of a leaf of depth 2; 0 for a leaf of depth 1
+    chapter: int = 0
 
     @property
     def path(self) -> str:
@@ -114,7 +119,7 @@ def _walk(node: dict[str, Any], he: Any, en: Any, keys: tuple[str, ...],
             en_chapter = en_chapters[number - 1] if number <= len(en_chapters) else []
             yield Leaf(keys + (str(number),), titles + ((str(number), str(number)),),
                        _strings(he_chapter, f"{where} {number} (he)"),
-                       _strings(en_chapter, f"{where} {number} (en)"))
+                       _strings(en_chapter, f"{where} {number} (en)"), chapter=number)
     else:
         raise ValueError(f"{where}: a leaf of depth {depth} is not supported")
 

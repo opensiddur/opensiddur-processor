@@ -211,10 +211,28 @@ class EnglishKind(enum.Enum):
 MAX_LABEL_WORDS = 8
 
 
+#: A text's number, as the Selichot numbers its selichot: a Hebrew numeral and a stop
+#: (``א.`` to ``ק.``) before the selichah's description, title or nothing.
+NUMBER = re.compile(r"\s*[\u05d0-\u05ea]{1,3}\.(\s|$)")
+
+
+def is_numbered(nodes: tuple[Node, ...]) -> bool:
+    """A segment that numbers the text after it: ``יא. <small>חתום שמעון בר יצחק</small>``,
+    ``ד. <b>במוצאי מנוחה</b>``, ``נז.`` -- the numeral, then nothing pointed."""
+    text = plain_text(nodes)
+    return bool(NUMBER.match(text)) and not is_pointed(text)
+
+
 def hebrew_kind(nodes: tuple[Node, ...]) -> HebrewKind:
     text = plain_text(nodes)
     if not text:
         return HebrewKind.EMPTY
+    if is_numbered(nodes):
+        return HebrewKind.LABEL
+    if has_hebrew(text) and not is_pointed(text) and wholly(nodes, {"small"}):
+        # An instruction in small print, however long ("ש"ץ מתחיל בקול רם והצבור עונין
+        # אחריו פסוק אחר פסוק ..."): the book prints its texts pointed.
+        return HebrewKind.LABEL
     if (has_hebrew(text) and not is_pointed(text) and len(text.split()) <= MAX_LABEL_WORDS
             and wholly(nodes, {"bold", "small", "large"})):
         return HebrewKind.LABEL

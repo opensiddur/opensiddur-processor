@@ -12,6 +12,9 @@
 # licence        the licence of both versions: Sefaria's "CC-BY" is CC BY 3.0
 # publisher, translator, date
 #                the printed source the versions transcribe
+# numbered_texts the namespace a new text is minted in when the book numbers it (א., ב., ...):
+#                prayer (the default), or poem for the selichot of a book of selichot; a text
+#                the book does not number is a prayer
 
 weekday_siddur_sefard_linear:
   title: Weekday Siddur Sefard Linear
@@ -50,3 +53,23 @@ shabbat_siddur_sefard_linear:
   place: New York
   translator: Avrohom Davis
   date: "1981"
+
+selichot_nusach_lita_linear:
+  title: Selichot Nusach Lita Linear
+  versions:
+    he: "The Metsudah Selichos: Hebrew text, Metsudah Publications, 1986"
+    en: "The Metsudah Selichos: translated and annotated by Rabbi Avrohom Davis, Metsudah Publications, 1986"
+  projects:
+    he: metsudah_selichot-davis-1986-he
+    en: metsudah_selichot-davis-1986-en
+  title_en: "The Metsudah Selichos"
+  title_he: "סליחות"
+  rite: >-
+    Nusach Lita, the Lithuanian (eastern) variant of the Ashkenazi rite, whose selection and
+    order of selichot differ from those of western Minhag Ashkenaz.
+  licence: https://creativecommons.org/licenses/by/3.0/
+  publisher: Metsudah Publications
+  place: New York
+  translator: Avrohom Davis
+  date: "1986"
+  numbered_texts: poem

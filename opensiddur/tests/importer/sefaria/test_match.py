@@ -656,5 +656,153 @@ class TestRecords(unittest.TestCase):
             self.assertEqual(load_records(path), {record.key: record})
 
 
+class TestSelichot(unittest.TestCase):
+    """The Metsudah Selichot: numbered selichot, their address, and paragraphs that reprint a
+    text the book first printed phrase by phrase."""
+
+    def test_a_selichah_is_named_after_its_address(self):
+        text = "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֵיךְ נִפְתַּח פֶּה לְפָנֶיךָ"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS, "poem"), T + "poem:eikh_niftach_peh")
+
+    def test_a_name_taken_in_the_other_namespace_grows(self):
+        text = "זֶה טֶקְסְט חָדָשׁ לְגַמְרֵי"
+        self.assertEqual(mint(text, {T + "prayer:zeh_teqst_chadash"}, NO_SPELLINGS, "poem"),
+                         T + "poem:zeh_teqst_chadash_legamrei")
+
+    def test_an_address_alone_is_still_a_name(self):
+        text = "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ תָּבֹא"
+        self.assertEqual(mint(text, set(), NO_SPELLINGS), T + "prayer:eloheinu_velohei_avoteinu")
+
+    def test_a_numbered_text_is_minted_in_the_numbered_namespace(self):
+        leaf = items("א. <small>פתיחה. חתום בנימין.</small>", *UNKNOWN, "<b>עוֹד טֶקְסְט</b> חָדָשׁ לְגַמְרֵי")
+        outcome = decide_work("w", [("L", leaf)], IncipitIndex(), {}, set(), spellings=NO_SPELLINGS,
+                              numbered_namespace="poem")
+        self.assertEqual([r.urn.split(":")[3] for r in outcome.decided], ["poem", "prayer"])
+
+    def test_a_paragraph_with_the_first_printings_words_is_a_repeat(self):
+        lines = ["<b>עֲנֵנוּ יְהֹוָה</b> עֲנֵנוּ", "עֲנֵנוּ אֱלֹהֵינוּ עֲנֵנוּ", "עֲנֵנוּ אָבִינוּ עֲנֵנוּ"]
+        paragraph = "<b>עֲנֵנוּ יְהֹוָה</b> עֲנֵנוּ עֲנֵנוּ אֱלֹהֵינוּ עֲנֵנוּ עֲנֵנוּ אָבִינוּ עֲנֵנוּ"
+        outcome = decide([("A", items(*lines)), ("B", items(paragraph, *UNKNOWN))])
+        self.assertEqual([(r.leaf, r.kind) for r in outcome.decided], [("A", "new"), ("B", "repeat"), ("B", "new")])
+        self.assertEqual(outcome.decided[1].urn, outcome.decided[0].urn)
+
+
+class TestRegroupedLength(unittest.TestCase):
+    def test_the_phrases_that_hold_the_words(self):
+        from opensiddur.importer.sefaria.match import regrouped_length
+        self.assertEqual(regrouped_length(["a b c", "d", "e f"], ["a b", "c d"]), 2)
+
+    def test_words_that_differ_or_end_inside_a_phrase(self):
+        from opensiddur.importer.sefaria.match import regrouped_length
+        self.assertIsNone(regrouped_length(["a b x"], ["a b c"]))
+        self.assertIsNone(regrouped_length(["a b c d"], ["a b c"]))
+        self.assertIsNone(regrouped_length(["a"], ["a b"]))
+
+
+class TestLaterTextTheTextPrints(unittest.TestCase):
+    VAYAAVOR = "וַיַּעֲבֹר יְהֹוָה עַל פָּנָיו וַיִּקְרָא"
+    MIDDOT = "יְהֹוָה יְהֹוָה אֵל רַחוּם וְחַנּוּן אֶרֶךְ אַפַּיִם וְרַב חֶסֶד וֶאֱמֶת"
+
+    def phrases(self):
+        return [words(self.VAYAAVOR), words(self.MIDDOT)]
+
+    def test_words_the_collection_prints_with_the_text_do_not_cut_it(self):
+        index = index_of(prayer_c_vayaavor=self.VAYAAVOR + " " + self.MIDDOT,
+                         prayer_c_middot=self.MIDDOT + " נֹצֵר חֶסֶד לָאֲלָפִים")
+        self.assertIsNone(later_text(self.phrases(), T + "prayer:vayaavor", index))
+
+    def test_a_text_the_collection_prints_apart_still_cuts(self):
+        index = index_of(prayer_c_vayaavor=self.VAYAAVOR + " וְעוֹד דְּבָרִים אֲחֵרִים לְגַמְרֵי",
+                         prayer_c_middot=self.MIDDOT + " נֹצֵר חֶסֶד לָאֲלָפִים")
+        self.assertEqual(later_text(self.phrases(), T + "prayer:vayaavor", index), (1, T + "prayer:middot"))
+
+
+class TestStanzasWordedOtherwise(unittest.TestCase):
+    """A pizmon another rite words a little otherwise (Nusach Lita's Yisrael Nosha): each of its
+    stanzas is the collection's stanza it agrees with, not swallowed by the one before."""
+    S1 = "יִשְׂרָאֵל נוֹשַׁע בַּיהֹוָה תְּשׁוּעַת עוֹלָמִים גַּם הַיּוֹם יִוָּשְׁעוּ מִפִּיךָ שׁוֹכֵן מְרוֹמִים"
+    S2 = "שְׁעָרֶיךָ הֵם דּוֹפְקִים כַּעֲנִיִּים וְדַלִּים צְקוֹן לַחֲשָׁם קְשֹׁב יָהּ שׁוֹכֵן מְעֻלִּים"
+    S3 = "פְּחוּדִים הֵם מִכָּל צָרֵיהֶם מִמְּחָרְפֵיהֶם וּמִמְּגַדְּפֵיהֶם נָא אַל תַּעַזְבֵם יְהֹוָה אֱלֹהֵי אֲבוֹתֵיהֶם"
+    LITA_S3 = ["פְּחוּדִים הֵם מִכָּל צָרוֹת", "מִמְּחָרְפֵיהֶם וּמִלּוֹחֲצֵיהֶם", "נָא אַל תַּעַזְבֵם",
+               "יְהֹוָה אֱלֹהֵי אֲבוֹתֵיהֶם"]
+
+    def index(self):
+        body = "".join(f'<tei:milestone unit="stanza" corresp="{T}poem:nosha/stanza_{n}"/>{text} '
+                       for n, text in enumerate((self.S1, self.S2, self.S3), 1))
+        return documents(f'<tei:div corresp="{T}poem:nosha"><tei:p>{body}</tei:p></tei:div>')
+
+    def test_each_stanza_is_the_collections(self):
+        lines = ["<b>יִשְׂרָאֵל נוֹשַׁע</b> בַּיהֹוָה תְּשׁוּעַת עוֹלָמִים", "גַּם הַיּוֹם יִוָּשְׁעוּ מִפִּיךָ שׁוֹכֵן מְרוֹמִים",
+                 "שְׁעָרֶיךָ הֵם דּוֹפְקִים כַּעֲנִיִּים וְדַלִּים", "צְקוֹן לַחֲשָׁם קְשֹׁב יָהּ שׁוֹכֵן מְעֻלִּים", *self.LITA_S3]
+        outcome = decide([("L", items(*lines))], self.index())
+        self.assertEqual([r.urn.rsplit("/", 1)[-1] for r in outcome.decided], ["stanza_1", "stanza_2", "stanza_3"])
+        self.assertEqual([r.block for r in outcome.decided], [1, 3, 5])
+
+
+class TestRunsOnIntoItsOwnText(unittest.TestCase):
+    def test_a_text_the_volume_printed_before_cuts_a_block(self):
+        # The earlier text again, its opening not marked: nothing but its words ends the block.
+        unmarked = [UNKNOWN[0].replace("<b>", "").replace("</b>", ""), *UNKNOWN[1:]]
+        later = items("<b>עוֹד טֶקְסְט</b> חָדָשׁ לְגַמְרֵי בְּלִי מָקוֹר", "וְעוֹד שׁוּרָה אַחַת שֶׁלּוֹ", *unmarked)
+        outcome = decide([("A", items(*UNKNOWN)), ("B", later)])
+        self.assertEqual([(r.leaf, r.kind) for r in outcome.decided], [("A", "new"), ("B", "new"), ("B", "repeat")])
+
+
+class TestPoemWordedOtherwise(unittest.TestCase):
+    ASHER = ("אָדוֹן דִּין אִם יִדַּקֵּן בְּחֵקֶר פֹּעַל אִם יִבָּדֵק גֶּבֶר לְפָנֶיךָ לֹא יִצְדַּק דֹּפִי תִּתֵּן "
+             "בִּצְבָא מַעְלָה הֵן בְּמַלְאָכֶיךָ תָּשִׂים תָּהֳלָה")
+    LITA = ["א. <small>חתום זבדיה</small>", "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ", "אָדוֹן דִּין אִם יְדֻקְדַּק",
+            "בְּחֵקֶר פֹּעַל אִם יֻבְדַּק", "גֶּבֶר לְפָנֶיךָ לֹא יִצְדַּק", "דֹּפִי תִּתֵּן בִּצְבָא מַעְלָה",
+            "הֵן בְּמַלְאָכֶיךָ תָּשִׂים תָּהֳלָה"]
+
+    def decide(self, lines):
+        return decide_work("w", [("L", items(*lines))], index_of(poem_c_adon_din=self.ASHER), {}, set(),
+                           spellings=NO_SPELLINGS, numbered_namespace="poem")
+
+    def test_a_numbered_selichah_is_the_collections_poem(self):
+        (record,) = self.decide(self.LITA).decided
+        self.assertEqual((record.kind, record.urn), ("existing", T + "poem:adon_din"))
+
+    def test_an_unnumbered_text_is_not_matched_so(self):
+        (record,) = self.decide(self.LITA[1:]).decided
+        self.assertEqual(record.kind, "new")
+
+
+class TestKaddishParts(unittest.TestCase):
+    """A Kaddish printed part by part: its יתגדל is ``kaddish/yitgaddal``, not the half Kaddish
+    the collection builds of it and the parts after it."""
+    YITGADDAL = "יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא בְּעָלְמָא דִּי בְרָא כִרְעוּתֵהּ וְיַמְלִיךְ מַלְכוּתֵהּ"
+    RESPONSE = "יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא"
+    YITBARAKH = "יִתְבָּרַךְ וְיִשְׁתַּבַּח וְיִתְפָּאַר וְיִתְרוֹמַם וְיִתְנַשֵּׂא וְיִתְהַדָּר"
+
+    def index(self):
+        parts = "".join(div(f"prayer:kaddish/{name}", text) for name, text in
+                        (("yitgaddal", self.YITGADDAL), ("yehe_shemeh", self.RESPONSE), ("yitbarakh", self.YITBARAKH)))
+        chatzi = (f'<tei:div corresp="{T}prayer:kaddish/chatzi">'
+                  + "".join(f'<j:transclude target="{T}prayer:kaddish/{n}"/>' for n in ("yitgaddal", "yehe_shemeh", "yitbarakh"))
+                  + "</tei:div>")
+        # Another book prints the half Kaddish whole, so its words find it first.
+        whole = div("prayer:kaddish/chatzi", " ".join((self.YITGADDAL, self.RESPONSE, self.YITBARAKH)))
+        return documents(parts, chatzi, whole)
+
+    def test_the_opening_lines_are_the_first_part(self):
+        lines = ["<b>יִתְגַּדַּל וְיִתְקַדַּשׁ</b> שְׁמֵהּ רַבָּא", "בְּעָלְמָא דִּי בְרָא כִרְעוּתֵהּ", "וְיַמְלִיךְ מַלְכוּתֵהּ",
+                 self.RESPONSE, self.YITBARAKH]
+        outcome = decide([("L", items(*lines))], self.index())
+        self.assertEqual([r.urn.rsplit("/", 1)[-1] for r in outcome.decided][:2], ["yitgaddal", "yehe_shemeh"])
+
+    def test_a_block_running_on_into_a_kaddish_chosen_whole(self):
+        from opensiddur.importer.sefaria.equivalents import Choice, Equivalents
+
+        table = Equivalents(texts=(Choice(tuple(words("יִתְגַּדַּל וְיִתְקַדַּשׁ")), T + "prayer:kaddish/chatzi",
+                                          ends=tuple(words("לְעָלַם וּלְעָלְמֵי עָלְמַיָּא"))),))
+        # The Kaddish runs on at the end of the block before, unmarked, in words of its own.
+        lines = [*UNKNOWN, "יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא", "וְיַצְמַח פּוּרְקָנֵהּ", self.RESPONSE]
+        outcome = decide_work("w", [("L", items(*lines))], IncipitIndex(), {}, set(), spellings=NO_SPELLINGS,
+                              equivalents=table, registered=set())
+        self.assertEqual([r.urn.rsplit(":", 1)[-1] for r in outcome.decided][-1], "kaddish/chatzi")
+        self.assertEqual(len(outcome.decided), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

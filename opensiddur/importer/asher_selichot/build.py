@@ -17,6 +17,7 @@ import yaml
 from opensiddur.common.validate_names import URN_PATH, Spellings, load_spellings, respell
 from opensiddur.importer.util.validation import validate
 from .identities import project_name
+from .printings import unify
 
 TEI='http://www.tei-c.org/ns/1.0'
 J='http://jewishliturgy.org/ns/jlptei/2'
@@ -185,8 +186,9 @@ def build(source_root,project_directory):
     if editorial.exists():
         apply_editorial_notes(by_path, json.loads(editorial.read_text())['notes'])
     documents, renamed = respelled(documents)
+    documents, printed_again = unify(documents)
     obsolete = [Path(project_directory)/project_name(lang)/(name+'.xml')
-                for lang in ['he', 'en'] for name in OBSOLETE_ASSEMBLIES] + renamed
+                for lang in ['he', 'en'] for name in OBSOLETE_ASSEMBLIES] + renamed + printed_again
     return write_documents(documents, validator=validate, obsolete_paths=obsolete)
 
 

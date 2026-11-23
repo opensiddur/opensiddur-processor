@@ -241,7 +241,8 @@ def verify_continuation(source, project_directory):
     """Compare authored units to source readings and printed footnote evidence."""
     import re
     import unicodedata
-    from .first_day import EXPANSION_TARGETS
+    from .first_day import EXPANSION_TARGETS, PRINTED_IN_FULL
+    from .identities import TEXTS
     groups=json.loads((source/'first-day-continuation.json').read_text())['sections']
     poetry=json.loads((source.parent/'poetry-structure.json').read_text())['units']
     count=0
@@ -315,6 +316,14 @@ def verify_continuation(source, project_directory):
             if reading['kind']=='rubric' and lang=='he':
                 # Preserve printed phrase dots in the Hebrew cue stream.
                 actual={k:v.replace(' · ',' ') for k,v in actual.items()}
+            if reading['id'] in TEXTS and TEXTS[reading['id']][0] in PRINTED_IN_FULL:
+                # A text printed in full elsewhere (Vayaavor, pp. 11-12) and transcluded here: this
+                # printing is that text, word for word, whatever its pages and punctuation.
+                words_of=lambda streams:re.sub(r'[^\w\s]','',' '.join(v for (_,l),v in sorted(streams.items()) if l==lang)).split()
+                if words_of(actual)!=words_of(expected):
+                    raise ValueError(f'{reading["id"]}: not the words of the text printed in full')
+                count+=1
+                continue
             differences=check(actual,expected)
             if differences:raise ValueError(f'{reading["id"]}: {differences}')
             count+=1
@@ -327,6 +336,8 @@ def verify_continuation(source, project_directory):
                     roots.append(etree.parse(str(project/(spelled_name(name)+'.xml'))).getroot())
             if reading['id']==groups['closing'][0]['id']:
                 roots.append(etree.parse(str(project/(spelled_name('bemotzaei_menuhah')+'.xml'))).getroot())
+            if reading['id'] in TEXTS and TEXTS[reading['id']][0] in PRINTED_IN_FULL:
+                continue  # its pages are where it is printed in full
             roots.append(unit)
         pages=[]
         for root in roots:

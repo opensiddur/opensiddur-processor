@@ -426,7 +426,7 @@
 {"urn": "urn:x-opensiddur:text:poem:avelah_nafshi_vechashakh_toari", "status": "canonical", "label_en": "avelah nafshi vehashakh toari"}
 {"urn": "urn:x-opensiddur:text:poem:az_terem_nimtechu_nivlei_shekhavim", "status": "canonical", "label_en": "az terem nimtehu nivlei shehaqim"}
 {"urn": "urn:x-opensiddur:text:poem:elohim_ein_biltekha", "status": "canonical", "label_en": "elohim ein biltekha"}
-{"urn": "urn:x-opensiddur:text:poem:et_adonai_behimmatzeo_ledorsho_qiddamti", "status": "canonical", "label_en": "et adonai behimamtseo ledorsho qidamti"}
+{"urn": "urn:x-opensiddur:text:poem:et_adonai_behimmatzo_ledorsho_qiddamti", "status": "canonical", "label_en": "et adonai behimmatzo ledorsho qidamti"}
 {"urn": "urn:x-opensiddur:text:poem:horita_derekh_teshuvah", "status": "canonical", "label_en": "horita derekh teshuvah"}
 {"urn": "urn:x-opensiddur:text:poem:horita_derekh_teshuvah/stanza_1", "status": "canonical", "label_en": "horita derekh teshuvah/stanza 1", "parent": "urn:x-opensiddur:text:poem:horita_derekh_teshuvah"}
 {"urn": "urn:x-opensiddur:text:poem:horita_derekh_teshuvah/stanza_2", "status": "canonical", "label_en": "horita derekh teshuvah/stanza 2", "parent": "urn:x-opensiddur:text:poem:horita_derekh_teshuvah"}
@@ -502,8 +502,6 @@
 {"urn": "urn:x-opensiddur:text:poem:ometz_yosif_tahor_yadayim", "status": "canonical", "label_en": "omets yosif tahor yadayim"}
 {"urn": "urn:x-opensiddur:text:poem:oznekha_hatteh_vehaqshev_lecheqer_rannen", "status": "canonical", "label_en": "oznekha hatteh vehaqshev leheqer ranen"}
 {"urn": "urn:x-opensiddur:text:poem:teshuvah_chashuvah_qedumah_meaz_lehetiv", "status": "canonical", "label_en": "teshuvah hashuvah qedumah meaz lehetiv"}
-{"urn": "urn:x-opensiddur:text:poem:adon_befaqdekha_enosh_labeqarim", "status": "canonical", "label_en": "adon befaqdekha enosh labbeqarim"}
-{"urn": "urn:x-opensiddur:text:poem:adon_din_im_tedaqdeq", "status": "canonical", "label_en": "adon din im tedaqdeq"}
 {"urn": "urn:x-opensiddur:text:poem:yirtzeh_tzom_ammekha", "status": "canonical", "label_en": "yertseh tsom ammekha"}
 {"urn": "urn:x-opensiddur:text:poem:yirtzeh_tzom_ammekha/stanza_1", "status": "canonical", "label_en": "yertseh tsom ammekha/stanza 1", "parent": "urn:x-opensiddur:text:poem:yirtzeh_tzom_ammekha"}
 {"urn": "urn:x-opensiddur:text:poem:yirtzeh_tzom_ammekha/stanza_2", "status": "canonical", "label_en": "yertseh tsom ammekha/stanza 2", "parent": "urn:x-opensiddur:text:poem:yirtzeh_tzom_ammekha"}
@@ -9573,3 +9571,34 @@
 {"urn": "urn:x-opensiddur:text:poem:ish_chasid_hayah", "status": "canonical", "label_he": "אִישׁ חָסִיד הָיָה. בְּלִי מָזוֹן וּמִחְיָה:", "label_en": "ish chasid hayah"}
 {"urn": "urn:x-opensiddur:text:poem:eliyyahu_hanavi_eliyyahu", "status": "canonical", "label_he": "אֵלִיָּֽהוּ הַנָּבִיא. אֵלִיָּֽהוּ הַתִּשְׁבִּי. אֵלִיָּֽהוּ הַגִּלְעָדִי:", "label_en": "eliyyahu hanavi eliyyahu"}
 {"urn": "urn:x-opensiddur:text:poem:chai_adonai_uvarukh_tzuri", "status": "canonical", "label_he": "חַי יְהֹוָה וּבָרוּךְ צוּרִי. בַּיהֹוָה תִּתְהַלֵּל", "label_en": "chai adonai uvarukh tzuri"}
+{"urn": "urn:x-opensiddur:text:poem:ani_qeratikha_ki", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֲנִי קְרָאתִיךָ כִּי־תַעֲנֵנִי", "label_en": "ani qeratikha ki"}
+{"urn": "urn:x-opensiddur:text:poem:afes_hod_kevudah", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אָפֵס הוֹד כְּבוּדָה", "label_en": "afes hod kevudah"}
+{"urn": "urn:x-opensiddur:text:poem:im_avoneinu_anu_vanu", "status": "canonical", "label_he": "אִם עֲוֹנֵינוּ עָנוּ בָנוּ. אָתָאנוּ לְךָ", "label_en": "im avoneinu anu vanu"}
+{"urn": "urn:x-opensiddur:text:poem:eikhakhah_eftzeh_feh", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֵיכָכָה אֶפְצֶה פֶה", "label_en": "eikhakhah eftzeh feh"}
+{"urn": "urn:x-opensiddur:text:poem:merubbim_tzarkhei_ammekha", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ מְרֻבִּים צָרְכֵי עַמְּךָ,", "label_en": "merubbim tzarkhei ammekha"}
+{"urn": "urn:x-opensiddur:text:poem:el_emunah_ezrah", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֵל־אֱמוּנָה עֶזְרָה הָבָה.", "label_en": "el emunah ezrah"}
+{"urn": "urn:x-opensiddur:text:poem:elohim_yireh_lo", "status": "canonical", "label_he": "אֱלֹהִים יִרְאֶה־לּוֹ שֶׂה־פְזוּרָה וְיוֹשַׁע. לְקוֹל שַׁוְעָתָהּ", "label_en": "elohim yireh lo"}
+{"urn": "urn:x-opensiddur:text:poem:emet_attah_hu", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֱמֶת אַתָּה־הוּא רִאשׁוֹן", "label_en": "emet attah hu"}
+{"urn": "urn:x-opensiddur:text:poem:chayyim_arukhim_tikhtevenu", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ חַיִּים אֲרוּכִים תִּכְתְּבֵנוּ", "label_en": "chayyim arukhim tikhtevenu"}
+{"urn": "urn:x-opensiddur:text:poem:av_lerachem_verav", "status": "canonical", "label_he": "אָב לְרַחֵם וְרַב סְלֹחַ חוֹלַלְתָּנוּ. בְּנֵי", "label_en": "av lerachem verav"}
+{"urn": "urn:x-opensiddur:text:poem:mefalleti_eli_tzuri", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ מְפַלְּטִי אֵלִי צוּרִי", "label_en": "mefalleti eli tzuri"}
+{"urn": "urn:x-opensiddur:text:poem:elekha_tzuri_kapay", "status": "canonical", "label_he": "אֵלֶיךָ צוּרִי כַּפַּי שִׁטַּחְתִּי. וְגֹדֶל וְגֹבַהּ", "label_en": "elekha tzuri kapay"}
+{"urn": "urn:x-opensiddur:text:poem:enqat_mesalledekha_taal", "status": "canonical", "label_he": "אֶנְקַת מְסַלְּדֶיךָ, תַּעַל לִפְנֵי כִסֵּא כְבוֹדֶךָ.", "label_en": "enqat mesalledekha taal"}
+{"urn": "urn:x-opensiddur:text:poem:adonei_haadonim_hashqifah", "status": "canonical", "label_he": "אֲדוֹנֵי הָאֲדוֹנִים, הַשְׁקִיפָה מִמְּעוֹנִים. וְרַחֵם אֶבְיוֹנִים,", "label_en": "adonei haadonim hashqifah"}
+{"urn": "urn:x-opensiddur:text:poem:yaqru_reekha_rav", "status": "canonical", "label_he": "יָקְרוּ רֵעֶיךָ רַב מְחוֹלֵל. אֶדּוֹם לַיהֹוָה", "label_en": "yaqru reekha rav"}
+{"urn": "urn:x-opensiddur:text:poem:ayached_tzuri_verov_hodaot", "status": "canonical", "label_he": "שְׁמַע יִשְׂרָאֵל יְהֹוָה אֱלֹהֵינוּ יְהֹוָה אֶחָד:", "label_en": "ayached tzuri verov hodaot"}
+{"urn": "urn:x-opensiddur:text:poem:yaazov_rasha_netivo", "status": "canonical", "label_he": "יַעֲזֹב רָשָׁע נְתִיבוֹ, וְיַכְנִיעַ רוּם לְבָבוֹ.", "label_en": "yaazov rasha netivo"}
+{"urn": "urn:x-opensiddur:text:poem:geroni_nichar_zoeq", "status": "canonical", "label_he": "גְּרוֹנִי נִחַר זוֹעֵק חָמָס. רְאוֹתִי רָשָׁע", "label_en": "geroni nichar zoeq"}
+{"urn": "urn:x-opensiddur:text:poem:akh_bekha_miqveh", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אַךְ בְּךָ מִקְוֵה", "label_en": "akh bekha miqveh"}
+{"urn": "urn:x-opensiddur:text:poem:eikh_ukhal_lavo", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֵיךְ אוּכַל לָבֹא", "label_en": "eikh ukhal lavo"}
+{"urn": "urn:x-opensiddur:text:poem:adon_binah_hagigenu", "status": "canonical", "label_he": "אֲדוֹן בִּינָה הֲגִיגֵנוּ. אֱזֹן שִׂיחֵנוּ בְּשַׁאֲגֵנוּ.", "label_en": "adon binah hagigenu"}
+{"urn": "urn:x-opensiddur:text:poem:elekha_hael_einei", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֵלֶיךָ הָאֵל עֵינֵי־כָל־יְצִיר", "label_en": "elekha hael einei"}
+{"urn": "urn:x-opensiddur:text:poem:yerushalayim_et_adonai", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ יְרוּשָׁלַיִם אֶת־יְהֹוָה הַלְלִי", "label_en": "yerushalayim et adonai"}
+{"urn": "urn:x-opensiddur:text:poem:ezrachi_heir_mimizrach", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אֶזְרָחִי הֵעִיר מִמִּזְרָח", "label_en": "ezrachi heir mimizrach"}
+{"urn": "urn:x-opensiddur:text:poem:yoshev_begavhei_meromim", "status": "canonical", "label_he": "יוֹשֵׁב בְּגָבְהֵי מְרוֹמִים וּמַבִּיט בְּעִמְקֵי הֲדוֹמִים.", "label_en": "yoshev begavhei meromim"}
+{"urn": "urn:x-opensiddur:text:poem:amnam_anachnu_chatanu", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אָמְנָם אֲנַחְנוּ חָטָאנוּ", "label_en": "amnam anachnu chatanu"}
+{"urn": "urn:x-opensiddur:text:poem:arbaah_avot_neziqin", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ אַרְבָּעָה אֲבוֹת נְזִיקִין", "label_en": "arbaah avot neziqin"}
+{"urn": "urn:x-opensiddur:text:poem:shalom_tishpot_lanu", "status": "canonical", "label_he": "אֱלֹהֵֽינוּ וֵאלֹהֵי אֲבוֹתֵֽינוּ שָׁלוֹם תִּשְׁפֹּת לָנוּ.", "label_en": "shalom tishpot lanu"}
+{"urn": "urn:x-opensiddur:text:poem:arid_besichi_besichi", "status": "canonical", "label_he": "אָרִיד בְּשִׂיחִי. בְּשִׂיחִי לְגוֹחִי. לְגוֹחִי בַּהֲשִׂיחִי.", "label_en": "arid besichi besichi"}
+{"urn": "urn:x-opensiddur:text:poem:eikh_neenchah_bemishbar", "status": "canonical", "label_he": "אֵיךְ נֶאֶנְחָה בְּמִשְׁבָּר. אֲדוּקָה מִקֶּדֶם כְּבָר.", "label_en": "eikh neenchah bemishbar"}
+{"urn": "urn:x-opensiddur:text:poem:amon_pitchei_teshuvah", "status": "canonical", "label_he": "שְׁמַע יִשְׂרָאֵל יְהֹוָה אֱלֹהֵינוּ יְהֹוָה אֶחָד:", "label_en": "amon pitchei teshuvah"}

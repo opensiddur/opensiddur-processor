@@ -9,6 +9,7 @@ from opensiddur.importer.sefaria.markup import (
     Text,
     english_kind,
     hebrew_kind,
+    is_numbered,
     leading_label,
     parse_segment,
     plain_text,
@@ -77,6 +78,29 @@ class TestKinds(unittest.TestCase):
         label, rest = leading_label(parse_segment("<small>בָּרוּךְ שֵׁם</small> כְּבוֹד"))
         self.assertIsNone(label)
 
+
+
+class TestSelichotKinds(unittest.TestCase):
+    def test_a_numbered_line_is_a_label(self):
+        for segment in ("א. <small>פתיחה. מיוסד על פי א\"ב. חתום בנימין.</small><br>",
+                        "ד. <b>במוצאי מנוחה</b><br>", "נז. <br>",
+                        "יב. <small>על פי א\"ב כפול. חתום גרשום בר יהודה (מאור הגולה)</small>"):
+            with self.subTest(segment=segment):
+                self.assertIs(hebrew_kind(parse_segment(segment)), HebrewKind.LABEL)
+                self.assertTrue(is_numbered(parse_segment(segment)))
+
+    def test_a_pointed_line_after_a_numeral_is_text(self):
+        nodes = parse_segment("א. אֵיךְ נִפְתַּח פֶּה")
+        self.assertFalse(is_numbered(nodes))
+        self.assertIs(hebrew_kind(nodes), HebrewKind.TEXT)
+
+    def test_a_long_instruction_in_small_print_is_a_label(self):
+        segment = ('<small>ש"ץ מתחיל בקול רם והצבור עונין אחריו פסוק אחר פסוק עד "ככלות כחנו אל '
+                   'תעזבנו"</small><br>')
+        self.assertIs(hebrew_kind(parse_segment(segment)), HebrewKind.LABEL)
+        # Bold is how the book heads a text; a long unpointed bold line is not a label.
+        bold = '<b>ש"ץ מתחיל בקול רם והצבור עונין אחריו פסוק אחר פסוק עד "ככלות כחנו אל תעזבנו"</b>'
+        self.assertIsNot(hebrew_kind(parse_segment(bold)), HebrewKind.LABEL)
 
 if __name__ == "__main__":
     unittest.main()
