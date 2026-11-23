@@ -1356,7 +1356,9 @@ def build(source, project_directory, *, draft=False):
                     'annotations': list(PROJECTS.values()) if parallel else [PROJECTS['he']],
                     'priority': {'transclusion': [project]+[p for p in PROJECTS.values() if p != project],
                                  'instructions': [project]+[p for p in PROJECTS.values() if p != project]},
-                    'typography': {'instructions': {'from': 'both'}, 'line_numbers': {'enabled': False}}}
+                    'typography': {'instructions': {'from': 'both'},
+                                   'line_numbers': {'enabled': False},
+                                   'paragraphs': {'line_spacing': 1.15}}}
         if parallel:
             settings['parallel'] = {'projects': [PROJECTS['en']]}
         if project != EXPANDED:
