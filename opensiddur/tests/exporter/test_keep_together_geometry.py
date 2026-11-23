@@ -294,7 +294,10 @@ class TestSingleStream(_KeepTogether, unittest.TestCase):
     English rubric in the Hebrew text stands on lines of its own."""
 
     PARALLEL = False
-    TYPOGRAPHY = {}
+    # The corrected heading paragraphs change pagination. This spacing makes
+    # the same unprotected fixture actually strand rubrics (LI19 and LI24),
+    # keeping the negative control meaningful rather than relying on old edges.
+    TYPOGRAPHY = {"paragraphs": {"spacing": "0.6em"}}
     SIDES = "L"
 
 
