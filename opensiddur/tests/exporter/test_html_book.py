@@ -1253,3 +1253,27 @@ class TestScanLinkCss(unittest.TestCase):
         self.assertIn(".col { position: relative; --scan-link-offset: -1.6rem; }", margin)
         self.assertIn(".scan-link-margin { position: absolute; "
                       "inset-inline-start: var(--scan-link-offset); }", margin)
+
+
+class TestRunInRubricTextSpace(unittest.TestCase):
+    def test_instruction_and_description_separate_adjacent_text_and_inline_words(self):
+        for kind in ('instruction', 'description'):
+            for word in ('word', '<tei:seg>word</tei:seg>'):
+                with self.subTest(kind=kind, word=word):
+                    main = _render(f'<tei:p><tei:note type="{kind}">Reader</tei:note>{word}</tei:p>')
+                    paragraph, = main.xpath('//h:p', namespaces=NS)
+                    self.assertEqual('Reader word', ''.join(paragraph.itertext()))
+
+    def test_hebrew_description_keeps_word_boundary_in_copied_text(self):
+        main = _render('<tei:p>תפלה <tei:note type="description">הש״ץ בקול</tei:note>'
+                       '<tei:seg>כֹּהֲנִים</tei:seg></tei:p>')
+        paragraph, = main.xpath('//h:p', namespaces=NS)
+        self.assertEqual('תפלה הש״ץ בקול כֹּהֲנִים', ''.join(paragraph.itertext()))
+
+    def test_existing_space_and_closing_punctuation_are_unchanged(self):
+        for tail in (' word', ':'):
+            with self.subTest(tail=tail):
+                main = _render('<tei:p><tei:note type="instruction">Reader</tei:note>'
+                               f'{tail}</tei:p>')
+                paragraph, = main.xpath('//h:p', namespaces=NS)
+                self.assertEqual('Reader' + tail, ''.join(paragraph.itertext()))

@@ -328,6 +328,15 @@
              \OSKeepSep draws its strut as a rule of its own: \strut copies \strutbox,
              and a copy keeps the attributes it was made with, which are none. -->
         <xsl:text>\newattribute\OSKeepAttr&#10;</xsl:text>
+        <!-- Apparatus insertion starts its paragraph before expanding the note.
+             Read our direction tag from the third normalfootfmt argument before
+             noindent creates that paragraph; leave untagged apparatus unchanged. -->
+        <xsl:text>\protected\def\OSNoteDirection#1{\pardir#1\textdir#1}&#10;</xsl:text>
+        <xsl:text>\makeatletter&#10;\long\def\OSInspectNoteDirection#1#2#3{\OSPeekNoteDirection#3\OSNoteDirectionEnd}&#10;</xsl:text>
+        <xsl:text>\def\OSPeekNoteDirection{\@ifnextchar\OSNoteDirection{\OSReadNoteDirection}{\OSSkipNoteDirection}}&#10;</xsl:text>
+        <xsl:text>\long\def\OSReadNoteDirection\OSNoteDirection#1#2\OSNoteDirectionEnd{\OSNoteDirection{#1}}&#10;</xsl:text>
+        <xsl:text>\long\def\OSSkipNoteDirection#1\OSNoteDirectionEnd{}&#10;</xsl:text>
+        <xsl:text>\pretocmd{\normalvfootnote@inserted}{\OSInspectNoteDirection#2}{}{\PackageError{opensiddur}{could not set apparatus paragraph direction}{}}&#10;\makeatother&#10;</xsl:text>
         <xsl:text>\newcommand{\OSKeepHeadBegin}{\OSKeepAttr=1\relax}&#10;</xsl:text>
         <xsl:text>\newcommand{\OSKeepHeadEnd}{\unsetattribute\OSKeepAttr}&#10;</xsl:text>
         <xsl:text>\newcommand{\OSKeepSep}{\mbox{\OSKeepAttr=2\relax\vrule width 0pt height\ht\strutbox depth\dp\strutbox}}&#10;</xsl:text>
@@ -570,8 +579,10 @@
         <xsl:call-template name="keep-preamble"/>
         <xsl:if test="$uses-reledpar">
             <xsl:call-template name="column-keep-preamble"/>
-            <xsl:call-template name="column-marks-preamble"/>
         </xsl:if>
+        <xsl:call-template name="column-marks-preamble">
+            <xsl:with-param name="parallel" select="$uses-reledpar"/>
+        </xsl:call-template>
 
         <!-- Labelled lists (tei:list, tei:label, tei:item). The label's appearance
              (\OSListLabelStyle) and the item's indent (\OSListIndent) are typography
@@ -1071,7 +1082,7 @@
                          reledmac zeroes \parfillskip inside a \pstart, which is why a
                          heading set in a column looks right and this one, set between
                          columns, did not. -->
-                    <xsl:text>{\parfillskip=0pt\interlinepenalty=10000\relax </xsl:text>
+                    <xsl:text>\par&#10;{\parfillskip=0pt\interlinepenalty=10000\relax </xsl:text>
                     <xsl:if test="$is-hebrew">
                         <xsl:text>\begin{hebrew}</xsl:text>
                     </xsl:if>
@@ -1079,7 +1090,7 @@
                          with this title. Its \nobreak goes after \begin{hebrew}, which
                          writes a language record to the page, and a skip after a \write
                          can break whatever penalty came before it. -->
-                    <xsl:text>\OSApplyKeep </xsl:text>
+                    <xsl:text>\par\OSApplyKeep\vskip0.5\baselineskip\relax\noindent </xsl:text>
                     <xsl:value-of select="$titles"/>
                     <xsl:if test="$is-hebrew">
                         <xsl:text>\end{hebrew}</xsl:text>
@@ -1297,13 +1308,16 @@
 
     <!-- One \Pages (or \Columns) block, optionally preceded by a heading set across the
          whole page rather than inside either column. -->
-    <!-- A mark after a column line prevents reledpar's lastbox from retrieving it.
+    <!-- A mark after a line prevents reledmac/reledpar's lastbox from retrieving it.
+         Single streams need the same protection as parallel columns. Their marks are
+         restored after the line box, before penalties can trigger a page break.
          Keep those exact nodes until the assembled row has been placed, then put them
          back before the page-break check. Moving marks to before a raw line instead
          only makes the preceding line escape. Queues are separate for facing pages. -->
     <xsl:template name="column-marks-preamble">
+        <xsl:param name="parallel" as="xs:boolean" select="true()"/>
         <xsl:text>\directlua{
-OScolumnmarks = { L = {}, R = {} }
+OScolumnmarks = { S = {}, L = {}, R = {} }
 function OScolumnmarks.collect(side, boxnum)
  local box = tex.box[boxnum]
  if not box then return end
@@ -1327,13 +1341,19 @@ function OScolumnmarks.flush(side)
 end
 }
 \makeatletter
-\patchcmd{\do@lineL}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("L", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect L marks}{}}
+\patchcmd{\do@line}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("S", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect single-stream marks}{}}
+\pretocmd{\add@penalties}{\directlua{OScolumnmarks.flush("S")}}{}{\PackageError{opensiddur}{could not flush single-stream marks}{}}
+\apptocmd{\print@eledsection}{\directlua{OScolumnmarks.flush("S")}}{}{\PackageError{opensiddur}{could not flush single-stream heading marks}{}}
+</xsl:text>
+        <xsl:if test="$parallel">
+        <xsl:text>\patchcmd{\do@lineL}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("L", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect L marks}{}}
 \patchcmd{\do@lineR}{\unvbox\one@lineR}{\directlua{OScolumnmarks.collect("R", \number\one@lineR)}\unvbox\one@lineR}{}{\PackageError{opensiddur}{could not collect R marks}{}}
 \pretocmd{\checkpb@columns}{\directlua{OScolumnmarks.flush("L");OScolumnmarks.flush("R")}}{}{\PackageError{opensiddur}{could not flush column marks}{}}
 \pretocmd{\checkpageL}{\directlua{OScolumnmarks.flush("L")}}{}{\PackageError{opensiddur}{could not flush L marks}{}}
 \pretocmd{\checkpageR}{\directlua{OScolumnmarks.flush("R")}}{}{\PackageError{opensiddur}{could not flush R marks}{}}
-\makeatother
 </xsl:text>
+        </xsl:if>
+        <xsl:text>\makeatother&#10;</xsl:text>
     </xsl:template>
 
     <xsl:template name="parallel-columns">
@@ -2143,6 +2163,9 @@ end
                 </xsl:for-each-group>
             </xsl:map>
         </xsl:variable>
+        <xsl:variable name="note-anchor-leaves" as="node()*"
+                      select="$leaves[not(f:is-head-note(.)
+                          and generate-id(f:head-note-div(.)) = $head-divs)]"/>
         <xsl:iterate select="$leaves">
             <xsl:param name="in-pstart" as="xs:boolean" select="$single-pstart"/>
             <xsl:on-completion>
@@ -2150,7 +2173,40 @@ end
                     <xsl:text>\pend&#10;</xsl:text>
                 </xsl:if>
             </xsl:on-completion>
+            <xsl:variable name="note-lang" select="if (@f:note-lang) then string(@f:note-lang)
+                else string((ancestor-or-self::*[@xml:lang][1])/@xml:lang)"/>
+            <xsl:variable name="text-lang" select="if (@f:text-lang) then string(@f:text-lang)
+                else string((ancestor::*[@xml:lang][1])/@xml:lang)"/>
             <xsl:choose>
+                <!-- reledmac captures paragraph direction at pstart. Changing only
+                     textdir inside a block rubric leaves its wrapped last line in the
+                     surrounding paragraph's direction. Give a standalone rubric its
+                     own language before opening its paragraph. Paired streams and
+                     authored inline cues retain their existing paragraph counts. -->
+                <xsl:when test="self::tei:note[@type = ('instruction', 'description')]
+                    and not(@f:echoed = 'true')
+                    and not($align-verses or $single-pstart or $has-alt-column)
+                    and not(ancestor::tei:p or ancestor::tei:l or ancestor::tei:head)
+                    and f:is-rtl-lang($note-lang) ne f:is-rtl-lang($text-lang)">
+                    <xsl:if test="$in-pstart"><xsl:text>\pend&#10;</xsl:text></xsl:if>
+                    <xsl:variable name="language" select="if (f:is-rtl-lang($note-lang))
+                        then 'hebrew' else 'english'"/>
+                    <xsl:value-of select="concat('\begin{', $language, '}')"/>
+                    <xsl:text>&#10;\instructionnote{</xsl:text>
+                    <xsl:call-template name="pstart"/>
+                    <xsl:text>\OSKeepAttr=3\relax </xsl:text>
+                    <xsl:call-template name="note-content">
+                        <xsl:with-param name="separate-direction-runs" select="true()"/>
+                        <xsl:with-param name="note-anchor-leaves" tunnel="yes"
+                            select="$note-anchor-leaves"/>
+                    </xsl:call-template>
+                    <xsl:text>\pend}&#10;</xsl:text>
+                    <xsl:value-of select="concat('\end{', $language, '}')"/>
+                    <xsl:text>&#10;</xsl:text>
+                    <xsl:next-iteration>
+                        <xsl:with-param name="in-pstart" select="false()"/>
+                    </xsl:next-iteration>
+                </xsl:when>
                 <xsl:when test="self::text() and not(normalize-space(.)) and not($in-pstart)">
                     <!-- Whitespace-only text outside a pstart is structural whitespace
                          between sections/paragraphs; TeX handles its own spacing. -->
@@ -2274,7 +2330,13 @@ end
                             <xsl:if test="not($in-pstart)">
                                 <xsl:call-template name="pstart"/>
                             </xsl:if>
-                            <xsl:text>\vno{</xsl:text>
+                            <!-- A quotation can begin after an attached prefix,
+                                 such as Hebrew bet. Keep the number tight there. -->
+                            <xsl:text>\</xsl:text>
+                            <xsl:value-of select="if (ancestor::tei:seg[@type='quotation']
+                                [preceding-sibling::node()[1][self::text()][matches(., '\S$')]])
+                                then 'vnoint' else 'vno'"/>
+                            <xsl:text>{</xsl:text>
                             <xsl:value-of select="f:verse-number-label(string(@n))"/>
                             <xsl:text>}</xsl:text>
                             <xsl:next-iteration>
@@ -2431,6 +2493,10 @@ end
                                  excluded from line numbering. It is kept whole, however
                                  many lines its title and translation run to, and kept
                                  with the paragraph after it; see \OSKeepNext. -->
+                            <!-- This full-width heading is not the spanning-heading
+                                 path. End any language paragraph before adding its
+                                 separation, outside the numbered line's box. -->
+                            <xsl:text>\par\OSApplyKeep\vskip0.5\baselineskip\relax&#10;</xsl:text>
                             <xsl:text>\begingroup\interlinepenalty=10000\relax&#10;</xsl:text>
                             <xsl:call-template name="pstart"/><xsl:text>\skipnumbering&#10;</xsl:text>
                             <xsl:call-template name="heading">
@@ -2566,9 +2632,15 @@ end
                             <xsl:if test="$in-pstart">
                                 <xsl:text>\pend&#10;</xsl:text>
                             </xsl:if>
-                            <xsl:call-template name="pstart"/>
+                            <!-- Paired columns count paragraphs even when a side
+                                 is empty. A full-width stream has no such partner:
+                                 defer opening until actual content, so a chapter-only
+                                 fragment cannot consume a rubric's keep-with-next. -->
+                            <xsl:if test="$single-pstart">
+                                <xsl:call-template name="pstart"/>
+                            </xsl:if>
                             <xsl:next-iteration>
-                                <xsl:with-param name="in-pstart" select="true()"/>
+                                <xsl:with-param name="in-pstart" select="$single-pstart"/>
                             </xsl:next-iteration>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -2605,7 +2677,12 @@ end
                             <xsl:text>\OSListItemPar </xsl:text>
                         </xsl:if>
                     </xsl:if>
-                    <xsl:apply-templates select="." mode="emit"/>
+                    <xsl:apply-templates select="." mode="emit">
+                        <!-- Wrappers disappear when a stream is flattened. Notes from
+                             different wrappers can therefore share one printed anchor. -->
+                        <xsl:with-param name="note-anchor-leaves" tunnel="yes"
+                            select="$note-anchor-leaves"/>
+                    </xsl:apply-templates>
                     <xsl:next-iteration>
                         <xsl:with-param name="in-pstart" select="true()"/>
                     </xsl:next-iteration>
@@ -2879,7 +2956,13 @@ end
         <xsl:param name="node" as="node()?"/>
         <xsl:variable name="note" select="$node/self::tei:note[not(@type = ('instruction', 'description'))]
                                                               [not(ancestor::tei:standOff)]"/>
-        <xsl:sequence select="($note/parent::tei:div[tei:head],
+        <!-- A compiled standoff note targeting an explicit anchor is a sibling
+             of that anchor. It stays at that point in the body, even when the
+             containing division also has a heading. -->
+        <xsl:variable name="anchor-targets" as="xs:string*"
+                      select="$note/parent::tei:div/tei:anchor/@xml:id ! concat('#', .)"/>
+        <xsl:sequence select="($note[not(tokenize(normalize-space(@target), '\s+') = $anchor-targets)]
+                                   /parent::tei:div[tei:head],
                                $note/ancestor::tei:head[1]/parent::tei:div)[1]"/>
     </xsl:function>
 
@@ -3122,6 +3205,9 @@ end
             <xsl:copy-of select="@*"/>
             <xsl:attribute name="f:note-lang" select="$note-lang"/>
             <xsl:attribute name="f:text-lang" select="$text-lang"/>
+            <xsl:attribute name="f:needs-space"
+                select="exists(ancestor::tei:p | ancestor::tei:l)
+                        and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')"/>
             <!-- A block rubric introduces a new paragraph in both parallel
                  columns, even when its language matches one column. Otherwise
                  the translation runs onto the rubric's last line while the
@@ -3796,6 +3882,13 @@ end
                             then f:is-inline-conditional($start)
                             else (ancestor::tei:p or ancestor::tei:l)">
                 <xsl:text>\OSCondEndInline{}</xsl:text>
+                <!-- The bracket macro trims the scope's final word space. Move
+                     that source boundary outside the bracket, without separating
+                     an attached prefix or adding another existing outer space. -->
+                <xsl:if test="matches(string(preceding-sibling::node()[1]), '\s$')
+                    and matches(string(following-sibling::node()[1]), '^[\p{L}\p{N}\p{Ps}]')">
+                    <xsl:text>\ </xsl:text>
+                </xsl:if>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text>\OSCondEndBlock{}</xsl:text>
@@ -3902,14 +3995,49 @@ end
         <xsl:variable name="crosses"
                       select="f:is-rtl-lang($note-lang) ne f:is-rtl-lang($text-lang)"/>
         <xsl:variable name="within" select="exists(ancestor::tei:p | ancestor::tei:l)"/>
-        <xsl:text>\</xsl:text>
-        <xsl:value-of select="if (@f:parallel-block = 'true') then 'OSInstructionBlock'
+        <!-- A role-only division can sit between two parallel blocks. Its rubric
+             still runs in (a preceding apparatus anchor must stay on its line), but
+             the line must be classified as a rubric so pagination keeps it with the
+             next block. Do not tag a run-in cue whose division also contains words. -->
+        <xsl:variable name="container" select="ancestor::tei:div[1]"/>
+        <xsl:variable name="standalone" as="xs:boolean"
+                      select="not($within) and not(ancestor::tei:head) and exists($container)
+                              and empty($container//text()[normalize-space(.)]
+                                  [not(ancestor::tei:note or ancestor::tei:fs)])"/>
+        <xsl:variable name="command" select="if (@f:parallel-block = 'true'
+                                 or parent::j:conditional[not(f:is-inline-conditional(.))]
+                                 or (not($within) and descendant::tei:foreign
+                                     [f:is-rtl-lang(string(@xml:lang)) ne f:is-rtl-lang($text-lang)]))
+                              then 'OSInstructionBlock'
                               else if (not($crosses)) then 'instructionnote'
                               else if ($within) then 'OSInstructionLine'
                               else 'OSInstructionBlock'"/>
+        <xsl:if test="$command = 'instructionnote' and (@f:needs-space = 'true'
+                      or ($within and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')))">
+            <xsl:text>\ </xsl:text>
+        </xsl:if>
+        <xsl:if test="$standalone and $command = 'instructionnote'">
+            <xsl:text>{\OSKeepAttr=3\relax </xsl:text>
+        </xsl:if>
+        <xsl:text>\</xsl:text><xsl:value-of select="$command"/>
         <xsl:text>{</xsl:text>
-        <xsl:call-template name="note-content"/>
+        <xsl:call-template name="note-content">
+            <xsl:with-param name="separate-direction-runs" select="$command = 'OSInstructionBlock'"/>
+        </xsl:call-template>
         <xsl:text>}</xsl:text>
+        <xsl:if test="$standalone and $command = 'instructionnote'"><xsl:text>}</xsl:text></xsl:if>
+        <!-- Run-in rubrics need a word boundary before an inline scope's
+             opening bracket as well as before ordinary prayer words. A note
+             inside j:conditional is emitted immediately before that bracket. -->
+        <xsl:if test="$command = 'instructionnote' and
+            (@f:needs-space-after = 'true' or
+             ($within and not($crosses) and not(@f:parallel-block = 'true')
+              and matches(string(following-sibling::node()[string(.) ne ''][1]),
+                                  '^[\p{L}\p{N}\p{Ps}]')) or
+             (parent::j:conditional[f:is-inline-conditional(.)]
+              and not(matches(string(.), '\s$'))))">
+            <xsl:text>\ </xsl:text>
+        </xsl:if>
         </xsl:if>
     </xsl:template>
 
@@ -3976,8 +4104,52 @@ end
         </xsl:if>
     </xsl:template>
 
+    <!-- Adjacent notes share an anchor. Their interlinear marks have zero width,
+         so printing each separately would superimpose the serials. Print one
+         comma-separated mark at the first note while retaining every apparatus entry. -->
+    <xsl:function name="f:note-neighbor" as="node()?">
+        <xsl:param name="note" as="element(tei:note)"/>
+        <xsl:param name="leaves" as="node()*"/>
+        <xsl:param name="forward" as="xs:boolean"/>
+        <xsl:variable name="position" select="(for $i in 1 to count($leaves)
+            return if ($leaves[$i] is $note) then $i else ())[1]"/>
+        <xsl:variable name="candidates" as="node()*" select="if (exists($position))
+            then (if ($forward) then subsequence($leaves, $position + 1)
+                  else reverse(subsequence($leaves, 1, $position - 1)))
+            else (if ($forward) then $note/following-sibling::node()
+                  else reverse($note/preceding-sibling::node()))"/>
+        <!-- An empty anchor has no emitted text. A populated anchor may contain
+             a materialized note, so it must remain a boundary here. -->
+        <xsl:sequence select="$candidates[not(self::text()[not(normalize-space())]
+            or self::tei:anchor[empty(node())] or self::comment()
+            or self::processing-instruction())][1]"/>
+    </xsl:function>
+
+    <xsl:function name="f:same-note-location" as="xs:boolean">
+        <xsl:param name="note" as="element(tei:note)"/>
+        <xsl:param name="other" as="element(tei:note)?"/>
+        <xsl:variable name="heading" select="f:head-note-div($note)"/>
+        <xsl:variable name="other-heading" select="if ($other) then f:head-note-div($other) else ()"/>
+        <!-- A hoisted heading note and an explicit body-anchor note may be XML
+             siblings, but are printed in different places. -->
+        <xsl:sequence select="exists($other) and
+            ((empty($heading) and empty($other-heading))
+             or (exists($heading) and exists($other-heading) and $heading is $other-heading))"/>
+    </xsl:function>
+
+    <xsl:function name="f:adjacent-notes" as="element(tei:note)+">
+        <xsl:param name="note" as="element(tei:note)"/>
+        <xsl:param name="leaves" as="node()*"/>
+        <xsl:variable name="next" select="f:note-neighbor($note, $leaves, true())"/>
+        <xsl:sequence select="($note, if ($next/self::tei:note
+                [not(@type = ('instruction', 'description'))]
+                and f:same-note-location($note, $next/self::tei:note))
+            then f:adjacent-notes($next, $leaves) else ())"/>
+    </xsl:function>
+
     <xsl:template name="os-b-footnote-emit">
         <xsl:param name="serial" as="xs:integer"/>
+        <xsl:param name="note-anchor-leaves" as="node()*" tunnel="yes" select="()"/>
         <!-- In bidi/RTL contexts, empty-lemma \edtext{} can be fragile with reledmac's
              aux-file writes. Use an explicit visible-but-zero-width lemma via
              \OSInterlinearNotemark. \Bfootnote routes content to the B-series apparatus.
@@ -3987,13 +4159,23 @@ end
              corrupts the catcode-group that controls [ ] delimiters when the .1
              file is re-read on the next pass. -->
         <xsl:text>\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{</xsl:text>
-        <xsl:value-of select="f:note-mark($serial)"/>
+        <xsl:variable name="previous" select="f:note-neighbor(., $note-anchor-leaves, false())"/>
+        <xsl:if test="not($previous/self::tei:note
+                [not(@type = ('instruction', 'description'))])
+                or not(f:same-note-location(., $previous/self::tei:note))">
+            <xsl:value-of select="string-join(
+                for $note in f:adjacent-notes(., $note-anchor-leaves)
+                return f:note-mark(f:note-serial($note)), ',')"/>
+        </xsl:if>
         <xsl:text>}}{\</xsl:text>
         <!-- A colophon division is set after the endnotes have been printed (see the root
              template), so its notes are footnotes whatever the placement. -->
         <xsl:value-of select="if ($notes-placement = 'endnote' and not(ancestor::tei:back[@p:colophon]))
                               then 'Bendnote' else 'Bfootnote'"/>
-        <xsl:text>{\OSFootnotemark{</xsl:text>
+        <xsl:variable name="rtl" select="f:is-rtl-lang(string((ancestor-or-self::*[@xml:lang][1])/@xml:lang))"/>
+        <xsl:text>{\OSNoteDirection{</xsl:text>
+        <xsl:value-of select="if ($rtl) then 'TRT' else 'TLT'"/>
+        <xsl:text>}\OSFootnotemark{</xsl:text>
         <xsl:value-of select="f:note-mark($serial)"/>
         <xsl:text>}\notenote{</xsl:text>
         <xsl:call-template name="note-content"/>
@@ -4024,6 +4206,7 @@ end
     </xsl:template>
 
     <xsl:template name="note-content">
+        <xsl:param name="separate-direction-runs" as="xs:boolean" select="false()"/>
         <!-- The same language the macro was chosen by, computed the same way, so the two
              cannot disagree about one note. @f:note-lang because pairing the columns copies
              a rubric out of its tree to stamp it, and a rubric written in the language
@@ -4040,7 +4223,9 @@ end
                      Use {{\textdir TRT ...}} (regular braces) to avoid leaking
                      \begingroup/\endgroup into reledmac's aux-file write machinery. -->
                 <xsl:text>{{\textdir TRT\foreignlanguage{hebrew}{</xsl:text>
-                <xsl:apply-templates mode="emit"/>
+                <xsl:call-template name="note-direction-runs">
+                    <xsl:with-param name="separate" select="$separate-direction-runs"/>
+                </xsl:call-template>
                 <xsl:text>}}}</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -4048,11 +4233,32 @@ end
                      in an RTL (Hebrew) context. This avoids visual reversal of
                      LTR runs like \"note\" rendering backwards. -->
                 <xsl:text>{{\textdir TLT\foreignlanguage{english}{</xsl:text>
-                <xsl:apply-templates mode="emit"/>
+                <xsl:call-template name="note-direction-runs">
+                    <xsl:with-param name="separate" select="$separate-direction-runs"/>
+                </xsl:call-template>
                 <xsl:text>}}}</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <!-- A full-width bilingual rubric must not start its translation halfway
+         through a line in the other direction. Inline foreign phrases remain
+         inline; only top-level runs in block instructions are separated. -->
+    <xsl:template name="note-direction-runs">
+        <xsl:param name="separate" as="xs:boolean"/>
+        <xsl:choose>
+            <xsl:when test="$separate and empty(text()[normalize-space()])
+                            and exists(tei:foreign[@xml:lang])
+                            and empty(*[not(self::tei:foreign[@xml:lang])])">
+                <xsl:for-each select="tei:foreign">
+                    <xsl:if test="position() gt 1"><xsl:text>\newline </xsl:text></xsl:if>
+                    <xsl:apply-templates select="." mode="emit"/>
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise><xsl:apply-templates mode="emit"/></xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
 
     <!-- A list inside a note. tei:note is emitted whole by pass 1 (xsl:sequence, so its
          children never reach mode="leaves"), which means a list nested in one — the JPS

@@ -562,6 +562,12 @@ class CompilerProcessor:
                 prioritized_instruction = self._urn_resolver.prioritize_range(
                     other_instruction_notes, self.linear_data.instruction_priority)
                 if prioritized_instruction:
+                    # Project priority chooses an edition, not an arbitrary occurrence
+                    # within it. Repeated role/rubric URNs can have different local
+                    # wording or languages in the same edition. Keep this occurrence
+                    # when its own edition already won the selection.
+                    if prioritized_instruction.project == self.project:
+                        return [], _AnnotationCommand.KEEP
                     # need to get the element, transclude it in place 
                     replacement_instruction = prioritized_instruction
                     replacement_processor = CompilerProcessor(

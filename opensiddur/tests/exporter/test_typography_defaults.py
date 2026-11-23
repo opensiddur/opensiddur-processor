@@ -232,18 +232,18 @@ _EXPECTED: dict[str, list[Expect]] = {
     ],
     "notes.placement": [_parameter("notes-placement")],
     "notes.anchor": [_preamble(lambda v: r"\newcommand{\OSInterlinearNotemark}[1]{%"
-                               "\n" r"  \leavevmode\hbox to 0pt{\hss{\textdir TLT\raisebox{1.5ex}")],
+                               "\n" r"  \leavevmode\hbox to 0pt{\hss{\textdir TLT\raisebox{\dimexpr\ht\strutbox+0.15ex\relax}")],
     "notes.mark": [_parameter("notes-mark")],
     "markers.section_separator": [
         _preamble(lambda v: rf"\newcommand{{\OSSectionSeparator}}{{\OSSectionSeparatorStyle{{{v}}}}}")
     ],
-    "markers.verse_numbers": [_preamble(lambda v: r"\newcommand{\vno}[1]{\textsuperscript")],
+    "markers.verse_numbers": [_preamble(lambda v: r"\newcommand{\vno}[1]{\if\relax\detokenize{#1}\relax\else\textsuperscript")],
     "markers.chapter_numbers": [_preamble(lambda v: r"\newcommand{\chno}[1]{{\large")],
     "markers.conditional.inline_open": [
         _preamble(lambda v: rf"\newcommand{{\OSCondStartInline}}{{{{\bfseries{v}}}}}")
     ],
     "markers.conditional.inline_close": [
-        _preamble(lambda v: rf"\newcommand{{\OSCondEndInline}}{{{{\bfseries{v}}}}}")
+        _preamble(lambda v: rf"\newcommand{{\OSCondEndInline}}{{\unskip{{\bfseries{v}}}}}")
     ],
     "markers.conditional.block": [
         _preamble(lambda v: r"\newcommand{\OSCondStartBlock}{\OSCondRule}"),
