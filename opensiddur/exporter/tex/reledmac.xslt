@@ -570,8 +570,10 @@
         <xsl:call-template name="keep-preamble"/>
         <xsl:if test="$uses-reledpar">
             <xsl:call-template name="column-keep-preamble"/>
-            <xsl:call-template name="column-marks-preamble"/>
         </xsl:if>
+        <xsl:call-template name="column-marks-preamble">
+            <xsl:with-param name="parallel" select="$uses-reledpar"/>
+        </xsl:call-template>
 
         <!-- Labelled lists (tei:list, tei:label, tei:item). The label's appearance
              (\OSListLabelStyle) and the item's indent (\OSListIndent) are typography
@@ -1297,13 +1299,16 @@
 
     <!-- One \Pages (or \Columns) block, optionally preceded by a heading set across the
          whole page rather than inside either column. -->
-    <!-- A mark after a column line prevents reledpar's lastbox from retrieving it.
+    <!-- A mark after a line prevents reledmac/reledpar's lastbox from retrieving it.
+         Single streams need the same protection as parallel columns. Their marks are
+         restored after the line box, before penalties can trigger a page break.
          Keep those exact nodes until the assembled row has been placed, then put them
          back before the page-break check. Moving marks to before a raw line instead
          only makes the preceding line escape. Queues are separate for facing pages. -->
     <xsl:template name="column-marks-preamble">
+        <xsl:param name="parallel" as="xs:boolean" select="true()"/>
         <xsl:text>\directlua{
-OScolumnmarks = { L = {}, R = {} }
+OScolumnmarks = { S = {}, L = {}, R = {} }
 function OScolumnmarks.collect(side, boxnum)
  local box = tex.box[boxnum]
  if not box then return end
@@ -1327,13 +1332,19 @@ function OScolumnmarks.flush(side)
 end
 }
 \makeatletter
-\patchcmd{\do@lineL}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("L", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect L marks}{}}
+\patchcmd{\do@line}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("S", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect single-stream marks}{}}
+\pretocmd{\add@penalties}{\directlua{OScolumnmarks.flush("S")}}{}{\PackageError{opensiddur}{could not flush single-stream marks}{}}
+\apptocmd{\print@eledsection}{\directlua{OScolumnmarks.flush("S")}}{}{\PackageError{opensiddur}{could not flush single-stream heading marks}{}}
+</xsl:text>
+        <xsl:if test="$parallel">
+        <xsl:text>\patchcmd{\do@lineL}{\unvbox\one@line}{\directlua{OScolumnmarks.collect("L", \number\one@line)}\unvbox\one@line}{}{\PackageError{opensiddur}{could not collect L marks}{}}
 \patchcmd{\do@lineR}{\unvbox\one@lineR}{\directlua{OScolumnmarks.collect("R", \number\one@lineR)}\unvbox\one@lineR}{}{\PackageError{opensiddur}{could not collect R marks}{}}
 \pretocmd{\checkpb@columns}{\directlua{OScolumnmarks.flush("L");OScolumnmarks.flush("R")}}{}{\PackageError{opensiddur}{could not flush column marks}{}}
 \pretocmd{\checkpageL}{\directlua{OScolumnmarks.flush("L")}}{}{\PackageError{opensiddur}{could not flush L marks}{}}
 \pretocmd{\checkpageR}{\directlua{OScolumnmarks.flush("R")}}{}{\PackageError{opensiddur}{could not flush R marks}{}}
-\makeatother
 </xsl:text>
+        </xsl:if>
+        <xsl:text>\makeatother&#10;</xsl:text>
     </xsl:template>
 
     <xsl:template name="parallel-columns">

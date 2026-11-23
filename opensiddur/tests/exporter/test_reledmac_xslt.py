@@ -4098,16 +4098,16 @@ class TestPreambleIsAllTeX(unittest.TestCase):
         preamble = out.split(r"\begin{document}")[0]
         # The preamble embeds Lua, whose lines are not TeX; skip from \directlua to the
         # brace that closes it.
-        stray, in_lua = [], False
+        stray, lua_depth = [], 0
         for line in preamble.splitlines():
-            if "directlua" in line:
-                in_lua = True
-            if in_lua:
-                if line.rstrip().endswith("}"):
-                    in_lua = False
+            if lua_depth or line.lstrip().startswith(r"\directlua{"):
+                # Lua table constructors also end in braces. Track the complete
+                # block rather than mistaking the first table for its end.
+                lua_depth += line.count("{") - line.count("}")
                 continue
             if line.strip() and not line.lstrip().startswith(("\\", "%", "}", "{", "]")):
                 stray.append(line)
+        self.assertEqual(0, lua_depth, "unclosed directlua block")
         self.assertEqual([], stray, "non-TeX lines in the preamble")
 
     def test_no_xml_comment_delimiters_survive(self):
