@@ -921,12 +921,9 @@ class TestNotesMapping(unittest.TestCase):
           </tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\OSInstructionBlock{", out)
-        definition = [
-            line for line in out.splitlines()
-            if r"\newcommand{\OSInstructionBlock}" in line
-        ][0]
-        self.assertIn(r"\newline", definition)
+        body = out.split(r"\begin{document}", 1)[1]
+        self.assertRegex(body, r"\\begin\{english\}\s*\\instructionnote\{\\pstart")
+        self.assertRegex(body, r"\\pend\}\s*\\end\{english\}\s*\\pstart")
 
     def test_an_instruction_running_with_the_text_needs_no_line_of_its_own(self):
         """Same direction, so it can share the line and keeps the plain inline macro."""

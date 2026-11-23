@@ -2164,7 +2164,40 @@ end
                     <xsl:text>\pend&#10;</xsl:text>
                 </xsl:if>
             </xsl:on-completion>
+            <xsl:variable name="note-lang" select="if (@f:note-lang) then string(@f:note-lang)
+                else string((ancestor-or-self::*[@xml:lang][1])/@xml:lang)"/>
+            <xsl:variable name="text-lang" select="if (@f:text-lang) then string(@f:text-lang)
+                else string((ancestor::*[@xml:lang][1])/@xml:lang)"/>
             <xsl:choose>
+                <!-- reledmac captures paragraph direction at pstart. Changing only
+                     textdir inside a block rubric leaves its wrapped last line in the
+                     surrounding paragraph's direction. Give a standalone rubric its
+                     own language before opening its paragraph. Paired streams and
+                     authored inline cues retain their existing paragraph counts. -->
+                <xsl:when test="self::tei:note[@type = ('instruction', 'description')]
+                    and not(@f:echoed = 'true')
+                    and not($align-verses or $single-pstart or $has-alt-column)
+                    and not(ancestor::tei:p or ancestor::tei:l or ancestor::tei:head)
+                    and f:is-rtl-lang($note-lang) ne f:is-rtl-lang($text-lang)">
+                    <xsl:if test="$in-pstart"><xsl:text>\pend&#10;</xsl:text></xsl:if>
+                    <xsl:variable name="language" select="if (f:is-rtl-lang($note-lang))
+                        then 'hebrew' else 'english'"/>
+                    <xsl:value-of select="concat('\begin{', $language, '}')"/>
+                    <xsl:text>&#10;\instructionnote{</xsl:text>
+                    <xsl:call-template name="pstart"/>
+                    <xsl:text>\OSKeepAttr=3\relax </xsl:text>
+                    <xsl:call-template name="note-content">
+                        <xsl:with-param name="separate-direction-runs" select="true()"/>
+                        <xsl:with-param name="note-anchor-leaves" tunnel="yes"
+                            select="$note-anchor-leaves"/>
+                    </xsl:call-template>
+                    <xsl:text>\pend}&#10;</xsl:text>
+                    <xsl:value-of select="concat('\end{', $language, '}')"/>
+                    <xsl:text>&#10;</xsl:text>
+                    <xsl:next-iteration>
+                        <xsl:with-param name="in-pstart" select="false()"/>
+                    </xsl:next-iteration>
+                </xsl:when>
                 <xsl:when test="self::text() and not(normalize-space(.)) and not($in-pstart)">
                     <!-- Whitespace-only text outside a pstart is structural whitespace
                          between sections/paragraphs; TeX handles its own spacing. -->
