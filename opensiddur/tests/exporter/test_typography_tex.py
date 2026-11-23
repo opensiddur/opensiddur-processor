@@ -487,7 +487,7 @@ class TestNotes(unittest.TestCase):
         with it the two sides of a parallel text aligned."""
         tex = _tex({"notes": {"anchor": "interlinear"}})
         self.assertIn(r"\hbox to 0pt", tex)
-        self.assertIn(r"\raisebox{1.5ex}", tex)
+        self.assertIn(r"\raisebox{\dimexpr\ht\strutbox+0.15ex\relax}", tex)
 
     def test_a_superscript_anchor(self):
         mark = _macro(_tex({"notes": {"anchor": "superscript"}}), r"\OSInterlinearNotemark")

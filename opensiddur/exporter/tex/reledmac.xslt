@@ -328,6 +328,15 @@
              \OSKeepSep draws its strut as a rule of its own: \strut copies \strutbox,
              and a copy keeps the attributes it was made with, which are none. -->
         <xsl:text>\newattribute\OSKeepAttr&#10;</xsl:text>
+        <!-- Apparatus insertion starts its paragraph before expanding the note.
+             Read our direction tag from the third normalfootfmt argument before
+             noindent creates that paragraph; leave untagged apparatus unchanged. -->
+        <xsl:text>\protected\def\OSNoteDirection#1{\pardir#1\textdir#1}&#10;</xsl:text>
+        <xsl:text>\makeatletter&#10;\long\def\OSInspectNoteDirection#1#2#3{\OSPeekNoteDirection#3\OSNoteDirectionEnd}&#10;</xsl:text>
+        <xsl:text>\def\OSPeekNoteDirection{\@ifnextchar\OSNoteDirection{\OSReadNoteDirection}{\OSSkipNoteDirection}}&#10;</xsl:text>
+        <xsl:text>\long\def\OSReadNoteDirection\OSNoteDirection#1#2\OSNoteDirectionEnd{\OSNoteDirection{#1}}&#10;</xsl:text>
+        <xsl:text>\long\def\OSSkipNoteDirection#1\OSNoteDirectionEnd{}&#10;</xsl:text>
+        <xsl:text>\pretocmd{\normalvfootnote@inserted}{\OSInspectNoteDirection#2}{}{\PackageError{opensiddur}{could not set apparatus paragraph direction}{}}&#10;\makeatother&#10;</xsl:text>
         <xsl:text>\newcommand{\OSKeepHeadBegin}{\OSKeepAttr=1\relax}&#10;</xsl:text>
         <xsl:text>\newcommand{\OSKeepHeadEnd}{\unsetattribute\OSKeepAttr}&#10;</xsl:text>
         <xsl:text>\newcommand{\OSKeepSep}{\mbox{\OSKeepAttr=2\relax\vrule width 0pt height\ht\strutbox depth\dp\strutbox}}&#10;</xsl:text>
@@ -1073,7 +1082,7 @@
                          reledmac zeroes \parfillskip inside a \pstart, which is why a
                          heading set in a column looks right and this one, set between
                          columns, did not. -->
-                    <xsl:text>{\parfillskip=0pt\interlinepenalty=10000\relax </xsl:text>
+                    <xsl:text>\par&#10;{\parfillskip=0pt\interlinepenalty=10000\relax </xsl:text>
                     <xsl:if test="$is-hebrew">
                         <xsl:text>\begin{hebrew}</xsl:text>
                     </xsl:if>
@@ -1081,7 +1090,7 @@
                          with this title. Its \nobreak goes after \begin{hebrew}, which
                          writes a language record to the page, and a skip after a \write
                          can break whatever penalty came before it. -->
-                    <xsl:text>\OSApplyKeep </xsl:text>
+                    <xsl:text>\par\OSApplyKeep\vskip0.5\baselineskip\relax\noindent </xsl:text>
                     <xsl:value-of select="$titles"/>
                     <xsl:if test="$is-hebrew">
                         <xsl:text>\end{hebrew}</xsl:text>
@@ -2484,6 +2493,10 @@ end
                                  excluded from line numbering. It is kept whole, however
                                  many lines its title and translation run to, and kept
                                  with the paragraph after it; see \OSKeepNext. -->
+                            <!-- This full-width heading is not the spanning-heading
+                                 path. End any language paragraph before adding its
+                                 separation, outside the numbered line's box. -->
+                            <xsl:text>\par\OSApplyKeep\vskip0.5\baselineskip\relax&#10;</xsl:text>
                             <xsl:text>\begingroup\interlinepenalty=10000\relax&#10;</xsl:text>
                             <xsl:call-template name="pstart"/><xsl:text>\skipnumbering&#10;</xsl:text>
                             <xsl:call-template name="heading">
@@ -2619,9 +2632,15 @@ end
                             <xsl:if test="$in-pstart">
                                 <xsl:text>\pend&#10;</xsl:text>
                             </xsl:if>
-                            <xsl:call-template name="pstart"/>
+                            <!-- Paired columns count paragraphs even when a side
+                                 is empty. A full-width stream has no such partner:
+                                 defer opening until actual content, so a chapter-only
+                                 fragment cannot consume a rubric's keep-with-next. -->
+                            <xsl:if test="$single-pstart">
+                                <xsl:call-template name="pstart"/>
+                            </xsl:if>
                             <xsl:next-iteration>
-                                <xsl:with-param name="in-pstart" select="true()"/>
+                                <xsl:with-param name="in-pstart" select="$single-pstart"/>
                             </xsl:next-iteration>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -3863,6 +3882,13 @@ end
                             then f:is-inline-conditional($start)
                             else (ancestor::tei:p or ancestor::tei:l)">
                 <xsl:text>\OSCondEndInline{}</xsl:text>
+                <!-- The bracket macro trims the scope's final word space. Move
+                     that source boundary outside the bracket, without separating
+                     an attached prefix or adding another existing outer space. -->
+                <xsl:if test="matches(string(preceding-sibling::node()[1]), '\s$')
+                    and matches(string(following-sibling::node()[1]), '^[\p{L}\p{N}\p{Ps}]')">
+                    <xsl:text>\ </xsl:text>
+                </xsl:if>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:text>\OSCondEndBlock{}</xsl:text>
@@ -4000,11 +4026,16 @@ end
         </xsl:call-template>
         <xsl:text>}</xsl:text>
         <xsl:if test="$standalone and $command = 'instructionnote'"><xsl:text>}</xsl:text></xsl:if>
-        <!-- Separate a run-in label from a following word even when that
-             word is wrapped in an inline element without source whitespace. -->
-        <xsl:if test="$within and not($crosses) and not(@f:parallel-block = 'true')
-                      and matches(string(following-sibling::node()[string(.) ne ''][1]),
-                                  '^[\p{L}\p{N}\p{Ps}]')">
+        <!-- Run-in rubrics need a word boundary before an inline scope's
+             opening bracket as well as before ordinary prayer words. A note
+             inside j:conditional is emitted immediately before that bracket. -->
+        <xsl:if test="$command = 'instructionnote' and
+            (@f:needs-space-after = 'true' or
+             ($within and not($crosses) and not(@f:parallel-block = 'true')
+              and matches(string(following-sibling::node()[string(.) ne ''][1]),
+                                  '^[\p{L}\p{N}\p{Ps}]')) or
+             (parent::j:conditional[f:is-inline-conditional(.)]
+              and not(matches(string(.), '\s$'))))">
             <xsl:text>\ </xsl:text>
         </xsl:if>
         </xsl:if>
@@ -4141,7 +4172,10 @@ end
              template), so its notes are footnotes whatever the placement. -->
         <xsl:value-of select="if ($notes-placement = 'endnote' and not(ancestor::tei:back[@p:colophon]))
                               then 'Bendnote' else 'Bfootnote'"/>
-        <xsl:text>{\OSFootnotemark{</xsl:text>
+        <xsl:variable name="rtl" select="f:is-rtl-lang(string((ancestor-or-self::*[@xml:lang][1])/@xml:lang))"/>
+        <xsl:text>{\OSNoteDirection{</xsl:text>
+        <xsl:value-of select="if ($rtl) then 'TRT' else 'TLT'"/>
+        <xsl:text>}\OSFootnotemark{</xsl:text>
         <xsl:value-of select="f:note-mark($serial)"/>
         <xsl:text>}\notenote{</xsl:text>
         <xsl:call-template name="note-content"/>

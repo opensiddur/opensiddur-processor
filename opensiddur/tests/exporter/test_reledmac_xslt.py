@@ -762,7 +762,7 @@ class TestNotesMapping(unittest.TestCase):
         out = _transform(xml)
         # \edtext{\OSInterlinearNotemark}{... \Bfootnote{\OSFootnotemark ...}}: interlinear
         # serial mark + B-series footnote at page bottom (not an endnote after \pend).
-        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSFootnotemark{1}\notenote{", out)
+        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSNoteDirection{TLT}\OSFootnotemark{1}\notenote{", out)
         self.assertIn("commentary", out)
         self.assertNotIn(r"\footnote{", out)
 
@@ -994,7 +994,7 @@ class TestNotesMapping(unittest.TestCase):
           </tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSFootnotemark{1}\notenote{", out)
+        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSNoteDirection{TLT}\OSFootnotemark{1}\notenote{", out)
         self.assertIn("English annotation", out)
         self.assertIn(r"{{\textdir TLT\foreignlanguage{english}{", out)
 
@@ -4375,10 +4375,10 @@ class TestHeadingNotes(unittest.TestCase):
         right = body.split(r"\begin{Rightside}")[1].split(r"\end{Rightside}")[0]
         self.assertIn(self.EDTEXT, self._arg(right, r"\OSheadA"))
 
-    def test_a_heading_set_across_the_page_without_notes_is_unchanged(self):
+    def test_a_heading_across_the_page_separates_the_previous_paragraph(self):
         body = self._body(self._parallel().replace(self.NOTE, ""), layout="pairs")
         self.assertIn(
-            r"{\parfillskip=0pt\interlinepenalty=10000\relax \begin{hebrew}\OSApplyKeep \OSheadA",
+            r"{\parfillskip=0pt\interlinepenalty=10000\relax \begin{hebrew}\par\OSApplyKeep\vskip0.5\baselineskip\relax\noindent \OSheadA",
             body)
 
     def test_a_suppressed_heading_keeps_the_note_on_its_placeholder_row(self):
@@ -4547,7 +4547,7 @@ class TestLabelledLists(unittest.TestCase):
         note = out[out.index(r"\Bfootnote{"):]
         note = note[:note.index(r"\pend")]
         self.assertIn(r"\OSListItem{Alpha}\newline \OSListItem{Beta}", note)
-        self.assertNotIn(r"\par", note)
+        self.assertNotRegex(note, r"\\par(?![A-Za-z@])")
         self.assertNotIn(r"\OSListItemPar", note)
 
     def test_a_standoff_note_label_is_left_alone(self):

@@ -256,8 +256,9 @@ class _KeepTogether:
     def test_the_rubrics_stand_on_lines_of_their_own(self):
         # A rubric run in with its text is part of a line of text; only one on lines of
         # its own can be parted from what it introduces.
-        self.assertNotIn(r"\instructionnote{", self.tex)
-        self.assertIn(r"\OSInstructionBlock{", self.tex)
+        body = self.tex.split(r"\begin{document}", 1)[1]
+        self.assertNotRegex(body, r"\\instructionnote\{(?!\\pstart)")
+        self.assertRegex(body, r"\\(?:OSInstructionBlock\{|instructionnote\{\\pstart)")
 
     def test_no_widows(self):
         self.assertEqual(self._of_kind("widow"), [])

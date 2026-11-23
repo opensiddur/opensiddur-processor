@@ -705,7 +705,7 @@ def _note_mark_tex(style: TextStyle, anchor: NoteAnchor, spacing: float) -> list
         # interlinear band and the text it annotates is not respaced — which is
         # what keeps two sides of a parallel text aligned.
         body = (
-            r"\leavevmode\hbox to 0pt{\hss{\textdir TLT\raisebox{1.5ex}"
+            r"\leavevmode\hbox to 0pt{\hss{\textdir TLT\raisebox{\dimexpr\ht\strutbox+0.15ex\relax}"
             r"{\foreignlanguage{english}{\kern0.05em\normalfont"
             + tokens
             + r" #1\kern0.05em}}}\hss}"
