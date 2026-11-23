@@ -317,7 +317,7 @@ class TestPairsSpanningHeadings(_KeepTogether, unittest.TestCase):
     PRIMARY = "he"
 
     def test_the_titles_are_set_in_hebrew(self):
-        self.assertIn(r"\begin{hebrew}\OSApplyKeep \OSheadA{", self.tex)
+        self.assertIn(r"\begin{hebrew}\par\OSApplyKeep\vskip0.5\baselineskip\relax\noindent \OSheadA{", self.tex)
 
 
 @_NEEDS_TEX

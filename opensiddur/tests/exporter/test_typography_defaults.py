@@ -232,7 +232,7 @@ _EXPECTED: dict[str, list[Expect]] = {
     ],
     "notes.placement": [_parameter("notes-placement")],
     "notes.anchor": [_preamble(lambda v: r"\newcommand{\OSInterlinearNotemark}[1]{%"
-                               "\n" r"  \leavevmode\hbox to 0pt{\hss{\textdir TLT\raisebox{1.5ex}")],
+                               "\n" r"  \leavevmode\hbox to 0pt{\hss{\textdir TLT\raisebox{\dimexpr\ht\strutbox+0.15ex\relax}")],
     "notes.mark": [_parameter("notes-mark")],
     "markers.section_separator": [
         _preamble(lambda v: rf"\newcommand{{\OSSectionSeparator}}{{\OSSectionSeparatorStyle{{{v}}}}}")
