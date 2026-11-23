@@ -566,6 +566,13 @@
             </xsl:call-template>
             <xsl:apply-templates/>
         </xsl:element>
+            <!-- This must be a real text space, not a CSS margin: copying or
+             reading a run-in rubric must not join it to the following word. -->
+        <xsl:if test="f:in-text(.) and matches(
+                      string(following-sibling::node()[string(.) ne ''][1]),
+                      '^[\p{L}\p{N}\p{Ps}]')">
+            <xsl:text> </xsl:text>
+        </xsl:if>
     </xsl:template>
 
     <!-- Every other note opens as a popover from its numbered mark. -->

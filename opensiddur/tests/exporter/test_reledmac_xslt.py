@@ -850,10 +850,12 @@ class TestNotesMapping(unittest.TestCase):
           </tei:p></tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml, **{"notes-mark": "symbol"})
-        self.assertIn(r"\OSInterlinearNotemark{\textparagraph}", out)
-        self.assertIn(
-            r"\OSInterlinearNotemark{\textasteriskcentered\textasteriskcentered}", out
-        )
+        # Adjacent notes share one in-text mark; the apparatus retains each symbol.
+        self.assertIn(r"\textparagraph,\textasteriskcentered\textasteriskcentered,"
+                      r"\textdagger\textdagger}", out)
+        for mark in (r"\textparagraph", r"\textasteriskcentered\textasteriskcentered",
+                     r"\textdagger\textdagger"):
+            self.assertIn(r"\OSFootnotemark{" + mark + r"}\notenote{", out)
 
     def test_instruction_note_is_inline(self):
         xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -1051,6 +1053,113 @@ class TestNotesMapping(unittest.TestCase):
         self.assertEqual(out.count("First"), 1)
         self.assertEqual(out.count("Second"), 1)
 
+    def test_adjacent_notes_share_one_readable_mark_and_keep_every_note(self):
+        for series, label in (("arabic", "1,2,3"), ("alpha", "a,b,c"),
+                              ("roman", "i,ii,iii")):
+            with self.subTest(series=series):
+                xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+                  <tei:text><tei:body><tei:p>א<tei:note>First</tei:note>
+                    <tei:note xml:lang="en">Second</tei:note><tei:note>Third</tei:note>
+                    word<tei:note>Separate</tei:note></tei:p></tei:body></tei:text>
+                </tei:TEI>"""
+                out = _transform(xml, **{"notes-mark": series})
+                self.assertIn(r"\OSInterlinearNotemark{" + label + "}", out)
+                for word in ("First", "Second", "Third", "Separate"):
+                    self.assertEqual(out.count(word), 1)
+                self.assertEqual(len(re.findall(r"\\OSFootnotemark\{[^}]+\}\\notenote", out)), 4)
+                self.assertEqual(out.count(r"\OSInterlinearNotemark{}"), 2)
+
+    def test_notes_in_flattened_wrappers_share_one_mark(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+            xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
+          <tei:text><tei:body><tei:div><tei:div>
+            <tei:note xml:lang="he">First</tei:note><tei:anchor xml:id="first"/>
+          </tei:div></tei:div><p:transclude><tei:div>
+            <tei:note xml:lang="en">Second</tei:note><tei:anchor xml:id="second"/>
+          </tei:div></p:transclude><tei:p>Following words.</tei:p></tei:body></tei:text>
+        </tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1,2}", out)
+        self.assertEqual(out.count(r"\OSInterlinearNotemark{}"), 1)
+        self.assertEqual(out.count(r"\OSFootnotemark{1}\notenote"), 1)
+        self.assertEqual(out.count(r"\OSFootnotemark{2}\notenote"), 1)
+
+    def test_paragraph_between_flattened_notes_keeps_separate_marks(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en">
+          <tei:text><tei:body><tei:div><tei:note>First</tei:note></tei:div>
+            <tei:p>Words between.</tei:p>
+            <tei:div><tei:note>Second</tei:note></tei:div>
+          </tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1}", out)
+        self.assertIn(r"\OSInterlinearNotemark{2}", out)
+        self.assertNotIn(r"\OSInterlinearNotemark{1,2}", out)
+
+    def test_flattened_note_groups_stay_in_their_parallel_stream(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+            xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
+          <tei:text><tei:body><p:parallel>
+            <p:parallelItem role="primary" xml:lang="he"><tei:div>
+              <tei:p>א</tei:p><tei:div><tei:note>First</tei:note></tei:div>
+              <tei:div><tei:note>Second</tei:note></tei:div><tei:p>ב</tei:p>
+            </tei:div></p:parallelItem>
+            <p:parallelItem role="parallel" xml:lang="en"><tei:div>
+              <tei:p>One</tei:p><tei:div><tei:note>Third</tei:note></tei:div>
+              <tei:div><tei:note>Fourth</tei:note></tei:div><tei:p>Two</tei:p>
+            </tei:div></p:parallelItem>
+          </p:parallel></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        groups = re.findall(r"\\OSInterlinearNotemark\{([0-9]+,[0-9]+)\}", out)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(sorted(int(n) for group in groups for n in group.split(',')), [1, 2, 3, 4])
+        for text in ('First', 'Second', 'Third', 'Fourth'):
+            self.assertEqual(out.count(text), 1)
+
+    def test_hoisted_heading_note_does_not_hide_body_note_mark(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en">
+          <tei:text><tei:body><tei:div><tei:head>Title</tei:head>
+            <tei:note>Heading note.</tei:note>
+            <tei:note target="#body">Body note.</tei:note><tei:anchor xml:id="body"/>
+            <tei:p>Words.</tei:p>
+          </tei:div></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1}", out)
+        self.assertIn(r"\OSInterlinearNotemark{2}", out)
+        self.assertNotIn(r"\OSInterlinearNotemark{1,2}", out)
+        self.assertEqual(out.count('Heading note.'), 1)
+        self.assertEqual(out.count('Body note.'), 1)
+
+    def test_instruction_between_notes_does_not_merge_their_marks(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+          <tei:text><tei:body><tei:p>א<tei:note>First</tei:note>
+            <tei:note type="instruction">Stand.</tei:note><tei:note>Second</tei:note>
+          </tei:p></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInterlinearNotemark{1}", out)
+        self.assertIn(r"\OSInterlinearNotemark{2}", out)
+        self.assertNotIn(r"\OSInterlinearNotemark{1,2}", out)
+
+    def test_mixed_direction_rubric_between_paragraphs_gets_a_block_line(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+          <tei:text><tei:body><tei:div><tei:note type="instruction">
+            <tei:foreign xml:lang="he">סוגרים הארון.</tei:foreign>
+            <tei:foreign xml:lang="en">The Holy Ark is closed.</tei:foreign>
+          </tei:note></tei:div><tei:p>א</tei:p></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInstructionBlock{", out)
+        self.assertNotIn(r"\instructionnote{", out)
+
+    def test_full_width_conditional_rubric_uses_the_block_measure(self):
+        xml = """<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+                   xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he">
+          <tei:text><tei:body><j:conditional>
+            <tei:note type="instruction" xml:lang="he">סוגרים הארון.
+              <tei:foreign xml:lang="en">The Holy Ark is closed.</tei:foreign>
+            </tei:note><tei:p>א</tei:p></j:conditional></tei:body></tei:text></tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\OSInstructionBlock{", out)
+        self.assertNotIn(r"\instructionnote{", out)
+
     def test_parallel_body_note_per_column(self):
         """Each parallel stream numbers its own editorial notes from 1."""
         xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -1205,7 +1314,7 @@ class TestSourceWhitespaceIsNotAParagraphBreak(unittest.TestCase):
         body = self._document_body(out)
         self.assertIn(r"\instructionnote{", body)
         self.assertNotRegex(body, r"\n[ \t]*\n[ \t]*\\instructionnote")
-        self.assertRegex(body, r"\\notenote\{.*?\}{4,}\n\\instructionnote\{")
+        self.assertRegex(body, r"\\notenote\{.*?\}{4,}\n\{\\OSKeepAttr=3\\relax \\instructionnote\{")
 
     def test_no_blank_line_survives_anywhere_in_a_stream(self):
         """The guard for the whole class, not just the note case."""
@@ -2565,6 +2674,36 @@ class TestEditionColophons(unittest.TestCase):
         out = _transform(etree.tostring(root, encoding="unicode"), **{"notes-placement": "endnote"})
         self.assertIn("\\Bfootnote", out[out.index("First published in 1842."):])
 
+
+
+
+class TestRunInRubricTrailingSpace(unittest.TestCase):
+    def test_inline_label_separates_following_word_and_segment(self):
+        for kind in ('instruction', 'description'):
+            for following in ('word', '<tei:seg>word</tei:seg>'):
+                with self.subTest(kind=kind, following=following):
+                    xml = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en">'
+                           '<tei:text><tei:body><tei:p>'
+                           f'<tei:note type="{kind}">Reader</tei:note>{following}'
+                           '</tei:p></tei:body></tei:text></tei:TEI>')
+                    self.assertRegex(_transform(xml), r"Reader\}+(?:\\ )word")
+
+    def test_hebrew_role_label_separates_wrapped_prayer_word(self):
+        xml = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">'
+               '<tei:text><tei:body><tei:p><tei:seg>תפלה </tei:seg>'
+               '<tei:note type="description">הש״ץ בקול</tei:note>'
+               '<tei:seg>כֹּהֲנִים</tei:seg></tei:p></tei:body></tei:text></tei:TEI>')
+        self.assertIn('}\\ כֹּהֲנִים', _transform(xml))
+
+    def test_existing_space_and_following_punctuation_are_not_changed(self):
+        for tail in (' word', ':'):
+            with self.subTest(tail=tail):
+                xml = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en">'
+                       '<tei:text><tei:body><tei:p><tei:note type="instruction">Reader</tei:note>'
+                       f'{tail}</tei:p></tei:body></tei:text></tei:TEI>')
+                output = _transform(xml)
+                self.assertRegex(output, r"Reader\}+" + re.escape(tail))
+                self.assertNotRegex(output, r"Reader\}+(?:\\ )" + re.escape(tail))
 
 if __name__ == "__main__":
     unittest.main()
@@ -4048,8 +4187,8 @@ class TestConditionalRuleWidth(unittest.TestCase):
         </tei:TEI>"""
         out = _transform(xml)
         self.assertIn(
-            r"\newcommand{\OSCondRule}{\leavevmode\hbox to \OSMeasure"
-            r"{\hss\rule{0.25\hsize}{0.4pt}\hss}}",
+            r"\hbox to \OSMeasure"
+            r"{\hss\rule{0.25\hsize}{0.4pt}\hss}\newline\ignorespaces}",
             out,
         )
         self.assertIn(
@@ -4193,6 +4332,16 @@ class TestHeadingNotes(unittest.TestCase):
         title = self._arg(body, r"\OSheadA")
         self.assertIn(self.EDTEXT, title)
         self.assertLess(title.index("Section"), title.index(self.EDTEXT))
+
+    def test_a_note_targeting_a_body_anchor_is_not_hoisted_to_the_heading(self):
+        xml = self._single('<tei:p>Text<tei:note>Earlier note.</tei:note></tei:p>'
+                           '<tei:note target="#ending">Ending note.</tei:note>'
+                           '<tei:anchor xml:id="ending"/>')
+        body = self._body(xml)
+        self.assertNotIn("Ending note.", self._arg(body, r"\OSheadA"))
+        self.assertLess(body.index("Earlier note."), body.index("Ending note."))
+        self.assertEqual(["1", "2", "3"],
+                         re.findall(r"OSInterlinearNotemark\{(\d+)\}", body))
 
     def test_a_division_of_heading_and_rubric_alone_still_carries_it(self):
         """The haggadah has sections with no text to anchor on."""
@@ -4794,6 +4943,53 @@ class TestKeepTogether(unittest.TestCase):
         run_in = next(line for line in out.splitlines()
                       if line.startswith(r"\newcommand{\instructionnote}"))
         self.assertNotIn("OSKeepAttr", run_in)
+
+    def test_standalone_same_language_role_is_kept_without_forcing_a_line_break(self):
+        source = '<tei:div><tei:note type="description">Reader:</tei:note></tei:div>'
+        xml = f'<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body>{source}<tei:p>Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
+        self.assertEqual(body.count('Reader:'), 1)
+
+    def test_block_rubric_separates_top_level_directions(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he"><tei:text><tei:body><tei:div><j:conditional><tei:note type="instruction" xml:lang="he"><tei:foreign xml:lang="de-Hebr">הוראה</tei:foreign> <tei:foreign xml:lang="en">An English direction.</tei:foreign></tei:note></j:conditional></tei:div></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"}\newline \leavevmode", body)
+
+    def test_role_in_paragraph_or_heading_is_not_tagged_standalone(self):
+        for wrapper in ('p', 'head'):
+            with self.subTest(wrapper=wrapper):
+                xml = f'<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:div><tei:{wrapper}>Words <tei:note type="instruction">Stand.</tei:note></tei:{wrapper}></tei:div></tei:body></tei:text></tei:TEI>'
+                body = self._body(_transform(xml))
+                self.assertNotIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
+
+    def test_inline_role_after_punctuation_gets_a_word_space(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p>Words:<tei:note type="instruction">Reader.</tei:note></tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"Words:\ \instructionnote{", body)
+
+    def test_quoted_verse_number_does_not_space_an_attached_prefix(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he"><tei:text><tei:body><tei:p>בְּ<tei:seg type="quotation"><tei:milestone unit="verse" n="14"/>אֶהְיֶה<tei:milestone unit="verse"/></tei:seg>:</tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"בְּ\vnoint{14}אֶהְיֶה", body)
+
+    def test_parallel_inline_role_keeps_its_preceding_word_space_after_copying(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en"><tei:text><tei:body><p:parallel><p:parallelItem role="primary" xml:lang="en"><tei:div><tei:p>Words:<tei:note type="instruction">Reader.</tei:note> More words.</tei:p></tei:div></p:parallelItem><p:parallelItem role="parallel" xml:lang="en"><tei:div><tei:p>Translation.</tei:p></tei:div></p:parallelItem></p:parallel></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml, layout="pairs"))
+        self.assertIn(r"Words:\ \instructionnote{", body)
+
+    def test_block_instruction_keeps_an_embedded_foreign_word_inline(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xml:lang="he"><tei:text><tei:body><tei:div><j:conditional><tei:note type="instruction" xml:lang="en">In many congregations <tei:foreign xml:lang="he">תשגב</tei:foreign> is not said.</tei:note></j:conditional></tei:div></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn('In many congregations', body)
+        self.assertIn('is not said.', body)
+        self.assertNotIn(r"\newline", body)
+
+    def test_same_language_inline_role_stays_run_in(self):
+        xml = '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="en"><tei:text><tei:body><tei:p><tei:note type="description">Reader:</tei:note> Prayer words.</tei:p></tei:body></tei:text></tei:TEI>'
+        body = self._body(_transform(xml))
+        self.assertIn(r"\instructionnote{", body)
+        self.assertNotIn(r"{\OSKeepAttr=3\relax \instructionnote{", body)
 
     def test_a_keep_reaches_a_heading_set_across_the_page(self):
         body = self._body(_transform(self._parallel("Same", "Same"), layout="pairs"))
