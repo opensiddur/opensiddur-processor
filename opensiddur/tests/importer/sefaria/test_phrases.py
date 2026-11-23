@@ -93,6 +93,27 @@ class TestRecordedPhrases(unittest.TestCase):
             found = recorded_phrases([project])
         self.assertEqual(found, {"modeh_ani": {1: skeleton("מוֹדֶה אֲנִי"), 2: skeleton("מֶֽלֶךְ")}})
 
+    def test_the_order_across_projects_is_the_fullest_printings(self):
+        # The first project transcludes the text the full Kaddish opens with, and holds only the
+        # phrases after it (and one of its own); the second prints it whole.
+        words = {1: "יִתְגַּדַּל", 2: "בְּעָלְמָא", 3: "יְהֵא", 4: "יִתְבָּרַךְ", 5: "תִּתְקַבַּל", 6: "וְיַצְמַח"}
+
+        def project(root, name, numbers):
+            milestones = "".join(f'<tei:milestone unit="phrase" corresp="{T}metsudah:kaddish/shalem/{n}"/>{words[n]} '
+                                 for n in numbers)
+            (root / name).mkdir()
+            (root / name / "kaddish_shalem.xml").write_text(
+                '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he"><tei:teiHeader/><tei:text>'
+                f'<tei:body><tei:div><tei:p>{milestones}</tei:p></tei:div></tei:body></tei:text></tei:TEI>',
+                encoding="utf-8")
+            return root / name
+        with tempfile.TemporaryDirectory() as tmp:
+            found = recorded_phrases([project(Path(tmp), "a", [3, 4, 6]), project(Path(tmp), "b", [1, 2, 3, 4, 5])])
+        self.assertEqual(list(found["kaddish/shalem"]), [1, 2, 3, 4, 6, 5])
+        # Mapped against it, a whole printing keeps every number.
+        self.assertEqual(map_phrases([found["kaddish/shalem"][n] for n in (1, 2, 3, 4, 5)], found["kaddish/shalem"]),
+                         [1, 2, 3, 4, 5])
+
 
 if __name__ == "__main__":
     unittest.main()

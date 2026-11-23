@@ -620,7 +620,8 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     # A document carries a URN once: a text a variant names among its own words is marked
     # unless the text's own words, or another variant's, already mark it (two printings of the
     # Shema lining שְׁמַע יִשְׂרָאֵל otherwise, each naming Deuteronomy 6:4).
-    marked = set(verses.values())
+    skip = opening[1] if opening else 0
+    marked = {verse for position, verse in verses.items() if position >= skip}
 
     def insert(anchor: int | None) -> None:
         for variant, by_anchor in passages:
@@ -638,6 +639,11 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
                         writer.end_phrase()
                         writer.parts.append(f'<tei:milestone unit="prayer" corresp="{attr(variant.parts[number])}"/>')
                         part_open = True
+                    elif number in variant.parts and part_open:
+                        # A part already marked ends the one before it, unmarked here.
+                        writer.end_phrase()
+                        writer.parts.append('<tei:milestone unit="prayer"/>')
+                        part_open = False
                     writer.phrase(pair, number)
                 if part_open:
                     writer.end_phrase()
@@ -647,7 +653,6 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     insert(None)
     numbers = iter(phrase_numbers)
     position = -1
-    skip = opening[1] if opening else 0
     for pair in block.pairs:
         if not is_phrase(pair):
             if position + 1 >= skip:

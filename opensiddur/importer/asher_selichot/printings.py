@@ -13,6 +13,7 @@ a division with that URN, and the variant's feature is named by it.
 """
 
 import copy
+import re
 
 from lxml import etree
 
@@ -57,14 +58,21 @@ def _branch(div, feature, value, identity, children):
 
 
 def _declare_around(service, target, feature, value, identity):
-    """Declare the variant around each transclusion of ``target`` in ``service``."""
-    for node in list(service.iter(f'{{{J}}}transclude')):
-        if node.get('target') != target:
-            continue
+    """Declare the variant around each transclusion of ``target`` in ``service`` that does not
+    declare it already; a second in one service has its own id (``<identity>_2``)."""
+    nodes = [node for node in service.iter(f'{{{J}}}transclude') if node.get('target') == target
+             and not _declares(node.getprevious(), feature)]
+    taken = {node.get(XML + 'id') for node in service.iter(f'{{{J}}}declare')}
+    for node in nodes:
+        unique, count = identity, 1
+        while unique in taken:
+            count += 1
+            unique = f'{identity}_{count}'
+        taken.add(unique)
         declaration = etree.Element(f'{{{J}}}declare')
-        declaration.set(XML + 'id', identity)
+        declaration.set(XML + 'id', unique)
         _fs(declaration, feature, value)
-        end = etree.Element(f'{{{J}}}endDeclare', target='#' + identity)
+        end = etree.Element(f'{{{J}}}endDeclare', target='#' + unique)
         end.tail, node.tail = node.tail, None
         node.addprevious(declaration)
         node.addnext(end)
@@ -101,8 +109,7 @@ def unify(documents):
                 for node in root.iter(f'{{{J}}}transclude'):
                     if node.get('target') == later_urn:
                         node.set('target', text_urn)
-                if not _declared(root, feature):
-                    _declare_around(root, text_urn, feature, False, stem + '_printed')
+                _declare_around(root, text_urn, feature, False, stem + '_printed')
             dropped.append(later_path)
     return [(p, r) for p, r in documents if p in by_path], dropped
 
@@ -118,6 +125,10 @@ def text_urn(urn):
 
 def _declared(root, feature):
     return any(f.get('name') == feature for f in root.iter(f'{{{TEI}}}f'))
+
+
+def _declares(node, feature):
+    return node is not None and node.tag == f'{{{J}}}declare' and _declared(node, feature)
 
 
 def printing(project, name):
@@ -139,13 +150,14 @@ def printing(project, name):
 def branch(div, feature, value):
     """A copy of ``div`` with only the branch of ``feature`` that is ``value``."""
     out = copy.deepcopy(div)
-    keep = None
+    keep = opened = None
     for child in list(out):
         if child.tag == f'{{{J}}}conditional' and _declared(child, feature):
             keep = child.find(f'.//{{{TEI}}}binary').get('value') == ('true' if value else 'false')
+            opened = child.get(XML + 'id')
             out.remove(child)
-        elif child.tag == f'{{{J}}}endConditional':
-            keep = None
+        elif child.tag == f'{{{J}}}endConditional' and opened and child.get('target') == '#' + opened:
+            keep = opened = None
             out.remove(child)
         elif keep is False:
             out.remove(child)
@@ -159,5 +171,9 @@ _DECLARATIONS = {identity for later_stem, (stem, variant) in LATER_PRINTINGS.ite
 def is_declaration(node):
     """A variant declaration (or its end) the build put around a transclusion in a service."""
     if node.tag == f'{{{J}}}declare':
-        return node.get(XML + 'id') in _DECLARATIONS
-    return node.tag == f'{{{J}}}endDeclare' and node.get('target', '').lstrip('#') in _DECLARATIONS
+        return _ours(node.get(XML + 'id', ''))
+    return node.tag == f'{{{J}}}endDeclare' and _ours(node.get('target', '').lstrip('#'))
+
+
+def _ours(identity):
+    return identity in _DECLARATIONS or re.sub(r'_\d+$', '', identity) in _DECLARATIONS

@@ -90,10 +90,13 @@ texts:
     transcludes: {T}prayer:half_text
 """
 
-    def convert(self, full):
+    def convert(self, full, half_again=None):
         tree = {"Morning": {"Upon Arising": self.HALF, "Again": full}, "Blessings": BLESSINGS}
         structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
                      "Morning / Again": "chol/shacharit/again", "Blessings": "berakhot/test"}
+        if half_again:
+            tree["Morning"]["Later"] = half_again
+            structure["Morning / Later"] = "chol/shacharit/later"
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
@@ -123,7 +126,23 @@ texts:
 
     def test_in_words_of_its_own_it_is_written_in_full(self):
         changed = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ אַחֵר", "none like our King"), *self.OWN]
-        for text in self.convert(changed).values():
+        self.assert_in_full(self.convert(changed))
+
+    def test_in_english_or_rubrics_of_its_own_it_is_written_in_full(self):
+        english = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ", "none like our Sovereign"), *self.OWN]
+        rubric = [self.HALF[0], ("", "<small>Congregation:</small>"), self.HALF[1], *self.OWN]
+        for full in (english, rubric):
+            with self.subTest(full=full[1]):
+                self.assert_in_full(self.convert(full))
+
+    def test_a_text_with_variants_of_its_own_is_not_transcluded(self):
+        # No place transcluding the full text declares the half text's variants: all would be set.
+        variant = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ לְעוֹלָם", "none like our King ever")]
+        texts = self.convert(self.HALF + self.OWN, half_again=variant)
+        self.assert_in_full(texts)
+
+    def assert_in_full(self, texts):
+        for text in texts.values():
             self.assertEqual(text.xpath("//j:transclude", namespaces=NS), [])
             self.assertEqual(len(text.xpath("//tei:milestone[@unit='phrase']/@corresp", namespaces=NS)), 3)
 

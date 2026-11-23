@@ -51,13 +51,12 @@ from opensiddur.importer.sefaria.match import (
     decide_work,
     excluded_projects,
     load_records,
-    phrase_skeletons,
     registry_urns,
     save_records,
     scripture_verses,
     verse_length,
 )
-from opensiddur.importer.sefaria.phrases import clashing_paths, recorded_phrases, text_path
+from opensiddur.importer.sefaria.phrases import clashing_paths, recorded_phrases, skeleton, text_path
 from opensiddur.importer.sefaria.source import PATH_SEPARATOR, WorkSource, load_work_source
 from opensiddur.importer.sefaria.tei_builder import (
     Notes,
@@ -295,17 +294,36 @@ def first_printings(plan: WorkPlan) -> dict[str, TextBlock]:
     return found
 
 
+def _opening_words(block: TextBlock, count: int) -> list[tuple[str, tuple[str, ...]]]:
+    """The words of ``block`` up to the end of its ``count``th phrase, rubrics and all: each
+    pair's Hebrew skeleton and English words."""
+    out: list[tuple[str, tuple[str, ...]]] = []
+    seen = 0
+    for pair in block.pairs:
+        if seen == count:
+            break
+        out.append((skeleton(plain_text(pair.he)), tuple(re.findall(r"\w+", plain_text(pair.en).lower()))))
+        seen += is_phrase(pair)
+    return out
+
+
 def opening_transclusion(plan: WorkPlan, urn: str, item: TextBlock, numbers: list[int],
                          variants: Collection[VariantPrinting],
-                         first: dict[str, TextBlock]) -> tuple[str, int] | None:
+                         first: dict[str, TextBlock],
+                         printings: dict[str, list[VariantPrinting]]) -> tuple[str, int] | None:
     """The text ``urn`` opens with, and how many of its phrases that text is, where it is
     transcluded (``equivalents.yaml``'s ``transcludes``): the volume prints that text, and the
-    block opens with its words, phrase for phrase, words no variant of ``urn`` changes."""
+    block opens with its words, phrase for phrase, words no variant of ``urn`` changes.
+
+    The transcluded text stands for everything in the place it takes: its first printing must
+    have the same rubrics there and the same English, and no variants of its own -- no place
+    transcluding ``urn`` declares them, so every one of them would be set (the Ten Days'
+    לְעֵלָּא וּלְעֵלָּא of the Selichot half Kaddish, under the closing full Kaddish)."""
     opening = plan.openings.get(urn)
-    if opening is None or opening not in first:
+    if opening is None or opening not in first or printings.get(opening):
         return None
     count = len(first[opening].phrases)
-    if count >= len(item.phrases) or phrase_skeletons(item)[:count] != phrase_skeletons(first[opening]):
+    if count >= len(item.phrases) or _opening_words(item, count) != _opening_words(first[opening], count):
         return None
     covered = numbers[:count]
     base = set(numbers)
@@ -366,7 +384,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
                              plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths,
                              plan.conditions, plan.clashes,
-                             opening_transclusion(plan, record.urn, item, numbers, variants, first))
+                             opening_transclusion(plan, record.urn, item, numbers, variants, first, printings))
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn, plan.clashes), document(document_header(work, lang, title), body, lang, notes))

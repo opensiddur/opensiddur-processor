@@ -13,7 +13,8 @@
 #        `with` (the full Kaddish, with תתקבל, not the Mourner's).
 #        `transcludes` names a text this one opens with: where the volume prints that text and
 #        the block opens with its words, phrase for phrase, the text's file transcludes it and
-#        holds only its own words after it (each larger Kaddish, the half Kaddish).
+#        holds only its own words after it (each larger Kaddish, the half Kaddish) -- unless the
+#        English or rubrics there differ, or that text has variants of its own.
 # joins: a block opening so continues the text before it in its leaf; with `after`, only a text
 #        that has those words (the Kaddish may run on at the end of the block before it).
 

@@ -203,7 +203,11 @@ Each text's URN, in order of preference:
    הוּא יַעֲשֶׂה שָׁלוֹם). A choice may name a text its text opens with (`transcludes`): where
    the volume prints that text and the block opens with its words, phrase for phrase, words no
    variant of the larger text changes, the larger text's file transcludes it and holds only its
-   own words after it — each larger Kaddish transcludes the volume's half Kaddish.
+   own words after it — each larger Kaddish transcludes the volume's half Kaddish. The
+   transcluded text stands for everything in the place it takes, so its first printing must
+   have the same rubrics there and the same English, and no variants of its own: no place
+   transcluding the larger text declares them, and every one would be set (the Selichot's half
+   Kaddish, with the Ten Days' לְעֵלָּא וּלְעֵלָּא, is not transcluded by its full Kaddish).
 3. **The next part of the same text.** Where the block before it (rubrics apart) is a part of a
    text, a block that one of its keys finds among that text's parts — and agrees with at least
    as well as with any other candidate — is that part: the Kedushah's קדוש קדוש קדוש is

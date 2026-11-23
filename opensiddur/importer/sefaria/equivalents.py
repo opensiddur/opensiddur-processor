@@ -141,6 +141,8 @@ def load_equivalents(path: Path = EQUIVALENTS_FILE) -> Equivalents:
         urn = str(entry.get("urn", ""))
         if not urn.startswith(TEXT_PREFIX):
             raise EquivalentsError(f"{path.name} texts #{n}: {urn!r} is not a text URN")
+        if not isinstance(entry.get("with") or [], list):
+            raise EquivalentsError(f"{path.name} texts #{n}: with is a list of runs of words, not {entry['with']!r}")
         texts.append(Choice(_opens(entry, f"{path.name} texts #{n}"), urn, _leaf(entry),
                             entry.get("note", ""), tuple(words(str(entry.get("ends", "")))),
                             tuple(tuple(words(str(run))) for run in entry.get("with") or ()),

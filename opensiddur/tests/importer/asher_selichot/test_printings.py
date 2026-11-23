@@ -63,6 +63,38 @@ class TestUnify(unittest.TestCase):
             self.assertEqual([etree.QName(n).localname for n in div if not printings.is_declaration(n)],
                              ['head', 'transclude', 'p'])
 
+    def test_a_service_saying_the_text_twice_declares_each_with_its_own_id(self):
+        project = Path('p')
+        twice = service(T + 'poem:first_poem')
+        div = twice.find(f'.//{{{TEI}}}div')
+        div.append(etree.fromstring(f'<j:transclude xmlns:j="{J}" target="{T}poem:first_poem"/>'))
+        later_too = service(T + 'poem:first_poem')
+        later_too.find(f'.//{{{TEI}}}div').append(
+            etree.fromstring(f'<j:transclude xmlns:j="{J}" target="{T}poem:later_poem"/>'))
+        documents = self.documents(project)[:2] + [(project / 'twice.xml', twice), (project / 'both.xml', later_too)]
+        by_name = {path.name: root for path, root in printings.unify(documents)[0]}
+        ids = by_name['twice.xml'].xpath('//j:declare/@xml:id', namespaces={'j': J})
+        self.assertEqual(ids, ['first_poem_printed', 'first_poem_printed_2'])
+        self.assertEqual(by_name['twice.xml'].xpath('//j:endDeclare/@target', namespaces={'j': J}),
+                         ['#first_poem_printed', '#first_poem_printed_2'])
+        self.assertTrue(all(printings.is_declaration(n) for n in by_name['twice.xml'].iter(f'{{{J}}}declare')))
+        # A service saying both printings declares each.
+        values = by_name['both.xml'].xpath('//j:declare//tei:binary/@value', namespaces={'j': J, 'tei': TEI})
+        self.assertEqual(sorted(values), ['false', 'true'])
+
+    def test_a_branch_ends_at_its_own_end_only(self):
+        div = module(T + 'poem:first_poem', 'first words').find(f'.//{{{TEI}}}div')
+        printings._branch(div, FEATURE, False, 'first_poem_printed', [
+            etree.fromstring(f'<j:conditional xmlns:j="{J}" xml:id="own"/>'),
+            etree.fromstring(f'<tei:p xmlns:tei="{TEI}">kept</tei:p>'),
+            etree.fromstring(f'<j:endConditional xmlns:j="{J}" target="#own"/>'),
+            etree.fromstring(f'<tei:p xmlns:tei="{TEI}">still first</tei:p>')])
+        printings._branch(div, FEATURE, True, 'first_poem_later_service',
+                          [etree.fromstring(f'<tei:p xmlns:tei="{TEI}">later</tei:p>')])
+        self.assertNotIn('later', ''.join(printings.branch(div, FEATURE, False).itertext()))
+        self.assertIn('still first', ''.join(printings.branch(div, FEATURE, False).itertext()))
+        self.assertNotIn('still first', ''.join(printings.branch(div, FEATURE, True).itertext()))
+
     def test_the_verifiers_find_each_printing_by_its_file_name(self):
         with tempfile.TemporaryDirectory() as directory:
             project = Path(directory)

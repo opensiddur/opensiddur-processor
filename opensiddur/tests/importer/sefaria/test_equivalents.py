@@ -79,6 +79,9 @@ texts:
             equivalents("texts:\n  - opens: אבג\n    urn: prayer:x\n")
         with self.assertRaises(EquivalentsError):
             equivalents("joins:\n  - opens: ''\n")
+        # A string for ``with`` would be read letter by letter: a run in every block.
+        with self.assertRaises(EquivalentsError):
+            equivalents("texts:\n  - opens: אבג\n    with: דהו\n    urn: urn:x-opensiddur:text:prayer:x\n")
 
 
 class TestEnds(unittest.TestCase):

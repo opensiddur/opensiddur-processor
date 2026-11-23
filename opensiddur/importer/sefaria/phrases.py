@@ -146,13 +146,31 @@ def map_phrases(new: Sequence[str], recorded: dict[int, str]) -> list[int]:
 
 def recorded_phrases(project_dirs: Iterable[Path]) -> dict[str, dict[int, str]]:
     """The phrases already named in the Hebrew projects ``project_dirs``: text path ->
-    {number: skeleton of the phrase's words}."""
-    found: dict[str, dict[int, str]] = {}
+    {number: skeleton of the phrase's words}, in the order the text prints them.
+
+    Each project's order is its printing's; across projects, the fullest printing's order, with
+    each phrase only another project prints after the phrase that project prints it after. (A
+    printing that transcludes the text it opens with holds only the phrases after them: in the
+    order the projects come in, its phrases would stand before the opening ones.)"""
+    by_project: list[dict[str, dict[int, str]]] = []
     for project in project_dirs:
+        found: dict[str, dict[int, str]] = {}
         for xml_file in sorted(project.glob("*.xml")):
             for path, number, text in _phrases_in(etree.parse(str(xml_file)).getroot()):
                 found.setdefault(path, {}).setdefault(number, skeleton(text))
-    return found
+        by_project.append(found)
+    merged: dict[str, dict[int, str]] = {}
+    for path in dict.fromkeys(path for found in by_project for path in found):
+        printings = sorted((found[path] for found in by_project if path in found), key=len, reverse=True)
+        order = list(printings[0])
+        for printing in printings[1:]:
+            previous = None
+            for number in printing:
+                if number not in order:
+                    order.insert(0 if previous is None else order.index(previous) + 1, number)
+                previous = number
+        merged[path] = {n: next(p[n] for p in printings if n in p) for n in order}
+    return merged
 
 
 def _phrases_in(root: etree._Element) -> list[tuple[str, int, str]]:
