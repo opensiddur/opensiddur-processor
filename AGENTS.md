@@ -313,8 +313,7 @@ how `hasiddur_hashalem-birnbaum-1949-he`/`-en` in opensiddur-projects encodes it
   `opensiddur-projects/project/` are absent there. Nothing a module does at import time may read
   them; a test that passes locally can error in CI for that reason alone.
 - The JavaScript agreement tests (`test_condition_agreement.py`, `test_calendar_agreement.py`,
-  parts of `test_html_book.py`)
-  skip without Node but run in CI. Set `$OPENSIDDUR_NODE` (see `opensiddur/exporter/README.md`)
+  parts of `test_html_book.py`) skip without Node but run in CI. Set `$OPENSIDDUR_NODE` (see `opensiddur/exporter/README.md`)
   before changing `condition.js`, `calendar.js` or the Python they port.
 - Don't run the tests while `opensiddur.exporter.refdb` or a compile runs in the same worktree:
   the SQLite reference database locks, and unrelated tests fail with `database is locked`.
