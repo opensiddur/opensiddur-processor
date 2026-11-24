@@ -125,6 +125,17 @@ Pairs each leaf's Hebrew and English segments:
   whose songs and verses have no bold openings); a leaf whose counts agree may have a decision
   for this alone.
 
+**Misprints** (`corrections.yaml`, `corrections.py`). A clear misprint in a segment — a
+typographical error, or a slip that makes one printing of a text differ from the book's other
+printings of it ("if His Messiah" in the Weekday half Kaddish, "far above" for the lone לְעֵלָּא
+in the Selichot's first half Kaddish) — is listed by work, leaf (its path before chapters are
+joined), version, 1-based segment, the words as printed (`sic`) and as corrected (`corr`). After
+alignment the words are marked in their segment: the files write both, `tei:choice/tei:sic +
+tei:corr`, for `readings.errors` to choose (corrected by default), and every comparison of words
+(matching, a text's printings, the opening a larger text shares with a smaller one) uses the
+corrected words. An entry whose words are not in its segment exactly once is an error. Wording
+that is a translator's choice is not a misprint, and stays as printed.
+
 ### 3. Texts and rubrics (`blocks.py`, `markup.py`)
 
 A leaf is a stretch of the book, not one text. The book marks where each text begins — the

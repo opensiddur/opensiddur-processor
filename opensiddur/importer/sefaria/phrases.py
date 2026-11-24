@@ -192,7 +192,8 @@ def _phrases_in(root: etree._Element) -> list[tuple[str, int, str]]:
             feed(element.tail)
             return
         local = etree.QName(element).localname
-        if local in ("teiHeader", "standOff", "note"):
+        # A misprint's printed words (tei:sic): a phrase's words are the corrected ones.
+        if local in ("teiHeader", "standOff", "note", "sic"):
             feed(element.tail)
             return
         if local == "milestone" and element.get("unit") == "phrase":

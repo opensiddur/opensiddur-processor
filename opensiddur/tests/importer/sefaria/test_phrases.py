@@ -84,14 +84,15 @@ class TestRecordedPhrases(unittest.TestCase):
                '<tei:text><tei:body><tei:div corresp="urn:x-opensiddur:text:prayer:modeh_ani"><tei:p>'
                f'<tei:milestone unit="phrase" corresp="{T}metsudah:modeh_ani/1"/>מוֹדֶה אֲנִי'
                '<tei:note type="instruction">not words</tei:note> '
-               f'<tei:milestone unit="phrase" corresp="{T}metsudah:modeh_ani/2"/><tei:hi rend="small">מֶֽלֶךְ</tei:hi>'
+               f'<tei:milestone unit="phrase" corresp="{T}metsudah:modeh_ani/2"/><tei:hi rend="small">מֶֽלֶךְ</tei:hi> '
+               '<tei:choice><tei:sic>חַי</tei:sic><tei:corr>חַי וְקַיָּם</tei:corr></tei:choice>'
                '</tei:p></tei:div></tei:body></tei:text></tei:TEI>')
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp) / "p"
             project.mkdir()
             (project / "modeh_ani.xml").write_text(xml, encoding="utf-8")
             found = recorded_phrases([project])
-        self.assertEqual(found, {"modeh_ani": {1: skeleton("מוֹדֶה אֲנִי"), 2: skeleton("מֶֽלֶךְ")}})
+        self.assertEqual(found, {"modeh_ani": {1: skeleton("מוֹדֶה אֲנִי"), 2: skeleton("מֶֽלֶךְ חַי וְקַיָּם")}})
 
     def test_the_order_across_projects_is_the_fullest_printings(self):
         # The first project transcludes the text the full Kaddish opens with, and holds only the

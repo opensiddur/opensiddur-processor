@@ -119,7 +119,8 @@ uv run python -m opensiddur.importer.sefaria.update                   # monthly:
 ```
 URN decisions are recorded in `specs/sefaria/metsudah_urns.jsonl` (sticky: correct a line and rerun);
 leaves whose Hebrew and English cannot be paired automatically are decided in
-`opensiddur/importer/sefaria/alignment_decisions.yaml`. Curated knowledge that applies to every
+`opensiddur/importer/sefaria/alignment_decisions.yaml`; clear misprints, written as
+`tei:sic`/`tei:corr`, are listed in `corrections.yaml`. Curated knowledge that applies to every
 Metsudah volume lives beside it: `equivalents.yaml` (the URN a text opening so is — another rite's
 words for a text the collection names, a collage's name — and blocks that continue the text before
 them) and `conditions.yaml` (the book's condition rubrics, labels and marked alternatives, as

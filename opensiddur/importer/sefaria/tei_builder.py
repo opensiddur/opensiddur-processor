@@ -43,6 +43,7 @@ from opensiddur.importer.sefaria.align import Pair
 from opensiddur.importer.sefaria.blocks import Heading, Item, Rubric, TextBlock, is_heading, is_phrase
 from opensiddur.importer.sefaria.markup import (
     Break,
+    Correction,
     EnglishKind,
     HebrewKind,
     Footnote,
@@ -119,6 +120,9 @@ def render(nodes: Iterable[Node], lang: str, notes: Notes | None, *, in_note: bo
     for node in nodes:
         if isinstance(node, Text):
             out.append(_text(node.text, lang))
+        elif isinstance(node, Correction):
+            out.append(f"<tei:choice><tei:sic>{_text(node.sic, lang)}</tei:sic>"
+                       f"<tei:corr>{_text(node.corr, lang)}</tei:corr></tei:choice>")
         elif isinstance(node, Break):
             out.append(" ")
         elif isinstance(node, Footnote):

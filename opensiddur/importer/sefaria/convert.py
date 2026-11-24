@@ -39,6 +39,7 @@ from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import Alignment, Pair, align_work, join_chapters, load_decisions
+from opensiddur.importer.sefaria.corrections import apply_corrections, load_corrections
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, is_phrase
 from opensiddur.importer.sefaria.download import load_manifest
 from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
@@ -140,9 +141,12 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
               own_phrases: dict[str, dict[int, str]] | None = None,
               equivalents_path: Path | None = None,
               registered: set[str] | None = None,
-              conditions_path: Path | None = None) -> WorkPlan:
+              conditions_path: Path | None = None,
+              corrections_path: Path | None = None) -> WorkPlan:
     alignments = align_work(work.key, source.leaves,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
+    corrections = load_corrections(corrections_path) if corrections_path else load_corrections()
+    alignments = apply_corrections(alignments, corrections.get(work.key, []))
     # A leaf of depth 2 is aligned chapter by chapter, and placed and divided whole.
     table = yaml.safe_load((structure_path or work.structure_file()).read_text(encoding="utf-8")) or {}
     # (A placed inner node of the same name -- the Song of Songs, which holds its preface -- is
@@ -591,7 +595,8 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                  spellings: Spellings | None = None,
                  works: dict[str, Work] | None = None,
                  equivalents_path: Path | None = None,
-                 conditions_path: Path | None = None) -> WorkPlan:
+                 conditions_path: Path | None = None,
+                 corrections_path: Path | None = None) -> WorkPlan:
     directory = work.data_directory(sourcetexts_root)
     source = load_work_source(directory)
     info = source_info(work, directory)
@@ -612,7 +617,7 @@ def convert_work(work: Work, *, sourcetexts_root: Path | None = None,
                      phrases=recorded_phrases(other_volumes), structure_path=structure_path,
                      decisions_path=decisions_path, spellings=spellings,
                      equivalents_path=equivalents_path, registered=registry_urns(registry_directory),
-                     conditions_path=conditions_path,
+                     conditions_path=conditions_path, corrections_path=corrections_path,
                      own_phrases=recorded_phrases([project_directory / work.projects["he"]]
                                                   if (project_directory / work.projects["he"]).exists() else []))
     check_phrase_paths({k: r for k, r in plan.decisions.records.items()

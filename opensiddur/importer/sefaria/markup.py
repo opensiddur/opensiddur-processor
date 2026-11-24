@@ -58,12 +58,21 @@ class Break:
 
 
 @dataclass(frozen=True)
+class Correction:
+    """A misprint and its correction (``corrections.yaml``): the corrected words are the text's
+    words wherever words are compared, and both are written, as ``tei:sic`` and ``tei:corr``."""
+
+    sic: str
+    corr: str
+
+
+@dataclass(frozen=True)
 class Footnote:
     marker: str
     children: tuple["Node", ...]
 
 
-Node = Text | Styled | Break | Footnote
+Node = Text | Styled | Break | Footnote | Correction
 
 _TAG_STYLES = {"b": "bold", "strong": "bold", "i": "italic", "em": "italic", "small": "small",
                "big": "large", "span": "foreign", "sup": "superscript"}
@@ -142,6 +151,8 @@ def plain_text(nodes: Iterable[Node]) -> str:
     for node in walk(nodes):
         if isinstance(node, Text):
             parts.append(node.text)
+        elif isinstance(node, Correction):
+            parts.append(node.corr)
         elif isinstance(node, Break):
             parts.append(" ")
     return " ".join("".join(parts).split())

@@ -90,7 +90,7 @@ texts:
     transcludes: {T}prayer:half_text
 """
 
-    def convert(self, full, half_again=None):
+    def convert(self, full, half_again=None, corrections=""):
         tree = {"Morning": {"Upon Arising": self.HALF, "Again": full}, "Blessings": BLESSINGS}
         structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
                      "Morning / Again": "chol/shacharit/again", "Blessings": "berakhot/test"}
@@ -105,13 +105,14 @@ texts:
         (root / "registry").mkdir()
         (root / "decisions.yaml").write_text("{}\n")
         (root / "equivalents.yaml").write_text(self.TABLE, encoding="utf-8")
+        (root / "corrections.yaml").write_text(corrections, encoding="utf-8")
         convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
                      registry_directory=root / "registry", urns_path=root / "urns.jsonl",
                      index=IncipitIndex(), output_directory=root / "out",
                      structure_path=write_structure(root / "s.yaml", structure),
                      decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
                      works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
-                     conditions_path=root / "conditions.yaml")
+                     conditions_path=root / "conditions.yaml", corrections_path=root / "corrections.yaml")
         self.projects = {lang: root / "project" / WORK.projects[lang] for lang in ("he", "en")}
         return {lang: etree.parse(str(self.projects[lang] / "full_text.xml")) for lang in ("he", "en")}
 
@@ -126,6 +127,20 @@ texts:
                 self.assertEqual(div[0].get("target"), T + "prayer:half_text")
                 self.assertEqual(text.xpath("//tei:milestone[@unit='phrase']/@corresp", namespaces=NS),
                                  [T + "metsudah:full_text/3"])
+
+    def test_a_misprint_corrected_in_the_text_it_opens_with_is_transcluded(self):
+        full = self.HALF + self.OWN
+        self.HALF = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ", "none like out King")]
+        corrections = (f"{WORK.key}:\n  - {{leaf: Morning / Upon Arising, lang: en, segment: 2, "
+                       "sic: out King, corr: our King}\n")
+        texts = self.convert(full, corrections=corrections)
+        self.assertEqual(texts["en"].find(".//tei:body/tei:div", namespaces=NS)[0].get("target"),
+                         T + "prayer:half_text")
+        half = etree.parse(str(self.projects["en"] / "half_text.xml"))
+        self.assertEqual([(c.findtext("tei:sic", namespaces=NS), c.findtext("tei:corr", namespaces=NS))
+                          for c in half.iterfind(".//tei:choice", namespaces=NS)], [("out King", "our King")])
+        # Uncorrected, the English differs, and the full text is written in full.
+        self.assert_in_full(self.convert(full))
 
     def test_in_words_of_its_own_it_is_written_in_full(self):
         changed = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ אַחֵר", "none like our King"), *self.OWN]
@@ -276,6 +291,7 @@ class TestConvertWork(unittest.TestCase):
         decisions.write_text("{}\n")
         kwargs.setdefault("equivalents_path", Path(self.tmp.name) / "equivalents.yaml")
         kwargs.setdefault("conditions_path", Path(self.tmp.name) / "conditions.yaml")
+        kwargs.setdefault("corrections_path", Path(self.tmp.name) / "corrections.yaml")
         return convert_work(WORK, sourcetexts_root=self.sources, project_directory=self.projects,
                             registry_directory=self.registry, urns_path=self.urns, index=self.index,
                             output_directory=self.output, structure_path=self.structure,

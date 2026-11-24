@@ -1,0 +1,21 @@
+# Misprints in the Metsudah volumes, written as tei:sic + tei:corr (see corrections.py).
+# leaf: the leaf's path before chapters are joined; segment: 1-based, in the version `lang`.
+
+weekday_siddur_sefard_linear:
+  # The half Kaddish prints "if His Messiah" each time; the volume's other Kaddishes, and the
+  # Shabbat volume's, print "of His Mashiach" (decided 2026-11-23).
+  - {leaf: "The Morning Prayers / Yishtabach", lang: en, segment: 61,
+     sic: "if His Messiah", corr: "of His Mashiach"}
+  - {leaf: "The Morning Prayers / Vehu Rachum", lang: en, segment: 351,
+     sic: "if His Messiah", corr: "of His Mashiach"}
+  - {leaf: "The Morning Prayers / Ashrei U'va L'Tzion", lang: en, segment: 208,
+     sic: "if His Messiah", corr: "of His Mashiach"}
+  - {leaf: "The Morning Prayers / Psalm in the House of a Mourner", lang: en, segment: 107,
+     sic: "if His Messiah", corr: "of His Mashiach"}
+  - {leaf: "The Morning Prayers / Mourner's Kaddish", lang: en, segment: 7,
+     sic: "if His Messiah", corr: "of His Mashiach"}
+
+selichot_nusach_lita_linear:
+  # The first half Kaddish translates the lone לְעֵלָּא "far above", the Ten Days' reading;
+  # every other printing translates it "above" (decided 2026-11-23).
+  - {leaf: "First Day / 1", lang: en, segment: 71, sic: "far above", corr: "above"}
