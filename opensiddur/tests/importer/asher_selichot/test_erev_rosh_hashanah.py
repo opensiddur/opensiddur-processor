@@ -1,5 +1,6 @@
 """Erev-specific differences must survive the shared service assembly."""
 import unittest
+import unittest.mock
 from lxml import etree
 from opensiddur.importer.asher_selichot import erev_rosh_hashanah as erev
 from opensiddur.importer.asher_selichot.first_day import poetic_lines
@@ -17,6 +18,11 @@ class ErevAssemblyTests(unittest.TestCase):
             self.assertTrue(all(n.get('type')=='inline' for n in root[1]))
             self.assertEqual(root[-1].get('unit'),'prayer')
             self.assertIsNone(root[-1].get('corresp'))
+
+    def test_a_renamed_text_is_transcluded_by_its_new_urn(self):
+        with unittest.mock.patch.object(erev, 'RENAMED_URNS', {'urn:old': 'urn:new'}):
+            for targets in (['urn:old', 'urn:kept'], {'he': ['urn:old', 'urn:kept']}):
+                self.assertEqual(erev.targets({'expansion_targets': targets}, 'he'), ['urn:new', 'urn:kept'])
 
     def test_compiled_pairing_rejects_unrelated_english(self):
         ns='http://jewishliturgy.org/ns/processing'

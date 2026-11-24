@@ -9,7 +9,7 @@ from lxml import etree
 from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spelled_name, spelled_urn
 from .first_day import (poetic_lines, words_with_notes, mixed_words,
                         append_words, expansion_scope)
-from .identities import project_name
+from .identities import RENAMED_URNS, project_name
 from .printings import is_declaration, printing
 
 EREV = 'urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah'
@@ -59,7 +59,8 @@ def readings(source):
 
 def targets(reading, lang):
     value = reading.get('expansion_targets', [])
-    return value.get(lang, []) if isinstance(value, dict) else value
+    value = value.get(lang, []) if isinstance(value, dict) else value
+    return [RENAMED_URNS.get(target, target) for target in value]
 
 
 def body_words(parent, words, notes, lang):

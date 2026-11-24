@@ -13,6 +13,12 @@ def project_name(lang):
     in Latin letters, Selichoth."""
     return f'selichoth-asher-1912-{lang}'
 
+#: URNs the readings name that are now another text's (see TEXTS): the build writes the new one.
+RENAMED_URNS = {
+    BASE + 'prayer:el_erekh_apayim': BASE + 'prayer:el_erekh_appayim_attah',
+    BASE + 'prayer:vayaavor/selichot_preliminary': BASE + 'prayer:vayaavor',
+}
+
 # reading ID: (filename stem, canonical text identity)
 TEXTS = {
     'invocation': ('lekha_adonai_hatsedaqah', 'prayer:lekha_adonai_hatsedaqah'),
