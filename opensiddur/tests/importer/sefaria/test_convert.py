@@ -112,8 +112,11 @@ texts:
                      decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
                      works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
                      conditions_path=root / "conditions.yaml")
-        return {lang: etree.parse(str(root / "project" / WORK.projects[lang] / "full_text.xml"))
-                for lang in ("he", "en")}
+        self.projects = {lang: root / "project" / WORK.projects[lang] for lang in ("he", "en")}
+        return {lang: etree.parse(str(self.projects[lang] / "full_text.xml")) for lang in ("he", "en")}
+
+    def place(self, lang, name):
+        return etree.parse(str(self.projects[lang] / f"siddur_chol_shacharit_{name}.xml"))
 
     def test_the_text_it_opens_with_is_transcluded(self):
         for lang, text in self.convert(self.HALF + self.OWN).items():
@@ -135,11 +138,34 @@ texts:
             with self.subTest(full=full[1]):
                 self.assert_in_full(self.convert(full))
 
-    def test_a_text_with_variants_of_its_own_is_not_transcluded(self):
-        # No place transcluding the full text declares the half text's variants: all would be set.
+    def test_the_place_declares_the_variants_of_the_text_it_opens_with(self):
+        # The full text's file holds the half text's first printing: each place transcluding the
+        # full text says the half text's variants are not printed there.
         variant = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ לְעוֹלָם", "none like our King ever")]
-        texts = self.convert(self.HALF + self.OWN, half_again=variant)
-        self.assert_in_full(texts)
+        for lang, text in self.convert(self.HALF + self.OWN, half_again=variant).items():
+            with self.subTest(lang=lang):
+                self.assertEqual(text.xpath("//j:transclude/@target", namespaces=NS), [T + "prayer:half_text"])
+                place = self.place(lang, "again")
+                (declare,) = place.xpath("//j:declare[following-sibling::*[1][@target='%sprayer:full_text']]" % T,
+                                         namespaces=NS)
+                self.assertEqual(declare.xpath(".//tei:f/@name", namespaces=NS),
+                                 ["urn:x-opensiddur:condition:prayer:half_text/chol_shacharit_later"])
+                self.assertEqual(declare.xpath(".//tei:binary/@value", namespaces=NS), ["false"])
+
+    def test_an_instruction_the_text_opens_with_is_the_places(self):
+        # The text before runs on into the full text, unmarked: the block is cut where it opens,
+        # and the instruction between them goes with the full text's block.
+        before = ("<b>הוֹדוּ לַיהוָה</b> כִּי טוֹב", "Give thanks to God for He is good")
+        lead = ("", "<small>The Chazzan recites the following:</small>")
+        unmarked = (self.HALF[0][0].replace("<b>", "").replace("</b>", ""), self.HALF[0][1])
+        for lang in ("he", "en"):
+            texts = self.convert([before, lead, unmarked, self.HALF[1], *self.OWN])
+            with self.subTest(lang=lang):
+                self.assertEqual(texts[lang].xpath("//tei:note", namespaces=NS), [])
+                self.assertEqual(texts[lang].xpath("//j:transclude/@target", namespaces=NS), [T + "prayer:half_text"])
+        place = self.place("en", "again")
+        (note,) = place.xpath("//tei:note[following-sibling::j:transclude]", namespaces=NS)
+        self.assertEqual(" ".join(note.xpath("string()").split()), "The Chazzan recites the following:")
 
     def assert_in_full(self, texts):
         for text in texts.values():

@@ -205,9 +205,10 @@ Each text's URN, in order of preference:
    variant of the larger text changes, the larger text's file transcludes it and holds only its
    own words after it — each larger Kaddish transcludes the volume's half Kaddish. The
    transcluded text stands for everything in the place it takes, so its first printing must
-   have the same rubrics there and the same English, and no variants of its own: no place
-   transcluding the larger text declares them, and every one would be set (the Selichot's half
-   Kaddish, with the Ten Days' לְעֵלָּא וּלְעֵלָּא, is not transcluded by its full Kaddish).
+   have the same rubrics there and the same English. Which of its variants is said is the
+   place's to declare: the larger text's file holds its first printing, so each place
+   transcluding the larger text declares the smaller text's variants not printed (the
+   Selichot's closing full Kaddish, with לְעֵלָּא מִן כָּל, on the Ten Days as on the other days).
 3. **The next part of the same text.** Where the block before it (rubrics apart) is a part of a
    text, a block that one of its keys finds among that text's parts — and agrees with at least
    as well as with any other candidate — is that part: the Kedushah's קדוש קדוש קדוש is
@@ -355,6 +356,11 @@ Each language's project is laid out as the house style lays out a siddur:
   ends the verse (sof pasuq or colon) unless another verse follows — so a liturgical text that
   quotes scripture (the Six Remembrances, Hodu, Ashrei's psalms) reuses the verses' URNs, once
   in a project. A text's variants are merged into its file (see URNs).
+  An instruction that applies only where the text is printed is the place's, set before the
+  transclusion, never in the text's file: the rubrics a text opens with, before its first words
+  ("The Chazzan recites the following half-Kaddish"), go to the structure file. A condition the
+  text opens with stays with it where every printing opens so (Condition rubrics, below), and so
+  does a rubric after a heading of the text's own.
 
 | Sefaria markup | JLPTEI |
 |---|---|

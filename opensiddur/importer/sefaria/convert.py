@@ -39,7 +39,7 @@ from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import Alignment, Pair, align_work, join_chapters, load_decisions
-from opensiddur.importer.sefaria.blocks import Item, TextBlock, divide, is_phrase
+from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, is_phrase
 from opensiddur.importer.sefaria.download import load_manifest
 from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
 from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
@@ -165,6 +165,7 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                             places={path: place for path, place in structure.items() if place},
                             own_phrases=own_phrases, equivalents=equivalents, registered=registered,
                             clashes=clashes, numbered_namespace=work.numbered_texts)
+    items = {leaf: placed_rubrics(leaf_items, conditions) for leaf, leaf_items in items.items()}
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
     # quoted by two texts is marked in the first.
     verses: dict[tuple[str, int], dict[int, str]] = {}
@@ -189,6 +190,31 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                if (n := verse_length(urn, index)) is not None}
     return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths,
                     conditions, clashes, equivalents.openings())
+
+
+def placed_rubrics(items: list[Item], conditions: Conditions) -> list[Item]:
+    """``items`` with the instructions a text opens with, before its first words, the place's:
+    a rubric before its transclusion, not words of its file. They say what is done here ("The
+    Chazzan recites the following half-Kaddish"), and the text printed elsewhere does without
+    them. A condition the text opens with, and what follows it, stay with the text (its file
+    may open with it: ``first_printing_rubrics``); so does a rubric after a heading of the
+    text's own, which is part of how the text is set out."""
+    out: list[Item] = []
+    for item in items:
+        if isinstance(item, TextBlock) and item.head is None:
+            k = 0
+            while k < len(item.pairs) and not is_phrase(item.pairs[k]) and not _is_condition(item.pairs[k], conditions):
+                k += 1
+            if k:
+                out.append(Rubric(item.pairs[:k]))
+                item = TextBlock(None, item.pairs[k:])
+        out.append(item)
+    return out
+
+
+def _is_condition(pair: Pair, conditions: Conditions) -> bool:
+    return ((pair.he_kind is HebrewKind.EMPTY and conditions.for_rubric(plain_text(pair.en)) is not None)
+            or conditions.for_label(plain_text(pair.he)) is not None)
 
 
 @dataclass
@@ -309,18 +335,16 @@ def _opening_words(block: TextBlock, count: int) -> list[tuple[str, tuple[str, .
 
 def opening_transclusion(plan: WorkPlan, urn: str, item: TextBlock, numbers: list[int],
                          variants: Collection[VariantPrinting],
-                         first: dict[str, TextBlock],
-                         printings: dict[str, list[VariantPrinting]]) -> tuple[str, int] | None:
+                         first: dict[str, TextBlock]) -> tuple[str, int] | None:
     """The text ``urn`` opens with, and how many of its phrases that text is, where it is
     transcluded (``equivalents.yaml``'s ``transcludes``): the volume prints that text, and the
     block opens with its words, phrase for phrase, words no variant of ``urn`` changes.
 
     The transcluded text stands for everything in the place it takes: its first printing must
-    have the same rubrics there and the same English, and no variants of its own -- no place
-    transcluding ``urn`` declares them, so every one of them would be set (the Ten Days'
-    לְעֵלָּא וּלְעֵלָּא of the Selichot half Kaddish, under the closing full Kaddish)."""
+    have the same rubrics there and the same English. Its words are that printing's, so a place
+    transcluding ``urn`` declares each of its variants not printed (:func:`opening_transclusions`)."""
     opening = plan.openings.get(urn)
-    if opening is None or opening not in first or printings.get(opening):
+    if opening is None or opening not in first:
         return None
     count = len(first[opening].phrases)
     if count >= len(item.phrases) or _opening_words(item, count) != _opening_words(first[opening], count):
@@ -332,6 +356,24 @@ def opening_transclusion(plan: WorkPlan, urn: str, item: TextBlock, numbers: lis
         if not set(covered) <= set(variant.numbers) or any(a is None or a in covered[:-1] for a in anchors):
             return None
     return opening, count
+
+
+def opening_transclusions(plan: WorkPlan, printings: dict[str, list[VariantPrinting]],
+                          first: dict[str, TextBlock]) -> dict[str, tuple[str, int]]:
+    """Each text whose file transcludes the text it opens with (:func:`opening_transclusion`):
+    its URN -> that text's URN and how many phrases it is."""
+    found: dict[str, tuple[str, int]] = {}
+    for leaf_path, items in plan.items.items():
+        for item in items:
+            if isinstance(item, TextBlock):
+                record = plan.record(leaf_path, item)
+                if record.kind in ("existing", "new") and record.urn in plan.openings and record.urn not in found:
+                    numbers = record.phrases or list(range(1, len(item.phrases) + 1))
+                    opening = opening_transclusion(plan, record.urn, item, numbers,
+                                                   printings.get(record.urn, ()), first)
+                    if opening is not None:
+                        found[record.urn] = opening
+    return found
 
 
 def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
@@ -353,6 +395,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
     printings = text_printings(plan)
     opened = first_printing_rubrics(plan)
     first = first_printings(plan)
+    transcluded = opening_transclusions(plan, printings, first)
     for leaf in plan.source.leaves:
         place = plan.structure.get(leaf.path)
         if not place:
@@ -371,6 +414,11 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
                 # Which of the text's variants this place prints, and which it does not.
                 declarations[id(item)] = [(variant_urn(record.urn, v.name), v.name == record.variant)
                                           for v in variants]
+            opening = transcluded.get(record.urn)
+            if opening is not None and printings.get(opening[0]):
+                # The text it opens with, transcluded in its file, is that text's first printing.
+                declarations.setdefault(id(item), []).extend(
+                    (variant_urn(opening[0], v.name), False) for v in printings[opening[0]])
             # Its condition rubric gates it here, unless the text's own file opens with it.
             pair = leading_condition(plan, item)
             if pair is not None and _norm(plain_text(pair.en)) != opened.get(record.urn):
@@ -384,7 +432,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
                              plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths,
                              plan.conditions, plan.clashes,
-                             opening_transclusion(plan, record.urn, item, numbers, variants, first, printings))
+                             transcluded.get(record.urn))
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn, plan.clashes), document(document_header(work, lang, title), body, lang, notes))
