@@ -280,6 +280,8 @@ and Hebrew/English alignment after regeneration.
 - Tests live in `opensiddur/tests/`, mirroring the package structure.
 - Write tests in `unittest` style.
 - Mock external calls (network APIs, file I/O where appropriate).
+- Test against mock or synthetic data files, never the project's real data (sources, projects,
+  settings files). A test must not fail because the data changed.
 - The CI runs `unittest discover`, but `uv run pytest` also works locally.
 - A pile of validation failures in a new worktree usually means the schema has not been
   compiled yet — see the setup step at the top of Commands.
