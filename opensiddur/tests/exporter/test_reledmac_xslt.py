@@ -762,7 +762,7 @@ class TestNotesMapping(unittest.TestCase):
         out = _transform(xml)
         # \edtext{\OSInterlinearNotemark}{... \Bfootnote{\OSFootnotemark ...}}: interlinear
         # serial mark + B-series footnote at page bottom (not an endnote after \pend).
-        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSFootnotemark{1}\notenote{", out)
+        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSNoteDirection{TLT}\OSFootnotemark{1}\notenote{", out)
         self.assertIn("commentary", out)
         self.assertNotIn(r"\footnote{", out)
 
@@ -921,12 +921,9 @@ class TestNotesMapping(unittest.TestCase):
           </tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\OSInstructionBlock{", out)
-        definition = [
-            line for line in out.splitlines()
-            if r"\newcommand{\OSInstructionBlock}" in line
-        ][0]
-        self.assertIn(r"\newline", definition)
+        body = out.split(r"\begin{document}", 1)[1]
+        self.assertRegex(body, r"\\begin\{english\}\s*\\instructionnote\{\\pstart")
+        self.assertRegex(body, r"\\pend\}\s*\\end\{english\}\s*\\pstart")
 
     def test_an_instruction_running_with_the_text_needs_no_line_of_its_own(self):
         """Same direction, so it can share the line and keeps the plain inline macro."""
@@ -997,7 +994,7 @@ class TestNotesMapping(unittest.TestCase):
           </tei:body></tei:text>
         </tei:TEI>"""
         out = _transform(xml)
-        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSFootnotemark{1}\notenote{", out)
+        self.assertIn(r"\leavevmode{\OSRTLfalse\edtext{\OSInterlinearNotemark{1}}{\Bfootnote{\OSNoteDirection{TLT}\OSFootnotemark{1}\notenote{", out)
         self.assertIn("English annotation", out)
         self.assertIn(r"{{\textdir TLT\foreignlanguage{english}{", out)
 
@@ -4113,16 +4110,16 @@ class TestPreambleIsAllTeX(unittest.TestCase):
         preamble = out.split(r"\begin{document}")[0]
         # The preamble embeds Lua, whose lines are not TeX; skip from \directlua to the
         # brace that closes it.
-        stray, in_lua = [], False
+        stray, lua_depth = [], 0
         for line in preamble.splitlines():
-            if "directlua" in line:
-                in_lua = True
-            if in_lua:
-                if line.rstrip().endswith("}"):
-                    in_lua = False
+            if lua_depth or line.lstrip().startswith(r"\directlua{"):
+                # Lua table constructors also end in braces. Track the complete
+                # block rather than mistaking the first table for its end.
+                lua_depth += line.count("{") - line.count("}")
                 continue
             if line.strip() and not line.lstrip().startswith(("\\", "%", "}", "{", "]")):
                 stray.append(line)
+        self.assertEqual(0, lua_depth, "unclosed directlua block")
         self.assertEqual([], stray, "non-TeX lines in the preamble")
 
     def test_no_xml_comment_delimiters_survive(self):
@@ -4393,10 +4390,10 @@ class TestHeadingNotes(unittest.TestCase):
         right = body.split(r"\begin{Rightside}")[1].split(r"\end{Rightside}")[0]
         self.assertIn(self.EDTEXT, self._arg(right, r"\OSheadA"))
 
-    def test_a_heading_set_across_the_page_without_notes_is_unchanged(self):
+    def test_a_heading_across_the_page_separates_the_previous_paragraph(self):
         body = self._body(self._parallel().replace(self.NOTE, ""), layout="pairs")
         self.assertIn(
-            r"{\parfillskip=0pt\interlinepenalty=10000\relax \begin{hebrew}\OSApplyKeep \OSheadA",
+            r"{\parfillskip=0pt\interlinepenalty=10000\relax \begin{hebrew}\par\OSApplyKeep\vskip0.5\baselineskip\relax\noindent \OSheadA",
             body)
 
     def test_a_suppressed_heading_keeps_the_note_on_its_placeholder_row(self):
@@ -4565,7 +4562,7 @@ class TestLabelledLists(unittest.TestCase):
         note = out[out.index(r"\Bfootnote{"):]
         note = note[:note.index(r"\pend")]
         self.assertIn(r"\OSListItem{Alpha}\newline \OSListItem{Beta}", note)
-        self.assertNotIn(r"\par", note)
+        self.assertNotRegex(note, r"\\par(?![A-Za-z@])")
         self.assertNotIn(r"\OSListItemPar", note)
 
     def test_a_standoff_note_label_is_left_alone(self):
