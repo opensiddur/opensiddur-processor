@@ -29,6 +29,7 @@ from typing import Any, Literal, Optional, TypedDict
 from lxml.etree import ElementBase
 from lxml import etree
 
+from opensiddur.exporter.whitespace import prefix_after_omission
 from opensiddur.exporter.constants import (
     RUBRIC_NOTE_TYPES,
     JLPTEI_NAMESPACE,
@@ -203,6 +204,7 @@ class CompilerProcessor:
         self._warn_if_index_is_stale()
 
         self.root_language = None
+        self._omitted_conditional_end = None
 
         # The markers of conditional scopes the range's bounds cut through. See
         # _place_conditional_marker.
@@ -875,12 +877,24 @@ class CompilerProcessor:
             return
         if isinstance(append_to, list):
             if append_to:
-                append_to[-1].tail = (append_to[-1].tail or "") + child.tail
+                append_to[-1].tail = self._prefix_before_tail(append_to[-1].tail, child) + child.tail
             return
         if len(append_to):
-            append_to[-1].tail = (append_to[-1].tail or "") + child.tail
+            append_to[-1].tail = self._prefix_before_tail(append_to[-1].tail, child) + child.tail
         else:
-            append_to.text = (append_to.text or "") + child.tail
+            append_to.text = self._prefix_before_tail(append_to.text, child) + child.tail
+
+    def _prefix_before_tail(self, prefix, child):
+        """Close only the join left by this just-removed false scope.
+
+        Remember the opener's evaluated result rather than evaluating again at
+        its closer, where declarations may have changed. Never mutate cached XML.
+        """
+        prefix = prefix or ""
+        if child is self._omitted_conditional_end:
+            self._omitted_conditional_end = None
+            return prefix_after_omission(prefix, child.tail, child.getparent())
+        return prefix
 
     def _push_declare(self, declare_id: str, entries: list[ConditionalSettingEntry]) -> None:
         """Push declared entries and trigger derived-settings recalculation."""
@@ -1114,6 +1128,7 @@ class CompilerProcessor:
 
         Returns (handled, result). result is None when stripped, or an element copy when retained.
         """
+        self._omitted_conditional_end = None
         if element.tag == J_CONDITION:
             # A note's own condition was evaluated when the note was selected; it is never text.
             return True, None
@@ -1161,6 +1176,8 @@ class CompilerProcessor:
                 )
             scoped_id = self._scoped_declare_id(bare_id, conditional_el)
             scope = self._pop_conditional_scope(scoped_id)
+            if scope.result == TriState.FALSE.value:
+                self._omitted_conditional_end = element
             if scope.result == TriState.UNDEFINED.value and not self._should_skip_conditional_content():
                 return True, self._copy_element_subtree(element)
             return True, None
