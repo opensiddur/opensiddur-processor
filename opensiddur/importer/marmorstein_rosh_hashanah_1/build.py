@@ -371,6 +371,21 @@ def unit_document(unit, lang, draft):
 
     segment_condition_scopes = []
     for segment_index, segment in enumerate(unit['languages'][lang]):
+        if segment.get('canonical') and len(segment['fragments']) > 1:
+            # A checked paginated occurrence keeps its page events through
+            # external compilation; inline compilation intentionally extracts words.
+            if len(unit['languages'][lang]) != 1:
+                raise ValueError('Paginated canonical transclusion must occupy its own caller')
+            close_references()
+            first = segment['fragments'][0]
+            if first.get('page_start', True):
+                attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(first['scan'][1:])-1, size='')}
+                if first.get('printed_page') is not None:
+                    attributes['n'] = first['printed_page']
+                element(div, 'pb', **attributes)
+            element(div, 'j:transclude', type='external', target=segment['canonical']+'@'+project)
+            current_page = segment['fragments'][-1]['scan']
+            continue
         if segment.get('transclude'):
             if paragraph is not None:
                 close_references()
@@ -1383,6 +1398,8 @@ def build(source, project_directory, *, draft=False):
                  for lang, project in PROJECTS.items()
                  for section in service_sections(readings.get('source_order', []))
                  if lang not in section.get('witnesses', PROJECTS)]
+    from .canonical_printings import apply as apply_canonical_printings
+    apply_canonical_printings(documents, readings)
     from .realizations import validate_generated
     validate_generated(documents, readings)
     paths_to_write = [path for path, _ in documents]

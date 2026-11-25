@@ -299,6 +299,8 @@ def canonical_text(readings, lang, target, settings, target_end=None):
 
 def validate_occurrences(readings):
     """Every transclusion must reproduce its own image reading, even in draft."""
+    from .canonical_printings import bindings as printing_bindings
+    printing_bindings(readings)
     by_stem = {u['stem']: u for u in readings['units']}
     if len(by_stem) != len(readings['units']):
         raise ValueError('Duplicate unit stem')
@@ -339,7 +341,8 @@ def validate_occurrences(readings):
                 if not target:
                     continue
                 fragments = segment['fragments']
-                if (len(fragments) != 1 or set(segment) - CANONICAL_OCCURRENCE_KEYS
+                if ((len(fragments) != 1 and not any(v['caller'] == unit['stem'] and v['lang'] == lang and v['identity'] == target
+                        for v in readings.get('canonical_printings', []))) or set(segment) - CANONICAL_OCCURRENCE_KEYS
                         or set(fragments[0]) - PLAIN_FRAGMENT_KEYS):
                     raise ValueError('Canonical occurrence must be one plain source fragment')
                 validate_occurrence_controls(segment)
@@ -463,6 +466,11 @@ def review_payloads(readings, corrections=None):
             relevant_corrections += [deepcopy(c) for c in corrections or []
                                      if c['file'] == own_file and c not in relevant_corrections]
             payload = dict(unit=witness, source_fidelity=fidelity, corrections=relevant_corrections, variants=overlays(readings, unit['stem']), expanded_order_sha256=hashlib.sha256(json.dumps(readings.get('expanded_order', []), ensure_ascii=False, sort_keys=True).encode()).hexdigest())
+            from .canonical_printings import bindings as printing_bindings
+            printings = [v for v in printing_bindings(readings)
+                         if v['lang'] == lang and unit['stem'] in (v['host'], v['caller'])]
+            if printings:
+                payload['canonical_printings'] = deepcopy(printings)
             for key in ('source_order','documentary_instructions','navigation'):
                 payload[key+'_sha256'] = hashlib.sha256(json.dumps(readings.get(key, {}), ensure_ascii=False, sort_keys=True).encode()).hexdigest()
             scans = sorted({f['scan'] for s in segments for f in s['fragments']} | {p['scan'] for v in overlays(readings, unit['stem'], lang) for p in v.get('printings', [])} | {p['scan'] for p in unit.get('additional_printings', {}).get(lang, [])})
@@ -583,8 +591,12 @@ def validate_generated(documents, readings):
         config = unit['canonical_home']
         for path, root in documents:
             if path.stem == config['file']:
-                if list(root.iter(T+'pb')):
-                    raise ValueError('Generated canonical home must contain no source page breaks')
+                from .canonical_printings import permitted_breaks
+                expected = permitted_breaks(readings, path.stem, root.get(X+'lang'))
+                pages = list(root.iter(T+'pb'))
+                actual = {(pb.get(X+'id'), pb.get('ed'), pb.get('n'), pb.get('facs')) for pb in pages}
+                if actual != expected or len(pages) != len(expected):
+                    raise ValueError('Generated canonical home contains undeclared source page breaks')
             if path.stem == unit['stem']:
                 canonical_root = config['urn']
                 if any(e.get('corresp') == canonical_root for e in root.iter(T+'div')):
@@ -678,7 +690,9 @@ def validate_generated(documents, readings):
         for target in targets:
             group = {r['corresp']:i == 0 for i,r in enumerate(item['readings'])}
             groups.setdefault(target, []).append(group)
-    for _, root in documents:
+    from .canonical_printings import guards as printing_guards
+    guarded = printing_guards(documents, readings)
+    for path, root in documents:
         active = []
         counter = 0
         for node in list(root.iter()):
@@ -716,6 +730,11 @@ def validate_generated(documents, readings):
                         raise ValueError('Caller must decide every wording option: '+target)
                     if not present:
                         defaults.update(group)
+                effective_settings = {**known, **defaults}
+                for printing in guarded:
+                    if (effective_settings.get(printing['feature']) is True
+                            and (path.stem != printing['caller'] or path.parent.name != PROJECTS[printing['lang']])):
+                        raise ValueError('Printing wording selected outside its attested caller')
                 if defaults:
                     parent = node.getparent();index = parent.index(node)
                     identifier = 'canonical_caller_wording_'+str(counter);counter += 1
