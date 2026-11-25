@@ -6,12 +6,13 @@ from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spel
 from .first_day import (poetic_lines, words_with_notes, mixed_words, expansion_scope,
                         EXPANSION_TARGETS)
 from .identities import text_urn, project_name
+from .printings import is_declaration, printing
 
 SECOND_DAY = 'urn:x-opensiddur:text:siddur:selichot/second_day'
 PRAYERS = [PRAYER+'el_melekh_yoshev', PRAYER+'vayaavor']
 OPENING = [PRAYER+name for name in ['ashrei', 'kaddish/selichot_preface',
     'kaddish/chatzi', 'lekha_adonai_hatsedaqah', 'shomea_tefillah',
-    'selah_lanu_avinu', 'el_erekh_apayim', 'vayaavor/selichot_preliminary']]
+    'selah_lanu_avinu', 'el_erekh_appayim_attah', 'vayaavor']]
 VERSES = [PRAYER+'adonai_boqer_tishma_qoli/repeat', PRAYER+'hateh_elohai_oznekha/repeat']
 
 
@@ -150,7 +151,7 @@ def verify_numbered_readings(source, project_directory, day_name):
         service = root.find(f'.//{{{TEI}}}body/{{{TEI}}}div')
         if service.get('corresp') != day_urn or normalize(service.find(f'{{{TEI}}}head').text) != normalize(data['heading'][lang]):
             raise ValueError('Numbered day needs its printed top-level heading')
-        units = [n for n in service if n.tag not in [f'{{{TEI}}}pb', f'{{{TEI}}}head']]
+        units = [n for n in service if n.tag not in [f'{{{TEI}}}pb', f'{{{TEI}}}head'] and not is_declaration(n)]
         if len(units) != len(data['units']):
             raise ValueError('Numbered-day boundary or source order changed')
         for reading, unit in zip(data['units'], units):
@@ -160,7 +161,7 @@ def verify_numbered_readings(source, project_directory, day_name):
                 module = etree.parse(str(project/(spelled_name(reading['filename'])+'.xml')))
                 if module.find(f'.//{{{TEI}}}idno[@type="urn"]').text != spelled_urn(reading['urn'])+'@'+project.name:
                     raise ValueError('Numbered-day canonical module identity changed')
-                unit = module.find(f'.//{{{TEI}}}body/{{{TEI}}}div')
+                unit = printing(project, spelled_name(reading['filename']))
             elif unit.get('corresp') != spelled_urn(day_urn+'/'+reading['id']):
                 raise ValueError('Numbered-day inline units are out of source order')
             unit = copy.deepcopy(unit)

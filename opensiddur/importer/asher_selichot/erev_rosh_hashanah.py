@@ -9,7 +9,8 @@ from lxml import etree
 from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spelled_name, spelled_urn
 from .first_day import (poetic_lines, words_with_notes, mixed_words,
                         append_words, expansion_scope)
-from .identities import project_name
+from .identities import RENAMED_URNS, project_name
+from .printings import is_declaration, printing
 
 EREV = 'urn:x-opensiddur:text:siddur:selichot/erev_rosh_hashanah'
 EXTRA = PRAYER+'selichot/rahamekha_rabbim'
@@ -58,7 +59,8 @@ def readings(source):
 
 def targets(reading, lang):
     value = reading.get('expansion_targets', [])
-    return value.get(lang, []) if isinstance(value, dict) else value
+    value = value.get(lang, []) if isinstance(value, dict) else value
+    return [RENAMED_URNS.get(target, target) for target in value]
 
 
 def body_words(parent, words, notes, lang):
@@ -257,18 +259,18 @@ def verify_readings(source, project_directory):
         project=project_directory/project_name(lang)
         service=etree.parse(str(project/'erev_rosh_hashanah.xml')).find(f'.//{{{TEI}}}body/{{{TEI}}}div')
         if normalize(service.find(f'{{{TEI}}}head').text)!=normalize(manifest['heading'][lang]):raise ValueError('Missing Erev heading')
-        nodes=[n for n in service if n.tag not in [f'{{{TEI}}}head',f'{{{TEI}}}pb']]
+        nodes=[n for n in service if n.tag not in [f'{{{TEI}}}head',f'{{{TEI}}}pb'] and not is_declaration(n)]
         if len(nodes)!=len(read):raise ValueError('Erev source order or boundary changed')
         for reading,node in zip(read,nodes):
             context=spelled_urn(reading.get('urn',EREV+'/'+reading['id']))
             if reading.get('filename'):
                 if node.get('target')!=context:raise ValueError('Erev module order changed')
-                node=etree.parse(str(project/(spelled_name(reading['filename'])+'.xml'))).find(f'.//{{{TEI}}}body/{{{TEI}}}div')
+                node=printing(project,spelled_name(reading['filename']))
             elif node.get('corresp')!=context:raise ValueError('Erev inline order changed')
             node=copy.deepcopy(node)
             if reading.get('range_urn'):
                 boundaries=node.findall(f'.//{{{TEI}}}milestone[@unit="prayer"]')
-                if [n.get('corresp') for n in boundaries]!=[reading['range_urn'],None]:
+                if [n.get('corresp') for n in boundaries]!=[spelled_urn(reading['range_urn']),None]:
                     raise ValueError('Reprinted prayer range boundaries changed')
                 prefix=('כִּי לֹא' if lang=='he' else 'for we do not presume') if reading['id']=='hateh_elohai' else ''
                 words=reading['fragments'][0][lang]['text']

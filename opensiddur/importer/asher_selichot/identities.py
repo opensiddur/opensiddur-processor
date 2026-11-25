@@ -13,6 +13,12 @@ def project_name(lang):
     in Latin letters, Selichoth."""
     return f'selichoth-asher-1912-{lang}'
 
+#: URNs the readings name that are now another text's (see TEXTS): the build writes the new one.
+RENAMED_URNS = {
+    BASE + 'prayer:el_erekh_apayim': BASE + 'prayer:el_erekh_appayim_attah',
+    BASE + 'prayer:vayaavor/selichot_preliminary': BASE + 'prayer:vayaavor',
+}
+
 # reading ID: (filename stem, canonical text identity)
 TEXTS = {
     'invocation': ('lekha_adonai_hatsedaqah', 'prayer:lekha_adonai_hatsedaqah'),
@@ -20,8 +26,10 @@ TEXTS = {
     'forgive_our_father': ('selah_lanu_avinu', 'prayer:selah_lanu_avinu'),
     'eikh_niftah': ('eikh_niftah_peh', 'poem:eikh_niftah_peh'),
     'mercy_invocation': ('ki_al_rahamekha', 'prayer:ki_al_rahamekha'),
-    'el_erekh_apayim': ('el_erekh_apayim', 'prayer:el_erekh_apayim'),
-    'vayaavor_before_selihot': ('vayaavor_preliminary', 'prayer:vayaavor/selichot_preliminary'),
+    # Not Tachanun's אֵל אֶרֶךְ אַפַּיִם וְרַב חֶסֶד (prayer:el_erekh_appayim): another text.
+    'el_erekh_apayim': ('el_erekh_appayim_attah', 'prayer:el_erekh_appayim_attah'),
+    # Vayaavor and the Thirteen Attributes it introduces, printed in full on p. 11 (build.py).
+    'vayaavor_before_selihot': ('vayaavor', 'prayer:vayaavor'),
     'morning_scriptural_petitions': ('adonai_boqer_tishma_qoli', 'prayer:adonai_boqer_tishma_qoli'),
     'selah_na': ('selah_na', 'prayer:selah_na'),
     'daniel_petition': ('hateh_elohai_oznekha', 'prayer:hateh_elohai_oznekha'),

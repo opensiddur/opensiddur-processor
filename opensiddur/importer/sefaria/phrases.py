@@ -101,11 +101,16 @@ def similarity(a: str, b: str) -> float:
 
 def map_phrases(new: Sequence[str], recorded: dict[int, str]) -> list[int]:
     """Numbers for the phrases ``new`` (skeletons, in order), given the phrases already
-    recorded for the text (number -> skeleton). The best order-keeping pairing of the same
-    phrases keeps their numbers; the rest are numbered after the highest recorded."""
+    recorded for the text (number -> skeleton), in the order the text prints them. The best
+    order-keeping pairing of the same phrases keeps their numbers; the rest are numbered after
+    the highest recorded.
+
+    The order is the printing's, not the numbers': a text printed after another volume's has its
+    own phrases numbered after that volume's, wherever in the text they stand (the Sefard full
+    Kaddish's וְיַצְמַח פּוּרְקָנֵהּ, after the Lita one's last phrase)."""
     if not recorded:
         return list(range(1, len(new) + 1))
-    old_numbers = sorted(recorded)
+    old_numbers = list(recorded)
     old = [recorded[n] for n in old_numbers]
     rows, cols = len(new), len(old)
     # Longest order-keeping pairing of same phrases, weighted by similarity.
@@ -141,13 +146,31 @@ def map_phrases(new: Sequence[str], recorded: dict[int, str]) -> list[int]:
 
 def recorded_phrases(project_dirs: Iterable[Path]) -> dict[str, dict[int, str]]:
     """The phrases already named in the Hebrew projects ``project_dirs``: text path ->
-    {number: skeleton of the phrase's words}."""
-    found: dict[str, dict[int, str]] = {}
+    {number: skeleton of the phrase's words}, in the order the text prints them.
+
+    Each project's order is its printing's; across projects, the fullest printing's order, with
+    each phrase only another project prints after the phrase that project prints it after. (A
+    printing that transcludes the text it opens with holds only the phrases after them: in the
+    order the projects come in, its phrases would stand before the opening ones.)"""
+    by_project: list[dict[str, dict[int, str]]] = []
     for project in project_dirs:
+        found: dict[str, dict[int, str]] = {}
         for xml_file in sorted(project.glob("*.xml")):
             for path, number, text in _phrases_in(etree.parse(str(xml_file)).getroot()):
                 found.setdefault(path, {}).setdefault(number, skeleton(text))
-    return found
+        by_project.append(found)
+    merged: dict[str, dict[int, str]] = {}
+    for path in dict.fromkeys(path for found in by_project for path in found):
+        printings = sorted((found[path] for found in by_project if path in found), key=len, reverse=True)
+        order = list(printings[0])
+        for printing in printings[1:]:
+            previous = None
+            for number in printing:
+                if number not in order:
+                    order.insert(0 if previous is None else order.index(previous) + 1, number)
+                previous = number
+        merged[path] = {n: next(p[n] for p in printings if n in p) for n in order}
+    return merged
 
 
 def _phrases_in(root: etree._Element) -> list[tuple[str, int, str]]:
@@ -169,7 +192,8 @@ def _phrases_in(root: etree._Element) -> list[tuple[str, int, str]]:
             feed(element.tail)
             return
         local = etree.QName(element).localname
-        if local in ("teiHeader", "standOff", "note"):
+        # A misprint's printed words (tei:sic): a phrase's words are the corrected ones.
+        if local in ("teiHeader", "standOff", "note", "sic"):
             feed(element.tail)
             return
         if local == "milestone" and element.get("unit") == "phrase":

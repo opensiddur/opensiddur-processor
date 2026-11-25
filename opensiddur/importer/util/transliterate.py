@@ -106,9 +106,11 @@ def transliterate_word(word: str) -> str:
             last_vowel = "\u05bb"
             continue
         if letter == "ו" and i > 0 and not (vowel_mark and vowel_mark not in HOLAM):
-            # Vav with holam is the vowel o, except after a sheva, where it is a consonant
-            # carrying the o (מִצְוֹת, "mitzvot").
-            if vowel_mark in HOLAM and SHEVA not in letters[i - 1][1]:
+            # Vav with holam is the vowel o, except after a letter with a sheva or a vowel of
+            # its own, where it is a consonant carrying the o (מִצְוֹת, "mitzvot"; עָוֹן,
+            # עֲוֺנֵינוּ, "avon", "avoneinu").
+            before = letters[i - 1][1]
+            if vowel_mark in HOLAM and SHEVA not in before and not any(m in VOWELS for m in before):
                 out.append("o")
                 last_vowel = vowel_mark
                 continue

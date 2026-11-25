@@ -3205,6 +3205,13 @@ end
             <xsl:copy-of select="@*"/>
             <xsl:attribute name="f:note-lang" select="$note-lang"/>
             <xsl:attribute name="f:text-lang" select="$text-lang"/>
+            <!-- Preserve the trailing word boundary before a parallel copy
+                 detaches this rubric from its paragraph and next sibling. -->
+            <xsl:attribute name="f:needs-space-after"
+                select="@f:needs-space-after = 'true' or
+                        (exists(ancestor::tei:p | ancestor::tei:l)
+                         and matches(string(following-sibling::node()[string(.) ne ''][1]),
+                                     '^[\p{L}\p{N}\p{Ps}]'))"/>
             <xsl:attribute name="f:needs-space"
                 select="exists(ancestor::tei:p | ancestor::tei:l)
                         and matches(string(preceding-sibling::node()[string(.) ne ''][1]), '\S$')"/>

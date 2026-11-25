@@ -13,6 +13,10 @@ class TestTransliterate(unittest.TestCase):
             "בָּרוּךְ אַתָּה יְהֹוָה": ["barukh", "attah", "adonai"],
             "הוֹדוּ לַיהוָֹה": ["hodu", "ladonai"],
             "מִצְוֹתָיו": ["mitzvotav"],
+            # A vav with holam after a vowelled letter is a consonant, however the holam is set.
+            "עָוֹן וְשָׁלוֹם": ["avon", "veshalom"],
+            "עֲוֺנֵינוּ": ["avoneinu"],
+            "עֲו\u200dֹנוֹת": ["avonot"],
             "מִלְּ֒פָנֶֽיךָ": ["milefanekha"],
             "מִלְּפָנֶֽיךָ": ["milefanekha"],
             "שַׁבָּת": ["shabbat"],

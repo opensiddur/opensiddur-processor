@@ -32,6 +32,9 @@ class Work:
     place: str
     translator: str
     date: str
+    #: the namespace a new text the book numbers (``markup.is_numbered``) is minted in: the
+    #: Selichot numbers its selichot, which are poems; every other new text is a prayer
+    numbered_texts: str = "prayer"
 
     @property
     def schema_file_title(self) -> str:
@@ -72,6 +75,7 @@ def load_works(path: Path = WORKS_FILE) -> dict[str, Work]:
             place=entry.get("place", ""),
             translator=entry["translator"],
             date=str(entry["date"]),
+            numbered_texts=str(entry.get("numbered_texts", "prayer")),
         )
     return works
 

@@ -71,6 +71,123 @@ class TestVariants(unittest.TestCase):
             self.assertEqual(first.xpath("//j:declare//tei:binary/@value", namespaces=NS), ["false"])
 
 
+class TestOpeningTransclusion(unittest.TestCase):
+    """A text that opens with another the volume prints (the full Kaddish, with the half
+    Kaddish): its file transcludes that text and holds only its own words."""
+
+    HALF = [("<b>אֵין כֵּאלֹהֵינוּ</b> אֵין כַּאדוֹנֵינוּ", "None like our God"),
+            ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ", "none like our King")]
+    OWN = [("מִי כֵאלֹהֵינוּ מִי כַאדוֹנֵינוּ", "Who is like our God")]
+    TABLE = f"""
+texts:
+  - opens: אין כאלהינו
+    ends: אין כמלכנו אין כמושיענו
+    urn: {T}prayer:half_text
+  - opens: אין כאלהינו
+    with: [מי כאלהינו]
+    ends: מי כאלהינו מי כאדונינו
+    urn: {T}prayer:full_text
+    transcludes: {T}prayer:half_text
+"""
+
+    def convert(self, full, half_again=None, corrections=""):
+        tree = {"Morning": {"Upon Arising": self.HALF, "Again": full}, "Blessings": BLESSINGS}
+        structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
+                     "Morning / Again": "chol/shacharit/again", "Blessings": "berakhot/test"}
+        if half_again:
+            tree["Morning"]["Later"] = half_again
+            structure["Morning / Later"] = "chol/shacharit/later"
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        write_work_dir(root / "sources" / "sefaria" / WORK.key, tree)
+        (root / "project").mkdir()
+        (root / "registry").mkdir()
+        (root / "decisions.yaml").write_text("{}\n")
+        (root / "equivalents.yaml").write_text(self.TABLE, encoding="utf-8")
+        (root / "corrections.yaml").write_text(corrections, encoding="utf-8")
+        convert_work(WORK, sourcetexts_root=root / "sources", project_directory=root / "project",
+                     registry_directory=root / "registry", urns_path=root / "urns.jsonl",
+                     index=IncipitIndex(), output_directory=root / "out",
+                     structure_path=write_structure(root / "s.yaml", structure),
+                     decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
+                     works={WORK.key: WORK}, equivalents_path=root / "equivalents.yaml",
+                     conditions_path=root / "conditions.yaml", corrections_path=root / "corrections.yaml")
+        self.projects = {lang: root / "project" / WORK.projects[lang] for lang in ("he", "en")}
+        return {lang: etree.parse(str(self.projects[lang] / "full_text.xml")) for lang in ("he", "en")}
+
+    def place(self, lang, name):
+        return etree.parse(str(self.projects[lang] / f"siddur_chol_shacharit_{name}.xml"))
+
+    def test_the_text_it_opens_with_is_transcluded(self):
+        for lang, text in self.convert(self.HALF + self.OWN).items():
+            with self.subTest(lang=lang):
+                div = text.find(".//tei:body/tei:div", namespaces=NS)
+                self.assertEqual(div[0].tag, f"{{{NS['j']}}}transclude")
+                self.assertEqual(div[0].get("target"), T + "prayer:half_text")
+                self.assertEqual(text.xpath("//tei:milestone[@unit='phrase']/@corresp", namespaces=NS),
+                                 [T + "metsudah:full_text/3"])
+
+    def test_a_misprint_corrected_in_the_text_it_opens_with_is_transcluded(self):
+        full = self.HALF + self.OWN
+        self.HALF = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ", "none like out King")]
+        corrections = (f"{WORK.key}:\n  - {{leaf: Morning / Upon Arising, lang: en, segment: 2, "
+                       "sic: out King, corr: our King}\n")
+        texts = self.convert(full, corrections=corrections)
+        self.assertEqual(texts["en"].find(".//tei:body/tei:div", namespaces=NS)[0].get("target"),
+                         T + "prayer:half_text")
+        half = etree.parse(str(self.projects["en"] / "half_text.xml"))
+        self.assertEqual([(c.findtext("tei:sic", namespaces=NS), c.findtext("tei:corr", namespaces=NS))
+                          for c in half.iterfind(".//tei:choice", namespaces=NS)], [("out King", "our King")])
+        # Uncorrected, the English differs, and the full text is written in full.
+        self.assert_in_full(self.convert(full))
+
+    def test_in_words_of_its_own_it_is_written_in_full(self):
+        changed = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ אַחֵר", "none like our King"), *self.OWN]
+        self.assert_in_full(self.convert(changed))
+
+    def test_in_english_or_rubrics_of_its_own_it_is_written_in_full(self):
+        english = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ", "none like our Sovereign"), *self.OWN]
+        rubric = [self.HALF[0], ("", "<small>Congregation:</small>"), self.HALF[1], *self.OWN]
+        for full in (english, rubric):
+            with self.subTest(full=full[1]):
+                self.assert_in_full(self.convert(full))
+
+    def test_the_place_declares_the_variants_of_the_text_it_opens_with(self):
+        # The full text's file holds the half text's first printing: each place transcluding the
+        # full text says the half text's variants are not printed there.
+        variant = [self.HALF[0], ("אֵין כְּמַלְכֵּנוּ אֵין כְּמוֹשִׁיעֵנוּ לְעוֹלָם", "none like our King ever")]
+        for lang, text in self.convert(self.HALF + self.OWN, half_again=variant).items():
+            with self.subTest(lang=lang):
+                self.assertEqual(text.xpath("//j:transclude/@target", namespaces=NS), [T + "prayer:half_text"])
+                place = self.place(lang, "again")
+                (declare,) = place.xpath("//j:declare[following-sibling::*[1][@target='%sprayer:full_text']]" % T,
+                                         namespaces=NS)
+                self.assertEqual(declare.xpath(".//tei:f/@name", namespaces=NS),
+                                 ["urn:x-opensiddur:condition:prayer:half_text/chol_shacharit_later"])
+                self.assertEqual(declare.xpath(".//tei:binary/@value", namespaces=NS), ["false"])
+
+    def test_an_instruction_the_text_opens_with_is_the_places(self):
+        # The text before runs on into the full text, unmarked: the block is cut where it opens,
+        # and the instruction between them goes with the full text's block.
+        before = ("<b>הוֹדוּ לַיהוָה</b> כִּי טוֹב", "Give thanks to God for He is good")
+        lead = ("", "<small>The Chazzan recites the following:</small>")
+        unmarked = (self.HALF[0][0].replace("<b>", "").replace("</b>", ""), self.HALF[0][1])
+        for lang in ("he", "en"):
+            texts = self.convert([before, lead, unmarked, self.HALF[1], *self.OWN])
+            with self.subTest(lang=lang):
+                self.assertEqual(texts[lang].xpath("//tei:note", namespaces=NS), [])
+                self.assertEqual(texts[lang].xpath("//j:transclude/@target", namespaces=NS), [T + "prayer:half_text"])
+        place = self.place("en", "again")
+        (note,) = place.xpath("//tei:note[following-sibling::j:transclude]", namespaces=NS)
+        self.assertEqual(" ".join(note.xpath("string()").split()), "The Chazzan recites the following:")
+
+    def assert_in_full(self, texts):
+        for text in texts.values():
+            self.assertEqual(text.xpath("//j:transclude", namespaces=NS), [])
+            self.assertEqual(len(text.xpath("//tei:milestone[@unit='phrase']/@corresp", namespaces=NS)), 3)
+
+
 class TestConditionsReachTheFiles(unittest.TestCase):
     def test_a_condition_rubric_becomes_a_conditional_in_both_languages(self):
         text = [MORNING[1], ("", "<small><i>On Rosh Chodesh add:</i></small>"),
@@ -174,6 +291,7 @@ class TestConvertWork(unittest.TestCase):
         decisions.write_text("{}\n")
         kwargs.setdefault("equivalents_path", Path(self.tmp.name) / "equivalents.yaml")
         kwargs.setdefault("conditions_path", Path(self.tmp.name) / "conditions.yaml")
+        kwargs.setdefault("corrections_path", Path(self.tmp.name) / "corrections.yaml")
         return convert_work(WORK, sourcetexts_root=self.sources, project_directory=self.projects,
                             registry_directory=self.registry, urns_path=self.urns, index=self.index,
                             output_directory=self.output, structure_path=self.structure,

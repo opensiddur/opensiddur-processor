@@ -17,6 +17,11 @@ then validates against that opensiddur-processor branch instead of main, and war
 the opensiddur-processor PR first, re-run the projects check (it falls back to main once the branch is
 deleted), then merge the projects PR.
 
+**Branches and pull requests.** Name branches `feat/<short-description>` (features),
+`fix/<short-description>` (bug fixes), `chore/<short-description>` (refactors, upgrades) or
+`temp/<short-description>` (not meant to be merged). Pull requests target `main`, and are
+squash-merged.
+
 This repository has 3 parts: 
 (1) schema documentation for the Jewish Liturgy Project TEI extension (`JLPTEI-3.md`) and formal RelaxNG and Schematron schemas (schema/ subdirectory)
 (2) importers (opensiddur/importer/ subdirectory) that 
@@ -42,6 +47,15 @@ no sources or projects until `git submodule update --init` has run.
 The compiled schema artifacts are gitignored, so a new worktree has none. Without them
 ~47 validation tests fail in a way that looks like a real regression rather than missing
 setup.
+
+Each worktree needs its own `uv sync --all-groups`. Never point a worktree's `.venv` at another
+worktree's: the editable install is per venv, so the next `uv sync` (which `build-schema.sh` also
+runs) makes the other worktree import this one's source.
+
+The submodules are pinned at the commits the last release was built against, so a fresh
+`git submodule update --init` is usually behind. Before running an importer or regenerating
+projects, check out `origin/main` in `opensiddur-projects/` and `master` in `sourcetexts/`
+(its default branch). Don't commit the moved submodule pointers in an opensiddur-processor PR.
 
 **Run code:**
 ```bash
@@ -119,7 +133,8 @@ uv run python -m opensiddur.importer.sefaria.update                   # monthly:
 ```
 URN decisions are recorded in `specs/sefaria/metsudah_urns.jsonl` (sticky: correct a line and rerun);
 leaves whose Hebrew and English cannot be paired automatically are decided in
-`opensiddur/importer/sefaria/alignment_decisions.yaml`. Curated knowledge that applies to every
+`opensiddur/importer/sefaria/alignment_decisions.yaml`; clear misprints, written as
+`tei:sic`/`tei:corr`, are listed in `corrections.yaml`. Curated knowledge that applies to every
 Metsudah volume lives beside it: `equivalents.yaml` (the URN a text opening so is — another rite's
 words for a text the collection names, a collage's name — and blocks that continue the text before
 them) and `conditions.yaml` (the book's condition rubrics, labels and marked alternatives, as
@@ -255,6 +270,15 @@ and Hebrew/English alignment after regeneration.
 
 **URN/`corresp` scoping**: A `corresp` on a `tei:milestone` scopes from that milestone to the next same-unit milestone, or end of file. This is the basis for parallel-text alignment: two documents share an alignment segment when they carry identical `corresp` values on their milestones.
 
+**Context belongs to the place, not the text.** An instruction that applies only where a text is
+said ("The reader recites the half Kaddish", "Congregation and reader:") goes in the structure or
+service file, before its `j:transclude`, never in the transcluded text's own file; otherwise it is
+set everywhere the text is transcluded. Likewise, the place declares which variant of a text it
+says, around the transclusion.
+
+**Encoding reference.** Before treating a condition, credit or structure as unsupported, look at
+how `hasiddur_hashalem-birnbaum-1949-he`/`-en` in opensiddur-projects encodes it, and follow that.
+
 **Project layout**: Every `project/<name>/` directory must have `index.xml` as its entry point. Individual text files refer back to the index via `tei:sourceDesc/tei:p/tei:ref` or a `tei:bibl/tei:ptr`.
 
 **Naming** (`specs/NAMING_SCHEME.md`):
@@ -274,12 +298,35 @@ and Hebrew/English alignment after regeneration.
   `uv run python -m opensiddur.common.validate_names [project ...]`; pull requests to
   opensiddur-projects must pass it. A new variant in `spellings.yaml` makes the projects that
   still use the old spelling fail, so regenerate them in a paired PR with the same branch name.
+- Until the 1.0 release, a renamed URN replaces the old one everywhere in the three repositories,
+  with no alias record (see `specs/NAMING_SCHEME.md`).
+- In a scriptural citation, separate chapter from verse with a colon: `במדבר ו:כד–כו`,
+  `Numbers 6:24–26`.
 
 ### Testing Conventions
 
 - Tests live in `opensiddur/tests/`, mirroring the package structure.
 - Write tests in `unittest` style.
 - Mock external calls (network APIs, file I/O where appropriate).
+- Test against mock or synthetic data files, never the project's real data (sources, projects,
+  settings files). A test must not fail because the data changed.
+- CI does not initialise the submodules, so `sourcetexts/sources/` and
+  `opensiddur-projects/project/` are absent there. Nothing a module does at import time may read
+  them; a test that passes locally can error in CI for that reason alone.
+- The JavaScript agreement tests (`test_condition_agreement.py`, `test_calendar_agreement.py`,
+  parts of `test_html_book.py`) skip without Node but run in CI. Set `$OPENSIDDUR_NODE` (see `opensiddur/exporter/README.md`)
+  before changing `condition.js`, `calendar.js` or the Python they port.
+- Don't run the tests while `opensiddur.exporter.refdb` or a compile runs in the same worktree:
+  the SQLite reference database locks, and unrelated tests fail with `database is locked`.
+- XML forbids `--` inside a comment. One in an `.xslt` comment (`reledmac.xslt` has many long
+  ones) makes every transform-based test fail at once; write a dash as `—`.
 - The CI runs `unittest discover`, but `uv run pytest` also works locally.
 - A pile of validation failures in a new worktree usually means the schema has not been
   compiled yet — see the setup step at the top of Commands.
+
+### Output fonts
+
+The release and projects-validation workflows install only Culmus, Linux Libertine, Ezra SIL and
+FreeFont. `books --check`, run on opensiddur-projects PRs, fails when none of the faces in a
+settings file's font chain is installed there, even if one is installed locally. Culmus faces have
+no middle dot (U+00B7); Ezra SIL and FreeSerif do.

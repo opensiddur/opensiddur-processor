@@ -23,6 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   uses. In a Minchah Amidah, a blessing printed at Minchah with no page break inside it had
   been given the Shacharit page's link. Where the edition prints the unit around a text, only
   that printing's breaks are linked.
+- The humash's festival Torah readings print only the verses read, in the order they are read.
+  A day that reads two passages of one book printed everything between them as well: over 600
+  verses of Numbers on the sixth day of Hanukkah, on the seventh when it is Rosh Hodesh, on
+  Shabbat Rosh Hodesh during Hanukkah and on the fourth day of Hol HaMoed Pesah, and 44 of
+  Exodus on fast days. Hanukkah's Numbers 7 came before the Rosh Hodesh aliyot read first, and
+  on the intermediate days of Sukkot the fourth aliyah came second (third on Hoshana Raba), with
+  the instruction to repeat the verse also before the aliyah after it, which repeats nothing.
+  The opening citation lists the passages, and each later passage opens with its own. The five
+  maftirs of Shabbat Hol HaMoed Sukkot, of which a congregation reads the one for the day that
+  Shabbat falls on, are no longer marked as repeating one another.
 
 ### Added
 - **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)

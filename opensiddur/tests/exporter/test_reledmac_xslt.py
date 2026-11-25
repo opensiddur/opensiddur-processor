@@ -2692,6 +2692,21 @@ class TestRunInRubricTrailingSpace(unittest.TestCase):
                '<tei:seg>כֹּהֲנִים</tei:seg></tei:p></tei:body></tei:text></tei:TEI>')
         self.assertIn('}\\ כֹּהֲנִים', _transform(xml))
 
+    def test_parallel_copy_preserves_the_trailing_boundary(self):
+        for tail, expected in [('<tei:seg>בָּרוּךְ</tei:seg>', r'\ בָּרוּךְ'),
+                               (' בָּרוּךְ', ' בָּרוּךְ'), (':', ':')]:
+            with self.subTest(tail=tail):
+                xml = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" '
+                       'xmlns:p="http://jewishliturgy.org/ns/processing">'
+                       '<tei:text><tei:body><p:parallel>'
+                       '<p:parallelItem role="primary" xml:lang="he"><tei:p>'
+                       '<tei:note type="description">מסיים</tei:note>' + tail +
+                       '</tei:p></p:parallelItem>'
+                       '<p:parallelItem role="parallel" xml:lang="en"><tei:p>Blessed</tei:p>'
+                       '</p:parallelItem></p:parallel></tei:body></tei:text></tei:TEI>')
+                out = _transform(xml)
+                self.assertRegex(out, r'מסיים\}+' + re.escape(expected))
+
     def test_existing_space_and_following_punctuation_are_not_changed(self):
         for tail in (' word', ':'):
             with self.subTest(tail=tail):

@@ -40,7 +40,7 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, is_phrase, split_block
 from opensiddur.importer.sefaria.equivalents import Equivalents
-from opensiddur.importer.sefaria.markup import is_pointed, plain_text
+from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, plain_text
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
@@ -67,12 +67,19 @@ MITZVAH_FORMULA = tuple(words("אשר קדשנו במצותיו וצונו"))
 #: ("yehi_ratzon", "shir_hamaalot") would claim an opening many texts share.
 MIN_NAME_WORDS, MAX_NAME_WORDS = 3, 8
 NEW_NAMESPACE = "prayer"
+#: The namespaces new texts are minted in, whose paths must not repeat across them.
+MINTED_NAMESPACES = frozenset({"prayer", "poem"})
 #: Openings that many petitions share: a new text is named "yehi_ratzon" and the words after.
 PETITION_FORMULAS = tuple(tuple(words(f)) for f in (
     "יהי רצון מלפניך יהוה אלהינו ואלהי אבותינו",
     "יהי רצון מלפניך יהוה אלהי ואלהי אבותי",
     "יהי רצון מלפניך יהוה אלהינו",
     "יהי רצון מלפניך יהוה אלהי",
+))
+#: An address a text opens with that names none of it: a selichah's "Our God and God of our
+#: fathers". A new text is named from the words after it, as Asher's Selichoth names them.
+ADDRESS_FORMULAS = tuple(tuple(words(f)) for f in (
+    "אלהינו ואלהי אבותינו",
 ))
 
 
@@ -399,6 +406,10 @@ def later_text(phrase_words: list[list[str]], urn: str | None, index: IncipitInd
         if not collage and (psalm := _psalm_opening(found_here, phrase_words[start:], own, index)) is not None \
                 and not _contains(printed, rest[:INCIPIT_WORDS // 2]):
             return start, psalm
+        if found_here and _contains(printed, rest[:INCIPIT_WORDS]):
+            # The collection prints the text going on with these words (Asher's Vayaavor, with the
+            # Thirteen Attributes a stanza of Ezkerah also quotes): they are the text's own.
+            continue
         verse = any(f[len(TEXT_PREFIX):].startswith("bible:")
                     and opening_agreement(f, rest, index) >= LATER_TEXT_AGREEMENT for f in found_here)
         for found in found_here:
@@ -669,8 +680,18 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
         return Resolution(urn, evidence, _chapter_end(urn, phrase_words, index))
     evidence.insert(0, f"opens like {urn}")
     split_at = None
+    cut_at_part = None
     for sibling in other_parts(urn) if parent(urn) else []:
         incipit = part_key(sibling)
+        if _is_stanza(sibling):
+            # A stanza worded otherwise opens where it agrees best, if well enough.
+            near = [(opening_agreement(sibling, [w for p in phrase_words[start:] for w in p], index), -start)
+                    for start in range(1, len(phrase_words))
+                    if sum(len(p) for p in phrase_words[:start]) >= 2]
+            best = max(near, default=None)
+            if best is not None and best[0] >= STANZA_AGREEMENT and (split_at is None or -best[1] < split_at):
+                split_at = -best[1]
+            continue
         for start in range(1, len(phrase_words)):
             if sum(len(p) for p in phrase_words[:start]) < 2:
                 continue  # not a word on its own (וְאָמְרוּ:) before the part it leads into
@@ -681,10 +702,16 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
                 # Six words open many texts alike (יהי רצון מלפניך ה׳ אלהינו ואלהי): the part
                 # must go on agreeing.
                 if split_at is None or start < split_at:
-                    split_at = start
+                    split_at, cut_at_part = start, sibling
                 break
     if split_at is not None:
         evidence.append(f"cut before phrase {split_at + 1}, where the next part of {parent(urn)} opens")
+        opening = index.first_part(urn)
+        if cut_at_part in index.included(urn) and opening not in (None, urn):
+            # A text made of parts (Birnbaum's half Kaddish: יתגדל, the response, יתברך), cut
+            # where another of its own parts opens: the block is the part it opens with.
+            evidence.append(f"the part {opening.rsplit(':', 1)[-1]} {urn.rsplit(':', 1)[-1]} opens with")
+            urn = opening
     # A text the index holds whole (shorter than its collected opening) ends where its words do.
     whole = index.own_opening(urn)
     if (cut_at_end and 0 < len(whole) < COLLECTED_WORDS and len(block_words) > len(whole) + 2
@@ -700,6 +727,16 @@ def resolve(candidates: set[str], phrase_words: list[list[str]], index: IncipitI
                     evidence.append(f"cut before phrase {j + 2}, where {urn.rsplit(':', 1)[-1]} ends")
                 break
     return Resolution(urn, evidence, split_at)
+
+
+#: How closely the next stanza of a poem must agree with the collection's, over its collected
+#: opening, where another rite words its opening otherwise (Nusach Lita's פְּחוּדִים הֵם מִכָּל
+#: צָרוֹת, Asher's ... צָרֵיהֶם): the stanza two lines on agrees at most 0.62.
+STANZA_AGREEMENT = 0.75
+
+
+def _is_stanza(urn: str) -> bool:
+    return urn.rsplit("/", 1)[-1].startswith("stanza_")
 
 
 #: The most words a last phrase opening "and" may add to a text the index holds whole and still
@@ -837,6 +874,22 @@ INSERTION_REST = 0.15
 VARIANT_COVERAGE = 0.5
 
 
+def regrouped_length(block_phrases: list[str], earlier: list[str]) -> int | None:
+    """How many of a block's phrases hold exactly the words of ``earlier`` (phrase skeletons),
+    lined otherwise: a text the book printed phrase by phrase and prints again as a paragraph
+    (the Selichot's later days, which set the close of the service in paragraphs). None when
+    the words differ, or when ``earlier`` ends inside one of the block's phrases."""
+    wanted = " ".join(earlier).split()
+    seen: list[str] = []
+    for count, phrase in enumerate(block_phrases, 1):
+        seen.extend(phrase.split())
+        if len(seen) >= len(wanted):
+            return count if seen == wanted else None
+        if seen != wanted[:len(seen)]:
+            return None
+    return None
+
+
 def repeat_length(block_phrases: list[str], earlier: list[str], coverage: float = REPEAT_COVERAGE,
                   *, insertions: bool = False, introduced: frozenset[int] = frozenset()) -> int | None:
     """How many of a block's phrases are a later printing of ``earlier`` (phrase skeletons),
@@ -949,9 +1002,9 @@ def introduced_phrases(block: TextBlock) -> frozenset[int]:
     return frozenset(found)
 
 
-def mint(text: str, taken: set[str], spellings: Spellings) -> str:
-    """A new ``prayer:`` URN from a text's incipit. A blessing is named from the words after
-    its formula, which every blessing shares."""
+def mint(text: str, taken: set[str], spellings: Spellings, namespace: str = NEW_NAMESPACE) -> str:
+    """A new URN in ``namespace`` (``prayer:`` unless the work says otherwise) from a text's
+    incipit. A blessing is named from the words after its formula, which every blessing shares."""
     # Words as the index counts them: a maqaf separates words, punctuation alone is none.
     # A parenthesized or unpointed word is a label or an abbreviation, not the text's words.
     hebrew = [token for token in re.split(r"[\s\u05be]+", re.sub(r"\([^)]*\)", " ", text))
@@ -960,6 +1013,11 @@ def mint(text: str, taken: set[str], spellings: Spellings) -> str:
         hebrew = hebrew[6:] or hebrew
         if tuple(words(" ".join(hebrew[:4]))) == MITZVAH_FORMULA:
             hebrew = hebrew[4:] or hebrew
+    for formula in ADDRESS_FORMULAS:
+        if (tuple(words(" ".join(hebrew[:len(formula)]))) == formula
+                and len(hebrew) >= len(formula) + MIN_NAME_WORDS):
+            hebrew = hebrew[len(formula):]
+            break
     if hebrew and words(hebrew[0]) == ["אמן"] and len(hebrew) > MIN_NAME_WORDS:
         hebrew = hebrew[1:]  # the response before the text (אָמֵן. כְּשֵׁם שֶׁנִּכְנַס)
     minimum = MIN_NAME_WORDS
@@ -969,18 +1027,22 @@ def mint(text: str, taken: set[str], spellings: Spellings) -> str:
             hebrew = hebrew[:2] + hebrew[len(formula):]
             minimum = MIN_NAME_WORDS + 1
             break
+    def free(name: str) -> bool:
+        # A path is taken in either namespace: a prayer and a poem of one name would share
+        # their metsudah: phrases.
+        return all(f"{TEXT_PREFIX}{other}:{name}" not in taken for other in MINTED_NAMESPACES | {namespace})
+
     for count in range(minimum, MAX_NAME_WORDS + 1):
         name = name_from_hebrew(" ".join(hebrew), count, spellings)
         if not name:
             break
-        urn = f"{TEXT_PREFIX}{NEW_NAMESPACE}:{name}"
-        if urn not in taken:
-            return urn
-    base = f"{TEXT_PREFIX}{NEW_NAMESPACE}:{name_from_hebrew(' '.join(hebrew), MAX_NAME_WORDS, spellings) or 'text'}"
+        if free(name):
+            return f"{TEXT_PREFIX}{namespace}:{name}"
+    base = name_from_hebrew(" ".join(hebrew), MAX_NAME_WORDS, spellings) or "text"
     n = 2
-    while f"{base}_{n}" in taken:
+    while not free(f"{base}_{n}"):
         n += 1
-    return f"{base}_{n}"
+    return f"{TEXT_PREFIX}{namespace}:{base}_{n}"
 
 
 def registry_urns(registry_directory: Path = REGISTRY_DIRECTORY) -> set[str]:
@@ -1015,6 +1077,7 @@ def decide_work(
     equivalents: Equivalents | None = None,
     registered: set[str] | None = None,
     clashes: Collection[str] = frozenset(),
+    numbered_namespace: str = NEW_NAMESPACE,
 ) -> Decisions:
     """Decide the URN of every block of ``work_key`` that has no current record.
 
@@ -1028,7 +1091,8 @@ def decide_work(
     on its last run, which a text whose words changed keeps. ``places`` gives each leaf's
     ``siddur:`` path, which names the variants printed there. ``equivalents`` are the curated
     choices (``equivalents.yaml``), and ``registered`` the URNs the registry holds: a chosen URN
-    it does not hold is minted.
+    it does not hold is minted: in ``prayer:``, or, when the book numbers the text (a numbered
+    label just before it, ``markup.is_numbered``), in ``numbered_namespace``.
     """
     decider = _Decider(work_key, index, records, taken, recorded_phrases or {},
                        spellings or load_spellings(), places or {})
@@ -1036,6 +1100,7 @@ def decide_work(
     decider.equivalents = equivalents or Equivalents()
     decider.registered = taken if registered is None else registered
     decider.clashes = clashes
+    decider.numbered_namespace = numbered_namespace
     return decider.run(leaves)
 
 
@@ -1081,6 +1146,8 @@ class _Decider:
         self.own_phrases: dict[str, dict[int, str]] = {}
         #: the paths more than one text namespace uses (``phrases.clashing_paths``)
         self.clashes: Collection[str] = frozenset()
+        #: the namespace a new text the book numbers is minted in (the work's ``numbered_texts``)
+        self.numbered_namespace = NEW_NAMESPACE
         self.index = index
         self.records = records
         self.taken = taken
@@ -1271,6 +1338,19 @@ class _Decider:
         split = resolve({urn}, phrase_words, self.index).split_at
         return split is not None or later_text(phrase_words, urn, self.index) is not None
 
+    def later_choice(self, leaf: str, phrase_words: list[list[str]], *,
+                     before: int | None = None) -> tuple[int, str] | None:
+        """Where a block runs on into a text ``equivalents.yaml`` chooses whole by its last
+        words (``ends``): the 0-based phrase it opens at, before ``before``, and its URN."""
+        end = len(phrase_words) if before is None else before
+        for start in range(1, end):
+            if sum(len(p) for p in phrase_words[:start]) < 2:
+                continue
+            found = self.equivalents.choice(leaf, [w for phrase in phrase_words[start:] for w in phrase])
+            if found is not None and found.ends:
+                return start, found.urn
+        return None
+
     def decide_anew(self, leaf: str, blocks: list[Item], i: int, record: TextRecord | None) -> None:
         block = blocks[i]
         assert isinstance(block, TextBlock)
@@ -1288,10 +1368,18 @@ class _Decider:
             if choice is not None:
                 # Chosen: the text is that one. It is cut only where another part of it opens.
                 found = (resolve({choice.urn}, pw, self.index, cut_at_end=False)
-                         if choice.urn in self.index.incipit_of else Resolution(None, []))
+                         if choice.urn in self.index.incipit_of and not choice.ends else Resolution(None, []))
                 if found.urn is None:
+                    # (A choice that names its last words is the text to them, its parts and all:
+                    # the half Kaddish is not cut where its response opens.)
                     found = Resolution(choice.urn, [])
                 found.evidence.insert(0, "chosen in equivalents.yaml" + (f": {choice.note}" if choice.note else ""))
+                end = choice.end(pw)
+                if end is not None and (found.split_at is None or end < found.split_at):
+                    # The words the text ends with, and more after them (the day's verses after
+                    # the Selichot's Vayaavor, printed without a bold opening): it ends there.
+                    found.split_at = end
+                    found.evidence.append(f"cut before phrase {end + 1}, after the words it ends with")
                 return found
             context = self.sibling(leaf, blocks, i, bw, pw)
             if context is not None:
@@ -1307,7 +1395,19 @@ class _Decider:
 
         resolution = find(phrase_words)
         cut = resolution.split_at
-        later = later_text(phrase_words, resolution.urn, self.index, before=cut)
+        # A choice that names its last words ends there, and no text it holds before them ends
+        # it first (the full Kaddish's הוּא יַעֲשֶׂה שָׁלוֹם, a text of its own in Birnbaum).
+        # A text this volume printed before is found where the block runs on into it, too
+        # (the Selichot's עֲשֵׂה עִמָּנוּ after a selichah).
+        later = (None if choice is not None and choice.ends
+                 else later_text(phrase_words, resolution.urn, self.index, before=cut)
+                 or later_text(phrase_words, resolution.urn, self.own, before=cut))
+        if choice is None or not choice.ends:
+            # A text chosen whole by its last words, which the block runs on into (Ashrei, then
+            # the half Kaddish, whose Sefard words do not agree closely with Birnbaum's).
+            chosen_later = self.later_choice(leaf, phrase_words, before=later[0] if later else cut)
+            if chosen_later is not None:
+                later = chosen_later
         if later is not None:
             # The block runs on into another text: what it is, it is up to there.
             at, found_text = later
@@ -1331,7 +1431,16 @@ class _Decider:
             length = repeat_length(skeletons, earlier_skeletons, VARIANT_COVERAGE, insertions=True,
                                    introduced=introduced_phrases(block))
             earlier_length = repeat_length(earlier_skeletons, skeletons, VARIANT_COVERAGE)
-            if (earlier_length is not None and earlier_length < len(earlier_skeletons)
+            regrouped = regrouped_length(skeletons, earlier_skeletons)
+            if (regrouped is not None and skeletons[:regrouped] != earlier_skeletons
+                    and not (length is not None and skeletons[:length] == earlier_skeletons)):
+                # The same words, lined otherwise (a paragraph where the first printing went
+                # phrase by phrase): the same text.
+                kind = "repeat"
+                cut = regrouped if regrouped < len(skeletons) else None
+                evidence.append("the same words as its first printing in this volume, lined otherwise; "
+                                "transcluded")
+            elif (earlier_length is not None and earlier_length < len(earlier_skeletons)
                     and skeletons == earlier_skeletons[:earlier_length] and urn not in self.chosen
                     and earlier_length not in introduced_phrases(earlier.block)):
                 # (Not where a rubric introduces what follows in the first printing: that is a
@@ -1410,8 +1519,18 @@ class _Decider:
                 self.keep(record, leaf, blocks, block)
                 return
         if urn is None:
-            urn = mint(text, self.taken, self.spellings)
-            kind = "new"
+            # The book numbers it: its heading, or the rubric just before it, is its number.
+            numbered = (block.head is not None and is_numbered(block.head.he)) or (
+                i > 0 and isinstance(blocks[i - 1], Rubric)
+                and any(is_numbered(pair.he) for pair in blocks[i - 1].pairs))
+            known = self.poem_worded_otherwise(block_words) if numbered else None
+            if known is not None:
+                urn = known
+                evidence.append(f"agrees with {known}, worded otherwise: the same poem")
+            else:
+                urn = mint(text, self.taken, self.spellings,
+                           self.numbered_namespace if numbered else NEW_NAMESPACE)
+                kind = "new"
         elif (kind == "existing" and urn not in self.index.incipit_of and urn not in self.registered
               and not urn.startswith(TEXT_PREFIX + "bible:")):
             # A name chosen for a text the collection does not hold yet. Scripture is named by
@@ -1441,6 +1560,20 @@ class _Decider:
         found |= self.index.by_incipit.get(tuple(block_words[:SHORT_INCIPIT_WORDS]), set())
         return any(not u[len(TEXT_PREFIX):].startswith("bible:") for u in found)
 
+    def poem_worded_otherwise(self, block_words: list[str]) -> str | None:
+        """The collection's poem a numbered selichah is, where another rite words its opening
+        otherwise (Nusach Lita's אָדוֹן דִּין אִם יְדֻקְדַּק, Asher's אִם יִדַּקֵּן): the whole poem
+        that agrees best over its collected opening, its address apart, if at least as well as
+        a stanza must (``STANZA_AGREEMENT``)."""
+        for formula in ADDRESS_FORMULAS:
+            if tuple(block_words[:len(formula)]) == formula:
+                block_words = block_words[len(formula):]
+        poem = TEXT_PREFIX + "poem:"
+        best = max(((opening_agreement(u, block_words, self.index), u) for u in self.index.incipit_of
+                    if u.startswith(poem) and not _is_stanza(u)
+                    and len(self.index.incipit_of[u]) >= INCIPIT_WORDS), default=None)
+        return best[1] if best is not None and best[0] >= STANZA_AGREEMENT else None
+
     def sibling(self, leaf: str, blocks: list[Item], i: int, block_words: list[str],
                 phrase_words: list[list[str]]) -> Resolution | None:
         """The next part of the text the block before it (rubrics apart) is a part of, when the
@@ -1469,6 +1602,17 @@ class _Decider:
         if len(block_words) >= SHORT_INCIPIT_WORDS and tuple(block_words[:len(BLESSING_FORMULA)]) != BLESSING_FORMULA:
             candidates |= self.index.by_incipit.get(tuple(block_words[:SHORT_INCIPIT_WORDS]), set())
         found = sorted(u for u in candidates if parent(u) == up and u != previous.urn)
+        if not found and _is_stanza(previous.urn):
+            # The next stanza, worded otherwise than the collection's: the stanza it agrees with best.
+            near = max(((opening_agreement(u, block_words, self.index), u)
+                        for u in self.index.children.get(up, []) if _is_stanza(u) and u != previous.urn),
+                       default=None)
+            if near is not None and near[0] >= STANZA_AGREEMENT:
+                resolution = resolve({near[1]}, phrase_words, self.index)
+                if resolution.urn is None:
+                    resolution = Resolution(near[1], [f"opens like {near[1]}, worded otherwise"])
+                resolution.evidence.append(f"the next stanza of {up}, as the text before it is")
+                return resolution
         if len(found) != 1:
             return None
         # A part of the same text, but not one the block agrees with less than another text.

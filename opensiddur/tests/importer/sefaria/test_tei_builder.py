@@ -5,7 +5,7 @@ from lxml import etree
 from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.source import Leaf
-from opensiddur.importer.sefaria.tei_builder import Notes, file_stem, render, text_body
+from opensiddur.importer.sefaria.tei_builder import Notes, VariantPrinting, file_stem, render, text_body
 from opensiddur.importer.sefaria.markup import parse_segment
 from opensiddur.importer.util.hebrew import to_nfkd
 
@@ -117,6 +117,37 @@ class TestTextBody(unittest.TestCase):
         out = render(parse_segment("<b>שָׁ</b>"), "he", None)
         self.assertNotIn("<", out)
         self.assertEqual(out, to_nfkd("\u05e9\u05c1\u05b8"))  # shin, shin dot, qamatz, reordered
+
+
+class TestVariantParts(unittest.TestCase):
+    """A document carries a URN once: a verse the text marks, which variants also name among
+    their own words, is marked once."""
+
+    def test_a_verse_is_marked_once(self):
+        (block,) = blocks([("<b>שְׁמַע יִשְׂרָאֵל</b> יְהֹוָה אֱלֹהֵֽינוּ יְהֹוָה אֶחָד:", "Hear, Israel"),
+                           ("בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ", "Blessed")])
+        (lined,) = blocks([("<b>שְׁמַע יִשְׂרָאֵל</b> יְהֹוָה אֱלֹהֵֽינוּ", "Hear, Israel"),
+                           ("יְהֹוָה אֶחָד:", "is One"), ("בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ", "Blessed")])
+        verse = T + "bible:deuteronomy/6/4"
+        variants = tuple(VariantPrinting(name, lined, [n, n + 1, 2], {n: verse}) for name, n in (("a", 3), ("b", 5)))
+        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), variants, {0: verse}))
+        self.assertEqual(he.xpath(f"count(//tei:milestone[@corresp='{verse}'])", namespaces=NS), 1)
+
+    def test_a_part_ends_where_a_part_already_marked_begins(self):
+        (block,) = blocks([("<b>שְׁמַע יִשְׂרָאֵל</b> יְהֹוָה אֱלֹהֵֽינוּ יְהֹוָה אֶחָד:", "Hear, Israel"),
+                           ("וְאָהַבְתָּ", "And you shall love")])
+        (passage,) = blocks([("<b>שְׁמַע יִשְׂרָאֵל</b> יְהֹוָה אֱלֹהֵֽינוּ יְהֹוָה אֶחָד:", "Hear, Israel"),
+                             ("בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ", "Blessed"),
+                             ("שְׁמַע יִשְׂרָאֵל שֵׁנִית", "Hear again"), ("וְאָהַבְתָּ", "And you shall love")])
+        verse, blessed = T + "bible:deuteronomy/6/4", T + "prayer:barukh_shem"
+        variant = VariantPrinting("a", passage, [1, 3, 4, 2], {3: blessed, 4: verse})
+        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), (variant,), {0: verse}))
+        # The passage's own part ends before the verse already marked: an empty milestone.
+        inside = he.xpath("//j:conditional/following-sibling::*[following-sibling::j:endConditional]"
+                          "[self::tei:milestone]", namespaces=NS)
+        marks = [(m.get("unit"), m.get("corresp")) for m in inside if m.get("unit") == "prayer" or m.get("corresp")]
+        self.assertEqual(marks[:4], [("prayer", blessed), ("phrase", T + "metsudah:shema/3"), ("prayer", None),
+                                     ("phrase", T + "metsudah:shema/4")])
 
 
 class TestConditionScopes(unittest.TestCase):

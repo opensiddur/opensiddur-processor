@@ -70,6 +70,13 @@ class TestMapPhrases(unittest.TestCase):
                skeleton("מֶֽלֶךְ חַי וְקַיָּם")]
         self.assertEqual(map_phrases(new, old), [1, 3, 2])
 
+    def test_the_order_is_the_printings_not_the_numbers(self):
+        # Phrase 3 was added after the first printing's own (an earlier volume named 1 and 2),
+        # between them: a later printing in the same words keeps every number.
+        old = {1: skeleton("מוֹדֶה אֲנִי לְפָנֶֽיךָ"), 3: skeleton("שֶׁהֶחֱזַֽרְתָּ בִּי נִשְׁמָתִי"),
+               2: skeleton("מֶֽלֶךְ חַי וְקַיָּם")}
+        self.assertEqual(map_phrases(list(old.values()), old), [1, 3, 2])
+
 
 class TestRecordedPhrases(unittest.TestCase):
     def test_reads_phrase_milestones_and_their_words(self):
@@ -77,14 +84,36 @@ class TestRecordedPhrases(unittest.TestCase):
                '<tei:text><tei:body><tei:div corresp="urn:x-opensiddur:text:prayer:modeh_ani"><tei:p>'
                f'<tei:milestone unit="phrase" corresp="{T}metsudah:modeh_ani/1"/>מוֹדֶה אֲנִי'
                '<tei:note type="instruction">not words</tei:note> '
-               f'<tei:milestone unit="phrase" corresp="{T}metsudah:modeh_ani/2"/><tei:hi rend="small">מֶֽלֶךְ</tei:hi>'
+               f'<tei:milestone unit="phrase" corresp="{T}metsudah:modeh_ani/2"/><tei:hi rend="small">מֶֽלֶךְ</tei:hi> '
+               '<tei:choice><tei:sic>חַי</tei:sic><tei:corr>חַי וְקַיָּם</tei:corr></tei:choice>'
                '</tei:p></tei:div></tei:body></tei:text></tei:TEI>')
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp) / "p"
             project.mkdir()
             (project / "modeh_ani.xml").write_text(xml, encoding="utf-8")
             found = recorded_phrases([project])
-        self.assertEqual(found, {"modeh_ani": {1: skeleton("מוֹדֶה אֲנִי"), 2: skeleton("מֶֽלֶךְ")}})
+        self.assertEqual(found, {"modeh_ani": {1: skeleton("מוֹדֶה אֲנִי"), 2: skeleton("מֶֽלֶךְ חַי וְקַיָּם")}})
+
+    def test_the_order_across_projects_is_the_fullest_printings(self):
+        # The first project transcludes the text the full Kaddish opens with, and holds only the
+        # phrases after it (and one of its own); the second prints it whole.
+        words = {1: "יִתְגַּדַּל", 2: "בְּעָלְמָא", 3: "יְהֵא", 4: "יִתְבָּרַךְ", 5: "תִּתְקַבַּל", 6: "וְיַצְמַח"}
+
+        def project(root, name, numbers):
+            milestones = "".join(f'<tei:milestone unit="phrase" corresp="{T}metsudah:kaddish/shalem/{n}"/>{words[n]} '
+                                 for n in numbers)
+            (root / name).mkdir()
+            (root / name / "kaddish_shalem.xml").write_text(
+                '<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he"><tei:teiHeader/><tei:text>'
+                f'<tei:body><tei:div><tei:p>{milestones}</tei:p></tei:div></tei:body></tei:text></tei:TEI>',
+                encoding="utf-8")
+            return root / name
+        with tempfile.TemporaryDirectory() as tmp:
+            found = recorded_phrases([project(Path(tmp), "a", [3, 4, 6]), project(Path(tmp), "b", [1, 2, 3, 4, 5])])
+        self.assertEqual(list(found["kaddish/shalem"]), [1, 2, 3, 4, 6, 5])
+        # Mapped against it, a whole printing keeps every number.
+        self.assertEqual(map_phrases([found["kaddish/shalem"][n] for n in (1, 2, 3, 4, 5)], found["kaddish/shalem"]),
+                         [1, 2, 3, 4, 5])
 
 
 if __name__ == "__main__":

@@ -58,12 +58,21 @@ class Break:
 
 
 @dataclass(frozen=True)
+class Correction:
+    """A misprint and its correction (``corrections.yaml``): the corrected words are the text's
+    words wherever words are compared, and both are written, as ``tei:sic`` and ``tei:corr``."""
+
+    sic: str
+    corr: str
+
+
+@dataclass(frozen=True)
 class Footnote:
     marker: str
     children: tuple["Node", ...]
 
 
-Node = Text | Styled | Break | Footnote
+Node = Text | Styled | Break | Footnote | Correction
 
 _TAG_STYLES = {"b": "bold", "strong": "bold", "i": "italic", "em": "italic", "small": "small",
                "big": "large", "span": "foreign", "sup": "superscript"}
@@ -142,6 +151,8 @@ def plain_text(nodes: Iterable[Node]) -> str:
     for node in walk(nodes):
         if isinstance(node, Text):
             parts.append(node.text)
+        elif isinstance(node, Correction):
+            parts.append(node.corr)
         elif isinstance(node, Break):
             parts.append(" ")
     return " ".join("".join(parts).split())
@@ -211,10 +222,28 @@ class EnglishKind(enum.Enum):
 MAX_LABEL_WORDS = 8
 
 
+#: A text's number, as the Selichot numbers its selichot: a Hebrew numeral and a stop
+#: (``א.`` to ``ק.``) before the selichah's description, title or nothing.
+NUMBER = re.compile(r"\s*[\u05d0-\u05ea]{1,3}\.(\s|$)")
+
+
+def is_numbered(nodes: tuple[Node, ...]) -> bool:
+    """A segment that numbers the text after it: ``יא. <small>חתום שמעון בר יצחק</small>``,
+    ``ד. <b>במוצאי מנוחה</b>``, ``נז.`` -- the numeral, then nothing pointed."""
+    text = plain_text(nodes)
+    return bool(NUMBER.match(text)) and not is_pointed(text)
+
+
 def hebrew_kind(nodes: tuple[Node, ...]) -> HebrewKind:
     text = plain_text(nodes)
     if not text:
         return HebrewKind.EMPTY
+    if is_numbered(nodes):
+        return HebrewKind.LABEL
+    if has_hebrew(text) and not is_pointed(text) and wholly(nodes, {"small"}):
+        # An instruction in small print, however long ("ש"ץ מתחיל בקול רם והצבור עונין
+        # אחריו פסוק אחר פסוק ..."): the book prints its texts pointed.
+        return HebrewKind.LABEL
     if (has_hebrew(text) and not is_pointed(text) and len(text.split()) <= MAX_LABEL_WORDS
             and wholly(nodes, {"bold", "small", "large"})):
         return HebrewKind.LABEL

@@ -14,6 +14,7 @@ from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spel
 from .first_day import poetic_lines, words_with_notes, mixed_words, expansion_scope, append_words, verify_half_kaddish
 from .erev_rosh_hashanah import printed as ordinary_printed, targets
 from .identities import project_name
+from .printings import is_declaration, printing
 
 PENITENTIAL_SECOND_DAY = 'urn:x-opensiddur:text:siddur:selichot/penitential_second_day'
 J = 'http://jewishliturgy.org/ns/jlptei/2'
@@ -197,13 +198,13 @@ def verify_readings(source,project_directory):
         project=project_directory/project_name(lang)
         service=etree.parse(str(project/'penitential_second_day.xml')).find(f'.//{{{TEI}}}body/{{{TEI}}}div')
         if normalize(service.find(f'{{{TEI}}}head').text)!=normalize(manifest['heading'][lang]):raise ValueError('second penitential day heading changed')
-        nodes=[n for n in service if n.tag not in [f'{{{TEI}}}head',f'{{{TEI}}}pb']]
+        nodes=[n for n in service if n.tag not in [f'{{{TEI}}}head',f'{{{TEI}}}pb'] and not is_declaration(n)]
         if len(nodes)!=len(units):raise ValueError('second penitential day source order changed')
         for reading,node in zip(units,nodes):
             context=spelled_urn(reading.get('urn',PENITENTIAL_SECOND_DAY+'/'+reading['id']))
             if reading.get('filename'):
                 if node.get('target')!=context:raise ValueError('second penitential day module order changed')
-                node=etree.parse(str(project/(spelled_name(reading['filename'])+'.xml'))).find(f'.//{{{TEI}}}body/{{{TEI}}}div')
+                node=printing(project,spelled_name(reading['filename']))
             elif node.get('corresp')!=context:raise ValueError('second penitential day inline order changed')
             node=copy.deepcopy(node)
             scopes=node.findall(f'{{{J}}}conditional')

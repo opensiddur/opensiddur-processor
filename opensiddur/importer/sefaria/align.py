@@ -22,7 +22,7 @@ Any other mismatch is an error that names the leaf, for a decision to be recorde
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Collection, Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
@@ -37,7 +37,7 @@ from opensiddur.importer.sefaria.markup import (
     hebrew_kind,
     parse_segment,
 )
-from opensiddur.importer.sefaria.source import Leaf, segments_hash
+from opensiddur.importer.sefaria.source import PATH_SEPARATOR, Leaf, segments_hash
 
 DECISIONS_FILE = Path(__file__).with_name("alignment_decisions.yaml")
 #: The most Hebrew segments the trailing rule leaves untranslated without a decision. Unlike an
@@ -188,3 +188,57 @@ def align_work(work_key: str, leaves: tuple[Leaf, ...],
     if errors:
         raise AlignmentError("\n".join(errors))
     return alignments
+
+
+def join_chapters(leaves: tuple[Leaf, ...], alignments: list[Alignment],
+                  joined_paths: Collection[str]) -> tuple[tuple[Leaf, ...], list[Alignment]]:
+    """The chapters of each leaf of depth 2 (``Leaf.chapter``) whose path is in ``joined_paths``
+    -- the structure table places the leaf, not its chapters -- aligned one by one, joined into
+    one leaf and one alignment: the segments numbered on through the leaf, and each chapter
+    opening a text at its first phrase. Every other leaf passes through as it is (the Song of
+    Songs, whose chapters the Shabbat siddur places one by one)."""
+    from opensiddur.importer.sefaria.blocks import is_phrase  # blocks imports this module
+
+    by_leaf = {a.leaf: a for a in alignments}
+    joined_leaves: list[Leaf] = []
+    joined: list[Alignment] = []
+    position = 0
+    while position < len(leaves):
+        leaf = leaves[position]
+        if not leaf.chapter or PATH_SEPARATOR.join(leaf.keys[:-1]) not in joined_paths:
+            joined_leaves.append(leaf)
+            if leaf in by_leaf:
+                joined.append(by_leaf[leaf])
+            position += 1
+            continue
+        chapters: list[Leaf] = []
+        while (position < len(leaves) and leaves[position].chapter
+               and leaves[position].keys[:-1] == leaf.keys[:-1]):
+            chapters.append(leaves[position])
+            position += 1
+        he: list[str] = []
+        en: list[str] = []
+        pairs: list[Pair] = []
+        opens: set[int] = set()
+        for chapter in chapters:
+            he_offset, en_offset = len(he), len(en)
+            alignment = by_leaf[chapter]
+            opening = True
+            for pair in alignment.pairs:
+                moved = Pair(None if pair.he_index is None else pair.he_index + he_offset,
+                             None if pair.en_index is None else pair.en_index + en_offset,
+                             pair.he, pair.en)
+                if opening and moved.he_index is not None:
+                    opens.add(moved.he_index)
+                if is_phrase(pair):
+                    opening = False
+                pairs.append(moved)
+            opens.update(index + he_offset for index in alignment.opens)
+            he.extend(chapter.he)
+            en.extend(chapter.en)
+        day = Leaf(leaf.keys[:-1], leaf.titles[:-1], tuple(he), tuple(en))
+        joined_leaves.append(day)
+        policies = {by_leaf[c].policy for c in chapters}
+        joined.append(Alignment(day, tuple(pairs), policies.pop() if len(policies) == 1 else "joined",
+                                frozenset(opens)))
+    return tuple(joined_leaves), joined

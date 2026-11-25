@@ -43,6 +43,7 @@ from opensiddur.importer.sefaria.align import Pair
 from opensiddur.importer.sefaria.blocks import Heading, Item, Rubric, TextBlock, is_heading, is_phrase
 from opensiddur.importer.sefaria.markup import (
     Break,
+    Correction,
     EnglishKind,
     HebrewKind,
     Footnote,
@@ -119,6 +120,9 @@ def render(nodes: Iterable[Node], lang: str, notes: Notes | None, *, in_note: bo
     for node in nodes:
         if isinstance(node, Text):
             out.append(_text(node.text, lang))
+        elif isinstance(node, Correction):
+            out.append(f"<tei:choice><tei:sic>{_text(node.sic, lang)}</tei:sic>"
+                       f"<tei:corr>{_text(node.corr, lang)}</tei:corr></tei:choice>")
         elif isinstance(node, Break):
             out.append(" ")
         elif isinstance(node, Footnote):
@@ -562,7 +566,7 @@ def _trailing_words(text: str, wanted: tuple[str, ...]) -> str | None:
     return None
 
 
-def _variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | None, list[tuple[Pair, int | None]]]:
+def variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | None, list[tuple[Pair, int | None]]]:
     """A variant's own words, by the phrase of the first printing they follow (None: before
     the first): each run of its new phrases, with the rubrics that lead into them."""
     passages: dict[int | None, list[tuple[Pair, int | None]]] = {}
@@ -593,7 +597,7 @@ def _variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | No
 def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes,
               variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None,
               verse_lengths: dict[str, int] | None = None, conditions: Conditions | None = None,
-              clashes: Collection[str] = frozenset()) -> str:
+              clashes: Collection[str] = frozenset(), opening: tuple[str, int] | None = None) -> str:
     """A text's division: its heading, then its phrases and the rubrics among them.
 
     With ``variants``, the one text of every printing: the first printing's words, a phrase a
@@ -603,7 +607,11 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     ``verses`` (``match.scripture_verses``) gives the verse of scripture each phrase that opens
     one opens: its ``bible:`` URN is set before the phrase, in both languages, and its scope
     closed after the phrase that ends it -- by its punctuation, or by its length in words where
-    ``verse_lengths`` knows it -- or before a rubric, unless another verse follows at once."""
+    ``verse_lengths`` knows it -- or before a rubric, unless another verse follows at once.
+
+    With ``opening`` -- a text's URN and a number of phrases -- the text opens with that text,
+    transcluded in place of its first phrases and the rubrics among them (the full Kaddish, with
+    the half Kaddish it opens with)."""
     verses = verses or {}
     verse_lengths = verse_lengths or {}
     verse_words = 0
@@ -611,8 +619,13 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     head = head_xml(block.head, lang, notes) if block.head is not None else ""
     writer = _TextWriter(urn, lang, notes, conditions, clashes)
     base = set(phrase_numbers)
-    passages = [(v, _variant_passages(v, base)) for v in variants]
+    passages = [(v, variant_passages(v, base)) for v in variants]
     absent = {n: [v.name for v in variants if n not in set(v.numbers)] for n in phrase_numbers}
+    # A document carries a URN once: a text a variant names among its own words is marked
+    # unless the text's own words, or another variant's, already mark it (two printings of the
+    # Shema lining שְׁמַע יִשְׂרָאֵל otherwise, each naming Deuteronomy 6:4).
+    skip = opening[1] if opening else 0
+    marked = {verse for position, verse in verses.items() if position >= skip}
 
     def insert(anchor: int | None) -> None:
         for variant, by_anchor in passages:
@@ -623,12 +636,18 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
                     if number is None:
                         writer.rubric(pair)
                         continue
-                    if number in variant.parts:
+                    if number in variant.parts and variant.parts[number] not in marked:
                         # A text the collection names, inside this text: its URN on a
                         # milestone (the next part's ends it), its scope closed with the passage.
+                        marked.add(variant.parts[number])
                         writer.end_phrase()
                         writer.parts.append(f'<tei:milestone unit="prayer" corresp="{attr(variant.parts[number])}"/>')
                         part_open = True
+                    elif number in variant.parts and part_open:
+                        # A part already marked ends the one before it, unmarked here.
+                        writer.end_phrase()
+                        writer.parts.append('<tei:milestone unit="prayer"/>')
+                        part_open = False
                     writer.phrase(pair, number)
                 if part_open:
                     writer.end_phrase()
@@ -640,10 +659,14 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     position = -1
     for pair in block.pairs:
         if not is_phrase(pair):
-            writer.rubric(pair)
+            if position + 1 >= skip:
+                writer.rubric(pair)
             continue
         number = next(numbers)
         position += 1
+        if position < skip:
+            insert(number)  # (the transcluded text's own words: only after its last, a variant's)
+            continue
         if position in verses:
             writer.verse(verses[position])
             verse_words, verse_length = 0, verse_lengths.get(verses[position])
@@ -663,7 +686,8 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     writer.close_calendar(everything=True)
     content = "\n".join(writer.parts)
     paragraph = f"<tei:p>{content}</tei:p>" if content else ""
-    return f'<tei:body><tei:div corresp="{attr(urn)}">{head}{paragraph}</tei:div></tei:body>'
+    transclusion = f'<j:transclude type="external" target="{attr(opening[0])}"/>' if opening else ""
+    return f'<tei:body><tei:div corresp="{attr(urn)}">{head}{transclusion}{paragraph}</tei:div></tei:body>'
 
 
 def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: dict[int, str],

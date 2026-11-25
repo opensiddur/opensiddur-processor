@@ -40,9 +40,44 @@ class Choice:
     urn: str
     leaf: str | tuple[str, ...] | None = None
     note: str = ""
+    #: the words the text ends with: only a block that has them is the text, and one that runs
+    #: on past them is cut there
+    ends: tuple[str, ...] = ()
+    #: words the block must also have (the full Kaddish's תתקבל), each a run of words
+    having: tuple[tuple[str, ...], ...] = ()
+    #: a text this one opens with, transcluded where the volume prints it in the same words (the
+    #: full Kaddish opens with the half Kaddish)
+    transcludes: str = ""
 
     def matches(self, leaf: str, block_words: list[str]) -> bool:
-        return _in_leaf(self.leaf, leaf) and tuple(block_words[:len(self.opens)]) == self.opens
+        return (_in_leaf(self.leaf, leaf) and tuple(block_words[:len(self.opens)]) == self.opens
+                and (not self.ends or _has(block_words, self.ends))
+                and all(_has(block_words, run) for run in self.having))
+
+    def reach(self, block_words: list[str]) -> int:
+        """How far into the block the text reaches: where ``ends`` last ends (-1 without it)."""
+        if not self.ends:
+            return -1
+        n = len(self.ends)
+        return max((k + n for k in range(len(block_words) - n + 1)
+                    if tuple(block_words[k:k + n]) == self.ends), default=-1)
+
+    def end(self, phrase_words: list[list[str]]) -> int | None:
+        """The 0-based phrase after the last one ``ends`` closes -- a refrain closes every stanza
+        -- where the block runs on past it."""
+        if not self.ends:
+            return None
+        seen: list[str] = []
+        found = None
+        for count, phrase in enumerate(phrase_words, 1):
+            seen.extend(phrase)
+            if tuple(seen[-len(self.ends):]) == self.ends:
+                found = count
+        return found if found is not None and found < len(phrase_words) else None
+
+
+def _has(block_words: list[str], run: tuple[str, ...]) -> bool:
+    return any(tuple(block_words[k:k + len(run)]) == run for k in range(len(block_words) - len(run) + 1))
 
 
 @dataclass(frozen=True)
@@ -50,6 +85,9 @@ class Join:
     opens: tuple[str, ...]
     leaf: str | tuple[str, ...] | None = None
     note: str = ""
+    #: words the text before must have (a part of the Kaddish joins only a Kaddish, which may run
+    #: on at the end of the block before it: Ashrei and the half Kaddish after it)
+    after: tuple[str, ...] = ()
 
     def matches(self, leaf: str, block_words: list[str]) -> bool:
         return _in_leaf(self.leaf, leaf) and tuple(block_words[:len(self.opens)]) == self.opens
@@ -61,12 +99,19 @@ class Equivalents:
     joins: tuple[Join, ...] = ()
 
     def choice(self, leaf: str, block_words: list[str]) -> Choice | None:
-        """The longest-opening choice a block matches."""
+        """The choice a block matches with the longest opening; among those, the one whose text
+        reaches furthest into the block (the full Kaddish, not the half Kaddish it opens with),
+        and then the one with more words it must have (the full Kaddish, not the Mourner's)."""
         found = [c for c in self.texts if c.matches(leaf, block_words)]
-        return max(found, key=lambda c: len(c.opens)) if found else None
+        return max(found, key=lambda c: (len(c.opens), c.reach(block_words), len(c.having))) if found else None
 
-    def joins_previous(self, leaf: str, block_words: list[str]) -> bool:
-        return any(j.matches(leaf, block_words) for j in self.joins)
+    def openings(self) -> dict[str, str]:
+        """Each text that opens with another, transcluded: its URN -> the URN of that other."""
+        return {c.urn: c.transcludes for c in self.texts if c.transcludes}
+
+    def joins_previous(self, leaf: str, block_words: list[str], previous_words: list[str] | None = None) -> bool:
+        return any(j.matches(leaf, block_words) and (
+            not j.after or _has(previous_words or [], j.after)) for j in self.joins)
 
 
 def _in_leaf(wanted: str | tuple[str, ...] | None, leaf: str) -> bool:
@@ -96,9 +141,16 @@ def load_equivalents(path: Path = EQUIVALENTS_FILE) -> Equivalents:
         urn = str(entry.get("urn", ""))
         if not urn.startswith(TEXT_PREFIX):
             raise EquivalentsError(f"{path.name} texts #{n}: {urn!r} is not a text URN")
+        if not isinstance(entry.get("with") or [], list):
+            raise EquivalentsError(f"{path.name} texts #{n}: with is a list of runs of words, not {entry['with']!r}")
         texts.append(Choice(_opens(entry, f"{path.name} texts #{n}"), urn, _leaf(entry),
-                            entry.get("note", "")))
-    joins = [Join(_opens(entry, f"{path.name} joins #{n}"), _leaf(entry), entry.get("note", ""))
+                            entry.get("note", ""), tuple(words(str(entry.get("ends", "")))),
+                            tuple(tuple(words(str(run))) for run in entry.get("with") or ()),
+                            str(entry.get("transcludes", ""))))
+        if texts[-1].transcludes and not texts[-1].transcludes.startswith(TEXT_PREFIX):
+            raise EquivalentsError(f"{path.name} texts #{n}: transcludes {texts[-1].transcludes!r}, not a text URN")
+    joins = [Join(_opens(entry, f"{path.name} joins #{n}"), _leaf(entry), entry.get("note", ""),
+                  tuple(words(str(entry.get("after", "")))))
              for n, entry in enumerate(data.get("joins") or (), start=1)]
     return Equivalents(tuple(texts), tuple(joins))
 
@@ -113,11 +165,13 @@ def apply_joins(leaf: str, items: list[Item], equivalents: Equivalents) -> list[
     rubrics and headings between them, and its own heading, become pairs inside the text."""
     merged: list[Item] = []
     for item in items:
-        if isinstance(item, TextBlock) and equivalents.joins_previous(leaf, _block_words(item)):
-            k = len(merged) - 1
-            while k >= 0 and isinstance(merged[k], (Rubric, Heading)):
-                k -= 1
-            if k >= 0 and isinstance(merged[k], TextBlock):
+        k = len(merged) - 1
+        while k >= 0 and isinstance(merged[k], (Rubric, Heading)):
+            k -= 1
+        previous = merged[k] if k >= 0 and isinstance(merged[k], TextBlock) else None
+        if isinstance(item, TextBlock) and equivalents.joins_previous(
+                leaf, _block_words(item), _block_words(previous) if previous is not None else None):
+            if previous is not None:
                 target = merged[k]
                 assert isinstance(target, TextBlock)
                 between: list = []

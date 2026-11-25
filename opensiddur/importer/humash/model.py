@@ -15,6 +15,13 @@ aliyah; it does not print those verses twice.
 28:3-5, yisrael 28:6-10, revi'i 28:11-15 — 28:3 belongs to both kohen and levi and really is
 read twice. Cutting at the union cannot express that, so a unit-space whose own spans overlap
 is emitted span by span and the shared verses are transcluded twice.
+
+A festival reading may also leave one stretch of a book for another: on the sixth day of
+Hanukkah the Rosh Hodesh aliyot, Numbers 28:1-15, are followed by Numbers 7:42-47. Cut at the
+union, the verses between the two would be printed as though they were read, so
+build.festival_file cuts such a reading into runs, each read without a break, segments each run
+by itself in the order it is read, and `mark_repeats` then decides over the whole reading which
+text is read again.
 """
 
 from __future__ import annotations
@@ -23,6 +30,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from opensiddur.importer.humash.refs import (
+    UNIT_MAFTIR,
     ReadingSpan,
     VerseRef,
     previous_verse,
@@ -37,8 +45,8 @@ class Segment:
     start: VerseRef
     end: VerseRef
     opening: list[ReadingSpan] = field(default_factory=list)
-    # Set when this segment repeats text already emitted, because two spans of one
-    # unit-space overlap.
+    # Set when this segment repeats text already emitted: by `segment_by_span` where two spans
+    # of one unit-space overlap, and by `mark_repeats` over a whole festival reading.
     duplicate: bool = False
 
     @property
@@ -167,3 +175,46 @@ def segment_reading(
     start = start if start is not None else min(span.start for span in spans)
     end = end if end is not None else max(span.end for span in spans)
     return segment_by_union(spans, start, end, sourcetexts_root)
+
+
+# readings.festival_readings labels the maftirs that hebcal keys by day, "M-day1" to "M-day5",
+# maftir_day1 to maftir_day5.
+DAY_MAFTIR_PREFIX = "maftir_day"
+
+
+def are_alternatives(first: ReadingSpan, second: ReadingSpan) -> bool:
+    """Whether two spans are alternatives for one place in a reading, only one of them read.
+
+    The maftir of Shabbat Chol HaMoed Sukkot depends on which intermediate day the Shabbat falls
+    on, and hebcal gives all five. Their verses overlap, but a congregation reads one of them,
+    so none of them reads another again.
+    """
+    return (
+        first.unit == second.unit == UNIT_MAFTIR
+        and first.label != second.label
+        and first.label.startswith(DAY_MAFTIR_PREFIX)
+        and second.label.startswith(DAY_MAFTIR_PREFIX)
+    )
+
+
+def mark_repeats(segments: list[Segment]) -> list[Segment]:
+    """Flag each of `segments`, given in reading order, that reads again text emitted before it.
+
+    `segment_by_span` flags the repeats among the spans it is given. A festival reading is
+    segmented a run at a time (build._reading_runs), and a later run may read again what an
+    earlier one read, so the flag is decided here over the whole reading. Segments opened by
+    spans that are alternatives to one another (`are_alternatives`) do not repeat each other.
+    """
+    for index, segment in enumerate(segments):
+        segment.duplicate = any(
+            earlier.start.book == segment.start.book
+            and earlier.start <= segment.end
+            and segment.start <= earlier.end
+            and not any(
+                are_alternatives(mine, theirs)
+                for mine in segment.opening
+                for theirs in earlier.opening
+            )
+            for earlier in segments[:index]
+        )
+    return segments

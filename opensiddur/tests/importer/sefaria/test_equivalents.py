@@ -79,6 +79,71 @@ texts:
             equivalents("texts:\n  - opens: אבג\n    urn: prayer:x\n")
         with self.assertRaises(EquivalentsError):
             equivalents("joins:\n  - opens: ''\n")
+        # A string for ``with`` would be read letter by letter: a run in every block.
+        with self.assertRaises(EquivalentsError):
+            equivalents("texts:\n  - opens: אבג\n    with: דהו\n    urn: urn:x-opensiddur:text:prayer:x\n")
+
+
+class TestEnds(unittest.TestCase):
+    """A choice that names the words its text ends with (the Selichot's full Kaddish)."""
+    TABLE = """
+texts:
+  - opens: יתגדל ויתקדש
+    ends: עשה שלום במרומיו
+    urn: urn:x-opensiddur:text:prayer:kaddish/shalem
+"""
+
+    def test_only_a_block_with_the_words_is_the_text(self):
+        table = equivalents(self.TABLE)
+        self.assertIsNotNone(table.choice("L", words("יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו")))
+        self.assertIsNone(table.choice("L", words("יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא")))
+
+    def test_the_text_ends_after_the_phrase_its_words_end(self):
+        (choice,) = equivalents(self.TABLE).texts
+        phrases = [words("יִתְגַּדַּל וְיִתְקַדַּשׁ"), words("עֹשֶׂה שָׁלוֹם"), words("בִּמְרוֹמָיו"), words("אַחֵר")]
+        self.assertEqual(choice.end(phrases), 3)
+        self.assertIsNone(choice.end(phrases[:3]))  # the block ends with them: nothing to cut
+
+
+class TestKaddishChoices(unittest.TestCase):
+    """Each Kaddish whole, told apart by its ending and the words it has."""
+    TABLE = """
+texts:
+  - opens: יתגדל ויתקדש
+    ends: דאמירן בעלמא ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/chatzi
+  - opens: יתגדל ויתקדש
+    with: [תתקבל צלותהון]
+    ends: ועל כל ישראל ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/shalem
+  - opens: יתגדל ויתקדש
+    ends: ועל כל ישראל ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/yatom
+joins:
+  - opens: יהא שמה רבא
+    after: יתגדל ויתקדש
+"""
+    HALF = "יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ יְהֵא שְׁמֵהּ רַבָּא יִתְבָּרַךְ דַּאֲמִירָן בְּעָלְמָא וְאִמְרוּ אָמֵן"
+    PEACE = " יְהֵא שְׁלָמָא עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל וְאִמְרוּ אָמֵן"
+
+    def choice(self, text):
+        return equivalents(self.TABLE).choice("L", words(text)).urn.rsplit("/", 1)[-1]
+
+    def test_the_kaddish_that_reaches_furthest_with_its_words(self):
+        self.assertEqual(self.choice(self.HALF), "chatzi")
+        self.assertEqual(self.choice(self.HALF + self.PEACE), "yatom")
+        self.assertEqual(self.choice(self.HALF + " תִּתְקַבֵּל צְלוֹתְהוֹן" + self.PEACE), "shalem")
+
+    def test_a_part_joins_only_a_kaddish(self):
+        table = equivalents(self.TABLE)
+        self.assertTrue(table.joins_previous("L", words("יְהֵא שְׁמֵהּ רַבָּא"), words("יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ")))
+        self.assertFalse(table.joins_previous("L", words("יְהֵא שְׁמֵהּ רַבָּא"), words("בָּרְכוּ אֶת יְהֹוָה")))
+        self.assertFalse(table.joins_previous("L", words("יְהֵא שְׁמֵהּ רַבָּא")))
+
+    def test_a_kaddish_running_on_at_the_end_of_the_block_before(self):
+        # Ashrei, and the half Kaddish after it in the same block.
+        before = words("אַשְׁרֵי יוֹשְׁבֵי בֵיתֶךָ הַלְלוּיָהּ יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ")
+        self.assertTrue(equivalents(self.TABLE).joins_previous("L", words("יְהֵא שְׁמֵהּ רַבָּא"), before))
 
 
 if __name__ == "__main__":

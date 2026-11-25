@@ -1,0 +1,22 @@
+# Where each node of Sefaria's schema for the Metsudah Selichot (Nusach Lita) sits in the book's
+# running order: its siddur: URN (specs/SIDDUR_URN_SCHEME.md), scoped to the Metsudah projects
+# by @project. The days are the days Asher's Selichoth names (selichoth-asher-1912), so the two
+# books' days share their siddur: paths.
+#
+# A day is a leaf of depth 2 in Sefaria's schema; its chapters are aligned one by one and joined
+# into the day (source.py, align.join_chapters), so only the day is placed.
+
+First Day: selichot/first_day
+Second Day: selichot/second_day
+Third Day: selichot/third_day
+Fourth Day: selichot/fourth_day
+Fifth Day: selichot/fifth_day
+Sixth Day: selichot/sixth_day
+Seventh Day: selichot/seventh_day
+Erev Rosh Hashana: selichot/erev_rosh_hashanah
+Fast of Gedaliah: selichot/tzom_gedaliah
+Second Day of the Ten Days of Penitence: selichot/penitential_second_day
+Third Day of the Ten Days of Penitence: selichot/penitential_third_day
+Fourth Day of the Ten Days of Penitence: selichot/penitential_fourth_day
+Fifth Day of the Ten Days of Penitence: selichot/penitential_fifth_day
+Yom Kippur Eve: selichot/erev_yom_kippur

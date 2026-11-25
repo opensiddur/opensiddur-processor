@@ -184,7 +184,8 @@ variants:
   zokef: zoqef
   # Tzadi is tz, not ts
   atsmi: atzmi
-  behimamtseo: behimmatzeo
+  behimamtseo: behimmatzo
+  behimmatzeo: behimmatzo
   betsa: betza
   betsedeq: betzedeq
   betsidqat: betzidqat
@@ -420,6 +421,7 @@ variants:
   # Other
   azariah: azaryah
   haeil: hael
+  machshvot: machshevot
   meros: merosh
   neessar: neesar
   rashaa: rasha

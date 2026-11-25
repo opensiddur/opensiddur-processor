@@ -5,7 +5,19 @@
 # texts: the URN a block opening so is -- the collection's text it does the same job as, in
 #        another rite's words, or the name a new text is given (a verse collage by its function or
 #        common incipit, or a name shared with an opensiddur.org post).
-# joins: a block opening so continues the text before it in its leaf.
+#        `ends` gives the words the text ends with: only a block that has them is the text, and
+#        a block that runs on past them, into a text the book does not mark, is cut there.
+#        `with` lists words the block must also have. Of the choices a block matches, the one
+#        with the longest opening wins, then the one whose ending reaches furthest into the
+#        block (the full Kaddish, not the half Kaddish it opens with), then the one with more
+#        `with` (the full Kaddish, with תתקבל, not the Mourner's).
+#        `transcludes` names a text this one opens with: where the volume prints that text and
+#        the block opens with its words, phrase for phrase, the text's file transcludes it and
+#        holds only its own words after it (each larger Kaddish, the half Kaddish) -- unless the
+#        English or rubrics there differ. A place transcluding it declares that text's variants
+#        not printed.
+# joins: a block opening so continues the text before it in its leaf; with `after`, only a text
+#        that has those words (the Kaddish may run on at the end of the block before it).
 
 texts:
   # -- The Shema and its blessings -------------------------------------------------------------
@@ -205,8 +217,111 @@ texts:
   - opens: חי יהוה וברוך צורי
     urn: urn:x-opensiddur:text:poem:chai_adonai_uvarukh_tzuri
     note: "a song: poem:"
+  # -- The Selichot ----------------------------------------------------------------------------
+  # Texts Asher's Selichoth prints whole, which the Metsudah volume prints running on into the
+  # next, or divided where it sets a verse in bold: each whole, by its last words.
+  # The pizmon יִשְׂרָאֵל נוֹשַׁע, stanza by stanza: Asher's stanzas, not the recension Asher
+  # prints for the fasts (poem:yisrael_nosha/fast_day_recension), whose stanzas are numbered.
+  - opens: ישראל נושע ביהוה תשועת עולמים גם
+    urn: urn:x-opensiddur:text:poem:yisrael_nosha/yisrael_nosha
+  - opens: שעריך הם דופקים
+    urn: urn:x-opensiddur:text:poem:yisrael_nosha/shearekha
+  - opens: פחודים הם מכל
+    urn: urn:x-opensiddur:text:poem:yisrael_nosha/pechudim
+  - opens: טובותיך יקדמו להם
+    urn: urn:x-opensiddur:text:poem:yisrael_nosha/mituvekha
+  - opens: יושעו לעין כל
+    urn: urn:x-opensiddur:text:poem:yisrael_nosha/yivashu
+  - opens: הקשיבה אדון לקול שועתם
+    urn: urn:x-opensiddur:text:poem:yisrael_nosha/haqshivah
+  - opens: כרחם אב על בנים כן תרחם
+    ends: יהוה הושיעה המלך יעננו ביום קראנו
+    urn: urn:x-opensiddur:text:prayer:adonai_boqer_tishma_qoli/repeat
+    note: "the verses Asher's Selichoth repeats, כרחם אב to ביום קראנו (Birnbaum's qorbanot/pesuqim are its last three)"
+  - opens: סלח נא לעון העם הזה
+    ends: ויאמר יהוה סלחתי כדברך
+    urn: urn:x-opensiddur:text:prayer:selach_na
+    note: "with the verse it leads into, ויאמר ה׳ סלחתי כדברך, as Asher's Selichoth prints it"
+  - opens: הטה אלהי אזנך ושמע
+    ends: כי שמך נקרא על עירך ועל עמך
+    urn: urn:x-opensiddur:text:prayer:hatteh_elohai_oznekha
+    note: "Daniel's petition, הטה to על עירך ועל עמך, as Asher's Selichoth prints it"
+  - opens: שומר ישראל שמור שארית ישראל
+    ends: האמרים שמע ישראל
+    urn: urn:x-opensiddur:text:prayer:tachanun/shomer_yisrael/text
+  - opens: שומר גוי אחד שמור שארית עם אחד
+    ends: המיחדים שמך יהוה אלהינו יהוה אחד
+    urn: urn:x-opensiddur:text:prayer:tachanun/shomer_goy_echad/text
+  - opens: שומר גוי קדוש שמור שארית עם קדוש
+    ends: המשלשים בשלש קדשות לקדוש
+    urn: urn:x-opensiddur:text:prayer:tachanun/shomer_goy_qadosh/text
+  - opens: מתרצה ברחמים ומתפיס בתחנונים
+    ends: לדור עני כי אין עוזר
+    urn: urn:x-opensiddur:text:prayer:mitratzeh_berachamim
+  - opens: אבינו מלכנו חננו ועננו
+    ends: עשה עמנו צדקה וחסד והושיענו
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/chonnenu
+  - opens: לך אדני הצדקה ולנו בשת הפנים
+    leaf: ["First Day", "Second Day", "Third Day", "Fourth Day", "Fifth Day", "Sixth Day", "Seventh Day", "Erev Rosh Hashana", "Fast of Gedaliah", "Second Day of the Ten Days of Penitence", "Third Day of the Ten Days of Penitence", "Fourth Day of the Ten Days of Penitence", "Fifth Day of the Ten Days of Penitence", "Yom Kippur Eve"]
+    urn: urn:x-opensiddur:text:prayer:lekha_adonai_hatzedaqah
+    note: "Asher's Selichoth prints the verse's אֲדֹנָי as the divine name"
+  # -- The Kaddish: each printing whole, by the words that tell one Kaddish from another --------
+  - opens: יתגדל ויתקדש שמה רבא
+    ends: דאמירן בעלמא ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/chatzi
+    note: "the half Kaddish, whole: יתגדל, the response and יתברך, as Birnbaum builds it and Asher prints it"
+  - opens: יתגדל ויתקדש שמה רבא
+    with: [תתקבל צלותהון]
+    ends: ועל כל ישראל ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/shalem
+    transcludes: urn:x-opensiddur:text:prayer:kaddish/chatzi
+    note: "the full Kaddish, with תתקבל; the Selichot's later days print it in paragraphs, the response and יתברך in one"
+  - opens: יתגדל ויתקדש שמה רבא
+    with: [על ישראל ועל רבנן]
+    ends: ועל כל ישראל ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/derabbanan
+    transcludes: urn:x-opensiddur:text:prayer:kaddish/chatzi
+    note: "Kaddish d'Rabbanan, with על ישראל ועל רבנן"
+  - opens: יתגדל ויתקדש שמה רבא
+    ends: ועל כל ישראל ואמרו אמן
+    urn: urn:x-opensiddur:text:prayer:kaddish/yatom
+    transcludes: urn:x-opensiddur:text:prayer:kaddish/chatzi
+    note: "the Mourner's Kaddish: יהא שלמא and עושה שלום after the half Kaddish, without תתקבל or על ישראל"
+  - opens: שמע ישראל יהוה אלהינו יהוה אחד איחד צורי
+    leaf: Fast of Gedaliah
+    ends: שמע ישראל יהוה אלהינו יהוה אחד
+    urn: urn:x-opensiddur:text:poem:ayached_tzuri_verov_hodaot
+    note: "Yosef bar Shmuel Tov Elem's selichah, the Shema its refrain: one poem, named by its first line"
+  - opens: שמע ישראל יהוה אלהינו יהוה אחד אמן פתחי תשובה
+    leaf: Fifth Day of the Ten Days of Penitence
+    ends: מחסנו וסתרנו האר פניך אלינו יהי חסדך יהוה עלינו
+    urn: urn:x-opensiddur:text:poem:amon_pitchei_teshuvah
+    note: "a selichah with the Shema its refrain until its last stanzas, each opening with the last word of the one before: one poem, named by its first line"
+  - opens: ויעבר יהוה על פניו ויקרא
+    urn: urn:x-opensiddur:text:prayer:vayaavor
+    ends: כי אתה אדני טוב וסלח ורב חסד לכל קראיך
+    note: "the introduction and the Thirteen Attributes it introduces, one text (Asher's Selichoth, Tachanun, the Selichot); in the Selichot the day's verses after it are a text of their own"
 
 joins:
+  # A verse the book sets in bold inside a text Asher's Selichoth prints whole.
+  - opens: ויאמר יהוה סלחתי כדברך
+    after: סלח נא לעון העם הזה
+  - opens: כי לא על צדקתינו
+    after: הטה אלהי אזנך ושמע
+  # The Kaddish's parts, where the book sets one apart (after a rubric, or opening in bold),
+  # are the Kaddish's own words: joined to the Kaddish before them, and to nothing else.
+  - opens: יהא שמה רבא מברך
+    after: יתגדל ויתקדש
+  - opens: יתברך וישתבח
+    after: יתגדל ויתקדש
+  - opens: תתקבל צלותהון
+    after: יתגדל ויתקדש
+  - opens: יהא שלמא רבא
+    after: יתגדל ויתקדש
+  - opens: על ישראל ועל רבנן
+    after: יתגדל ויתקדש
+  - opens: עשה שלום במרומיו
+    after: יתגדל ויתקדש
   # The Shema's paragraphs, and the verse said silently after its first, are one text.
   - opens: ברוך שם כבוד מלכותו לעולם ועד
     leaf: The Morning Prayers / Recitation of Shema

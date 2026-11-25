@@ -27,7 +27,12 @@ For each work the importer reads three files:
 - `schemas/<Title>.json` — the index record. A liturgical work is a *complex text*: a tree of
   named sections (schema nodes, each with an English `key` and English and Hebrew titles)
   whose leaves are jagged arrays. The Metsudah leaves have depth 1 ("Paragraph"); Shabbat and
-  Selichot have some of depth 2 ("Chapter", "Paragraph"), read as a leaf per chapter.
+  Selichot have some of depth 2 ("Chapter", "Paragraph"), read as a leaf per chapter. Where the
+  structure table places the leaf itself rather than its chapters (each day of the Selichot,
+  whose chapters are its selichot and the runs of the service between them), the chapters are
+  aligned one by one and then joined into the one leaf, numbered on, each chapter opening a text
+  at its first phrase (`align.join_chapters`). The Song of Songs, an inner node of the Shabbat
+  siddur whose chapters the table places one by one, stays a leaf per chapter.
 - The Hebrew and the English version files, `json/<categories>/<Title>/<Language>/<versionTitle>.json`:
   the same tree, its leaves arrays of strings. Never `merged.json`, which mixes in every other
   version (for Yom Kippur and Shabbat, a near-empty "Community Translation" with junk in it).
@@ -120,6 +125,17 @@ Pairs each leaf's Hebrew and English segments:
   whose songs and verses have no bold openings); a leaf whose counts agree may have a decision
   for this alone.
 
+**Misprints** (`corrections.yaml`, `corrections.py`). A clear misprint in a segment — a
+typographical error, or a slip that makes one printing of a text differ from the book's other
+printings of it ("if His Messiah" in the Weekday half Kaddish, "far above" for the lone לְעֵלָּא
+in the Selichot's first half Kaddish) — is listed by work, leaf (its path before chapters are
+joined), version, 1-based segment, the words as printed (`sic`) and as corrected (`corr`). After
+alignment the words are marked in their segment: the files write both, `tei:choice/tei:sic +
+tei:corr`, for `readings.errors` to choose (corrected by default), and every comparison of words
+(matching, a text's printings, the opening a larger text shares with a smaller one) uses the
+corrected words. An entry whose words are not in its segment exactly once is an error. Wording
+that is a translator's choice is not a misprint, and stays as printed.
+
 ### 3. Texts and rubrics (`blocks.py`, `markup.py`)
 
 A leaf is a stretch of the book, not one text. The book marks where each text begins — the
@@ -136,7 +152,11 @@ first words in bold, or a heading — so a leaf is divided into:
 - **headings** with no text before the next.
 
 Pointing tells a heading from text that happens to be bold: Metsudah's headings (`<b>אבות</b>`)
-are unpointed, its liturgy pointed.
+are unpointed, its liturgy pointed. Unpointed Hebrew set wholly in small print is an instruction
+however long it runs (`ש"ץ מתחיל בקול רם והצבור עונין אחריו פסוק אחר פסוק ...`). A Hebrew numeral
+and a stop before the line (`יא. <small>חתום שמעון בר יצחק</small>`, `ד. <b>במוצאי מנוחה</b>`)
+is the number the Selichot gives a selichah: a label, a rubric before the text it numbers
+(`markup.is_numbered`).
 
 ### 4. URNs (`match.py`)
 
@@ -148,7 +168,9 @@ Each text's URN, in order of preference:
    in it without long gaps, and is cut where the earlier printing ends; an earlier printing that
    ran on past a later one is cut where the later one ends.
    - **A repeat** prints exactly the first printing's words, phrase for phrase, and transcludes
-     it.
+     it. Exactly its words lined otherwise are a repeat too, cut after the phrase they end in
+     (`regrouped_length`): the Selichot prints the close of the service phrase by phrase on its
+     first day and in untranslated paragraphs on the days after.
    - **A variant** is mostly the same with words of its own — a passage added (Nachem in
      Minchah's Boneh Yerushalayim on Tisha b'Av), left out, or worded otherwise. It keeps the
      text's URN, and the one text file holds every printing: the first printing's words, a
@@ -174,14 +196,39 @@ Each text's URN, in order of preference:
    a verse collage by its function (`shesh_zekhirot`) or common incipit (`yehi_khevod`), or
    the name an opensiddur.org post already has (`shirat_hayam`). `joins` make a block
    continue the text before it in its leaf, the rubrics and headings between becoming pairs
-   inside it (the Shema's paragraphs; the six remembrances, their labels descriptions). The
+   inside it (the Shema's paragraphs; the six remembrances, their labels descriptions). A join
+   may name words the text before must have (`after`): the Kaddish's parts the book sets apart
+   (its response, יתברך, תתקבל, יהא שלמא, על ישראל, עושה שלום) join only a Kaddish, even one
+   that runs on at the end of the block before it (Ashrei, then the half Kaddish). The
    choices apply to every Metsudah volume; they are knowledge about texts, not decisions about
    one block. A text chosen this way is not cut by a shorter later printing, and a later
-   printing of it that differs is its variant.
+   printing of it that differs is its variant. A choice may name the words its text ends with
+   (`ends`), and runs of words it must also have (`with`): only a block that has them is that
+   text, the one reaching furthest into the block winning, then the one with more `with` —
+   each Kaddish is chosen whole this way, `kaddish/shalem` (with תתקבל) and not the half
+   Kaddish or the Mourner's that open alike, and a block that runs on into such a text
+   unmarked is cut where it opens (Ashrei, then a half Kaddish whose Sefard words do not agree
+   closely with Birnbaum's) — and the text ends there, cut
+   before what the book runs on into without marking it (the day's verses after the
+   Selichot's Vayaavor), never earlier for a text it holds (the full Kaddish's
+   הוּא יַעֲשֶׂה שָׁלוֹם). A choice may name a text its text opens with (`transcludes`): where
+   the volume prints that text and the block opens with its words, phrase for phrase, words no
+   variant of the larger text changes, the larger text's file transcludes it and holds only its
+   own words after it — each larger Kaddish transcludes the volume's half Kaddish. The
+   transcluded text stands for everything in the place it takes, so its first printing must
+   have the same rubrics there and the same English. Which of its variants is said is the
+   place's to declare: the larger text's file holds its first printing, so each place
+   transcluding the larger text declares the smaller text's variants not printed (the
+   Selichot's closing full Kaddish, with לְעֵלָּא מִן כָּל, on the Ten Days as on the other days).
 3. **The next part of the same text.** Where the block before it (rubrics apart) is a part of a
    text, a block that one of its keys finds among that text's parts — and agrees with at least
    as well as with any other candidate — is that part: the Kedushah's קדוש קדוש קדוש is
-   `amidah/qedushah/qadosh` there, not Yotzer's.
+   `amidah/qedushah/qadosh` there, not Yotzer's. A poem's stanzas (`…/stanza_N`) another rite
+   words a little otherwise are found by agreement rather than by their first words: a stanza
+   ends where the collection's next stanza agrees best over its collected opening, if at least
+   0.75 (`STANZA_AGREEMENT`; two lines off, Nusach Lita's Yisrael Nosha agrees at most 0.62),
+   and the block after a stanza is the stanza it agrees with best. Each keeps the book's words:
+   the volume's file for the stanza transcribes them.
 4. **An existing text.** The block's opening is looked up in the incipit index of the
    collection's Hebrew projects (`util/incipit.py`, shared with the opensiddur.org importer).
    The opensiddur.org imports and this work's own projects are left out: their openings
@@ -213,14 +260,21 @@ Each text's URN, in order of preference:
      ends with, when one text has it.
    - **Cuts.** Otherwise a match stays the part, and the block is cut where another part opens
      (the Kaddish divides into its parts this way, the part going on agreeing past its first
-     six words), or where a text the index holds whole ends. A block is also cut where it runs
+     six words), or where a text the index holds whole ends. A text made of parts that is cut
+     where one of its own parts opens is the part it opens with (the Kaddish's יתגדל lines would
+     be `kaddish/yitgaddal`; the Metsudah volumes' Kaddishes are chosen whole instead, above).
+     A block is also cut where it runs
      into another text the collection names (Vezot Hatorah, then Yehi Ratzon Milifnei Avinu):
      a six-word match agreeing closely over its opening, not scripture (save a whole psalm,
      below), not a part of the same
      text or something it transcludes, not a later stanza of a poem, not a verse the
      collection quotes inside a text (a milestone), and — for a short text — followed here by
      what follows it there (Adonai Sefatai is followed by the Amidah; a line quoted from the end
-     of Avinu Malkenu is not). The block is then decided again up to the cut. No cut leaves a
+     of Avinu Malkenu is not), and not words the collection prints the text going on with
+     (Asher's Vayaavor goes on with the Thirteen Attributes, which a stanza of Ezkerah quotes).
+     A text this volume printed earlier counts as one the collection names (the Selichot's
+     עֲשֵׂה עִמָּנוּ, after a selichah, without a bold opening). The block is then decided again
+     up to the cut. No cut leaves a
      word on its own. A block is cut before a blessing's formula in its middle — a new blessing
      is a text of its own — unless the block is one text that ends with the closing formula of
      the text it opens like (Barukh She'amar's litany and blessing).
@@ -257,7 +311,16 @@ Each text's URN, in order of preference:
    parenthesized words (labels) are skipped, a blessing is named after its formulas
    (`al_mitzvat_tzitzit`, not `barukh_attah`), a petition after "yehi_ratzon" and two words
    past its formula (`yehi_ratzon_shetishlach_meherah`), and a response before a text is
-   dropped (`keshem_shenikhnas_laberit`, not `amen_…`). Lengthened until it is not taken.
+   dropped (`keshem_shenikhnas_laberit`, not `amen_…`), and so is a selichah's address
+   (`eikh_niftach_peh`, not `eloheinu_velohei_avoteinu_…`, as Asher's Selichoth names them).
+   Lengthened until it is not taken in `prayer:` or `poem:`, whose texts of one path would share
+   their `metsudah:` phrases. A numbered selichah the lookup does not find is first compared,
+   its address apart, with every whole poem the collection holds: the one that agrees best
+   over its collected opening, if at least 0.75, is that poem worded otherwise (Nusach Lita's
+   אָדוֹן דִּין אִם יְדֻקְדַּק is Asher's `adon_din_im_yiddeqen`). A text the book numbers is
+   otherwise minted in the work's
+   `numbered_texts` namespace (`works.yaml`): the Selichot's numbered selichot are `poem:`, the
+   prayers between them `prayer:`.
 
 **Shared with opensiddur.org.** A Metsudah text that an opensiddur.org post also prints shares
 one URN with it: where a post as a whole is the text, its record in
@@ -304,6 +367,11 @@ Each language's project is laid out as the house style lays out a siddur:
   ends the verse (sof pasuq or colon) unless another verse follows — so a liturgical text that
   quotes scripture (the Six Remembrances, Hodu, Ashrei's psalms) reuses the verses' URNs, once
   in a project. A text's variants are merged into its file (see URNs).
+  An instruction that applies only where the text is printed is the place's, set before the
+  transclusion, never in the text's file: the rubrics a text opens with, before its first words
+  ("The Chazzan recites the following half-Kaddish"), go to the structure file. A condition the
+  text opens with stays with it where every printing opens so (Condition rubrics, below), and so
+  does a rubric after a heading of the text's own.
 
 | Sefaria markup | JLPTEI |
 |---|---|
