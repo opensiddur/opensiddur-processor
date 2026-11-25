@@ -34,6 +34,15 @@ This repository has 3 parts:
 Any specifications for agents to build code should be stored in the specs/ directory.
 Specifications and plans for bug fixes are temporary working artifacts and must not be committed.
 
+**Scan digitization instructions.** Before transcribing, reviewing, regenerating or
+exporting a scanned edition, read
+[`specs/SCAN_DIGITIZATION_INSTRUCTIONS.md`](specs/SCAN_DIGITIZATION_INSTRUCTIONS.md).
+It records the reusable lessons from Heidenheim–Marmorstein, including review
+evidence, pointing questions, conditional recitation and export checks. For that
+edition, also read [`specs/MARMORSTEIN_ROSH_HASHANAH_1.md`](specs/MARMORSTEIN_ROSH_HASHANAH_1.md)
+and its current source review records; historical installment checkpoints are
+not the current acceptance status.
+
 ## Commands
 
 **Set up a fresh checkout or worktree** — run all three before trusting a test run:

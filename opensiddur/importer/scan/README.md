@@ -1,5 +1,10 @@
 # Shared scan code and edition recipes
 
+Before working on a scanned edition, read the required
+[scan digitization instructions](../../../specs/SCAN_DIGITIZATION_INSTRUCTIONS.md).
+They cover transcription, review, alignment, recitation structure and export QA;
+this README describes the shared code contracts.
+
 Reusable behavior lives here and is included in coverage:
 
 | Module | Contract tested with synthetic inputs |
