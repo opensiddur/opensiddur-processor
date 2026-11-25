@@ -7,7 +7,7 @@ from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.importer.scan.review import review_is_current
 from opensiddur.importer.util.internet_archive import write_if_changed
 from . import BOOK
-from .build import unit_review_text, front_text, instruction_review_text
+from .build import unit_review_text, front_text, instruction_review_text, rubric_source_pages
 from .realizations import review_payloads, validate_occurrences
 
 
@@ -47,6 +47,8 @@ def report(source):
             fragments.setdefault(scan, []).append(key)
         elif instruction.get('witnesses') != []:
             raise ValueError('A source instruction requires a scan; only editorial instructions have no witnesses')
+        for page in rubric_source_pages(instruction)[1:]:
+            fragments.setdefault(page['scan'], []).append(key)
         if not review_is_current(reviews.get(key, {}), instruction_review_text(instruction)):
             pending.append(key)
     front_path = source/'front.json'

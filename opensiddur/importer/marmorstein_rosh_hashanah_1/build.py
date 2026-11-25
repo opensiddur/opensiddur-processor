@@ -127,7 +127,32 @@ def quotation_words(parent, text, quotations, lang):
     words(parent, text, lang)
 
 
-def rubric_words(parent, rubric, lang):
+def rubric_source_pages(rubric):
+    """Validate the exact, consecutive source spans of one documentary instruction."""
+    if 'source_pages' not in rubric:
+        return []
+    pages = rubric['source_pages']
+    if (not isinstance(pages, list) or len(pages) < 2
+            or any(rubric.get(key) for key in ('language_spans', 'abbreviations', 'uncertain_characters'))):
+        raise ValueError('Paginated rubric requires at least two literal pages without overlapping interpretations')
+    for page in pages:
+        if (not isinstance(page, dict) or set(page) - {'scan', 'printed_page', 'text'}
+                or not {'scan', 'text'} <= set(page)
+                or not isinstance(page['scan'], str) or not re.fullmatch(r's[1-9][0-9]*', page['scan'])
+                or not isinstance(page['text'], str) or not page['text']
+                or (page.get('printed_page') is not None and not isinstance(page['printed_page'], str))):
+            raise ValueError('Invalid paginated rubric source fragment')
+    if (' '.join(page['text'] for page in pages) != rubric['text']
+            or rubric.get('scan') != pages[0]['scan']
+            or rubric.get('printed_page') != pages[0].get('printed_page')):
+        raise ValueError('Paginated rubric must exactly preserve its text and opening scan/page label')
+    if any(int(right['scan'][1:]) != int(left['scan'][1:])+1
+           for left, right in zip(pages, pages[1:])):
+        raise ValueError('Paginated rubric source scans must be consecutive')
+    return pages
+
+
+def rubric_words(parent, rubric, lang, *, documentary_pages=False):
     """Keep source abbreviations selectable without losing their printed form."""
     if isinstance(rubric, str):
         words(parent, rubric, lang)
@@ -137,6 +162,18 @@ def rubric_words(parent, rubric, lang):
     if rubric.get('corresp'):
         parent.set('corresp', rubric['corresp'])
     text = rubric['text']
+    if 'source_pages' in rubric:
+        if not documentary_pages:
+            raise ValueError('Source-page pagination is supported only for documentary-order instructions')
+        for index, page in enumerate(rubric_source_pages(rubric)):
+            if index:
+                attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(page['scan'][1:])-1, size='')}
+                if page.get('printed_page') is not None:
+                    attributes['n'] = page['printed_page']
+                element(parent, 'pb', **attributes)
+                append_words(parent, ' ')
+            words(parent, page['text'], lang)
+        return
     if rubric.get('language_spans') and rubric.get('abbreviations'):
         raise ValueError('Overlapping abbreviation and language-span interpretation is not supported')
     for span in rubric.get('language_spans', []):
@@ -189,6 +226,9 @@ def instruction_review_text(instruction):
                  for item in instruction.get('uncertain_characters', []))
     parts.extend('[quotation '+json.dumps(quotation, ensure_ascii=False, sort_keys=True)+']'
                  for quotation in instruction.get('quotations', []))
+    if 'source_pages' in instruction:
+        rubric_source_pages(instruction)
+        parts.append('[source pages '+json.dumps(instruction['source_pages'], ensure_ascii=False, sort_keys=True)+']')
     return ' '.join(parts)
 
 
@@ -932,7 +972,9 @@ def expanded_order(parent, order, readings, by_stem):
             for instruction in instructions:
                 content = element(note, 'foreign') if len(instructions) > 1 else note
                 content.set(XML+'lang', instruction['language'])
-                rubric_words(content, instruction, instruction['language'])
+                rubric_source_pages(instruction)
+                expanded_instruction = {key: value for key, value in instruction.items() if key != 'source_pages'}
+                rubric_words(content, expanded_instruction, instruction['language'])
                 if content is not note:
                     append_words(note, ' ')
         elif 'navigation' in occurrence:
@@ -1137,10 +1179,13 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                 facs = page_image_url(IDENTIFIER, int(instruction['scan'][1:])-1, size='')
                 page_start = instruction.get('page_start', True)
                 if page_start.get(lang, False) if isinstance(page_start, dict) else page_start:
-                    element(div, 'pb', ed='1965', n=instruction['printed_page'], facs=facs)
+                    attributes = {'ed': '1965', 'facs': facs}
+                    if instruction.get('printed_page') is not None:
+                        attributes['n'] = instruction['printed_page']
+                    element(div, 'pb', **attributes)
                 note = element(div, 'note', type=instruction.get('type', 'instruction'), facs=facs)
                 note.set(XML+'lang', instruction['language'])
-                rubric_words(note, instruction, instruction['language'])
+                rubric_words(note, instruction, instruction['language'], documentary_pages=True)
         elif 'navigation' in occurrence:
             navigation = readings['navigation'][occurrence['navigation']]
             scan = navigation['scan'][lang]

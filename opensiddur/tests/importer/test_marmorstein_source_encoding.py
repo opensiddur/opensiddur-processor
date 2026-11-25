@@ -85,6 +85,28 @@ class SourceEncodingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'nonempty'):
             b.unit_document(unit, 'he', True)
 
+    def test_counted_divine_names_preserve_repeated_text_and_mixed_slots(self):
+        for text in ('ברוך ה׳ אחד ה׳ סוף', 'ברוך ה׳ ויי ה׳ סוף'):
+            with self.subTest(text=text):
+                unit = self.unit()
+                unit['languages']['he'] = [{'paragraph': 1, 'fragments': [
+                    {'scan': 's1', 'printed_page': '1', 'text': text}]}]
+                unit['source_encoding']['he'] = {'divine_names': [{'text': 'ה׳', 'count': 2}]}
+                document = b.unit_document(unit, 'he', True)
+                names = document.xpath('//j:divineName', namespaces={'j': b.J})
+                self.assertEqual(sum(node.text == 'ה׳' for node in names), 2)
+                self.assertEqual(self.words(document), text)
+
+    def test_counted_divine_names_reject_stale_or_invalid_counts(self):
+        for count in (0, 1, 3, True, '2'):
+            with self.subTest(count=count):
+                unit = self.unit()
+                unit['languages']['he'] = [{'paragraph': 1, 'fragments': [
+                    {'scan': 's1', 'printed_page': '1', 'text': 'א ה׳ ב ה׳ ג'}]}]
+                unit['source_encoding']['he'] = {'divine_names': [{'text': 'ה׳', 'count': count}]}
+                with self.assertRaises(ValueError):
+                    b.unit_document(unit, 'he', True)
+
     def test_outer_omission_does_not_swallow_next_stanza(self):
         document = b.unit_document(self.unit(), 'he', True)
         result = self.compile(document, {OUTER: False, INNER: True})

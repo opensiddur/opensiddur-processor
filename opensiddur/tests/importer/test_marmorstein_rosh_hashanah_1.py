@@ -85,6 +85,96 @@ class EditionWiringTest(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             return build(self.source, self.projects, **kwargs)
 
+    def test_instruction_page_boundary_without_printed_number(self):
+        for label in (None, 'printed-a'):
+            with self.subTest(label=label):
+                self.readings['documentary_instructions'] = {'notice': {
+                    'scan': 's12', 'printed_page': label, 'page_start': True,
+                    'language': 'he', 'witnesses': ['he'],
+                    'text': 'Example instruction'}}
+                self.readings['source_order'] = [{'instruction': 'notice'}, {'unit': 'first'}]
+                self.save('readings', self.readings)
+                self.generate(draft=True)
+                tree = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+                notice = next(n for n in tree.findall('.//'+T+'note')
+                              if n.text == 'Example instruction')
+                marker = notice.getprevious()
+                self.assertEqual(marker.tag, T+'pb')
+                self.assertEqual(marker.get('n'), label)
+                self.assertTrue(marker.get('facs').endswith('/page/n11.jpg'))
+                self.assertEqual(marker.get('facs'), notice.get('facs'))
+
+    def test_continuing_rubric_retains_one_note_and_both_scan_boundaries(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
+        instruction = {'scan': 's12', 'printed_page': 'a', 'page_start': True,
+            'language': 'he', 'witnesses': ['he'], 'text': 'Example crosses the page',
+            'source_pages': [{'scan': 's12', 'printed_page': 'a', 'text': 'Example crosses'},
+                             {'scan': 's13', 'printed_page': None, 'text': 'the page'}]}
+        self.readings['documentary_instructions'] = {'notice': instruction}
+        self.readings['source_order'] = [{'instruction': 'notice'}, {'unit': 'first'}]
+        self.save('readings', self.readings)
+        self.generate(draft=True)
+        tree = etree.parse(str(self.projects/PROJECTS['he']/'index.xml'))
+        note = next(n for n in tree.findall('.//'+T+'note')
+                    if ''.join(n.itertext()) == 'Example crosses the page')
+        self.assertEqual(note.getprevious().get('n'), 'a')
+        marker = note.find(T+'pb')
+        self.assertIsNotNone(marker)
+        self.assertIsNone(marker.get('n'))
+        self.assertTrue(marker.get('facs').endswith('/page/n12.jpg'))
+        before = instruction_review_text(instruction)
+        instruction['source_pages'][1]['printed_page'] = 'changed'
+        self.assertNotEqual(before, instruction_review_text(instruction))
+        instruction['source_pages'][1]['text'] = 'different words'
+        self.save('readings', self.readings)
+        with self.assertRaisesRegex(ValueError, 'exactly preserve'):
+            self.generate(draft=True)
+
+    def test_continuing_instruction_requires_review_on_both_source_pages(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
+        instruction = {'scan': 's12', 'printed_page': 'a', 'page_start': True,
+            'language': 'he', 'witnesses': ['he'], 'text': 'Example crosses the page',
+            'source_pages': [{'scan': 's12', 'printed_page': 'a', 'text': 'Example crosses'},
+                             {'scan': 's13', 'printed_page': None, 'text': 'the page'}]}
+        self.readings['documentary_instructions'] = {'notice': instruction}
+        self.save('readings', self.readings)
+        self.save('pages', {'pages': [{'scan_page': n, 'evidence': 'image'} for n in (12, 13)]})
+        (self.source/'independent').mkdir()
+        (self.source/'independent'/'reading.json').write_text(json.dumps({
+            'reviewer': 'second', 'pages': [{'scan': 's12'}, {'scan': 's13'}]}))
+        self.save('page_completion', {'s'+str(n): {'status': 'complete', 'evidence': 'image',
+            'independent_model': 'second', 'reading_keys': ['instruction/notice']} for n in (12, 13)})
+        self.save('reviews', {})
+        self.assertEqual(report(self.source)['leaves_fully_transcribed_and_reviewed'], 0)
+        self.save('reviews', {'instruction/notice': {'complete': True, 'primary_model': 'first',
+            'independent_model': 'second', 'primary_sha256': 'primary',
+            'independent_sha256': 'secondary', 'evidence': 'reading.json',
+            'final_sha256': reading_hash(instruction_review_text(instruction))}})
+        self.assertEqual(report(self.source)['leaves_fully_transcribed_and_reviewed'], 2)
+        instruction['source_pages'][1]['printed_page'] = 'different'
+        self.save('readings', self.readings)
+        self.assertEqual(report(self.source)['leaves_fully_transcribed_and_reviewed'], 0)
+
+    def test_paginated_instruction_rejects_untracked_or_inconsistent_pages(self):
+        from copy import deepcopy
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import rubric_words, rubric_source_pages
+        original = {'scan': 's12', 'printed_page': 'a', 'text': 'One two',
+            'source_pages': [{'scan': 's12', 'printed_page': 'a', 'text': 'One'},
+                             {'scan': 's13', 'text': 'two'}]}
+        with self.assertRaisesRegex(ValueError, 'documentary-order'):
+            rubric_words(etree.Element(T+'note'), original, 'he')
+        changes = [('no opening scan', lambda x: x.pop('scan')),
+                   ('wrong opening label', lambda x: x.update(printed_page='b')),
+                   ('duplicate', lambda x: x['source_pages'][1].update(scan='s12')),
+                   ('reversed', lambda x: x['source_pages'][1].update(scan='s11')),
+                   ('gap', lambda x: x['source_pages'][1].update(scan='s15'))]
+        for label, change in changes:
+            with self.subTest(label=label):
+                altered = deepcopy(original)
+                change(altered)
+                with self.assertRaises(ValueError):
+                    rubric_source_pages(altered)
+
     def test_sparse_translation_and_shared_expanded_order(self):
         stale = self.projects/PROJECTS['en']/'second.xml'
         stale.parent.mkdir(parents=True)

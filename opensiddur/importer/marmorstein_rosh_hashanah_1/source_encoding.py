@@ -152,28 +152,41 @@ def apply_source_encoding(root, unit, lang):
                   'bibliography_page_range', 'continuous_quotation_chapter', 'divine_names'})
     _interpretations(root, unit, config.get('interpretations', []))
     names = config.get('divine_names', [])
-    if not isinstance(names, list) or any(not isinstance(name, str) or not name.strip()
-                                          for name in names):
-        raise ValueError('Configured Divine Names must be nonempty source strings')
+    if not isinstance(names, list):
+        raise ValueError('Configured Divine Names must be a list')
     body = root.find('.//{'+T+'}body')
-    for name in names:
+    for directive in names:
+        if isinstance(directive, str):
+            name, expected = directive, 1
+        elif isinstance(directive, dict):
+            _keys(directive, {'text', 'count'}, {'text', 'count'}, 'Divine Name')
+            name, expected = directive['text'], directive['count']
+        else:
+            raise ValueError('Configured Divine Names must be nonempty source strings or counted directives')
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError('Configured Divine Names must be nonempty source strings')
+        if type(expected) is not int or expected < 1:
+            raise ValueError('Configured Divine Name count must be a positive integer')
         matches = [(node, slot) for node in body.iter() for slot in ('text', 'tail')
                    if name in (getattr(node, slot) or '')
                    and not any(ancestor.tag == '{'+J+'}divineName'
                                for ancestor in ([node] if slot == 'text' else [])
                                + list(node.iterancestors()))]
-        node, slot = _one(matches, 'Configured Divine Name')
-        value = getattr(node, slot)
-        if value.count(name) != 1:
-            raise ValueError('Configured Divine Name is ambiguous')
-        before, _, after = value.partition(name)
-        marked = etree.Element('{'+J+'}divineName')
-        marked.text, marked.tail = name, after
-        setattr(node, slot, before)
-        if slot == 'text':
-            node.insert(0, marked)
-        else:
-            node.addnext(marked)
+        found = sum(getattr(node, slot).count(name) for node, slot in matches)
+        if found != expected:
+            raise ValueError(f'Configured Divine Name is ambiguous: expected {expected} source occurrences, found {found}')
+        for node, slot in matches:
+            parts = getattr(node, slot).split(name)
+            setattr(node, slot, parts[0])
+            previous = node
+            for index, tail in enumerate(parts[1:]):
+                marked = etree.Element('{'+J+'}divineName')
+                marked.text, marked.tail = name, tail
+                if slot == 'text':
+                    node.insert(index, marked)
+                else:
+                    previous.addnext(marked)
+                    previous = marked
     if 'reference_terminators_outside_container' in config:
         if type(config['reference_terminators_outside_container']) is not bool:
             raise ValueError('Reference terminator flag must be a boolean')
