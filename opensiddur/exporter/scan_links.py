@@ -32,6 +32,9 @@ The rule, for the breaks of one edition directly inside one transclusion (their 
 4. Failing that, every break is marked: when the context cannot tell, no link is lost. This
    is the case of a book that copies several printings' units into one file.
 
+A break within a visible instruction or description links within that rubric. Such breaks
+never alter printing selection elsewhere. A preceding break never moves past them.
+
 A marked break is then moved forward to just before the next words it precedes, so that the
 symbol stands in a line of text: a page break between two paragraphs, or before a heading,
 would otherwise be set in a paragraph of its own -- in a parallel text, a paragraph the other
@@ -53,7 +56,8 @@ SCAN_LINK = f"{{{PROCESSING_NAMESPACE}}}scan-link"
 _PB = f"{{{TEI_NS}}}pb"
 _DIV = f"{{{TEI_NS}}}div"
 _TRANSCLUDE = f"{{{PROCESSING_NAMESPACE}}}transclude"
-#: A page break inside these records nothing about the running text.
+#: Ordinary notes, standoff annotations and headers do not mark the running text.
+#: Visible instruction/description notes are handled explicitly by _candidates.
 _EXCLUDED = frozenset({f"{{{TEI_NS}}}note", f"{{{TEI_NS}}}standOff", f"{{{TEI_NS}}}teiHeader"})
 _SIDDUR = "urn:x-opensiddur:text:siddur:"
 _PARALLEL_ITEM = f"{{{PROCESSING_NAMESPACE}}}parallelItem"
@@ -86,12 +90,18 @@ def _parse(pb: etree.ElementBase) -> _Break:
     return _Break(pb, tokens[0] if tokens else "", frozenset(printings))
 
 
+def _is_rubric(element: etree.ElementBase) -> bool:
+    return element.tag == f"{{{TEI_NS}}}note" and element.get("type") in {
+        "instruction", "description"}
+
+
 def _candidates(root: etree.ElementBase) -> list[_Break]:
     found = []
     for pb in root.iter(_PB):
         if not pb.get("facs"):
             continue
-        if any(ancestor.tag in _EXCLUDED for ancestor in pb.iterancestors()):
+        if any(ancestor.tag in _EXCLUDED and not _is_rubric(ancestor)
+               for ancestor in pb.iterancestors()):
             continue
         found.append(_parse(pb))
     return found
@@ -208,7 +218,31 @@ def _context(group: etree.ElementBase | None,
 def mark_scan_links(root: etree.ElementBase) -> None:
     """Mark, in place, each page break that links to its scan where the tree uses it."""
     candidates = _candidates(root)
+    ordinary = [brk for brk in candidates if not _within_rubric(brk.element)]
+    rubric = [brk for brk in candidates if _within_rubric(brk.element)]
     position = {id(brk.element): i for i, brk in enumerate(candidates)}
+    # Newly eligible rubric breaks use existing context, without redefining the
+    # edition's printings or becoming earlier-printing hints for ordinary text.
+    _mark_choices(ordinary, ordinary, position)
+    _mark_choices(rubric, ordinary, position, candidates)
+    columns = _Columns(root)
+    rubric_ids = {id(brk.element) for brk in rubric}
+    for brk in reversed(candidates):
+        if brk.element.get(SCAN_LINK):
+            _attach(brk.element, columns, rubric_ids)
+    for brk in candidates:
+        _unmark_if_empty_page(brk.element)
+
+
+def _within_rubric(element: etree.ElementBase) -> bool:
+    return any(_is_rubric(a) for a in element.iterancestors())
+
+
+def _mark_choices(candidates: list[_Break], context: list[_Break],
+                  position: dict[int, int], choices: list[_Break] | None = None) -> None:
+    choice_groups: dict[tuple[etree.ElementBase | None, str], list[_Break]] = {}
+    for brk in choices if choices is not None else candidates:
+        choice_groups.setdefault((_group(brk.element), brk.edition), []).append(brk)
     groups: dict[tuple[int, str], list[_Break]] = {}
     group_elements: dict[int, etree.ElementBase | None] = {}
     for brk in candidates:
@@ -217,29 +251,24 @@ def mark_scan_links(root: etree.ElementBase) -> None:
         groups.setdefault((id(group), brk.edition), []).append(brk)
 
     editions: dict[str, set[str]] = {}
-    for brk in candidates:
+    for brk in context:
         editions.setdefault(brk.edition, set()).update(brk.printings)
 
     for (group_id, edition), breaks in groups.items():
-        sets = {brk.printings for brk in breaks if brk.printings}
+        selection = choice_groups[(group_elements[group_id], edition)]
+        sets = {brk.printings for brk in selection if brk.printings}
         if not sets:
             chosen = None
         else:
-            printings = list(dict.fromkeys(p for brk in breaks for p in sorted(brk.printings)))
-            first = position[id(breaks[0].element)]
-            units, earlier = _context(group_elements[group_id], reversed(candidates[:first]))
-            chosen = _choose(printings, units, earlier, editions[edition])
+            printings = list(dict.fromkeys(p for brk in selection for p in sorted(brk.printings)))
+            first = position[id(selection[0].element)]
+            units, earlier = _context(
+                group_elements[group_id],
+                (brk for brk in reversed(context) if position[id(brk.element)] < first))
+            chosen = _choose(printings, units, earlier, editions.get(edition, set()))
         for brk in breaks:
             if chosen is None or not brk.printings or brk.printings & chosen:
                 brk.element.set(SCAN_LINK, "true")
-    columns = _Columns(root)
-    # Last first: a break moved up to words that an earlier break is moved up to as well
-    # then lands before it, and the two keep their order.
-    for brk in reversed(candidates):
-        if brk.element.get(SCAN_LINK):
-            _attach(brk.element, columns)
-    for brk in candidates:
-        _unmark_if_empty_page(brk.element)
 
 
 def _unmark_if_empty_page(pb: etree.ElementBase) -> None:
@@ -280,15 +309,58 @@ class _Columns:
                 yield later
 
 
-def _attach(pb: etree.ElementBase, columns: _Columns) -> None:
+def _attach(pb: etree.ElementBase, columns: _Columns, rubric_ids: set[int]) -> None:
     """Move a marked page break to just before the next words in its column."""
-    if _in_title_page(pb):
+    if _in_title_page(pb) or _rubric_words_follow(pb):
         return
     target = _next_words(pb, columns)
     if target is None:
         del pb.attrib[SCAN_LINK]
-    elif not _in_line(pb, *target):
+    elif not _in_line(pb, *target) and not _crosses_rubric_break(pb, target, rubric_ids):
         _move(pb, *target)
+
+
+def _crosses_rubric_break(pb: etree.ElementBase, target, rubric_ids: set[int]) -> bool:
+    """Do not move an earlier page past a visible rubric's later page boundary."""
+    column = next(pb.iterancestors(_PARALLEL_ITEM), None)
+    group = _group(pb)
+    project = (column.get(_PROJECT) if column is not None else None) or (
+        group.get(_PROJECT) if group is not None else None)
+    for element, where in _positions_after(pb, None, project):
+        if element is target[0] and where == target[1]:
+            return False
+        if where != "text" or element.tag != _PB or not element.get(SCAN_LINK) \
+                or id(element) not in rubric_ids:
+            continue
+        other = next(element.iterancestors(_PARALLEL_ITEM), None)
+        if column is not None and other is not None and column.get("role") != other.get("role"):
+            continue
+        return True
+    return False
+
+
+def _rubric_words_follow(pb: etree.ElementBase) -> bool:
+    """Keep a page boundary inside the visible rubric whose words it precedes.
+
+    Ordinary notes remain excluded. A break outside a rubric still seeks running
+    prayer words, preserving the existing placement and column behaviour.
+    """
+    rubric = next((a for a in pb.iterancestors() if _is_rubric(a)), None)
+    if rubric is None:
+        return False
+    for element, where in _positions_after(pb, rubric):
+        words = element.text if where == "text" else element.tail
+        if not (words or "").strip():
+            continue
+        container = element if where == "text" else element.getparent()
+        if container is None:
+            continue
+        for ancestor in (container, *container.iterancestors()):
+            if ancestor is rubric:
+                return True
+            if ancestor.tag in _NOT_RUNNING and not _is_rubric(ancestor):
+                break
+    return False
 
 
 def _in_line(pb: etree.ElementBase, element: etree.ElementBase, where: str) -> bool:

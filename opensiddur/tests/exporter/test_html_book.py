@@ -1189,6 +1189,18 @@ class TestScanLinks(unittest.TestCase):
         mark = ' p:scan-link="true"' if marked else ""
         return f'<tei:pb n="3v" ed="1822" facs="{self._URL}"{mark}/>'
 
+    def test_source_page_link_survives_a_continuing_instruction(self):
+        from opensiddur.exporter.scan_links import mark_scan_links
+        note = etree.fromstring(
+            f'<tei:note xmlns:tei="{TEI_NS}" type="instruction">before '
+            '<tei:pb n="2" facs="https://scan.example/2"/>after</tei:note>')
+        mark_scan_links(note)
+        out = _render(etree.tostring(note).decode(), **{"scan-links": "inline"})
+        link = out.find(".//h:a[@data-n='2']", NS)
+        self.assertIsNotNone(link)
+        self.assertEqual("https://scan.example/2", link.get("href"))
+        self.assertEqual("after", link.tail)
+
     def test_a_marked_break_links_to_its_scan(self):
         out = _render(f"<tei:p>{self._pb()}words</tei:p>", **{"scan-links": "margin"})
         link = out.find(".//h:a[@data-n='3v']", NS)
