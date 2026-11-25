@@ -88,6 +88,25 @@ def words(parent, text, lang):
         append_words(parent, text[end:])
 
 
+def optional_words(parent, text, spans, lang, identifier, *, strict=False):
+    """Keep intrinsic optional words inside their selected source printing."""
+    for number, span in enumerate(spans):
+        if strict and (span.get('printed') != '('+span.get('text','')+')'
+                or not span.get('text') or text.count(span['printed']) != 1):
+            raise ValueError('Optional words require one exact parenthesized source span')
+        before, found, text = text.partition(span['printed'])
+        if not found:
+            raise ValueError('Optional word not found in its source fragment')
+        words(parent, before, lang)
+        key = identifier+'_'+str(number)
+        condition = element(parent, 'j:conditional', type='marked')
+        condition.set(XML+'id', key)
+        feature_structures(element(condition, 'j:all'), [dict(type='opensiddur:variant', features={span['condition']: True})])
+        words(parent, span['text'], lang)
+        element(parent, 'j:endConditional', target='#'+key)
+    words(parent, text, lang)
+
+
 def quotation_words(parent, text, quotations, lang):
     """Bound excerpts inside a fragment without splitting its source condition."""
     for quotation in quotations:
@@ -682,19 +701,8 @@ def unit_document(unit, lang, draft):
                 if fragment.get('text_subtype'):
                     content.set('subtype', fragment['text_subtype'])
             if fragment.get('optional_spans'):
-                text = fragment['text']
-                for number, span in enumerate(fragment['optional_spans']):
-                    before, found, text = text.partition(span['printed'])
-                    if not found:
-                        raise ValueError('Optional word not found in its source fragment')
-                    words(content, before, text_language)
-                    identifier = unit['stem']+'_optional_'+str(segment_index)+'_'+str(index)+'_'+str(number)
-                    condition = element(content, 'j:conditional', type='marked')
-                    condition.set(XML+'id', identifier)
-                    feature_structures(element(condition, 'j:all'), [dict(type='opensiddur:variant', features={span['condition']: True})])
-                    words(content, span['text'], text_language)
-                    element(content, 'j:endConditional', target='#'+identifier)
-                words(content, text, text_language)
+                optional_words(content, fragment['text'], fragment['optional_spans'], text_language,
+                               unit['stem']+'_optional_'+str(segment_index)+'_'+str(index))
             elif fragment.get('alternatives'):
                 if any(fragment.get(key) for key in ('qere_ketiv', 'expansion', 'abbreviations',
                                                      'uncertain_characters', 'enlarged_letters')):
@@ -709,13 +717,18 @@ def unit_document(unit, lang, draft):
                     choice = element(content, 'choice')
                     if alternative.get('xml_id'):
                         choice.set(XML+'id', alternative['xml_id'])
-                    for reading in readings:
+                    for reading_index, reading in enumerate(readings):
                         option = element(choice, 'j:option')
                         if isinstance(reading, dict):
                             for attribute in ('corresp','facs'):
                                 if reading.get(attribute):
                                     option.set(attribute, reading[attribute])
-                            if reading.get('quotations'):
+                            if reading.get('optional_spans'):
+                                if any(reading.get(key) for key in ('quotations','language_spans','abbreviations','uncertain_characters')):
+                                    raise ValueError('Optional printing words cannot overlap other interpretations')
+                                optional_words(option, reading['text'], reading['optional_spans'], text_language,
+                                    unit['stem']+'_optional_option_'+str(segment_index)+'_'+str(index)+'_'+str(reading_index), strict=True)
+                            elif reading.get('quotations'):
                                 if any(reading.get(key) for key in ('abbreviations', 'language_spans', 'uncertain_characters')):
                                     raise ValueError('Quotation option cannot overlap other interpretations')
                                 quotation_words(option, reading['text'], reading['quotations'], text_language)

@@ -290,6 +290,8 @@ opensiddur:person:
   common: false
   supplied: declared
   features:
+    # Select the priest or congregation wording of personal prayers.
+    kohen: binary
     # The gender the book addresses its rubric to.
     gender: {symbol: {values: [male, female]}}
     birkat-hagomel: binary

@@ -145,6 +145,7 @@ def _selected_prefix(body, identity, settings, stop_node, stop_slot, needle):
         raise ValueError('Canonical printing needs one generated reference scope')
     unit = starts[0].get('unit')
     active, found, pieces = False, False, []
+    marked = []
 
     def slot(node, key):
         nonlocal found
@@ -152,6 +153,8 @@ def _selected_prefix(body, identity, settings, stop_node, stop_slot, needle):
             return
         value = getattr(node,key) or ''
         if node is stop_node and key == stop_slot:
+            if marked:
+                raise ValueError('Canonical page boundary cannot disappear inside optional words')
             pieces.append(value[:value.index(needle)])
             found = True
             raise StopIteration
@@ -169,6 +172,17 @@ def _selected_prefix(body, identity, settings, stop_node, stop_slot, needle):
                 raise ValueError('Printing scope has an unresolved wording option')
             if value is not True:
                 return
+        if active and node.tag == J+'conditional' and node.get('type') == 'marked':
+            # Source fidelity retains the printed delimiters of an undecided
+            # intrinsic addition; the compiler resolves them for each profile.
+            marked.append(node.get(X+'id'))
+            pieces.append('(')
+        elif active and node.tag == J+'endConditional' and node.get('target','').lstrip('#') in marked:
+            key = node.get('target').lstrip('#')
+            if marked[-1] != key:
+                raise ValueError('Canonical optional scopes must be properly nested')
+            marked.pop()
+            pieces.append(')')
         slot(node,'text')
         for child in node:
             walk(child)

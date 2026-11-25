@@ -10,7 +10,7 @@ PLAIN_SEGMENT_KEYS = {'paragraph','fragments','corresp','source','source_referen
                      'end_reference','source_reference_end','source_reference_part'}
 OCCURRENCE_CONTROL_KEYS = {'conditions', 'marked', 'condition_instruction',
                            'condition_instruction_language', 'speaker',
-                           'speaker_before_reference'}
+                           'speaker_before_reference', 'instructions'}
 CANONICAL_OCCURRENCE_KEYS = {'paragraph', 'fragments', 'canonical', 'canonical_end'} | OCCURRENCE_CONTROL_KEYS
 
 
@@ -27,6 +27,14 @@ def validate_occurrence_controls(segment):
     if ('marked' in segment and type(segment['marked']) is not bool) or (segment.get('marked') and not conditions):
         raise ValueError('Marked occurrence requires a boolean and conditions')
 
+
+    if 'instructions' in segment:
+        instructions = segment['instructions']
+        if (not isinstance(instructions, list) or not instructions or any(
+                not isinstance(i, dict) or set(i) != {'language','text'}
+                or any(not isinstance(i[k],str) or not i[k] for k in ('language','text'))
+                for i in instructions)):
+            raise ValueError('Canonical occurrence instructions require literal language/text rubrics')
 
     speaker = segment.get('speaker')
     if speaker is not None:
@@ -213,8 +221,27 @@ def prepare_unit(unit, readings):
             if any(not v['text'] or not v['corresp'].startswith('urn:x-opensiddur:condition:')
                    for v in item['readings']):
                 raise ValueError('Wording options need nonempty words and condition URNs')
+            choices = deepcopy(item['readings'])
+            if any('optional_spans' in choice for choice in choices) and not fragment.get('optional_spans'):
+                raise ValueError('Printing optionals require intrinsic source optional spans')
+            if fragment.get('optional_spans'):
+                if (unit.get('canonical_home', {}).get('preserve_intrinsic_optionals') is not True
+                        or item['printed'] != fragment['text']
+                        or choices[0].get('optional_spans') != fragment['optional_spans']):
+                    raise ValueError('Intrinsic optionals require an explicit whole-fragment printing overlay')
+                conditions = [v['condition'] for v in fragment['optional_spans']]
+                for choice in choices:
+                    spans = choice.get('optional_spans', [])
+                    if [v.get('condition') for v in spans] != conditions:
+                        raise ValueError('Every printing must preserve the same intrinsic optional settings')
+                    for span in spans:
+                        if (set(span) != {'printed','text','condition'}
+                                or span['printed'] != '('+span['text']+')'
+                                or choice['text'].count(span['printed']) != 1):
+                            raise ValueError('Printing optional does not match its literal parenthesized source')
+                fragment.pop('optional_spans')
             fragment.setdefault('alternatives', []).append(dict(
-                printed=item['printed'], readings=deepcopy(item['readings'])))
+                printed=item['printed'], readings=choices))
         if target := unit.get('canonical_whole'):
             # A complete short formula can share one range while its literal
             # source inventory retains the verse/invocation boundary.
@@ -266,10 +293,14 @@ def canonical_text(readings, lang, target, settings, target_end=None):
     host, segments = _range_segments(readings, lang, target, target_end)
     result = []
     for segment in segments:
-        if set(segment)-PLAIN_SEGMENT_KEYS:
+        allowed_segment = PLAIN_SEGMENT_KEYS | ({'instructions'} if host.get('canonical_home', {}).get('instructions_in_context') is True else set())
+        if set(segment)-allowed_segment:
             raise ValueError('Canonical host must contain only plain reviewed words and identities')
+        if segment.get('instructions'):
+            validate_occurrence_controls({'instructions':segment['instructions']})
         for fragment_index, fragment in enumerate(segment['fragments']):
-            if set(fragment)-PLAIN_FRAGMENT_KEYS:
+            allowed = PLAIN_FRAGMENT_KEYS | ({'optional_spans'} if host.get('canonical_home', {}).get('preserve_intrinsic_optionals') is True else set())
+            if set(fragment)-allowed:
                 raise ValueError('Canonical host fragment cannot carry unmodeled interpretations')
             if (fragment['scan'] != segments[0]['fragments'][0]['scan'] and fragment.get('page_start', True)
                     and host.get('canonical_home', {}).get('context') != 'literal'):
@@ -342,7 +373,9 @@ def validate_occurrences(readings):
                     continue
                 fragments = segment['fragments']
                 if ((len(fragments) != 1 and not any(v['caller'] == unit['stem'] and v['lang'] == lang and v['identity'] == target
-                        for v in readings.get('canonical_printings', []))) or set(segment) - CANONICAL_OCCURRENCE_KEYS
+                        for v in readings.get('canonical_printings', [])))
+                        or ('instructions' in segment and unit.get('canonical_home', {}).get('instructions_in_context') is not True)
+                        or set(segment) - CANONICAL_OCCURRENCE_KEYS
                         or set(fragments[0]) - PLAIN_FRAGMENT_KEYS):
                     raise ValueError('Canonical occurrence must be one plain source fragment')
                 validate_occurrence_controls(segment)
@@ -485,14 +518,29 @@ def prepare_documents(unit, readings):
     if (unit.get('instructions') and home_config.get('context') != 'literal') or any(unit.get(k) for k in ('conditions','marked','head','opening_page',
                                    'publication_context','reuse','text_corresp','canonical_whole','poetry','citations','wording_selection')):
         raise ValueError('Canonical home cannot inherit occurrence controls')
+    flags = ('preserve_intrinsic_optionals','instructions_in_context')
+    if any(key in home_config and home_config[key] is not True for key in flags):
+        raise ValueError('Canonical home interpretation flags must be explicitly true')
     for segments in unit['languages'].values():
         for segment in segments:
-            if set(segment)-PLAIN_SEGMENT_KEYS or any(set(f)-PLAIN_FRAGMENT_KEYS for f in segment['fragments']):
+            allowed_segment = PLAIN_SEGMENT_KEYS | ({'instructions'} if home_config.get('instructions_in_context') else set())
+            allowed_fragment = PLAIN_FRAGMENT_KEYS | ({'optional_spans'} if home_config.get('preserve_intrinsic_optionals') else set())
+            if set(segment)-allowed_segment or any(set(f)-allowed_fragment for f in segment['fragments']):
                 raise ValueError('Canonical home cannot inherit contextual interpretations')
+            if segment.get('instructions'):
+                validate_occurrence_controls({'instructions':segment['instructions']})
+            if home_config.get('preserve_intrinsic_optionals'):
+                for fragment in segment['fragments']:
+                    for span in fragment.get('optional_spans', []):
+                        if (set(span) != {'printed','text','condition'} or not span['text']
+                                or '(' in span['text'] or ')' in span['text']
+                                or span['printed'] != '('+span['text']+')'
+                                or fragment['text'].count(span['printed']) != 1):
+                            raise ValueError('Intrinsic home words require exact flat parenthesized source clauses')
     prepared = prepare_unit(unit, readings)
     home = {key: deepcopy(prepared[key]) for key in ('stem','languages','source_printings','source_notes') if key in prepared}
     allowed = {'file','urn','title','map_root','omit_publication_urn','text_corresp','join_source_fragments',
-               'context', 'context_urn'}
+               'context', 'context_urn', 'preserve_intrinsic_optionals', 'instructions_in_context'}
     if set(home_config)-allowed:
         raise ValueError('Canonical home configuration contains occurrence controls')
     if home_config.get('context', 'canonical') not in ('canonical', 'literal'):
@@ -505,11 +553,13 @@ def prepare_documents(unit, readings):
     context_urn = home_config.get('context_urn', unit['urn'])
     if ':siddur:' not in context_urn or context_urn == home_config['urn']:
         raise ValueError('Canonical home needs a distinct structural context URN')
-    home.update({k: deepcopy(v) for k, v in home_config.items() if k not in ('context', 'context_urn')})
+    home.update({k: deepcopy(v) for k, v in home_config.items() if k not in ('context', 'context_urn', 'preserve_intrinsic_optionals', 'instructions_in_context')})
     home['title'] = deepcopy(home_config['title'])
     # Canonical text ranges do not carry an older context's page break.
     for segments in home['languages'].values():
         for segment in segments:
+            if home_config.get('instructions_in_context'):
+                segment.pop('instructions', None)
             for fragment in segment['fragments']:
                 fragment['page_start'] = False
     context = deepcopy(unit)
@@ -546,6 +596,9 @@ def prepare_documents(unit, readings):
                             'source_reference_end','source_reference_part'):
                     segment.pop(key, None)
                 segment['canonical'] = identity
+                if home_config.get('preserve_intrinsic_optionals'):
+                    for fragment in segment['fragments']:
+                        fragment.pop('optional_spans', None)
                 if set(segment) - CANONICAL_OCCURRENCE_KEYS:
                     raise ValueError('Generated canonical pointer contains unmodeled controls')
                 validate_occurrence_controls(segment)
