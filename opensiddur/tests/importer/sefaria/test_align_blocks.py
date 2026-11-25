@@ -179,6 +179,20 @@ class TestSplitLeadingLabels(unittest.TestCase):
             ("מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:", "King, Lover of justice.", when),
         ])
 
+    def test_an_english_replacement_with_the_opening_replaces_the_whole_english_ending(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["בָּרוּךְ אַתָּה יְהֹוָה מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:",
+              "<small>בעשי\"ת יסיים:</small> הַמֶּֽלֶךְ הַמִּשְׁפָּט:"]
+        en = ["Blessed are You, Adonoy, King, Lover of justice.",
+              "<i>During the Ten Days:</i> Blessed are You, Adonoy, the King of Justice."]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת יסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en).strip(), p.otherwise) for p in pairs[:2]], [
+            ("בָּרוּךְ אַתָּה יְהֹוָה", "", None),
+            ("מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:", "Blessed are You, Adonoy, King, Lover of justice.", when),
+        ])
+
     def test_a_paragraph_that_is_all_ending_is_said_otherwise_whole(self):
         when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
         he = ["אַתָּה קָדוֹשׁ וְשִׁמְךָ קָדוֹשׁ.",

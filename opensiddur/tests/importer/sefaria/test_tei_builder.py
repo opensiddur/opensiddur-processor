@@ -422,6 +422,20 @@ class TestLeafGates(unittest.TestCase):
                 self.assertEqual(self.gated(xml), [["t1"]])
                 self.assertEqual(xml.xpath("string(//j:conditional/tei:note)", namespaces=NS), note)
 
+    def test_a_label_between_texts_may_govern_as_a_rubric_does(self):
+        import dataclasses
+        from opensiddur.importer.sefaria.conditions import LabelCondition
+        from opensiddur.importer.util.incipit import words
+        fast = {"holiday-aggregate": {"minor-fast": True}}
+        table = dataclasses.replace(conditions(), labels=(
+            LabelCondition(tuple(words("לתענית")), fast, instead_of_previous=True),))
+        items, urns, body = self.leaf(
+            ("<b>שָׁלוֹם רָב</b> עַל", "<small>לתענית:</small>", "<b>שִׂים שָׁלוֹם</b> טוֹבָה"),
+            ("Abundant peace", "", "Grant peace"), table)
+        xml = body("he")
+        self.assertEqual(self.gated(xml), [["t0"], ["t1"]])
+        self.assertEqual(len(xml.xpath("//j:conditional[1]/j:none", namespaces=NS)), 1)
+
     def leaf(self, he, en, table, **kwargs):
         from opensiddur.importer.sefaria.tei_builder import leaf_body
         leaf = Leaf(("L",), (("L", "L"),), he, en)
@@ -455,6 +469,23 @@ class TestLeafGates(unittest.TestCase):
             ("<small>Tachanun is also omitted today.</small>", "We have trespassed", "<b>FALLING ON THE FACE</b>",
              "And David said", "<small>The Chazzan recites the following Kaddish</small>", "Exalted"), table)
         self.assertEqual(self.gated(body("en")), [["t0", "t1"]])
+
+    def test_a_section_runs_until_the_heading_it_names(self):
+        # The rubric it names is the next text's heading ("FIRST BERACHA" before Birkat Hamazon).
+        import dataclasses
+        import re as _re
+        from opensiddur.importer.sefaria.conditions import LabelCondition
+        from opensiddur.importer.util.incipit import words
+        table = dataclasses.replace(conditions(), labels=(
+            LabelCondition(tuple(words("וכך מזמנין")), {"meal-context": {"zimmun": True}},
+                           section=True, until=_re.compile("FIRST BERACHA")),))
+        _, _, body = self.leaf(
+            ("<small>וכך מזמנין:</small>", "<b>רַבּוֹתַי</b> נְבָרֵךְ", "<b>יְהִי</b> שֵׁם",
+             "<small>ברכה זו משה תקנה</small>", "<b>בָּרוּךְ</b> אַתָּה"),
+            ("<i>Zimmun is said thus:</i>", "Gentlemen, let us bless", "The Name of Adonoy",
+             "<i><b>FIRST BERACHA</b></i>", "Blessed are You"), table)
+        for lang in ("he", "en"):
+            self.assertEqual(self.gated(body(lang)), [["t0", "t1"]], lang)
 
     def test_a_woman_says_makes_the_text_before_the_alternative(self):
         import re as _re

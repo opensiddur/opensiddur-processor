@@ -789,15 +789,15 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                         close_gate()  # ... and ends with
                     continue
                 close_gate()
-                if getattr(found, "instead_of_previous", False) and previous is not None and all(
+                if found.instead_of_previous and previous is not None and all(
                         p.startswith("<j:endConditional") for p in parts[previous + 1:]):
                     # (inside a gate of its own that has closed: the conditionals nest)
                     gates += 1
                     parts[previous] = (f'<j:conditional xml:id="when_{gates}">{negated_xml(found.when)}</j:conditional>'
                                        f'{parts[previous]}<j:endConditional target="#when_{gates}"/>')
                 gates += 1
-                gate, section, until, texts = f"when_{gates}", getattr(found, "section", False), getattr(found, "until", None), 0
-                until_included = getattr(found, "until_included", False)
+                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                until_included = found.until_included
                 note = rubric_note(pair, lang, notes)
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
         elif isinstance(item, Heading):
@@ -817,10 +817,12 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
             lead = leading.get(id(item))
             found = rubric_condition(table, lead) if lead is not None else None
-            # The rubric a section's condition runs to may open the next text's block.
+            # The rubric a section's condition runs to may open the next text's block, or be its
+            # heading.
+            opening = item.pairs[:next((k for k, p in enumerate(item.pairs) if is_phrase(p)), 0)]
             ends = gate is not None and until is not None and any(
                 until.search(" ".join(plain_text(pair.en).split()))
-                for pair in item.pairs[:next((k for k, p in enumerate(item.pairs) if is_phrase(p)), 0)])
+                for pair in ([item.head] if item.head is not None else []) + list(opening))
             if ends and not until_included:
                 close_gate()
             if lead is not None:
@@ -837,13 +839,13 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                         parts.append(xml)
             if ends and until_included:
                 close_gate()
-            if found is not None and getattr(found, "section", False):
+            if found is not None and found.section:
                 # A condition over a section (one day's introduction and psalm) gates every text
                 # to its end, as the same rubric between texts does.
                 close_gate()
                 gates += 1
-                gate, section, until, texts = f"when_{gates}", getattr(found, "section", False), getattr(found, "until", None), 0
-                until_included = getattr(found, "until_included", False)
+                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
+                until_included = found.until_included
                 note = rubric_note(lead, lang, notes)
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
             elif found is not None and gate is None:

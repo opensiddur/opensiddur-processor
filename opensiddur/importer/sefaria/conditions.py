@@ -28,6 +28,7 @@ passage to the next rubric (inside one); with ``section: true``, everything to t
 or, with ``until``, to the rubric that matches it. With ``instead_of_previous: true`` (between
 texts), the text before the rubric is what is said otherwise, and is conditional on the opposite.
 Inside a text, ``through`` (Hebrew words) ends the passage with the phrase that ends with them.
+A label standing between texts may say the same, but for ``through``.
 
 A condition (``when``) is written in a small grammar: a mapping of feature structure type to
 features (the types and features of ``opensiddur/exporter/features.yaml``, without the
@@ -128,6 +129,11 @@ class LabelCondition:
     when: Any
     #: the label's words replace the ending of the blessing before them
     ending: bool = False
+    #: between texts, how far the label governs, as a rubric does (``RubricCondition``)
+    section: bool = False
+    until: re.Pattern[str] | None = None
+    instead_of_previous: bool = False
+    until_included: bool = False
 
 
 @dataclass(frozen=True)
@@ -195,7 +201,11 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
             if not label:
                 raise ConditionsError(f"{where}: a label is needed")
             condition_xml(entry.get("when"), where)
-            found.append(LabelCondition(label, entry["when"], bool(entry.get("ending"))))
+            until = _pattern(entry["until"], where) if entry.get("until") else None
+            found.append(LabelCondition(label, entry["when"], bool(entry.get("ending")),
+                                        bool(entry.get("section")) or until is not None, until,
+                                        bool(entry.get("instead_of_previous")),
+                                        bool(entry.get("until_included"))))
     replacements = [Replacement(tuple(words(str(e["alternative"]))), tuple(words(str(e["replaces"]))))
                     for e in data.get("replacements") or ()]
     directives = tuple(_pattern(m, f"{path.name} directives #{n}")

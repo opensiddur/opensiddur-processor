@@ -45,7 +45,7 @@ from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, 
 from opensiddur.importer.sefaria.download import load_manifest
 from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
 from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
-from opensiddur.importer.sefaria.markup import HebrewKind, plain_text
+from opensiddur.importer.sefaria.markup import HebrewKind, leading_label, plain_text
 from opensiddur.importer.sefaria.match import (
     URNS_PATH,
     Decisions,
@@ -194,7 +194,8 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             for position, urn in sorted(scripture_verses(block, index).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
-                if work.layout == "paragraph" and ":" in plain_text(block.phrases[position].he).rstrip().rstrip(":"):
+                if work.layout == "paragraph" and ":" in plain_text(
+                        leading_label(block.phrases[position].he)[1]).rstrip().rstrip(":"):
                     continue  # a paragraph of verses: a verse's scope would claim them all
                 if urn not in marked:  # a verse repeated, even within one text, is marked once
                     marked.add(urn)

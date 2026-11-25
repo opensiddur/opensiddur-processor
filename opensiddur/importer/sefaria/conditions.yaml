@@ -133,7 +133,9 @@ rubrics:
 
   # -- The Sabbath and the festivals (the Shabbat siddur) ----------------------------------------
   - match: "^On Pesach, Shavuos and Sukkos,? say:"
-    when: {any: [{holiday: {pesah: true}}, {holiday: {shavuot: true}}, {holiday: {sukkot: true}}]}
+    # Vayedaber Moshe after Veshamru: on the festivals' days of Yom Tov, Shemini Atzeret among
+    # them, not on Chol Hamoed (as Birnbaum encodes it)
+    when: {all: [{holiday-aggregate: {yom-tov: true}}, {any: [{holiday: {pesah: true}}, {holiday: {shavuot: true}}, {holiday: {sukkot: true}}, {holiday: {shmini-atzeret: true}}]}]}
   - match: "^On Shavuos:"
     when: {holiday: {shavuot: true}}
   - match: "^On Shemini Atseres and Simchas Torah:"
@@ -358,17 +360,30 @@ labels:
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
     ending: true
   - label: 'לתענית ציבור'
-    # Sim Shalom at Minchah, which the fast days' Minchah says
+    # Sim Shalom at Minchah, which the fast days' Minchah says instead of Shalom Rav
+    instead_of_previous: true
     when: {any: [{holiday-aggregate: {minor-fast: true}}, {holiday: {tisha-bav: true}}]}
   - label: 'בראש חדש ובחול המועד אומרים זה'
     # Ya'aleh Veyavo in the Amidah
     when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
   - label: 'בראש חודש ובחול המועד אומרים כאן "יעלה ויבא"'
-    # ... and in Birkat Hamazon, which the English gives for Yom Tov as well
+    # ... and in Birkat Hamazon, which the English gives for Yom Tov as well; through Zokhrenu,
+    # to the rubric for one who forgot it
+    until: "^If you forgot to say"
     when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}, {holiday-aggregate: {yom-tov: true}}]}
+  - label: 'שלושה שאכלו כאחד חייבין בזימון, וכך מזמנין'
+    # the invitation and its responses, to the first blessing
+    when: {meal-context: {zimmun: true}}
+    until: "FIRST BERACHA"
+  - label: 'בשבת מוסיפים'
+    # Retzeh in Birkat Hamazon
+    when: {holiday-aggregate: {shabbat: true}}
   - label: 'בשבועות'
     when: {holiday: {shavuot: true}}
   - label: 'בחנוכה ופורים אומרים כאן ועל הנסים'
+    when: {any: [{holiday: {hanukkah: true}}, {holiday: {purim-observed: true}}]}
+  - label: "בחנוכה ופורים אומרים כאן על הניסים. ואם לא אמרו אין מחזירין אותו. ומכל מקום יוכל לאמרו בתוך שאר הרחמן. ויאמר הָרַחֲמָן הוּא יַעֲשֶׂה־לָּנוּ נִסִים וְנִפְלָאוֹת כְּמוֹ שֶׁעָשָׂה לַאֲבוֹתֵינוּ בַּיָּמִים הָהֵם בַּזְּמַן הַזֶּה וכו' בִּימֵי מַתִּתְיָהוּ וכו' או בִּימֵי מָרְדְּכַי וכו'."
+    # Al HaNissim in Birkat Hamazon (Siddur Ashkenaz): the whole instruction is the label
     when: {any: [{holiday: {hanukkah: true}}, {holiday: {purim-observed: true}}]}
   - label: 'בחול קודם ברכת המזון אומרים'
     # Psalm 137 on weekdays, Psalm 126 on Sabbaths and festivals, as Birnbaum conditions them
@@ -380,8 +395,9 @@ labels:
   - label: 'יחיד אומר'
     when: {quorum: {minyan: false}}
   - label: 'בראש חודש ובחוה"מ פסח מדלגין'
-    # "skip on Rosh Chodesh and Chol Hamoed Pesach": the words are said on the other days
-    when: {none: [{holiday: {rosh-hodesh: true}}, {all: [{holiday-aggregate: {chol-hamoed: true}}, {holiday: {pesah: true}}]}]}
+    # "skip on Rosh Chodesh and Chol Hamoed Pesach": the words are said only in the full Hallel
+    # (as Birnbaum encodes it), which the last days of Pesach do not say either
+    when: {hallel: {full: true}}
 
 inline:
   - label: 'בעשי"ת'

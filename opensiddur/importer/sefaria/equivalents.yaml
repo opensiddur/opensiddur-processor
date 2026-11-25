@@ -72,6 +72,11 @@ texts:
     ends: וביום השביעי שבת וינפש
     urn: urn:x-opensiddur:text:bible:exodus/31/16-17
     note: "the two verses, as Birnbaum encodes them; the festivals' verse after them is another text"
+  - opens: שים שלום טובה וברכה
+    leaf: "Weekday / Minchah / Amida / Peace"
+    ends: לברך את עמך ישראל בכל עת ובכל שעה בשלומך
+    urn: urn:x-opensiddur:text:prayer:amidah/shalom/sim_shalom
+    note: "Sim Shalom alone, which a fast day's Minchah says instead of Shalom Rav; the Ten Days' words and the blessing's ending after it are said every day"
   - opens: ברכה
     leaf: ["Weekday / Shacharit / Amidah / Prosperity", "Weekday / Minchah / Amida / Prosperity", "Weekday / Maariv / Amidah / Prosperity"]
     ends: ברכה

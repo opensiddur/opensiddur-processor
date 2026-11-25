@@ -397,7 +397,13 @@ def _replaced_endings(pairs: list[Pair], ending: Callable[[str], Any]) -> list[P
                 if not split[0]:
                     out[previous] = dataclasses.replace(was, otherwise=when)
                 else:
-                    before_en, ending_en = _split_english_ending(was.en, keep)
+                    # The English keeps its opening as its own replacement does: "During the
+                    # Ten Days: Blessed are You, Adonoy, the King of Justice" replaces the whole
+                    # English ending, where the Hebrew label replaces only הַמֶּֽלֶךְ הַמִּשְׁפָּט.
+                    replacing = split_leading(pair.en, {"italic", "small"}, hebrew=False)
+                    replacing_en = plain_text(replacing[1] if replacing is not None else pair.en)
+                    keep_en = _ENGLISH_BLESSING.match(replacing_en.strip()) is None
+                    before_en, ending_en = _split_english_ending(was.en, keep_en)
                     out[previous:previous + 1] = [dataclasses.replace(was, he=split[0], en=before_en),
                                                   Pair(was.he_index, was.en_index, split[1], ending_en,
                                                        otherwise=when)]
