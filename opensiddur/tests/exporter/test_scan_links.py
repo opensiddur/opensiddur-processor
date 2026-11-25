@@ -57,6 +57,99 @@ class TestWhichBreaksAreCandidates(unittest.TestCase):
         self.assertEqual([], _marked(
             "<tei:p>words<tei:note>" + _pb("1") + "a note</tei:note> more</tei:p>"))
 
+    def test_a_break_within_a_visible_rubric_keeps_its_exact_position(self):
+        for kind in ("instruction", "description"):
+            with self.subTest(kind=kind):
+                root = _tree(f'<tei:note type="{kind}">before '
+                             + _pb("2") + '<tei:hi>after</tei:hi></tei:note><tei:p>prayer</tei:p>')
+                note = root.find(f".//{TEI}note")
+                mark_scan_links(root)
+                self.assertEqual(["2"], _linked(root))
+                pb = root.find(f".//{TEI}pb")
+                self.assertIs(note, pb.getparent())
+                self.assertEqual(f"{TEI}hi", pb.getnext().tag)
+
+    def test_rubric_page_break_inside_standoff_or_commentary_is_not_linked(self):
+        for wrapper in ("<tei:standOff>{}</tei:standOff>",
+                        '<tei:note type="commentary">{}</tei:note>'):
+            with self.subTest(wrapper=wrapper):
+                note = '<tei:note type="instruction">' + _pb("2") + "rubric</tei:note>"
+                self.assertEqual([], _marked(wrapper.format(note)))
+
+    def test_a_break_at_the_end_of_a_rubric_attaches_to_next_prayer(self):
+        root = _tree('<tei:note type="instruction">rubric' + _pb("2")
+                     + '</tei:note><tei:p>prayer</tei:p>')
+        mark_scan_links(root)
+        pb = root.find(f".//{TEI}pb")
+        self.assertEqual(["2"], _linked(root))
+        self.assertEqual(f"{TEI}p", pb.getparent().tag)
+        self.assertEqual("prayer", pb.tail)
+
+    def test_ordinary_note_words_do_not_keep_a_rubric_break(self):
+        root = _tree('<tei:note type="instruction">rubric' + _pb("2")
+                     + '<tei:note type="commentary">annotation</tei:note></tei:note>'
+                     + '<tei:p>prayer</tei:p>')
+        mark_scan_links(root)
+        self.assertEqual(f"{TEI}p", root.find(f".//{TEI}pb").getparent().tag)
+
+    def test_a_break_cannot_move_past_a_later_page_inside_a_rubric(self):
+        root = _tree(_pb("1") + '<tei:note type="instruction">rubric '
+                     + _pb("2") + 'continued</tei:note><tei:p>prayer</tei:p>')
+        first = root.find(f".//{TEI}pb")
+        parent = first.getparent()
+        mark_scan_links(root)
+        self.assertEqual(["1", "2"], _linked(root))
+        self.assertIs(parent, first.getparent())
+
+    def test_a_rubric_break_stays_a_barrier_after_it_moves_to_next_prayer(self):
+        root = _tree(_pb("1") + '<tei:note type="instruction">rubric '
+                     + _pb("2") + '</tei:note><tei:p>prayer</tei:p>')
+        mark_scan_links(root)
+        self.assertEqual(["1", "2"], _linked(root))
+
+    def test_an_edition_with_only_a_rubric_break_needs_no_ordinary_context(self):
+        self.assertEqual(["rubric"], _marked(
+            '<tei:note type="instruction">' + _pb("rubric", "1949 shabbat/opening")
+            + 'rubric words</tei:note>'))
+
+    def test_rubric_uses_all_its_groups_printings_when_an_earlier_page_selects_one(self):
+        inner = _transclude(
+            "urn:prayer", '<tei:note type="instruction">'
+            + _pb("r", "1949 chol/shacharit/b") + 'rubric</tei:note><tei:p>'
+            + _pb("s", "1949 chol/shacharit/b") + _pb("m", "1949 chol/minchah/a")
+            + 'words</tei:p>')
+        body = _transclude("urn:book", '<tei:p>' + _pb("e", "1949 chol/minchah/a")
+                           + 'earlier</tei:p>' + inner)
+        self.assertEqual(["e", "m"], _marked(body))
+
+    def test_many_transclusions_keep_their_own_printing_groups_alive(self):
+        body = "".join(
+            _transclude(f"urn:prayer:{n}", '<tei:p>' + _pb(f"p{n}") + 'prayer</tei:p>'
+                        + '<tei:note type="instruction">' + _pb(f"r{n}")
+                        + 'rubric</tei:note>') for n in range(40))
+        self.assertEqual([value for n in range(40) for value in (f"p{n}", f"r{n}")],
+                         _marked(body))
+
+    def test_rubric_printing_never_changes_a_later_groups_printing_choice(self):
+        shared = _transclude("urn:prayer", '<tei:p>' + _pb("a", "1949 chol/opening")
+                            + _pb("b", "1949 shabbat/opening") + 'words</tei:p>')
+        rubric = ('<tei:note type="instruction">' + _pb("rubric", "1949 shabbat/opening")
+                  + 'rubric words</tei:note>')
+        self.assertEqual(["a", "b"], _marked(shared))
+        self.assertEqual(["rubric", "a", "b"], _marked(rubric + shared))
+
+    def test_another_columns_rubric_break_does_not_pin_this_columns_break(self):
+        body = ('<p:parallel><p:parallelItem role="primary">' + _pb("1")
+                + '</p:parallelItem><p:parallelItem role="parallel">'
+                + '<tei:note type="instruction">before ' + _pb("2")
+                + 'after</tei:note></p:parallelItem></p:parallel>'
+                + '<p:parallel><p:parallelItem role="primary"><tei:p>prayer</tei:p>'
+                + '</p:parallelItem></p:parallel>')
+        root = _tree(body)
+        mark_scan_links(root)
+        first = next(pb for pb in root.iter(f"{TEI}pb") if pb.get("n") == "1")
+        self.assertEqual(f"{TEI}p", first.getparent().tag)
+
     def test_nothing_else_is_changed(self):
         root = _tree("<tei:p>" + _pb("1", facs=False) + "words</tei:p>")
         before = etree.tostring(root)
