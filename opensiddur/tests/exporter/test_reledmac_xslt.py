@@ -5391,6 +5391,17 @@ class TestScanLinks(unittest.TestCase):
                          typography={"markers": {"scan_links": {"placement": placement}}}
                          ).split(r"\begin{document}")[1]
 
+    def test_source_page_link_survives_a_continuing_instruction(self):
+        from lxml import etree
+        from opensiddur.exporter.scan_links import mark_scan_links
+        root = etree.fromstring(self._document(
+            '<tei:note type="instruction">before '
+            '<tei:pb n="2" facs="https://scan.example/2"/>after</tei:note>').encode())
+        mark_scan_links(root)
+        out = transform(etree.tostring(root).decode(),
+                        typography={"markers": {"scan_links": {"placement": "inline"}}})
+        self.assertIn(r"before \OSScanLink{https://scan.example/2}after", out)
+
     def test_inline(self):
         self.assertIn(
             r"Before \OSScanLink{https://www.hebrewbooks.org/pdfpager.aspx?req=4909\&pgnum=6}"
