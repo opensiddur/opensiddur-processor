@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Source-scan links no longer repeat at each paragraph or transcluded module while the
+  same column remains on the same source page. Returning to a different page keeps its
+  link; optional passages and instructions cannot hide a required later link.
 - Faults that Windows exposes. Python on Windows has no time-zone database of its own, and
   `hdate` needs one when it is imported, so `tzdata` is now a dependency there; without it the
   exporter could not start. The validator lets jing open its temporary files. Every text file

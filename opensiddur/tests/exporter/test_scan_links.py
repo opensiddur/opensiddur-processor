@@ -476,3 +476,153 @@ class TestTheContextTheEditionPrints(unittest.TestCase):
             + _transclude(SIDDUR + "regalim/musaf",
                           "<tei:p>" + _pb("615", "1949 festival musaf") + "Musaf</tei:p>"))
         self.assertEqual(["600", "615"], _marked(body))
+
+
+class TestPageChanges(unittest.TestCase):
+    def test_one_link_per_page_across_paragraphs_and_transclusions(self):
+        root = _tree(_transclude("urn:a", "<tei:p>" + _pb("1") + "first</tei:p>")
+                     + _transclude("urn:b", "<tei:p>" + _pb("1") + "second</tei:p>")
+                     + "<tei:p>" + _pb("2") + "third</tei:p>")
+        before = "".join(root.itertext())
+        mark_scan_links(root)
+        self.assertEqual(_linked(root), ["1", "2"])
+        self.assertEqual(len(list(root.iter(TEI+"pb"))), 3)
+        self.assertEqual("".join(root.itertext()), before)
+
+    def test_returning_to_an_earlier_page_needs_its_link_again(self):
+        self.assertEqual(_marked("".join("<tei:p>" + _pb(n) + "words</tei:p>"
+                                        for n in ("1", "2", "1"))), ["1", "2", "1"])
+
+    def test_scan_identity_overrides_repeated_printed_page_label(self):
+        body = "<tei:p>" + _pb("1") + "first</tei:p><tei:p>" + _pb("2").replace('n="2"', 'n="1"') + "second</tei:p>"
+        self.assertEqual(_marked(body), ["1", "1"])
+
+    def test_parallel_columns_have_independent_page_states(self):
+        def item(role, page):
+            return f'<p:parallelItem role="{role}"><tei:p>' + _pb(page) + 'words</tei:p></p:parallelItem>'
+        root = _tree('<p:parallel>' + item('primary', '1') + item('secondary', '1')
+                     + item('primary', '1') + item('secondary', '2') + '</p:parallel>')
+        mark_scan_links(root)
+        self.assertEqual(_linked(root), ['1', '1', '2'])
+
+    def test_a_conditional_link_does_not_hide_an_unconditional_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>' + _pb('1') + 'optional words</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'
+        body += '<tei:p>' + _pb('1') + 'required words</tei:p>'
+        self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_a_conditional_page_change_requires_a_link_after_the_scope(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>'
+        body += f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>' + _pb('2') + 'optional</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'
+        body += '<tei:p>' + _pb('1') + 'last</tei:p>'
+        self.assertEqual(_marked(body), ['1', '2', '1'])
+
+    def test_same_page_through_a_conditional_is_not_a_page_change(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>'
+        body += f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>' + _pb('1') + 'optional</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'
+        body += '<tei:p>' + _pb('1') + 'last</tei:p>'
+        self.assertEqual(_marked(body), ['1'])
+
+    def test_optional_rubric_cannot_hide_required_page_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        for condition in ('', f'<j:condition xmlns:j="{j}"/>'):
+            with self.subTest(condition=bool(condition)):
+                root = _tree('<tei:note type="instruction">' + condition + _pb('1')
+                             + 'optional instruction</tei:note><tei:p>' + _pb('1') + 'required</tei:p>')
+                mark_scan_links(root)
+                self.assertEqual(_linked(root), ['1', '1'])
+
+    def test_implicit_conditional_ends_at_parent_end_with_or_without_id(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        for identifier in ('', ' xml:id="optional"'):
+            with self.subTest(identifier=identifier):
+                body = f'<tei:div><j:conditional xmlns:j="{j}"{identifier}/>'
+                body += '<tei:p>' + _pb('1') + 'optional</tei:p></tei:div>'
+                body += '<tei:p>' + _pb('1') + 'required</tei:p>'
+                self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_unknown_end_marker_does_not_hide_a_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#absent"/>'
+        body += '<tei:p>' + _pb('1') + 'after unmatched end</tei:p>'
+        self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_nested_conditionals_preserve_both_paths(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        def start(key):
+            return f'<j:conditional xmlns:j="{j}" xml:id="{key}"/>'
+        def end(key):
+            return f'<j:endConditional xmlns:j="{j}" target="#{key}"/>'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>' + start('outer')
+        body += '<tei:p>' + _pb('2') + 'outer</tei:p>' + start('inner')
+        body += '<tei:p>' + _pb('3') + 'inner</tei:p>' + end('inner') + end('outer')
+        body += '<tei:p>' + _pb('1') + 'last</tei:p>'
+        self.assertEqual(_marked(body), ['1', '2', '3', '1'])
+
+    def test_editions_keep_independent_page_states(self):
+        body = '<tei:p>' + _pb('1', '1949') + 'first</tei:p>'
+        body += '<tei:p>' + _pb('2', '1965') + 'second</tei:p>'
+        body += '<tei:p>' + _pb('1', '1949') + 'still first edition page</tei:p>'
+        self.assertEqual(_marked(body), ['1', '2'])
+
+    def test_project_columns_and_shared_wrapper_do_not_share_page_state(self):
+        for projects in (('he-project', 'en-project'), (None, None)):
+            with self.subTest(projects=projects):
+                def item(role, project):
+                    attr = f' p:project="{project}"' if project else ''
+                    return f'<p:parallelItem role="{role}"{attr}><tei:p>' + _pb('1') + 'words</tei:p></p:parallelItem>'
+                body = '<p:transclude target="urn:book" p:project="he-project"><p:parallel>'
+                body += ''.join(item(role, project) for _ in range(2)
+                                for role, project in zip(('primary', 'secondary'), projects))
+                body += '</p:parallel></p:transclude>'
+                self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_attached_duplicate_remains_in_tree_without_link_mark(self):
+        root = _tree('<tei:p>' + _pb('1') + 'first</tei:p>' + _pb('1') + '<tei:p>second</tei:p>')
+        mark_scan_links(root)
+        pages = list(root.iter(TEI+'pb'))
+        self.assertEqual(_linked(root), ['1'])
+        self.assertEqual(len(pages), 2)
+        self.assertEqual(pages[1].getparent().tag, TEI+'p')
+        self.assertEqual(pages[1].tail, 'second')
+        self.assertIsNone(pages[1].get(SCAN_LINK))
+
+    def test_electronic_compile_keeps_conditional_pair_through_transclusion(self):
+        import tempfile
+        from pathlib import Path
+        from opensiddur.exporter.linear import LinearData
+        from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
+        from opensiddur.exporter.refdb import ReferenceDatabase
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            project = base/'sample'
+            project.mkdir()
+            wrapper = f'<tei:TEI xmlns:tei="{TEI_NS}" xmlns:j="{j}" xml:lang="he"><tei:text><tei:body>{{}}</tei:body></tei:text></tei:TEI>'
+            (project/'index.xml').write_text(wrapper.format('<j:transclude target="urn:x-opensiddur:text:prayer:sample"/>'), encoding='utf-8')
+            body = '<j:conditional xml:id="optional"><tei:fs type="opensiddur:holiday-aggregate"><tei:f name="shabbat"><tei:binary value="true"/></tei:f></tei:fs></j:conditional>'
+            body += '<tei:p>' + _pb('1') + 'optional</tei:p><j:endConditional target="#optional"/>'
+            body += '<tei:p>' + _pb('1') + 'required</tei:p>'
+            (project/'part.xml').write_text(wrapper.format('<tei:div corresp="urn:x-opensiddur:text:prayer:sample">'+body+'</tei:div>'), encoding='utf-8')
+            data = LinearData(defer_reader_settings=True, project_priority=["sample"])
+            data.xml_cache.base_path = base
+            db = ReferenceDatabase(base/'refs.db')
+            db.index_project('sample', base)
+            try:
+                result = ExternalCompilerProcessor('sample', 'index.xml', linear_data=data, reference_database=db).process()[0]
+            finally:
+                db.close()
+            start = next(result.iter('{'+j+'}conditional'))
+            end = next(result.iter('{'+j+'}endConditional'))
+            self.assertEqual(end.get('target'), '#'+start.get('{http://www.w3.org/XML/1998/namespace}id'))
+            mark_scan_links(result)
+            self.assertEqual(_linked(result), ['1', '1'])
