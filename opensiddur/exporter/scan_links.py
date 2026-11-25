@@ -40,7 +40,8 @@ symbol stands in a line of text: a page break between two paragraphs, or before 
 would otherwise be set in a paragraph of its own -- in a parallel text, a paragraph the other
 column has no partner for. A break that no words follow, in its own column, is unmarked, as
 is a break followed directly by another of its printing, or by one linking the same scan
-page: the words are on the later page.
+page: the words are on the later page. Repeated links to the same source page across
+paragraphs and transclusions are suppressed until that column changes source page.
 """
 
 from collections.abc import Iterable
@@ -48,7 +49,7 @@ from dataclasses import dataclass
 
 from lxml import etree
 
-from opensiddur.exporter.constants import PROCESSING_NAMESPACE, TEI_NS
+from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS, XML_NS
 
 #: Set on each page break that links to its scan.
 SCAN_LINK = f"{{{PROCESSING_NAMESPACE}}}scan-link"
@@ -232,6 +233,68 @@ def mark_scan_links(root: etree.ElementBase) -> None:
             _attach(brk.element, columns, rubric_ids)
     for brk in candidates:
         _unmark_if_empty_page(brk.element)
+    _suppress_repeated_pages(root)
+
+
+
+def _suppress_repeated_pages(root: etree.ElementBase) -> None:
+    """Link only when a column's source page changes, across module boundaries.
+
+    A conditional or rubric may be skipped by the electronic reader. At its end,
+    retain both possible page states; suppress a later marker only if every path
+    has already linked that page. Source page breaks themselves remain intact.
+    """
+    states = {}
+    scopes = []
+    rubrics = {}
+    opening = f"{{{JLPTEI_NAMESPACE}}}conditional"
+    closing = f"{{{JLPTEI_NAMESPACE}}}endConditional"
+
+    def merge(before):
+        nonlocal states
+        states = {key: states.get(key, frozenset({None}))
+                  | before.get(key, frozenset({None}))
+                  for key in states.keys() | before.keys()}
+
+    def close_from(index):
+        for _, _, before in reversed(scopes[index:]):
+            merge(before)
+        del scopes[index:]
+
+    for event, node in etree.iterwalk(root, events=("start", "end")):
+        if event == "end":
+            # A conditional without an end marker ends with its parent.
+            for index, (_, parent, _) in enumerate(scopes):
+                if parent is node:
+                    close_from(index)
+                    break
+            if node in rubrics:
+                merge(rubrics.pop(node))
+            continue
+        if _is_rubric(node):
+            # Even an instruction without j:condition can be hidden by settings.
+            rubrics[node] = dict(states)
+        if node.tag == opening:
+            scopes.append((node.get(f"{{{XML_NS}}}id"), node.getparent(), dict(states)))
+        elif node.tag == closing:
+            target = (node.get("target") or "").removeprefix("#")
+            index = next((i for i in range(len(scopes)-1, -1, -1)
+                          if target and scopes[i][0] == target), None)
+            if index is None:
+                states.clear()
+            else:
+                close_from(index)
+        elif node.tag == _PB and node.get(SCAN_LINK):
+            column = next(node.iterancestors(_PARALLEL_ITEM), None)
+            group = _group(node)
+            project = ((column.get(_PROJECT) if column is not None else None)
+                       or (group.get(_PROJECT) if group is not None else None))
+            role = column.get("role") if column is not None else None
+            key = (project, role, _parse(node).edition)
+            page = node.get("facs")
+            if states.get(key) == frozenset({page}):
+                del node.attrib[SCAN_LINK]
+            states[key] = frozenset({page})
 
 
 def _within_rubric(element: etree.ElementBase) -> bool:
