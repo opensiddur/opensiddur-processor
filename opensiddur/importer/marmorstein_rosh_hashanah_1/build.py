@@ -1172,6 +1172,10 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                         IDENTIFIER, int(heading['scan'][1:])-1, size='')
                     element(section, 'pb', **attributes)
                 element(section, 'head', heading['text']).set(XML+'lang', heading['language'])
+            editorial_heading = occurrence.get('editorial_heads', {}).get(lang)
+            if editorial_heading:
+                element(section, 'head', editorial_heading,
+                        resp='urn:x-opensiddur:contributor:opensiddur.org/codex').set(XML+'lang', lang)
             if occurrence.get('declarations'):
                 declaration = element(section, 'j:declare')
                 declaration.set(XML+'id', 'documentary_'+occurrence['section']+'_'+lang+'_settings')
@@ -1444,7 +1448,8 @@ def build(source, project_directory, *, draft=False):
                                  'instructions': [project]+[p for p in PROJECTS.values() if p != project]},
                     'typography': {'instructions': {'from': 'both'},
                                    'line_numbers': {'enabled': False},
-                                   'paragraphs': {'line_spacing': 1.15}}}
+                                   'paragraphs': {'line_spacing': 1.15},
+                                   'markers': {'scan_links': {'placement': 'margin'}}}}
         if parallel:
             settings['parallel'] = {'projects': [PROJECTS['en']]}
         if project != EXPANDED:

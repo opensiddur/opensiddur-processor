@@ -2,7 +2,7 @@
 
 Contribution to [issue 214](https://github.com/opensiddur/opensiddur-processor/issues/214), digitizing the complete 355-leaf Archive item `mahzor-lyom-rishon-shel-rosh-hashanah-day-one-jenny-marmorstein-1965`.
 
-**Complete-volume acceptance: all 355 PDF scan pages, including front matter and appendices. No incomplete leaves or unresolved readings remain.** The source contains 556 literal units, 954 Hebrew/English unit witnesses and 355 canonical realization payloads. All 1,005 generated XML files pass schema validation. Missing English translations remain absent; this project covers the first-day volume.
+**Complete-volume acceptance: all 355 PDF scan pages, including front matter and appendices. No incomplete leaves or unresolved readings remain.** The source contains 556 literal units, 954 Hebrew/English unit witnesses and 355 canonical realization payloads. All 1,008 generated XML files pass schema validation. Missing English translations remain absent; this project covers the first-day volume.
 
 The shared expanded spine now includes the closing priestly-blessing directions, preparation and responses, the seven daily psalms after their daily Hymns of Unity at the printed Musaf conclusion, and complete Kaddish after study. The Hymn of Glory remains a named appendix. Existing canonical identities and printed rites are preserved, with local settings for genuine alternatives and repeated recitations. Required page-turn references are absent from the expanded output.
 
@@ -10,7 +10,23 @@ Independent evidence covers source images and human resolutions through 859, enc
 
 Post-update checks pass 321 importer/shared-scan/settings tests and 283 subtests. The separate scan-link exporter fix passes 561 tests and 294 subtests across its three affected suites. Full-book PDF checks cover links, bounds, glyphs and references; visual review covers the explicitly recorded changed and boundary pages. Twelve unrelated whole-corpus registry errors are unchanged from the accepted baseline; no new registry errors are introduced.
 
-The remaining exporter dependency is [PR 327](https://github.com/opensiddur/opensiddur-processor/pull/327), which restores the scan link inside a continuing source instruction. It remains separate from source/project changes and must merge before the dependent digitization PR. Earlier exporter PRs 297, 301, 311, 318 and 324 are merged. The coordinated digitization PRs reference issue 214 and are ready for review; no PR is merged automatically.
+[PR 327](https://github.com/opensiddur/opensiddur-processor/pull/327), restoring the scan link inside a continuing source instruction, is merged and integrated. Earlier exporter PRs 297, 301, 311, 318 and 324 are also merged. The coordinated digitization PRs reference issue 214 and are ready for review; no PR is merged automatically.
+
+Documentary navigation now groups the morning service through full Kaddish in
+`shacharit.xml`; Seder Avinu Malkenu is a child of Shacharit, retaining its
+non-Shabbat condition. The seven daily Shir ha-Yichud sections are grouped in
+`shir_hayyichud.xml`, with one credited editorial parent heading and the source
+headings below it. Shir ha-Kavod remains a sibling. Unwrapping these two groups
+exactly restores the previously accepted source order; all other reading fields
+and the expanded recitation sequence remain identical. The existing realization
+reviews are rebound only to the new structural hash, with independent approval
+and the original source/encoding provenance preserved in
+`independent/navigation_structure_20261125/`.
+
+Book settings use the existing margin placement for source-scan links. The
+separate exporter follow-up suppresses repeated links while each column remains
+on the same scan; it preserves distinct scans with repeated printed labels,
+returns to an earlier scan, and links needed when optional material is hidden.
 
 ## Repositories and outputs
 

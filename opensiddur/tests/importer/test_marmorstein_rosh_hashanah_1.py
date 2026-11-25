@@ -236,6 +236,21 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(link.get('target'), BASE+'invented@'+PROJECTS['he'])
         self.assertEqual(link.getparent().get('type'), 'optional-page-reference')
 
+    def test_editorial_parent_heading_nests_documentary_sections(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import documentary_order
+        order = [{'section': 'collection', 'heading': None,
+                  'editorial_heads': {'he': 'אסופה'}, 'order': [
+                      {'section': 'day', 'heading': 'day_heading', 'order': []}]}]
+        readings = {'documentary_instructions': {
+            'day_heading': {'text': 'יום', 'language': 'he', 'witnesses': ['he'],
+                            'page_start': False}}}
+        root = etree.Element(T+'div')
+        documentary_order(root, order, readings, {}, 'he', PROJECTS['he'])
+        head = root.find(T+'div/'+T+'head')
+        self.assertEqual(head.text, 'אסופה')
+        self.assertEqual(head.get('resp'), 'urn:x-opensiddur:contributor:opensiddur.org/codex')
+        self.assertEqual(root.find(T+'div/'+T+'div/'+T+'head').text, 'יום')
+
     def test_documentary_page_only_occurrence_is_language_specific(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import documentary_order
         order = [{'page_break': {'en': {'scan': 's13', 'printed_page': '7'}}}]
