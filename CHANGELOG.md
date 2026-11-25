@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the same as a hung one.
 
 ### Fixed
+- The monthly Sefaria update (`opensiddur.importer.sefaria.update`) no longer stops with a
+  traceback when Sefaria's new text makes a misprint correction or an alignment decision stale.
+  Such a leaf is reported for review, under its own heading, and its work is not converted. If a
+  conversion still fails on one, the report says so for that work and the other works are still
+  converted and reported.
 - Scan links no longer link pages of another printing among the pages of the one the book
   uses. In a Minchah Amidah, a blessing printed at Minchah with no page break inside it had
   been given the Shacharit page's link. Where the edition prints the unit around a text, only
