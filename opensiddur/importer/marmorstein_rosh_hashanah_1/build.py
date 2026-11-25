@@ -22,7 +22,7 @@ from opensiddur.importer.scan.review import review_is_current
 from opensiddur.importer.util.internet_archive import page_image_url, write_if_changed
 from opensiddur.importer.util.validation import validate
 from . import BOOK, IDENTIFIER, PROJECTS, EXPANDED, ROOT_URN, EXPANDED_URN
-from .realizations import prepare_unit, prepare_documents, selection, review_payloads, validate_occurrences
+from .realizations import prepare_documents, selection, review_payloads, validate_occurrences
 
 FRONT_KINDS = ('cover', 'title', 'copyright', 'preface')
 ROLE_LABELS = {'reader': 'חזן', 'congregation': 'קהל',

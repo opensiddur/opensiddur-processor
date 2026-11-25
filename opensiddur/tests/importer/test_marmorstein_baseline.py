@@ -45,7 +45,7 @@ class LiteralBaselineTest(unittest.TestCase):
             path=SOURCETEXTS_ROOT/BOOK/readings['accepted_literal_baseline']
             current = json.loads(path.read_text())
             fixed = json.loads(BASELINE.read_text())
-            self.assertTrue(fixed.keys() <= current.keys())
+            self.assertLessEqual(fixed.keys(), current.keys())
             self.assertEqual({key: current[key] for key in fixed}, fixed)
             validate_baseline(readings, current)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
-    unit_document, unit_review_text, transclude_unit, document, require_review,
+    unit_document, unit_review_text, transclude_unit, document,
 )
 from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
     prepare_unit, prepare_documents, validate_occurrences, review_payloads, selection,
@@ -172,7 +172,7 @@ class RealizationTest(unittest.TestCase):
                 with self.assertRaises(ValueError):validate_occurrences(r)
 
     def test_mapping_and_note_conditions_have_separate_review_payloads(self):
-        r=fixture();before=unit_review_text(r['units'][1],'en');payloads=dict((k,v)for k,v,_ in review_payloads(r))
+        r=fixture();before=unit_review_text(r['units'][1],'en')
         r['units'][1]['languages']['en'][0]['canonical']=P+'/other'
         self.assertEqual(unit_review_text(r['units'][1],'en'),before)
         with self.assertRaisesRegex(ValueError,'one host'):

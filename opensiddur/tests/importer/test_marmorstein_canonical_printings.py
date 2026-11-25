@@ -124,8 +124,7 @@ class CanonicalPrintingsTest(unittest.TestCase):
             for path,root in docs:
                 destination=base/project/path.name;destination.parent.mkdir(exist_ok=True)
                 destination.write_bytes(etree.tostring(root))
-            database=ReferenceDatabase(base/'reference.db')
-            try:
+            with ReferenceDatabase(base/'reference.db') as database:
                 database.sync_project(project,base)
                 state=LinearData(project_priority=[project],instruction_priority=[project],annotation_projects=[])
                 state.xml_cache.base_path=base
@@ -135,8 +134,6 @@ class CanonicalPrintingsTest(unittest.TestCase):
                 self.assertEqual(len(pages),1)
                 body=compiled.find('{'+b.TEI+'}text/{'+b.TEI+'}body')
                 self.assertEqual(' '.join(''.join(body.itertext()).split()),'alpha beta gamma DELTA')
-            finally:
-                database.close()
 
     def test_no_host_joined_word_or_following_part_is_accepted(self):
         for change in ['no_home','join_word','following']:

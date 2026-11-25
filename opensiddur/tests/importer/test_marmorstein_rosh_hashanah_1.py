@@ -11,7 +11,7 @@ from lxml import etree
 import yaml
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import profile, PROJECTS, EXPANDED
-from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_text, unit_review_text, words
+from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_review_text, words
 from opensiddur.importer.marmorstein_rosh_hashanah_1.download import download, regenerate
 from opensiddur.importer.marmorstein_rosh_hashanah_1.verify import report
 from opensiddur.importer.scan.review import review, reading_hash

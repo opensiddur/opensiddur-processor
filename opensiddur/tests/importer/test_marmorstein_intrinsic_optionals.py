@@ -52,12 +52,10 @@ class IntrinsicOptionalTest(unittest.TestCase):
                     if path.stem=='caller':
                         div=root.find('{'+b.TEI+'}text/{'+b.TEI+'}body/{'+b.TEI+'}div');start=etree.Element('{'+b.J+'}declare',attrib={b.XML+'id':'family_settings'});b.feature_structures(start,[dict(type='opensiddur:variant',features={F:included})]);div.insert(0,start);b.element(div,'j:endDeclare',target='#family_settings')
                     dest=base/project/path.name;dest.parent.mkdir(exist_ok=True);dest.write_bytes(etree.tostring(root))
-                database=ReferenceDatabase(base/'reference.db')
-                try:
+                with ReferenceDatabase(base/'reference.db') as database:
                     database.sync_project(project,base);state=LinearData(project_priority=[project],instruction_priority=[project],annotation_projects=[]);state.xml_cache.base_path=base
                     with unchecked_registry():compiled=CompilerProcessor(project,'caller.xml',linear_data=state,reference_database=database).process()
                     body=compiled.find('{'+b.TEI+'}text/{'+b.TEI+'}body');text=' '.join(''.join(body.itertext()).split());self.assertEqual(text,'ALPHA household GAMMA'if included else'ALPHA GAMMA');self.assertEqual(len(body.xpath('.//t:pb[contains(@facs,"n346")]',namespaces=NS)),1)
-                finally:database.close()
 
     def test_controls_must_be_explicit_and_printing_conditions_must_agree(self):
         for mutation in ['flag','instruction_flag','wrong_condition','missing_span','partial','bad_instruction']:
