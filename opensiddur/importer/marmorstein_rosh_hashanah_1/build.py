@@ -761,6 +761,9 @@ def unit_document(unit, lang, draft):
             raise ValueError('A repeated printing needs its siddur context')
         for page in div.iter('{'+TEI+'}pb'):
             page.set('ed', '1965 '+context)
+    if unit.get('source_encoding', {}).get(lang):
+        from .source_encoding import apply_source_encoding
+        root = apply_source_encoding(root, unit, lang)
     return root
 
 
@@ -783,6 +786,8 @@ def unit_review_text(unit, lang):
         parts.extend(a['abbr']+' ['+a['expan']+']' for a in instruction.get('abbreviations', []))
         parts.extend(span['text']+' ['+span['language']+']'
                      for span in instruction.get('language_spans', []))
+    if unit.get('source_encoding', {}).get(lang):
+        parts.append('[source encoding '+json.dumps(unit['source_encoding'][lang], ensure_ascii=False, sort_keys=True)+']')
     for segment in unit['languages'][lang]:
         if segment.get('deferred_page_boundary'):
             parts.append('[page boundary deferred after optional clause]')
@@ -1097,10 +1102,16 @@ def documentary_order(div, order, readings, by_stem, lang, project):
                         IDENTIFIER, int(heading['scan'][1:])-1, size='')
                     element(section, 'pb', **attributes)
                 element(section, 'head', heading['text']).set(XML+'lang', heading['language'])
+            if occurrence.get('declarations'):
+                declaration = element(section, 'j:declare')
+                declaration.set(XML+'id', 'documentary_'+occurrence['section']+'_'+lang+'_settings')
+                feature_structures(declaration, occurrence['declarations'])
             documentary_order(section, occurrence['order'], readings, by_stem, lang, project)
+            if occurrence.get('declarations'):
+                element(section, 'j:endDeclare', target='#documentary_'+occurrence['section']+'_'+lang+'_settings')
             if conditions:
                 element(section, 'j:endConditional', target='#'+identifier)
-            if not len(section) or all(child.tag in (f'{{{J}}}conditional', f'{{{J}}}endConditional')
+            if not len(section) or all(child.tag in (f'{{{J}}}conditional', f'{{{J}}}endConditional', f'{{{J}}}declare', f'{{{J}}}endDeclare')
                                        for child in section):
                 div.remove(section)
             for editorial in readings.get('documentary_notes', []):
@@ -1247,7 +1258,7 @@ def build(source, project_directory, *, draft=False):
                 yield end
     language_urns = {urn for unit in readings['units'] for urn in urn_strings(unit['languages'])}
     for urn in language_urns | set(urn_strings(readings.get('wording_variants', []))) | set(urn_strings(readings.get('source_order', []))) | set(urn_strings(readings.get('expanded_order', []))) | {
-            urn for unit in readings['units'] for key in ('wording_selection','conditions','citations')
+            urn for unit in readings['units'] for key in ('wording_selection','conditions','citations','source_encoding')
             for urn in urn_strings(unit.get(key, []))}:
         parsed = parse_urn(urn)
         if registry.resolve(urn) != urn:
