@@ -209,11 +209,16 @@ _MARKUP = re.compile(
 
 _ATTRIBUTE = re.compile(r"""([\w:.-]+)\s*=\s*("([^"]*)"|'([^']*)')""")
 
+# Text between whitespace and paseq. `_VerseText.tokens` also divides it where a line break
+# ends a word.
+_TOKEN = re.compile(f"[^\\s{PASEQ}]+")
+
 # The scanner works on source text, so it matches elements by the prefixed names both
 # importers write. TEI_NS and JLPTEI_NS below are the namespaces those prefixes are bound to.
 _CHOICE_TAG = "tei:choice"
 _READ_TAG = "j:read"
 _OPTION_TAG = "j:option"
+_LINE_BREAK_TAG = "tei:lb"
 _VERSE_MILESTONE_UNITS = _VERSE_TERMINATING_UNITS
 
 
@@ -222,13 +227,27 @@ def _attributes(attrs: str) -> dict[str, str]:
             for m in _ATTRIBUTE.finditer(attrs)}
 
 
+def _ends_a_word(match: re.Match[str]) -> bool:
+    """Whether a piece of markup is a line break that ends a word, as a space would.
+
+    Miqra al pi ha-Masorah writes no space beside most of the line breaks of its poetic
+    layout, so a line break has to end a word by itself. TEI marks one that falls inside a
+    word with `break="no"`, and that one does not.
+    """
+    return (
+        match.group("name") == _LINE_BREAK_TAG
+        and not match.group("close")
+        and _attributes(match.group("attrs") or "").get("break") != "no"
+    )
+
+
 @dataclass
 class _Run:
     """One run of character data in the source, and where it came from."""
 
     source: int      # offset of this run in the source text
     offset: int      # offset of this run within the verse's assembled text
-    text: str
+    text: str        # the character data, exactly as it stands in the source
     # Where a boundary at this run's very start must go instead, when the run sits inside an
     # element that may not be split: the offset of that element's start tag. None otherwise.
     before: int | None = None
@@ -244,16 +263,28 @@ class _VerseText:
     one string and written back through the offsets each run came from.
     """
 
-    def __init__(self, urn: str, opens_at: int, runs: list[_Run]):
+    def __init__(self, urn: str, opens_at: int, runs: list[_Run], breaks: list[int]):
         self.urn = urn
         self.opens_at = opens_at  # source offset just after the verse milestone
         self.runs = runs
         self.text = "".join(run.text for run in runs)
+        # Offsets in `text`, in order, at which a line break ends a word. Nothing is written
+        # there, so `text` stays exactly what the source has and `tokens()` divides at them.
+        self.breaks = breaks
         self.has_variant_reading = False
 
     def tokens(self) -> list[tuple[int, str]]:
-        """(offset, token) for each whitespace/paseq-delimited token, in reading order."""
-        return [(m.start(), m.group()) for m in re.finditer(f"[^\\s{PASEQ}]+", self.text)]
+        """(offset, token) for each token, in reading order.
+
+        A token is delimited by whitespace and paseq, and by a line break that ends a word,
+        at each of `breaks`.
+        """
+        bounds = [0, *self.breaks, len(self.text)]
+        return [
+            (match.start(), match.group())
+            for start, end in zip(bounds, bounds[1:])
+            for match in _TOKEN.finditer(self.text, start, end)
+        ]
 
     def source_offset(self, offset: int) -> int:
         """Where in the source a boundary at `offset` in the verse's text goes.
@@ -335,8 +366,8 @@ def _verses(xml: str) -> list[_VerseText]:
     and quoting one is not carrying it.
     """
     verses: list[_VerseText] = []
-    current: _VerseText | None = None
     runs: list[_Run] = []
+    breaks: list[int] = []
     urn = ""
     opens_at = 0
     length = 0
@@ -347,12 +378,12 @@ def _verses(xml: str) -> list[_VerseText]:
     position = 0
 
     def close():
-        nonlocal current, runs, length, variant
+        nonlocal runs, breaks, length, variant
         if urn:
-            verse = _VerseText(urn, opens_at, runs)
+            verse = _VerseText(urn, opens_at, runs, breaks)
             verse.has_variant_reading = variant
             verses.append(verse)
-        runs, length, variant = [], 0, False
+        runs, breaks, length, variant = [], [], 0, False
 
     for match in _MARKUP.finditer(xml):
         data_start, data_end = position, match.start()
@@ -377,12 +408,12 @@ def _verses(xml: str) -> list[_VerseText]:
         if name is None:
             continue
 
-        if urn and choice is None and (name == "tei:lb" or
-                                      (name == "tei:p" and match.group("close"))):
-            # MAM serializes adjacent lines without literal whitespace. They
-            # remain separate words; this synthetic separator has no output.
-            runs.append(_Run(source=match.end(), offset=length, text=" "))
-            length += 1
+        # Line and paragraph boundaries separate words without changing source text.
+        # Inside a choice, only boundaries in the selected reading count.
+        if urn and (_ends_a_word(match) or
+                    (name == "tei:p" and match.group("close"))):
+            if choice is None or choice[1] <= match.start() < choice[2]:
+                breaks.append(length)
 
         if not match.group("close") and not match.group("empty"):
             if name == "tei:text":

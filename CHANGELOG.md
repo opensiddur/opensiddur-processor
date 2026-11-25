@@ -83,6 +83,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The opening citation lists the passages, and each later passage opens with its own. The five
   maftirs of Shabbat Hol HaMoed Sukkot, of which a congregation reads the one for the day that
   Shabbat falls on, are no longer marked as repeating one another.
+- The second half of a verse (its `half-verse` milestone `b`) no longer begins a word late
+  where Miqra al pi ha-Masorah ends the first half with a line break. The pass that places the
+  milestones read a `tei:lb` as nothing at all, so a line break with no space beside it joined
+  the words on either side into one. Now a line break ends a word, unless it is marked
+  `break="no"`, as TEI marks one that falls inside a word. In the project as now imported,
+  3,606 verses, all but 23 of them in Psalms, Proverbs and Job, begin their second half one
+  word earlier (46 of them two words earlier), and 15 verses, in which line breaks joined every
+  word of the second half to the last word of the first, are divided where they were not.
 
 ### Added
 - **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)
