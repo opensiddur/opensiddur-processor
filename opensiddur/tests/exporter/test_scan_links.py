@@ -615,12 +615,9 @@ class TestPageChanges(unittest.TestCase):
             (project/'part.xml').write_text(wrapper.format('<tei:div corresp="urn:x-opensiddur:text:prayer:sample">'+body+'</tei:div>'), encoding='utf-8')
             data = LinearData(defer_reader_settings=True, project_priority=["sample"])
             data.xml_cache.base_path = base
-            db = ReferenceDatabase(base/'refs.db')
-            db.index_project('sample', base)
-            try:
+            with ReferenceDatabase(base/'refs.db') as db:
+                db.index_project('sample', base)
                 result = ExternalCompilerProcessor('sample', 'index.xml', linear_data=data, reference_database=db).process()[0]
-            finally:
-                db.close()
             start = next(result.iter('{'+j+'}conditional'))
             end = next(result.iter('{'+j+'}endConditional'))
             self.assertEqual(end.get('target'), '#'+start.get('{http://www.w3.org/XML/1998/namespace}id'))

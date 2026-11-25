@@ -118,7 +118,8 @@ closed lists is a change to this document, not a local decision.
 urn:x-opensiddur:text:prayer:<prayer>[/<part>]*
 ```
 
-**Never contains an occasion, service or rite.** A passage said only on some occasion
+**Never contains an occasion, service or rite, except to distinguish a complete
+wording variant as described below.** A passage said only on some occasion
 keeps its own name and is wrapped in `j:conditional`:
 
 ```
@@ -130,7 +131,22 @@ urn:x-opensiddur:text:prayer:ashrei
 urn:x-opensiddur:text:prayer:yaaleh_veyavo
 ```
 
+A calendar name may distinguish a **complete wording variant** when the words
+actually differ and selecting the undifferentiated identity would lose those
+words. `prayer:hadlaqat_ner_yom_tov/shabbat` identifies the combined blessing
+with של שבת ושל יום טוב, rather than the ordinary festival wording של יום טוב.
+It is registered as `kind: variant`; the parent path denotes a wording variant,
+not a smaller span or a new occasion identity. Reuse the conditional parent
+where it already supplies both wordings. An edition printing only the ordinary
+blessing cannot serve as the combined variant; an extraction of the complete wording in
+an existing compatible witness may supply it without creating new prayer words.
+Calendar names alone, changes of placement and differences of edition do not
+justify new identities.
+
 ### Nest only what lives in one place
+
+A `kind: variant` child is the documented complete-wording exception above;
+the following nesting rule governs sub-parts.
 
 > **A text is a sub-part of another only if that is the *only* place it appears.
 > A text appearing in more than one parent is an independent unit that those parents
@@ -465,7 +481,10 @@ urn:x-opensiddur:instruction:role/kohanim
 blessing is said by the kohanim present and by nobody else, and a siddur that marked it
 "congregation" would be telling the wrong people to say it.
 
-Emitted as `tei:note type="instruction"` carrying the URN in `@corresp`.
+Speaker labels before the passage they describe are emitted as
+`tei:note type="description"` carrying the URN in `@corresp`, following
+[Kinds of rubric](../schema/JLPTEI-3.md#kinds-of-rubric). A direction to say
+material that is not present is an instruction instead.
 
 ## Partial witnesses are normal
 

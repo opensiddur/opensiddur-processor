@@ -275,6 +275,7 @@ opensiddur:rite:
     value: binary
   features:
     ashkenaz: binary
+    german: binary
     sepharad: binary
     edot_hamizrach: binary
     teimani_baladi: binary
@@ -289,6 +290,8 @@ opensiddur:person:
   common: false
   supplied: declared
   features:
+    # Select the priest or congregation wording of personal prayers.
+    kohen: binary
     # The gender the book addresses its rubric to.
     gender: {symbol: {values: [male, female]}}
     birkat-hagomel: binary
@@ -331,6 +334,11 @@ opensiddur:practice:
     in-sukkah: binary
     lulav-first-use: binary
     tefillin-on-chol-hamoed: binary
+    musaf-shabbat-responses:
+      symbol:
+        values: [omit_both, hayom_only, both_no_cantor_repeat, both_cantor_hayom, both_cantor_repeat]
+    musaf-hayom-only-cantor-repeat: binary
+    musaf-areshet-cantor-repeat: binary
 
 opensiddur:service-context:
   common: false
