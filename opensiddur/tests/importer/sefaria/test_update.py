@@ -10,7 +10,7 @@ from unittest import mock
 
 import yaml
 
-from opensiddur.importer.sefaria.align import LeafDecision
+from opensiddur.importer.sefaria.align import AlignmentError, LeafDecision
 from opensiddur.importer.sefaria.corrections import CorrectionError, SegmentCorrection
 from opensiddur.importer.sefaria.update import classify, committed_manifest, main, update
 
@@ -215,6 +215,13 @@ class TestUpdateWithChanges(unittest.TestCase):
         self.assertIn("Not converted:", first)
         self.assertIn("Blessings (en 2)", first)
         self.assertIn("Converted: 2 text URN(s) decided again", second)
+
+    def test_an_alignment_error_is_reported_too(self):
+        self.change_text(WORK)
+        with mock.patch(CONVERT, side_effect=AlignmentError("Blessings: not a run of trailing rubrics")):
+            changes, path = self.run_update([WORK])
+        self.assertTrue(changes[0].error.startswith("AlignmentError: "))
+        self.assertIn("not a run of trailing rubrics", path.read_text())
 
     def test_main_exits_non_zero_after_a_failed_conversion(self):
         failed = classify(WORK.key, {}, {})
