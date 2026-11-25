@@ -18,9 +18,9 @@ from . import profile
 def regenerate(book):
     ia = book.source_directory / 'ia'
     corrections_path = book.source_directory / 'page_corrections.json'
-    corrections = json.loads(corrections_path.read_text()) if corrections_path.exists() else {}
+    corrections = json.loads(corrections_path.read_text(encoding="utf-8")) if corrections_path.exists() else {}
     result = derive_pages(book.archive_identifier, (ia / 'scandata.xml').read_bytes(),
-                          json.loads((ia / 'page_numbers.json').read_text()), corrections)
+                          json.loads((ia / 'page_numbers.json').read_text(encoding="utf-8")), corrections)
     write_if_changed(book.page_map, json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     return result
 

@@ -1247,14 +1247,14 @@ def documentary_order(div, order, readings, by_stem, lang, project):
 
 
 def build(source, project_directory, *, draft=False):
-    readings = json.loads((source/'readings.json').read_text())
+    readings = json.loads((source/'readings.json').read_text(encoding="utf-8"))
     baseline_path = readings.get('accepted_literal_baseline')
     if baseline_path:
         from .baseline import validate_baseline
         path = (source/baseline_path).resolve()
         if not path.is_relative_to(source.resolve()):
             raise ValueError('Accepted literal baseline must be inside the source book')
-        validate_baseline(readings, json.loads(path.read_text()))
+        validate_baseline(readings, json.loads(path.read_text(encoding="utf-8")))
     elif any(u.get('canonical_parts') or u.get('canonical_home') or u.get('canonical_whole')
              or u.get('page_context') or any(s.get('canonical') or s.get('canonical_end')
                                             for ss in u['languages'].values() for s in ss)
@@ -1262,12 +1262,12 @@ def build(source, project_directory, *, draft=False):
         raise ValueError('Canonical parts integration requires an accepted literal baseline')
     validate_occurrences(readings)
     corrections_path = source/'corrections.json'
-    correction_items = json.loads(corrections_path.read_text())['corrections'] if corrections_path.exists() else []
+    correction_items = json.loads(corrections_path.read_text(encoding="utf-8"))['corrections'] if corrections_path.exists() else []
     realization_payloads = {key: payload for key, payload, _ in review_payloads(readings, correction_items)}
     reviews_path = source/'reviews.json'
-    reviews = json.loads(reviews_path.read_text()) if reviews_path.exists() else {}
+    reviews = json.loads(reviews_path.read_text(encoding="utf-8")) if reviews_path.exists() else {}
     front_path = source/'front.json'
-    front_pages = json.loads(front_path.read_text())['pages'] if front_path.exists() else []
+    front_pages = json.loads(front_path.read_text(encoding="utf-8"))['pages'] if front_path.exists() else []
     if not draft:
         require_review(readings, reviews, correction_items)
         for page in front_pages:
@@ -1422,7 +1422,7 @@ def build(source, project_directory, *, draft=False):
     current_homes = sorted(str((project_directory/project/(unit['canonical_home']['file']+'.xml')).relative_to(project_directory))
                            for project in PROJECTS.values() for unit in readings['units']
                            if unit.get('canonical_home') and project.rsplit('-',1)[-1] in unit['languages'])
-    previous_homes = json.loads(home_manifest.read_text()) if home_manifest.exists() else []
+    previous_homes = json.loads(home_manifest.read_text(encoding="utf-8")) if home_manifest.exists() else []
     for relative in previous_homes:
         path = Path(relative)
         if len(path.parts) != 2 or path.parts[0] not in PROJECTS.values() or not re.fullmatch(r'[a-z0-9_]+\.xml',path.name) or path.name == 'index.xml':

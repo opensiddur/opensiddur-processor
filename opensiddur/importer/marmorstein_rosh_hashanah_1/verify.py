@@ -12,13 +12,13 @@ from .realizations import review_payloads, validate_occurrences
 
 
 def report(source):
-    pages = json.loads((source/'pages.json').read_text())['pages']
-    readings = json.loads((source/'readings.json').read_text())
+    pages = json.loads((source/'pages.json').read_text(encoding="utf-8"))['pages']
+    readings = json.loads((source/'readings.json').read_text(encoding="utf-8"))
     validate_occurrences(readings)
     reviews_path = source/'reviews.json'
-    reviews = json.loads(reviews_path.read_text()) if reviews_path.exists() else {}
+    reviews = json.loads(reviews_path.read_text(encoding="utf-8")) if reviews_path.exists() else {}
     completion_path = source/'page_completion.json'
-    completion = json.loads(completion_path.read_text()) if completion_path.exists() else {}
+    completion = json.loads(completion_path.read_text(encoding="utf-8")) if completion_path.exists() else {}
     fragments = {}
     pending = []
     for unit in readings['units']:
@@ -53,13 +53,13 @@ def report(source):
             pending.append(key)
     front_path = source/'front.json'
     if front_path.exists():
-        for page in json.loads(front_path.read_text())['pages']:
+        for page in json.loads(front_path.read_text(encoding="utf-8"))['pages']:
             key = 'front/'+page['scan']
             fragments.setdefault(page['scan'], []).append(key)
             if not review_is_current(reviews.get(key, {}), front_text(page)):
                 pending.append(key)
     corrections_path = source/'corrections.json'
-    corrections = json.loads(corrections_path.read_text())['corrections'] if corrections_path.exists() else []
+    corrections = json.loads(corrections_path.read_text(encoding="utf-8"))['corrections'] if corrections_path.exists() else []
     for key, payload, scans in review_payloads(readings, corrections):
         for scan in scans:
             fragments.setdefault(scan, []).append(key)
@@ -68,7 +68,7 @@ def report(source):
     independently_read = set()
     inventory_scans = {'s'+str(page['scan_page']) for page in pages}
     for path in (source/'independent').rglob('*.json'):
-        payload = json.loads(path.read_text())
+        payload = json.loads(path.read_text(encoding="utf-8"))
         if isinstance(payload, dict) and payload.get('reviewer'):
             for page in payload.get('pages', []):
                 if not isinstance(page, dict) or page.get('scan') is None:
