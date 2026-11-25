@@ -41,7 +41,7 @@ def document(lang, project, title, urn, *, index=False, draft=False):
         element(responsibility, 'name', 'Codex', ref='urn:x-opensiddur:contributor:opensiddur.org/codex')
     edition = element(desc, 'editionStmt')
     element(edition, 'edition', ('DRAFT: independent adjudication pending. ' if draft else '')
-            + 'Digitization in progress. Independent image readings and '
+            + 'JLPTEI digitization. Independent image readings and '
               'adjudications are recorded in sources/marmorstein_rosh_hashanah_1/.')
     publication = element(desc, 'publicationStmt')
     element(element(publication, 'distributor'), 'ref', 'Open Siddur Project', target='https://opensiddur.org')
@@ -1436,7 +1436,7 @@ def build(source, project_directory, *, draft=False):
     for project, variant, parallel in [(PROJECTS['he'], 'documentary', False),
                                        (PROJECTS['he'], 'with_translation', True),
                                        (EXPANDED, 'undated', True)]:
-        settings = {'description': 'First-day Rosh ha-Shanah mahzor; digitization in progress.',
+        settings = {'description': 'First-day Rosh ha-Shanah mahzor.',
                     'requires_processor': '>=0.8.0.dev0',
                     'book': {'project': project, 'file_name': 'index.xml', 'title': 'Prayerbook for the New Year — first day'},
                     'annotations': list(PROJECTS.values()) if parallel else [PROJECTS['he']],

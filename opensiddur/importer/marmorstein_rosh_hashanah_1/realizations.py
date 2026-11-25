@@ -31,7 +31,9 @@ def validate_occurrence_controls(segment):
     if 'instructions' in segment:
         instructions = segment['instructions']
         if (not isinstance(instructions, list) or not instructions or any(
-                not isinstance(i, dict) or set(i) != {'language','text'}
+                not isinstance(i, dict) or not {'language','text'} <= set(i)
+                or set(i) - {'language','text','type'}
+                or i.get('type', 'instruction') not in ('instruction', 'description')
                 or any(not isinstance(i[k],str) or not i[k] for k in ('language','text'))
                 for i in instructions)):
             raise ValueError('Canonical occurrence instructions require literal language/text rubrics')

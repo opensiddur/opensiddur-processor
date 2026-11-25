@@ -104,3 +104,14 @@ class IntrinsicOptionalTest(unittest.TestCase):
         self.assertFalse(roots['host'].xpath('//j:conditional[@type="marked"]',namespaces=NS))
         data['units'][0]['languages']['en'][0]['fragments'][0]['optional_spans'][0]['printed']='family)'
         with self.assertRaises(ValueError):r.validate_occurrences(data)
+
+    def test_context_description_keeps_its_kind_and_never_enters_shared_words(self):
+        data=intrinsic_fixture();rubric=data['units'][0]['languages']['en'][1]['instructions'][0];rubric['type']='description'
+        r.validate_occurrences(data);docs=self.generated(data);roots={path.stem:root for path,root in docs}
+        self.assertEqual(roots['host'].xpath('//t:note[@type="description"]/text()',namespaces=NS),['Finish together.'])
+        self.assertFalse(roots['words'].xpath('//t:note',namespaces=NS))
+        for value in ['commentary','unknown',True]:
+            rubric['type']=value
+            with self.subTest(value=value),self.assertRaises(ValueError):r.validate_occurrences(data)
+        rubric['type']='description';rubric['target']='unreviewed'
+        with self.assertRaises(ValueError):r.validate_occurrences(data)
