@@ -310,9 +310,11 @@ class InlineCompilerProcessor(CompilerProcessor):
                 if child.tail and not self._should_skip_conditional_content():
                     boundary = child.tag in _LINE_OR_BLOCK_TAGS
                     if previous_child is not None:
-                        previous_child.tail = _join(previous_child.tail or "", child.tail, boundary)
+                        previous_child.tail = _join(
+                            self._prefix_before_tail(previous_child.tail, child), child.tail, boundary)
                     else:
-                        text_element.text = _join(text_element.text, child.tail, boundary)
+                        text_element.text = _join(
+                            self._prefix_before_tail(text_element.text, child), child.tail, boundary)
             if self._closers_due:
                 # The range ended at this child: close the scopes it ends inside, after the
                 # end and its tail.

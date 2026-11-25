@@ -3396,7 +3396,15 @@ end
 
     <xsl:template match="tei:l" mode="leaves">
         <xsl:apply-templates select="node()" mode="leaves"/>
-        <xsl:if test="not(@p:part = ('first', 'middle'))">
+        <!-- A removed optional verse may leave only correspondence or page markers.
+             Keep those leaves, but do not spend a poetry row on their empty container.
+             A final split fragment still closes the line begun by its earlier parts. -->
+        <xsl:if test="not(@p:part = ('first', 'middle'))
+                      and (@p:part = 'last'
+                           or exists(.//tei:lb | .//tei:space | .//tei:gap
+                                     | .//tei:graphic | .//tei:ref[@type = 'page']
+                                     | .//j:conditional[@type = 'marked'] | .//j:endConditional)
+                           or f:sets-text(.))">
             <!-- Hard line break inside the current pstart -->
             <xsl:element name="tei:lb" namespace="http://www.tei-c.org/ns/1.0"/>
         </xsl:if>

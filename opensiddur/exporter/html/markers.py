@@ -25,7 +25,9 @@ the book's JSON.
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
+import re
 import logging
 from dataclasses import dataclass, field
 from typing import Any
@@ -178,7 +180,8 @@ def _number_scopes(root: etree.ElementBase) -> tuple[dict[str, etree.ElementBase
         openers[xml_id] = opener
 
         for fs, name in sorted(condition_features(node)):
-            if name not in pinned.get(fs, {}):
+            if name not in pinned.get(fs, {}) and opener.get(
+                    f"{{{PROCESSING_NAMESPACE}}}separator") != "true":
                 feature = features.setdefault(
                     (fs, name), Feature(fs, name, calendar=not is_reader_supplied(fs)))
                 feature.cids.append(cid)
@@ -438,6 +441,7 @@ def measure_text(root: etree.ElementBase, book: BookConditions) -> None:
 
 def prepare(root: etree.ElementBase) -> BookConditions:
     """Number, collect and label the undecided scopes in a compiled document, in place."""
+    _conditional_separators(root)
     openers, book = _number_scopes(root)
     if book.scopes:
         mark_silent_scopes(root)
@@ -448,3 +452,69 @@ def prepare(root: etree.ElementBase) -> BookConditions:
         _assign(root, measured)
         measure_text(root, book)
     return book
+
+
+def _conditional_separators(root):
+    """Hide a separator with an omitted inline insert immediately before punctuation.
+
+    The separator stays before the original marked scope, so undecided brackets
+    keep their printed spacing. Its separate silent scope shares the same
+    predicate and pinned settings, and needs no new reader setting.
+    """
+    from opensiddur.exporter.whitespace import closes_omitted_insert
+    identifiers = {node.get(XML_ID) for node in root.iter() if node.get(XML_ID)}
+    for opener in list(root.iter(J_CONDITIONAL)):
+        identifier = opener.get(XML_ID)
+        if not identifier:
+            continue
+        parent = opener.getparent()
+        if parent is None or not any(
+                node.tag in (f"{{{TEI_NS}}}p", f"{{{TEI_NS}}}l")
+                for node in [parent, *parent.iterancestors()]):
+            continue
+        endpoints = [node for node in parent if node.tag == J_END_CONDITIONAL
+                     and node.get("target") == "#"+identifier]
+        if len(endpoints) != 1 or parent.index(endpoints[0]) <= parent.index(opener):
+            continue
+        after = endpoints[0].tail or ""
+        if not closes_omitted_insert(after, parent):
+            continue
+        previous = opener.getprevious()
+        prefix = (previous.tail if previous is not None else parent.text) or ""
+        match = re.search(r"[ \t\r\n]+$", prefix)
+        if not match:
+            continue
+        earlier_text = (parent.text or "")+"".join(
+            "".join(node.itertext())+(node.tail or "")
+            for node in list(parent)[:parent.index(opener)])
+        if not earlier_text.strip():
+            continue
+        whitespace = match.group()
+        if previous is None:
+            parent.text = prefix[:match.start()]
+        else:
+            previous.tail = prefix[:match.start()]
+        new_id = identifier+"_separator"
+        while new_id in identifiers:
+            new_id += "_"
+        identifiers.add(new_id)
+        separator = deepcopy(opener)
+        separator.set(XML_ID, new_id)
+        # This auxiliary scope controls whitespace, not another passage in the
+        # reader's settings panel or its feature-ranking counts.
+        separator.set(f"{{{PROCESSING_NAMESPACE}}}separator", "true")
+        separator.attrib.pop("type", None)
+        separator.attrib.pop(f"{{{PROCESSING_NAMESPACE}}}silent", None)
+        for child in list(separator):
+            if child.tag == f"{{{TEI_NS}}}note":
+                separator.remove(child)
+        # _assign deliberately ignores whitespace-only text runs. An explicit
+        # inline holder lets the separator itself receive the scope's class.
+        separator.tail = None
+        space = etree.Element(f"{{{TEI_NS}}}seg")
+        space.text = whitespace
+        endpoint = etree.Element(J_END_CONDITIONAL, target="#"+new_id)
+        position = parent.index(opener)
+        parent.insert(position, separator)
+        parent.insert(position+1, space)
+        parent.insert(position+2, endpoint)
