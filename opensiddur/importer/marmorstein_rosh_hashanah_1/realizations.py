@@ -479,7 +479,8 @@ def review_payloads(readings, corrections=None):
                 owner, selected = _range_segments(readings, lang, target, endpoint)
                 selected_ids = {target} | {segment_identity(v) for v in selected}
                 range_corrections = [b for b in bindings if b['host'] == owner['stem']
-                                     and b['language'] == lang and b['item']['identity'] in selected_ids]
+                                     and b['language'] == lang and b['item']['identity'] in selected_ids
+                                     and (not b['item'].get('wording') or settings.get(b['item']['wording']) is True)]
                 corrected = corrected_text(actual, range_corrections)
                 normal = lambda text: ' '.join(text.split())
                 fidelity.append(dict(target=target, target_end=endpoint, settings=settings,
