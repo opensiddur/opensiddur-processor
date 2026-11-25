@@ -1,5 +1,9 @@
 # Digitize Heidenheim–Marmorstein: Rosh ha-Shanah, second day
 
+Track execution in the [working checklist](MARMORSTEIN_ROSH_HASHANAH_2_CHECKLIST.md).
+Each page batch must complete its source, encoding, order and presentation gates
+before acceptance is recorded and the next batch begins.
+
 ## Scope and source
 
 Continue issue [214](https://github.com/opensiddur/opensiddur-processor/issues/214)
