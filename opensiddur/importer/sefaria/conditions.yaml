@@ -353,10 +353,28 @@ labels:
     when: {holiday-aggregate: {tal-umatar: false}}
   - label: 'בעשי"ת יסיים'
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+    ending: true
+  - label: 'בעשי"ת מסיים'
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+    ending: true
+  - label: 'לתענית ציבור'
+    # Sim Shalom at Minchah, which the fast days' Minchah says
+    when: {any: [{holiday-aggregate: {minor-fast: true}}, {holiday: {tisha-bav: true}}]}
+  - label: 'בראש חדש ובחול המועד אומרים זה'
+    # Ya'aleh Veyavo in the Amidah
+    when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
+  - label: 'בראש חודש ובחול המועד אומרים כאן "יעלה ויבא"'
+    # ... and in Birkat Hamazon, which the English gives for Yom Tov as well
+    when: {any: [{holiday: {rosh-hodesh: true}}, {holiday-aggregate: {chol-hamoed: true}}, {holiday-aggregate: {yom-tov: true}}]}
   - label: 'בשבועות'
     when: {holiday: {shavuot: true}}
   - label: 'בחנוכה ופורים אומרים כאן ועל הנסים'
     when: {any: [{holiday: {hanukkah: true}}, {holiday: {purim-observed: true}}]}
+  - label: 'בחול קודם ברכת המזון אומרים'
+    # Psalm 137 on weekdays, Psalm 126 on Sabbaths and festivals, as Birnbaum conditions them
+    when: {none: [{day-of-week: {hebrew-day: 7}}, {any: [{holiday: {pesah: true}}, {holiday: {shavuot: true}}, {holiday: {sukkot: true}}, {holiday: {shmini-atzeret: true}}]}, {holiday: {rosh-hashana: true}}]}
+  - label: 'בשבת קודם ברכת המזון אומרים'
+    when: {any: [{day-of-week: {hebrew-day: 7}}, {any: [{holiday: {pesah: true}}, {holiday: {shavuot: true}}, {holiday: {sukkot: true}}, {holiday: {shmini-atzeret: true}}]}, {holiday: {rosh-hashana: true}}]}
   - label: 'ילדים האוכלים ביו"כ'
     when: {holiday: {yom-kippur: true}}
   - label: 'יחיד אומר'

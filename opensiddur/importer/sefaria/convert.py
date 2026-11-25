@@ -150,7 +150,11 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
     alignments = apply_corrections(alignments, corrections.get(work.key, []))
     if work.layout == "paragraph":
         labels = load_conditions(conditions_path) if conditions_path else load_conditions()
-        alignments = [split_leading_labels(a, lambda text: labels.for_label(text) is not None)
+        def ending(text: str):
+            found = labels.for_label(text)
+            return found.when if found is not None and found.ending else None
+
+        alignments = [split_leading_labels(a, lambda text: labels.for_label(text) is not None, ending)
                       for a in alignments]
     # A leaf of depth 2 is aligned chapter by chapter, and placed and divided whole.
     table = yaml.safe_load((structure_path or work.structure_file()).read_text(encoding="utf-8")) or {}
@@ -190,6 +194,8 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             for position, urn in sorted(scripture_verses(block, index).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
+                if work.layout == "paragraph" and ":" in plain_text(block.phrases[position].he).rstrip().rstrip(":"):
+                    continue  # a paragraph of verses: a verse's scope would claim them all
                 if urn not in marked:  # a verse repeated, even within one text, is marked once
                     marked.add(urn)
                     found[position] = urn

@@ -31,6 +31,7 @@ Rendering:
 
 from __future__ import annotations
 
+import dataclasses
 import html
 import re
 
@@ -53,6 +54,7 @@ from opensiddur.importer.sefaria.markup import (
     english_kind,
     leading_label,
     plain_text,
+    split_leading,
 )
 from opensiddur.importer.sefaria.conditions import Conditions, LeafGate, condition_xml, negated_xml
 from opensiddur.importer.sefaria.phrases import phrase_urn
@@ -203,6 +205,34 @@ def phrase_xml(pair: Pair, lang: str, notes: Notes, milestone: str | None, *, la
     return f"{mark}{prefix}{_trim(render(nodes, lang, notes))}"
 
 
+def english_instruction(nodes: tuple[Node, ...]) -> tuple[tuple[Node, ...], tuple[Node, ...]] | None:
+    """An English phrase that opens with its instruction, the English of a Hebrew label
+    (``<i>During the Ten Days of Penitence:</i> Blessed are You``): the instruction, and the
+    words; None when it does not open so."""
+    split = split_leading(nodes, {"italic", "small"}, hebrew=False)
+    if split is not None and plain_text(split[0]).rstrip().endswith(":"):
+        return split
+    return None
+
+
+def rubric_condition(table: Conditions, pair: Pair):
+    """The condition a rubric gives, if it is a condition rubric: an English rubric known by its
+    words, a Hebrew one known by its label (``בחול קודם ברכת המזון אומרים``), or a label standing
+    on its own line before the words it governs (<b>לפסח</b>, "On Pesach"), known by its Hebrew
+    or else by its English."""
+    if pair.he_kind is HebrewKind.EMPTY:
+        return table.for_rubric(plain_text(pair.en))
+    label = table.for_label(plain_text(pair.he))
+    if label is None and pair.he_kind is HebrewKind.LABEL:
+        return table.for_rubric(plain_text(pair.en))
+    return label
+
+
+def rubric_note(pair: Pair, lang: str, notes: Notes | None) -> str:
+    """A condition rubric as its conditional's note, in the project's language."""
+    return instruction(pair.he if lang == "he" else pair.en, lang, notes)
+
+
 def head_xml(pair: Pair, lang: str, notes: Notes | None, *, element: str = "head") -> str:
     """A heading (or, in a structure file, a ``tei:label``), with its footnotes anchored."""
     nodes = pair.he if lang == "he" else pair.en
@@ -308,7 +338,8 @@ class _TextWriter:
     def open_calendar(self, pair: Pair, when, through: tuple[str, ...] = ()) -> None:
         self.close_calendar()
         xml_id = self.next_id("when")
-        note = instruction(pair.en, "en", self.notes) if self.lang == "en" else ""
+        # The rubric is the conditional's note: in Hebrew, its label (<small>בשבועות:</small>).
+        note = rubric_note(pair, self.lang, self.notes)
         self.parts.append(conditional_open(xml_id, note, condition_xml(when)))
         # [id, depth, parenthesized, to close, the words that end it, the words so far,
         #  the paragraph a paragraph's label governs: the first after it, "next" until known]
@@ -347,12 +378,17 @@ class _TextWriter:
         # rather than the Hebrew running on into the row before.
         hebrew = plain_text(pair.he)
         current = self.calendar
-        if current is not None and current[6] == "next":
-            current[6] = pair.he_index
-        elif current is not None and current[6] is not None and pair.he_index != current[6]:
-            # A paragraph's label governs one paragraph: the rest of its own, or the next.
-            self.close_calendar()
-            current = self.calendar
+        # A paragraph's label governs one paragraph: the rest of its own, or the next -- which
+        # may be printed inside a variant's conditional opened after the label.
+        governing = self.calendars[-1] if self.calendars else None
+        if governing is not None and governing[6] == "next":
+            governing[6] = pair.he_index
+        elif governing is not None and governing[6] is not None and pair.he_index != governing[6]:
+            if governing is current:
+                self.close_calendar()
+                current = self.calendar
+            else:
+                governing[3] = True  # to close when the variant's conditional does
         if current is not None and current[2] is None:
             current[2] = hebrew.lstrip().startswith("(")
         label, _ = leading_label(pair.he)
@@ -363,8 +399,20 @@ class _TextWriter:
             # the conditional's note.
             self.end_phrase()
             xml_id = self.next_id("when")
-            note = instruction((label,), "he", self.notes) if self.lang == "he" else ""
+            if self.lang == "he":
+                note = instruction((label,), "he", self.notes)
+            elif (split := english_instruction(pair.en)) is not None:
+                # ... and in English, the instruction the phrase opens with.
+                note = instruction(split[0], "en", self.notes)
+                pair = dataclasses.replace(pair, en=split[1])
+            else:
+                note = ""
             self.parts.append(conditional_open(xml_id, note, condition_xml(labelled.when)))
+        elif pair.otherwise is not None:
+            # A blessing's ending that another, after its label, replaces: said otherwise.
+            self.end_phrase()
+            xml_id = self.next_id("when")
+            self.parts.append(conditional_open(xml_id, "", negated_xml(pair.otherwise)))
         xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number, self.clashes), label=labelled is None)
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
@@ -485,14 +533,7 @@ class _TextWriter:
         # languages, whichever the rubric is printed in, so that the two divide alike.
         self.end_phrase()
         self.verse(None)
-        found = None
-        if pair.he_kind is HebrewKind.EMPTY:
-            found = self.table.for_rubric(plain_text(pair.en))
-        elif pair.he_kind is HebrewKind.LABEL:
-            # A label standing on its own line before the words it governs (<b>לפסח</b>, "On
-            # Pesach"): known by its Hebrew, or else by its English.
-            label = self.table.for_label(plain_text(pair.he))
-            found = label if label is not None else self.table.for_rubric(plain_text(pair.en))
+        found = rubric_condition(self.table, pair)
         current = self.calendar
         if found is None and current is not None and current[2] is None:
             # A rubric between a condition rubric and the first words it governs ("Chazzan:",
@@ -735,7 +776,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
     for item in items:
         if isinstance(item, Rubric):
             for pair in item.pairs:
-                found = table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
+                found = rubric_condition(table, pair)
                 if found is None:
                     ends = gate is not None and until is not None and bool(
                         until.search(" ".join(plain_text(pair.en).split())))
@@ -748,16 +789,16 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                         close_gate()  # ... and ends with
                     continue
                 close_gate()
-                if found.instead_of_previous and previous is not None and all(
+                if getattr(found, "instead_of_previous", False) and previous is not None and all(
                         p.startswith("<j:endConditional") for p in parts[previous + 1:]):
                     # (inside a gate of its own that has closed: the conditionals nest)
                     gates += 1
                     parts[previous] = (f'<j:conditional xml:id="when_{gates}">{negated_xml(found.when)}</j:conditional>'
                                        f'{parts[previous]}<j:endConditional target="#when_{gates}"/>')
                 gates += 1
-                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
-                until_included = found.until_included
-                note = instruction(pair.en, "en", notes) if lang == "en" else ""
+                gate, section, until, texts = f"when_{gates}", getattr(found, "section", False), getattr(found, "until", None), 0
+                until_included = getattr(found, "until_included", False)
+                note = rubric_note(pair, lang, notes)
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
         elif isinstance(item, Heading):
             if gate is not None and section and until is None and texts:
@@ -775,7 +816,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 transclude = (f'<j:declare xml:id="{xml_id}">{variant_fs(declarations[id(item)])}</j:declare>'
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
             lead = leading.get(id(item))
-            found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
+            found = rubric_condition(table, lead) if lead is not None else None
             # The rubric a section's condition runs to may open the next text's block.
             ends = gate is not None and until is not None and any(
                 until.search(" ".join(plain_text(pair.en).split()))
@@ -789,25 +830,25 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 for pair in item.pairs:
                     if pair is lead or is_phrase(pair):
                         break
-                    if pair.he_kind is HebrewKind.EMPTY and table.for_rubric(plain_text(pair.en)):
+                    if rubric_condition(table, pair):
                         continue  # an earlier condition, overridden by the one the text opens with
                     xml = rubric_xml(pair, lang, notes)
                     if xml:
                         parts.append(xml)
             if ends and until_included:
                 close_gate()
-            if found is not None and found.section:
+            if found is not None and getattr(found, "section", False):
                 # A condition over a section (one day's introduction and psalm) gates every text
                 # to its end, as the same rubric between texts does.
                 close_gate()
                 gates += 1
-                gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
-                until_included = found.until_included
-                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                gate, section, until, texts = f"when_{gates}", getattr(found, "section", False), getattr(found, "until", None), 0
+                until_included = getattr(found, "until_included", False)
+                note = rubric_note(lead, lang, notes)
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
             elif found is not None and gate is None:
                 gates += 1
-                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                note = rubric_note(lead, lang, notes)
                 transclude = (conditional_open(f"when_{gates}", note, condition_xml(found.when))
                               + f'{transclude}<j:endConditional target="#when_{gates}"/>')
             parts.append(transclude)

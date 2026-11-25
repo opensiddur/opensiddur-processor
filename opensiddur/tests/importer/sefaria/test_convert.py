@@ -228,6 +228,42 @@ class TestConditionsReachTheFiles(unittest.TestCase):
                                              namespaces=NS), ["urn:x-opensiddur:text:siddur:berakhot/test"])
 
 
+    def test_an_ending_label_makes_the_ending_it_replaces_said_otherwise(self):
+        import dataclasses
+        work = dataclasses.replace(WORK, layout="paragraph")
+        text = [MORNING[1], ("אַתָּה קָדוֹשׁ: בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:", "You are holy. Blessed are You, Adonoy, the holy God."),
+                ('<small>בעשי"ת מסיים:</small> בָּרוּךְ אַתָּה יְהֹוָה הַמֶּֽלֶךְ הַקָּדוֹשׁ:',
+                 "<i>During the Ten Days:</i> Blessed are You, Adonoy, the holy King.")]
+        tree = {"Morning": {"Upon Arising": text}, "Blessings": BLESSINGS}
+        structure = {"Morning": "chol/shacharit", "Morning / Upon Arising": "chol/shacharit/upon_arising",
+                     "Blessings": "berakhot/test"}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_work_dir(root / "sources" / "sefaria" / work.key, tree)
+            (root / "project").mkdir()
+            (root / "registry").mkdir()
+            (root / "decisions.yaml").write_text("{}\n")
+            (root / "conditions.yaml").write_text(
+                "labels:\n  - label: 'בעשי\"ת מסיים'\n    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}\n"
+                "    ending: true\n", encoding="utf-8")
+            convert_work(work, sourcetexts_root=root / "sources", project_directory=root / "project",
+                         registry_directory=root / "registry", urns_path=root / "urns.jsonl",
+                         index=IncipitIndex(), output_directory=root / "out",
+                         structure_path=write_structure(root / "s.yaml", structure),
+                         decisions_path=root / "decisions.yaml", spellings=Spellings(frozenset(), {}),
+                         works={work.key: work}, equivalents_path=root / "equivalents.yaml",
+                         conditions_path=root / "conditions.yaml")
+            (text_file,) = [f for f in (root / "project" / work.projects["he"]).glob("*.xml")
+                            if etree.parse(str(f)).xpath("//j:conditional", namespaces=NS)]
+            body = etree.tostring(etree.parse(str(text_file)).find(".//tei:body", namespaces=NS), encoding="unicode")
+            otherwise = body[body.index("<j:none>"):]
+            otherwise = otherwise[:otherwise.index("<j:endConditional")]
+            self.assertIn("הָאֵל הַקָּדוֹשׁ", otherwise)
+            self.assertNotIn("אַתָּה קָדוֹשׁ:", otherwise)
+            ten_days = body[body.rindex("<j:conditional"):]
+            self.assertNotIn("<j:none>", ten_days)
+            self.assertIn("הַמֶּֽלֶךְ הַקָּדוֹשׁ", ten_days)
+
     def test_a_paragraphs_label_governs_that_paragraph_only(self):
         import dataclasses
         work = dataclasses.replace(WORK, layout="paragraph")

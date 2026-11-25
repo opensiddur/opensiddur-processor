@@ -8,7 +8,9 @@ alternatives, as ``j:conditional``.
   Pesach you should say:", "On Sunday:"), found by a regular expression. Such a rubric becomes the
   conditional's note (``descriptive-vs-conditional`` rubrics: a condition, dropped once true).
 - ``labels``: a Hebrew label set before a phrase (``<small>לְר"ח:</small> רֹאשׁ הַחֹדֶשׁ הַזֶּה``):
-  the phrase is conditional, the label its note.
+  the phrase is conditional, the label its note. With ``ending: true``, the label's words are
+  another ending of the blessing before it (``<small>בעשי"ת מסיים:</small> בָּרוּךְ אַתָּה יְהֹוָה
+  הַמֶּֽלֶךְ הַקָּדוֹשׁ:``): the ending they replace is conditional on the opposite.
 - ``inline``: an abbreviation that opens a parenthesized alternative inside a phrase
   (``(בעשי"ת הַשָּׁלוֹם)``): the alternative is a marked conditional, the abbreviation its note.
 - ``replacements``: an inline alternative that replaces words beside it rather than adding to
@@ -124,6 +126,8 @@ class LeafGate:
 class LabelCondition:
     label: tuple[str, ...]
     when: Any
+    #: the label's words replace the ending of the blessing before them
+    ending: bool = False
 
 
 @dataclass(frozen=True)
@@ -191,7 +195,7 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
             if not label:
                 raise ConditionsError(f"{where}: a label is needed")
             condition_xml(entry.get("when"), where)
-            found.append(LabelCondition(label, entry["when"]))
+            found.append(LabelCondition(label, entry["when"], bool(entry.get("ending"))))
     replacements = [Replacement(tuple(words(str(e["alternative"]))), tuple(words(str(e["replaces"]))))
                     for e in data.get("replacements") or ()]
     directives = tuple(_pattern(m, f"{path.name} directives #{n}")

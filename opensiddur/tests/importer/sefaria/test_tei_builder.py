@@ -289,6 +289,16 @@ class TestConditions(unittest.TestCase):
         # The label is not printed again before the phrase.
         self.assertEqual(len(he.xpath("//tei:note", namespaces=NS)), 1)
 
+    def test_the_english_instruction_of_a_labelled_phrase_is_its_note(self):
+        segments = [("<b>יַעֲלֶה</b> וְיָבֹא", "May it rise"),
+                    ("<small>לְר\"ח:</small> רֹאשׁ הַחֹדֶשׁ הַזֶּה", "<i>On Rosh Chodesh:</i> this Rosh Chodesh"),
+                    ("<small>לְפֶסַח:</small> חַג הַמַּצּוֹת הַזֶּה", "the <i>Festival of Matzos</i>")]
+        en = self.body(segments, [1, 2, 3], "en")
+        self.assertEqual(en.xpath("string(//j:conditional/tei:note)", namespaces=NS), "On Rosh Chodesh:")
+        text = "".join(en.itertext())
+        self.assertEqual(text.count("On Rosh Chodesh:"), 1)
+        self.assertIn("Festival of Matzos", text)
+
     def test_a_label_on_a_line_of_its_own_conditions_the_words_after_it(self):
         segments = [("<b>וְאֶת</b> מוּסַף", "And the Musaf-offering of"),
                     ("<small>לר\"ח</small>", "<small>On Rosh Chodesh:</small>"),
@@ -296,6 +306,8 @@ class TestConditions(unittest.TestCase):
         for lang in ("he", "en"):
             body = self.body(segments, [1, 2], lang)
             self.assertEqual(body.xpath("//j:conditional/tei:fs/tei:f/@name", namespaces=NS), ["rosh-hodesh"])
+            self.assertEqual(body.xpath("string(//j:conditional/tei:note)", namespaces=NS).strip(),
+                             {"he": 'לר"ח', "en": "On Rosh Chodesh:"}[lang])
 
     def test_an_inline_alternative_and_the_words_it_replaces(self):
         segments = [("<b>עֹשֶׂה</b> (בעשי\"ת הַשָּׁלוֹם) שָׁלוֹם בִּמְרוֹמָיו", "He Who makes peace"),
@@ -399,6 +411,16 @@ class TestLeafGates(unittest.TestCase):
             f"[following-sibling::j:endConditional[@target='#{g.get('{http://www.w3.org/XML/1998/namespace}id')}']]",
             namespaces=NS)] for g in gates]
         self.assertEqual(inside, [["t0"], ["t2", "t3"]])
+
+    def test_a_hebrew_label_between_texts_gates_the_next_text(self):
+        items, urns, body = self.leaf(
+            ("<b>מִזְמוֹר</b> לְדָוִד", "<small>לר\"ח:</small>", "<b>שִׁיר</b> הַמַּעֲלוֹת"),
+            ("A psalm", "", "A song"), conditions())
+        for lang, note in (("he", 'לר"ח:'), ("en", "")):
+            with self.subTest(lang=lang):
+                xml = body(lang)
+                self.assertEqual(self.gated(xml), [["t1"]])
+                self.assertEqual(xml.xpath("string(//j:conditional/tei:note)", namespaces=NS), note)
 
     def leaf(self, he, en, table, **kwargs):
         from opensiddur.importer.sefaria.tei_builder import leaf_body

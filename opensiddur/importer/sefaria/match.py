@@ -40,7 +40,7 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, is_phrase, split_block
 from opensiddur.importer.sefaria.equivalents import Equivalents
-from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, plain_text
+from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, leading_label, plain_text
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
@@ -138,8 +138,10 @@ def block_text(block: TextBlock) -> str:
 
 def matching_words(pair) -> list[str]:
     """A phrase's words as matching compares them: without an alternative or insertion the
-    book prints in parentheses (``(בעשי"ת הַשָּׁלוֹם)``)."""
-    return words(re.sub(r"\([^)]*\)", " ", plain_text(pair.he)))
+    book prints in parentheses (``(בעשי"ת הַשָּׁלוֹם)``), or the label the phrase opens with
+    (``<small>בעשי"ת יסיים:</small> הַמֶּֽלֶךְ הַמִּשְׁפָּט``), which is its condition's note."""
+    label, rest = leading_label(pair.he)
+    return words(re.sub(r"\([^)]*\)", " ", plain_text(rest if label is not None else pair.he)))
 
 
 def block_hash(block: TextBlock) -> str:
@@ -1255,6 +1257,14 @@ class _Decider:
     def cut(self, leaf: str, blocks: list[Item], i: int, at: int) -> TextBlock:
         # The block cut stays referenced: :attr:`done` holds ids, which Python would otherwise
         # give to a new block.
+        # A text is cut between the book's segments, never inside one -- a paragraph set apart
+        # into phrases (align.split_leading_labels) -- since a text is keyed by the segment it
+        # opens with: the cut moves on to the next segment, and without one is not made.
+        phrases = blocks[i].phrases
+        while 0 < at < len(phrases) and phrases[at].he_index == phrases[at - 1].he_index:
+            at += 1
+        if not 0 < at < len(phrases):
+            return blocks[i]
         self.replaced.append(blocks[i])
         first, rest = split_block(blocks[i], at)
         blocks[i:i + 1] = [first, rest]
@@ -1720,8 +1730,12 @@ class _Decider:
         """Cut the first printing of ``urn`` after ``length`` phrases, and decide the rest."""
         printing = self.printed[urn]
         i = printing.blocks.index(printing.block)
+        whole = printing.blocks[i]
         first = self.cut(printing.leaf, printing.blocks, i, length)
-        previous = self.outcome.records[self.key(printing.leaf, first)]
+        if first is whole:
+            return  # (not inside one of the book's segments)
+        length = len(first.phrases)
+        previous =self.outcome.records[self.key(printing.leaf, first)]
         self.save(TextRecord(
             work=self.work_key, leaf=printing.leaf, block=first.first_index, urn=urn, kind=previous.kind,
             incipit=previous.incipit, as_of=block_hash(first),

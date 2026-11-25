@@ -23345,12 +23345,8 @@
 {"urn": "urn:x-opensiddur:text:prayer:adonai_mah_rabbu", "status": "canonical", "label_he": "יְהֹוָה מָה־רַבּוּ צָרָי רַבִּים קָמִים עָלָי:", "label_en": "adonai mah rabbu"}
 {"urn": "urn:x-opensiddur:text:prayer:hinneh_lo_yanum", "status": "canonical", "label_he": "הִנֵּה לֹא יָנוּם וְלֹא יִישָׁן שׁוֹמֵר", "label_en": "hinneh lo yanum"}
 {"urn": "urn:x-opensiddur:text:prayer:dirshu_adonai_behimmatzo_qerauhu_bihyoto_qarov", "status": "canonical", "label_he": "דִּרְשׁוּ יְהוָה בְּהִמָּצְאוֹ קְרָאֻהוּ בִּהְיוֹתוֹ קָרוֹב׃", "label_en": "dirshu adonai behimmatzo qerauhu bihyoto qarov"}
-{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/shavuot", "status": "canonical", "label_he": "חַג הַשָּׁבֻעוֹת", "label_en": "yaaleh veyavo/shavuot"}
-{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/shemini_atzeret", "status": "canonical", "label_he": "שְׁמִינִי עֲצֶֽרֶת הַחַג הַזֶּה", "label_en": "yaaleh veyavo/shemini atzeret"}
-{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/rosh_hashanah", "status": "canonical", "label_he": "הַזִּכָּרוֹן הַזֶּה", "label_en": "yaaleh veyavo/rosh hashanah"}
-{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/yom_kippur", "status": "canonical", "label_he": "הַכִּפּוּרִים", "label_en": "yaaleh veyavo/yom kippur"}
-{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_shelo", "status": "canonical", "label_he": "יְהִי רָצוֹן שֶׁלֹּא יֵבוֹשׁ וְלֹא יִכָּלֵם", "label_en": "yehi ratzon shelo"}
-{"urn": "urn:x-opensiddur:text:prayer:hallel/barukh_haba", "status": "canonical", "label_he": "בָּרוּךְ הַבָּא בְּשֵׁם יְהֹוָה בֵּרַכְנוּכֶם מִבֵּית", "label_en": "hallel/barukh haba"}
+{"urn": "urn:x-opensiddur:text:prayer:reshit_chakhmah_yirat", "status": "canonical", "label_he": "רֵאשִׁית חָכְמָה יִרְאַת יְהֹוָה, שֵֽׂכֶל טוֹב", "label_en": "reshit chakhmah yirat"}
+{"urn": "urn:x-opensiddur:text:prayer:leshem_yichud_qudsha", "status": "canonical", "label_he": "לְשֵׁם יִחוּד קוּדְשָׁא בְּרִיךְ הוּא וּשְׁכִינְתֵּהּ", "label_en": "leshem yichud qudsha"}
 {"urn": "urn:x-opensiddur:text:prayer:yiru_eineinu_veyismach", "status": "canonical", "label_he": "יִרְאוּ עֵינֵֽינוּ וְיִשְׂמַח לִבֵּֽנוּ וְתָגֵל נַפְשֵֽׁנוּ", "label_en": "yiru eineinu veyismach"}
 {"urn": "urn:x-opensiddur:text:prayer:barukh_adonai_bayom", "status": "canonical", "label_he": "בָּרוּךְ יְהֹוָה בַּיּוֹם בָּרוּךְ יְהֹוָה בַּלָּֽיְלָה", "label_en": "barukh adonai bayom"}
 {"urn": "urn:x-opensiddur:text:prayer:hamalakh_hagoel_oti", "status": "canonical", "label_he": "הַמַּלְאָךְ הַגֹּאֵל אֹתִי מִכָּל רָע יְבָרֵךְ", "label_en": "hamalakh hagoel oti"}
@@ -23358,15 +23354,8 @@
 {"urn": "urn:x-opensiddur:text:prayer:vayyomer_adonai_el", "status": "canonical", "label_he": "וַיֹּֽאמֶר יְהֹוָה אֶל הַשָּׂטָן יִגְעַר יְהֹוָה", "label_en": "vayyomer adonai el"}
 {"urn": "urn:x-opensiddur:text:prayer:lishuatekha_qivviti_adonai", "status": "canonical", "label_he": "לִישׁוּעָתְ֒ךָ קִוִּיתִי יְהֹוָה קִוִּיתִי יְהֹוָה לִישׁוּעָתְ֒ךָ", "label_en": "lishuatekha qivviti adonai"}
 {"urn": "urn:x-opensiddur:text:prayer:beshem_adonai_elohei", "status": "canonical", "label_he": "בְּשֵׁם יְהֹוָה אֱלֺהֵי יִשְׂרָאֵל מִימִינִי מִיכָאֵל", "label_en": "beshem adonai elohei"}
-{"urn": "urn:x-opensiddur:text:prayer:reshit_chakhmah_yirat", "status": "canonical", "label_he": "רֵאשִׁית חָכְמָה יִרְאַת יְהֹוָה, שֵֽׂכֶל טוֹב", "label_en": "reshit chakhmah yirat"}
-{"urn": "urn:x-opensiddur:text:prayer:leshem_yichud_qudsha", "status": "canonical", "label_he": "לְשֵׁם יִחוּד קוּדְשָׁא בְּרִיךְ הוּא וּשְׁכִינְתֵּהּ", "label_en": "leshem yichud qudsha"}
-{"urn": "urn:x-opensiddur:text:prayer:reshit_chakhmah_yirat_adonai", "status": "canonical", "label_he": "רֵאשִׁית חָכְמָה יִרְאַת יְהֹוָה, שֵֽׂכֶל טוֹב", "label_en": "reshit chakhmah yirat adonai"}
-{"urn": "urn:x-opensiddur:text:prayer:leshem_yichud_qudsha_berikh", "status": "canonical", "label_he": "לְשֵׁם יִחוּד קוּדְשָׁא בְּרִיךְ הוּא וּשְׁכִינְתֵּהּ", "label_en": "leshem yichud qudsha berikh"}
-{"urn": "urn:x-opensiddur:text:prayer:yiru_eineinu_veyismach_libbenu", "status": "canonical", "label_he": "יִרְאוּ עֵינֵֽינוּ וְיִשְׂמַח לִבֵּֽנוּ וְתָגֵל נַפְשֵֽׁנוּ", "label_en": "yiru eineinu veyismach libbenu"}
-{"urn": "urn:x-opensiddur:text:prayer:barukh_adonai_bayom_barukh", "status": "canonical", "label_he": "בָּרוּךְ יְהֹוָה בַּיּוֹם בָּרוּךְ יְהֹוָה בַּלָּֽיְלָה", "label_en": "barukh adonai bayom barukh"}
-{"urn": "urn:x-opensiddur:text:prayer:hamalakh_hagoel_oti_mikal", "status": "canonical", "label_he": "הַמַּלְאָךְ הַגֹּאֵל אֹתִי מִכָּל רָע יְבָרֵךְ", "label_en": "hamalakh hagoel oti mikal"}
-{"urn": "urn:x-opensiddur:text:prayer:vayyomer_im_shamoa_tishma", "status": "canonical", "label_he": "וַיֹּֽאמֶר אִם שָׁמֽוֹעַ תִּשְׁמַע לְקוֹל יְהֹוָה", "label_en": "vayyomer im shamoa tishma"}
-{"urn": "urn:x-opensiddur:text:prayer:vayyomer_adonai_el_hasatan", "status": "canonical", "label_he": "וַיֹּֽאמֶר יְהֹוָה אֶל הַשָּׂטָן יִגְעַר יְהֹוָה", "label_en": "vayyomer adonai el hasatan"}
-{"urn": "urn:x-opensiddur:text:prayer:lishuatekha_qivviti_adonai_qivviti", "status": "canonical", "label_he": "לִישׁוּעָתְ֒ךָ קִוִּיתִי יְהֹוָה קִוִּיתִי יְהֹוָה לִישׁוּעָתְ֒ךָ", "label_en": "lishuatekha qivviti adonai qivviti"}
-{"urn": "urn:x-opensiddur:text:prayer:beshem_adonai_elohei_yisrael", "status": "canonical", "label_he": "בְּשֵׁם יְהֹוָה אֱלֺהֵי יִשְׂרָאֵל מִימִינִי מִיכָאֵל", "label_en": "beshem adonai elohei yisrael"}
-{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_shelo_yevosh", "status": "canonical", "label_he": "יְהִי רָצוֹן שֶׁלֹּא יֵבוֹשׁ וְלֹא יִכָּלֵם", "label_en": "yehi ratzon shelo yevosh"}
+{"urn": "urn:x-opensiddur:text:prayer:hallel/barukh_haba", "status": "canonical", "label_he": "בָּרוּךְ הַבָּא בְּשֵׁם יְהֹוָה בֵּרַכְנוּכֶם מִבֵּית", "label_en": "hallel/barukh haba"}
+{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/shemini_atzeret", "status": "canonical", "label_he": "שְׁמִינִי עֲצֶֽרֶת הַחַג הַזֶּה", "label_en": "yaaleh veyavo/shemini atzeret"}
+{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/rosh_hashanah", "status": "canonical", "label_he": "הַזִּכָּרוֹן הַזֶּה", "label_en": "yaaleh veyavo/rosh hashanah"}
+{"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/yom_kippur", "status": "canonical", "label_he": "הַכִּפּוּרִים", "label_en": "yaaleh veyavo/yom kippur"}
+{"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_shelo", "status": "canonical", "label_he": "יְהִי רָצוֹן שֶׁלֹּא יֵבוֹשׁ וְלֹא יִכָּלֵם", "label_en": "yehi ratzon shelo"}

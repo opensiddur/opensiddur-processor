@@ -304,6 +304,15 @@ def split_leading(nodes: tuple[Node, ...], styles: set[str], *, hebrew: bool) ->
                 and is_pointed(plain_text(first.children[breaks[0] + 1:])):
             return ((Styled(first.style, first.children[:breaks[0]]),),
                     (Styled(first.style, first.children[breaks[0] + 1:]),) + nodes[position + 1:])
+        # ... or after a colon (<small>לתענית ציבור: <b>שִׂים שָׁלוֹם</b> ...</small>)
+        opening = first.children[0] if first.children else None
+        if not breaks and isinstance(opening, Text) and ":" in opening.text:
+            at = opening.text.index(":") + 1
+            label, words = opening.text[:at], opening.text[at:]
+            rest = ((Text(words),) if words.strip() else ()) + first.children[1:]
+            if label.strip(" :") and not is_pointed(label) and is_pointed(plain_text(rest)):
+                return ((Styled(first.style, (Text(label),)),),
+                        (Styled(first.style, rest),) + nodes[position + 1:])
     end = position
     while end < len(nodes):
         node = nodes[end]
@@ -317,14 +326,14 @@ def split_leading(nodes: tuple[Node, ...], styles: set[str], *, hebrew: bool) ->
         end -= 1
     if not hebrew and end > position and not plain_text(nodes[position:end]).rstrip().endswith(":"):
         # An English instruction with names set in roman inside it (<i>From the Musaf of </i>
-        # Shemini Atzeres<i> until ... you should say:</i>): it runs to its last italic words
-        # that end with a colon.
+        # Shemini Atzeres<i> until ... you should say:</i>): it runs to its first italic words
+        # that end with a colon, so that a second instruction is not taken with the first.
         ends = [k + 1 for k in range(end, len(nodes))
                 if isinstance(nodes[k], Styled) and nodes[k].style in styles
                 and plain_text(nodes[k].children).rstrip().endswith(":")]
         if ends and all(isinstance(n, (Text, Break, Footnote)) or (isinstance(n, Styled) and n.style in styles | {"foreign"})
-                        for n in nodes[position:ends[-1]]):
-            end = ends[-1]
+                        for n in nodes[position:ends[0]]):
+            end = ends[0]
     label, rest = nodes[:end], nodes[end:]
     if end == position or not plain_text(rest):
         return None
