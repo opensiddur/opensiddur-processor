@@ -35,6 +35,17 @@ class TestReadWorkSource(unittest.TestCase):
         self.assertEqual([leaf.path for leaf in leaves], ["Outer"])
         self.assertEqual(leaves[0].he, ("א",))
 
+    def test_a_supplement_fills_only_the_leaves_the_version_leaves_empty(self):
+        tree = {"Filled": [("א", "a")], "Empty": [("ב", "")]}
+        index = make_index(tree)
+        he = make_version(tree, "he")
+        he["text"]["Empty"] = [""]
+        supplement = make_version({"Filled": [("other", "")], "Empty": [("ג", "")]}, "he")
+        leaves = {leaf.path: leaf for leaf in read_work_source(index, he, make_version(tree, "en"),
+                                                               {"he": supplement}).leaves}
+        self.assertEqual((leaves["Filled"].he, leaves["Filled"].supplied), (("א",), ()))
+        self.assertEqual((leaves["Empty"].he, leaves["Empty"].supplied), (("ג",), ("he",)))
+
     def test_leaf_hashes(self):
         hashes = leaf_hashes(make_source())
         self.assertEqual(hashes["Morning / Amidah"]["he_segments"], len(AMIDAH))

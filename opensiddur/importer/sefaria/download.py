@@ -61,7 +61,18 @@ LAST_EXPORT_URL = f"{BUCKET_URL}/last_export.txt"
 USER_AGENT = "OpenSiddur-Processor/1.0 (https://github.com/opensiddur/opensiddur-processor)"
 
 MANIFEST_NAME = "manifest.json"
-FILE_NAMES = {"schema": "schema.json", "he": "he.json", "en": "en.json"}
+FILE_NAMES = {"schema": "schema.json", "he": "he.json", "en": "en.json",
+              "he_supplement": "he_supplement.json", "en_supplement": "en_supplement.json"}
+
+
+def roles(work: Work) -> list[str]:
+    """The files a work downloads: its schema, its versions and its supplements."""
+    return ["schema", "he", "en"] + [f"{lang}_supplement" for lang in sorted(work.supplements)]
+
+
+def version_title(work: Work, role: str) -> str:
+    lang, _, supplement = role.partition("_")
+    return work.supplements[lang] if supplement else work.versions[lang]
 
 
 class DownloadError(RuntimeError):
@@ -100,7 +111,7 @@ class Client:
 
 @dataclass(frozen=True)
 class RemoteFile:
-    role: str  # "schema", "he" or "en"
+    role: str  # "schema", "he", "en", "he_supplement" or "en_supplement"
     url: str
     object_name: str
     version_title: str | None = None
@@ -122,8 +133,9 @@ def object_name(url: str) -> str:
 def locate(work: Work, books: dict[str, Any]) -> dict[str, RemoteFile]:
     """The schema and version files of ``work``, from the bucket index ``books.json``."""
     found: dict[str, RemoteFile] = {}
-    for lang, version_title in work.versions.items():
-        wanted = _normalized_version_title(version_title)
+    for role in roles(work)[1:]:
+        lang, title = role, version_title(work, role)
+        wanted = _normalized_version_title(title)
         matches = [
             entry for entry in books.get("books", [])
             if entry.get("title") == work.title
@@ -131,10 +143,10 @@ def locate(work: Work, books: dict[str, Any]) -> dict[str, RemoteFile]:
         ]
         if len(matches) != 1:
             raise DownloadError(
-                f"{work.key}: expected one {lang} version titled {version_title!r} in books.json, "
+                f"{work.key}: expected one {lang} version titled {title!r} in books.json, "
                 f"found {len(matches)}")
         url = matches[0]["json_url"]
-        found[lang] = RemoteFile(lang, url, object_name(url), version_title)
+        found[lang] = RemoteFile(lang, url, object_name(url), title)
     schema_path = f"schemas/{work.schema_file_title}.json"
     schema = [f for f in books.get("special_files", []) if f.get("path") == schema_path]
     if len(schema) != 1:
@@ -153,11 +165,11 @@ def stored_json(data: bytes) -> str:
     return json.dumps(json.loads(data), ensure_ascii=False, indent=1) + "\n"
 
 
-def _check_version(work: Work, lang: str, data: dict[str, Any]) -> None:
-    expected = work.versions[lang]
+def _check_version(work: Work, role: str, data: dict[str, Any]) -> None:
+    expected = version_title(work, role)
     if data.get("versionTitle") != expected:
         raise DownloadError(
-            f"{work.key}: the {lang} file is version {data.get('versionTitle')!r}, not {expected!r}")
+            f"{work.key}: the {role} file is version {data.get('versionTitle')!r}, not {expected!r}")
 
 
 def load_manifest(directory: Path) -> dict[str, Any]:
@@ -176,6 +188,10 @@ class DownloadResult:
 
 
 def readme(work: Work) -> str:
+    supplements = "".join(
+        f"- `{lang}_supplement.json`: the {'Hebrew' if lang == 'he' else 'English'} version "
+        f'"{title}", for the leaves the main version leaves empty\n'
+        for lang, title in sorted(work.supplements.items()))
     return f"""# {work.title} (Sefaria)
 
 Source: the Sefaria export bucket, `gs://{BUCKET}` ({BUCKET_URL}/), located through
@@ -186,7 +202,7 @@ Issue: https://github.com/opensiddur/opensiddur-processor/issues/307
 - `schema.json`: the work's Sefaria index record
 - `he.json`: the Hebrew version "{work.versions['he']}"
 - `en.json`: the English version "{work.versions['en']}"
-- `manifest.json`: URLs, the bucket's md5Hash and generation, sha256 as stored, the export
+{supplements}- `manifest.json`: URLs, the bucket's md5Hash and generation, sha256 as stored, the export
   date, and a hash of every leaf
 
 The versions are published by Sefaria under CC-BY (Creative Commons Attribution 3.0,
@@ -209,7 +225,7 @@ def download_work(work: Work, client: Client, books: dict[str, Any], directory: 
 
     entries: dict[str, dict[str, Any]] = {}
     contents: dict[str, str] = {}
-    for role in ("schema", "he", "en"):
+    for role in roles(work):
         file = remote[role]
         name = FILE_NAMES[role]
         meta = client.get_json(OBJECT_METADATA_URL.format(name=quote(file.object_name, safe="")))

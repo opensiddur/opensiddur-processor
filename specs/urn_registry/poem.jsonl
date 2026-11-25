@@ -9602,3 +9602,5 @@
 {"urn": "urn:x-opensiddur:text:poem:arid_besichi_besichi", "status": "canonical", "label_he": "אָרִיד בְּשִׂיחִי. בְּשִׂיחִי לְגוֹחִי. לְגוֹחִי בַּהֲשִׂיחִי.", "label_en": "arid besichi besichi"}
 {"urn": "urn:x-opensiddur:text:poem:eikh_neenchah_bemishbar", "status": "canonical", "label_he": "אֵיךְ נֶאֶנְחָה בְּמִשְׁבָּר. אֲדוּקָה מִקֶּדֶם כְּבָר.", "label_en": "eikh neenchah bemishbar"}
 {"urn": "urn:x-opensiddur:text:poem:amon_pitchei_teshuvah", "status": "canonical", "label_he": "שְׁמַע יִשְׂרָאֵל יְהֹוָה אֱלֹהֵינוּ יְהֹוָה אֶחָד:", "label_en": "amon pitchei teshuvah"}
+{"urn": "urn:x-opensiddur:text:poem:tzameah_nafshi", "status": "canonical", "label_he": "צָמְאָה נַפְשִׁי לֵאלֹהִים לְאֵל חָי לִבִּי", "label_en": "tzameah nafshi"}
+{"urn": "urn:x-opensiddur:text:poem:yom_zeh_leyisrael", "status": "canonical", "label_he": "יוֹם זֶה לְיִשְׂרָאֵל אוֹרָה וְשִׂמְחָה, שַׁבָּת", "label_en": "yom zeh leyisrael"}

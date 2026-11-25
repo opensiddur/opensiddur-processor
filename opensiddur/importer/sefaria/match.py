@@ -987,7 +987,9 @@ BLESSING_DISTINCTIVE_WORDS = 3
 
 def introduced_phrases(block: TextBlock) -> frozenset[int]:
     """The positions of a block's phrases that a rubric comes directly before, or that open a
-    parenthesis: the book sets the passage off (``(אַתָּה חוֹנַנְתָּֽנוּ`` at Maariv)."""
+    parenthesis: the book sets the passage off (``(אַתָּה חוֹנַנְתָּֽנוּ`` at Maariv). A label set
+    apart from its paragraph (``Pair.paragraph_label``) sets nothing off: it governs the
+    paragraph's words as a label inside a phrase does (``לְר"ח: רֹאשׁ הַחֹדֶשׁ``)."""
     found: set[int] = set()
     position = 0
     after_rubric = False
@@ -997,7 +999,7 @@ def introduced_phrases(block: TextBlock) -> frozenset[int]:
                 found.add(position)
             position += 1
             after_rubric = False
-        else:
+        elif not pair.paragraph_label:
             after_rubric = True
     return frozenset(found)
 
@@ -1751,7 +1753,7 @@ def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
     """The verses of scripture a text quotes, by the phrase each opens: phrase position ->
     ``bible:`` verse URN. A verse is found at a phrase that opens like it (six words, confirmed
     over its collected opening, as :func:`lookup` confirms); a half-verse found first is its
-    verse when it is the first half."""
+    verse when it is the first half, and a run of verses found first its first verse."""
     phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
     found: dict[int, str] = {}
     for start in range(len(phrase_words)):
@@ -1767,6 +1769,10 @@ def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
                 if path[3] != "a":
                     continue
                 urn = urn.rsplit("/", 1)[0]
+            elif "-" in path[2]:
+                # A run of verses another text is named by (bible:exodus/31/16-17) opens with its
+                # first verse: the verse found here.
+                urn = urn.rsplit("/", 1)[0] + "/" + path[2].split("-", 1)[0]
             verses.add(urn)
         if len(verses) == 1:
             found[start] = verses.pop()

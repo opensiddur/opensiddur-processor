@@ -38,7 +38,8 @@ import yaml
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings
-from opensiddur.importer.sefaria.align import Alignment, Pair, align_work, join_chapters, load_decisions
+from opensiddur.importer.sefaria.align import (Alignment, Pair, align_work, join_chapters, load_decisions,
+                                               split_leading_labels)
 from opensiddur.importer.sefaria.corrections import apply_corrections, load_corrections
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, is_phrase
 from opensiddur.importer.sefaria.download import load_manifest
@@ -147,6 +148,10 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
     corrections = load_corrections(corrections_path) if corrections_path else load_corrections()
     alignments = apply_corrections(alignments, corrections.get(work.key, []))
+    if work.layout == "paragraph":
+        labels = load_conditions(conditions_path) if conditions_path else load_conditions()
+        alignments = [split_leading_labels(a, lambda text: labels.for_label(text) is not None)
+                      for a in alignments]
     # A leaf of depth 2 is aligned chapter by chapter, and placed and divided whole.
     table = yaml.safe_load((structure_path or work.structure_file()).read_text(encoding="utf-8")) or {}
     # (A placed inner node of the same name -- the Song of Songs, which holds its preface -- is
@@ -455,8 +460,9 @@ def source_info(work: Work, directory: Path) -> SourceInfo:
     if not manifest:
         raise ConvertError(f"{directory}: no manifest; run the download first")
     files = manifest["files"]
-    for lang in LANGUAGES:
-        licence = files[f"{lang}.json"].get("license")
+    for name in [f"{lang}.json" for lang in LANGUAGES] + [f"{lang}_supplement.json" for lang in work.supplements]:
+        licence = files[name].get("license")
+        lang = name.removesuffix(".json")
         if licence != "CC-BY":
             # works.yaml records CC BY 3.0 for Sefaria's "CC-BY"; anything else needs a decision.
             raise ConvertError(
@@ -466,6 +472,7 @@ def source_info(work: Work, directory: Path) -> SourceInfo:
         last_export=manifest["last_export"],
         version_url={lang: f"https://www.sefaria.org/{work.schema_file_title}" for lang in LANGUAGES},
         md5={lang: files[f"{lang}.json"]["md5Hash"] for lang in LANGUAGES},
+        supplement_md5={lang: files[f"{lang}_supplement.json"]["md5Hash"] for lang in work.supplements},
     )
 
 

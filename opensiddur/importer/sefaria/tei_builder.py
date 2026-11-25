@@ -310,8 +310,10 @@ class _TextWriter:
         xml_id = self.next_id("when")
         note = instruction(pair.en, "en", self.notes) if self.lang == "en" else ""
         self.parts.append(conditional_open(xml_id, note, condition_xml(when)))
-        # [id, depth, parenthesized, to close, the words that end it, the words so far]
-        self.calendars.append([xml_id, len(self.open_variants), None, False, through, []])
+        # [id, depth, parenthesized, to close, the words that end it, the words so far,
+        #  the paragraph a paragraph's label governs: the first after it, "next" until known]
+        self.calendars.append([xml_id, len(self.open_variants), None, False, through, [],
+                               "next" if pair.paragraph_label else None])
 
     def close_calendar(self, *, everything: bool = False) -> None:
         """Close the condition rubric's conditional opened at this level (or, with
@@ -345,6 +347,12 @@ class _TextWriter:
         # rather than the Hebrew running on into the row before.
         hebrew = plain_text(pair.he)
         current = self.calendar
+        if current is not None and current[6] == "next":
+            current[6] = pair.he_index
+        elif current is not None and current[6] is not None and pair.he_index != current[6]:
+            # A paragraph's label governs one paragraph: the rest of its own, or the next.
+            self.close_calendar()
+            current = self.calendar
         if current is not None and current[2] is None:
             current[2] = hebrew.lstrip().startswith("(")
         label, _ = leading_label(pair.he)
@@ -856,6 +864,8 @@ class SourceInfo:
     last_export: str
     version_url: dict[str, str]
     md5: dict[str, str]
+    #: the md5 of each language's supplement (``Work.supplements``)
+    supplement_md5: dict[str, str] = field(default_factory=dict)
 
 
 def _publication(work: Work) -> str:
@@ -889,6 +899,17 @@ def source_bibl(work: Work, lang: str, info: SourceInfo) -> str:
     place = f"<tei:pubPlace>{esc(work.place)}</tei:pubPlace>" if work.place else ""
     accessed = info.last_export[:10]
     other = "en" if lang == "he" else "he"
+    linear = work.layout == "linear"
+    translation = work.translation_note or (
+        f"The English is {work.translator}’s translation, printed in the book’s linear layout "
+        "opposite the Hebrew." if linear else f"The English is {work.translator}’s translation.")
+    unit = "one phrase of the linear layout to a phrase milestone" if linear else "one paragraph to a phrase milestone"
+    supplement = ""
+    if lang in work.supplements:
+        supplement = (f'<tei:idno type="sefaria">{esc(work.supplements[lang])}</tei:idno>'
+                      f"<tei:note>Texts the version “{esc(version_title)}” leaves empty are from the "
+                      f"version “{esc(work.supplements[lang])}” (md5 {esc(info.supplement_md5.get(lang, ''))}), "
+                      "with no translation.</tei:note>")
     return (
         f'<tei:bibl xml:id="{PROJECT_SOURCE_BIBL_ID}">'
         f'<tei:title xml:lang="en">{esc(work.title_en)}</tei:title>'
@@ -899,17 +920,16 @@ def source_bibl(work: Work, lang: str, info: SourceInfo) -> str:
         f'<tei:distributor><tei:ref target="{SEFARIA_URL}">Sefaria</tei:ref></tei:distributor>'
         f'<tei:date type="accessed" when="{attr(accessed)}">{esc(accessed)}</tei:date>'
         f'<tei:idno type="url">{esc(info.version_url[lang])}</tei:idno>'
-        f'<tei:idno type="sefaria">{esc(version_title)}</tei:idno>'
+        f'<tei:idno type="sefaria">{esc(version_title)}</tei:idno>{supplement}'
         f"<tei:note>Rite: {esc(work.rite)}</tei:note>"
-        f"<tei:note xml:lang=\"en\">The English is {esc(work.translator)}’s translation, printed in the "
-        "book’s linear layout opposite the Hebrew.</tei:note>"
+        f"<tei:note xml:lang=\"en\">{esc(translation)}</tei:note>"
         f"<tei:note>Digitized by Sefaria as the {'Hebrew' if lang == 'he' else 'English'} version "
         f"“{esc(version_title)}” of {esc(work.title)}; its "
         f"{'English translation' if lang == 'he' else 'Hebrew text'} is the project "
         f"{esc(work.projects[other])}.</tei:note>"
         '<tei:note type="encoding">Converted from the Sefaria export of '
-        f"{esc(info.last_export)} (md5 {esc(info.md5[lang])}), one phrase of the linear layout "
-        "to a phrase milestone. See specs/SEFARIA_IMPORT.md in opensiddur-processor.</tei:note>"
+        f"{esc(info.last_export)} (md5 {esc(info.md5[lang])}), {unit}. "
+        "See specs/SEFARIA_IMPORT.md in opensiddur-processor.</tei:note>"
         "</tei:bibl>"
     )
 

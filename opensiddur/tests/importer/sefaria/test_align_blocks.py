@@ -5,6 +5,7 @@ from opensiddur.importer.sefaria.align import (
     LeafDecision,
     align_leaf,
     align_work,
+    split_leading_labels,
 )
 from opensiddur.importer.sefaria.blocks import Heading, Rubric, TextBlock, divide, split_block
 from opensiddur.importer.sefaria.markup import plain_text
@@ -86,6 +87,43 @@ class TestAlign(unittest.TestCase):
         self.assertIn("A:", message)
         self.assertIn("B:", message)
         self.assertIn("Gone: a decision for a leaf the work no longer has", message)
+
+
+class TestSplitLeadingLabels(unittest.TestCase):
+    """A paragraph's leading label is set apart, as the linear volumes print it."""
+
+    def split(self, he, en):
+        return split_leading_labels(align_leaf(leaf([he], [en]))).pairs
+
+    def test_a_label_and_its_english_become_a_pair_before_the_words(self):
+        pairs = self.split("<small>בחורף:</small> מַשִּׁיב הָרֽוּחַ", "<i>In winter:</i> Who causes the wind")
+        self.assertEqual([(plain_text(p.he), plain_text(p.en)) for p in pairs],
+                         [("בחורף:", "In winter:"), ("מַשִּׁיב הָרֽוּחַ", "Who causes the wind")])
+        self.assertEqual({(p.he_index, p.en_index) for p in pairs}, {(1, 1)})
+
+    def test_an_english_instruction_with_roman_names_inside_it_is_whole(self):
+        pairs = self.split("<small>בקיץ:</small> מוֹרִיד הַטָּל",
+                           "<i>From the Musaf of </i>Shemini Atzeres<i> until the </i>Musaf<i> you should say:</i> Causer of the dew")
+        self.assertEqual([plain_text(p.en) for p in pairs],
+                         ["From the Musaf of Shemini Atzeres until the Musaf you should say:", "Causer of the dew"])
+
+    def test_a_label_the_english_does_not_print_stands_alone(self):
+        pairs = self.split("<small>חזן:</small> בָּרְכוּ", "Bless Adonoy")
+        self.assertEqual([(plain_text(p.he), plain_text(p.en)) for p in pairs],
+                         [("חזן:", ""), ("בָּרְכוּ", "Bless Adonoy")])
+
+    def test_a_condition_label_inside_the_words_is_set_apart(self):
+        he = "מַשִּׁיב הָרֽוּחַ: <small>בקיץ:</small> מוֹרִיד הַטָּל <small>ג\"פ</small> מְכַלְכֵּל"
+        pairs = split_leading_labels(align_leaf(leaf([he], ["Who causes the wind"])),
+                                     lambda text: text == "בקיץ:").pairs
+        self.assertEqual([(plain_text(p.he), plain_text(p.en), p.paragraph_label) for p in pairs],
+                         [("מַשִּׁיב הָרֽוּחַ:", "Who causes the wind", False), ("בקיץ:", "", True),
+                          ('מוֹרִיד הַטָּל ג"פ מְכַלְכֵּל', "", False)])
+
+    def test_words_in_small_print_a_heading_or_bold_are_not_split(self):
+        for he in ("<small>בָּרוּךְ שֵׁם</small>", "<small>מציאות השם</small>", "<b>בָּרוּךְ</b> אַתָּה"):
+            with self.subTest(he=he):
+                self.assertEqual(len(self.split(he, "x")), 1)
 
 
 class TestDivide(unittest.TestCase):

@@ -22,7 +22,8 @@ Any other mismatch is an error that names the leaf, for a decision to be recorde
 
 from __future__ import annotations
 
-from collections.abc import Collection, Iterator
+import dataclasses
+from collections.abc import Callable, Collection, Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
@@ -33,9 +34,13 @@ from opensiddur.importer.sefaria.markup import (
     EnglishKind,
     HebrewKind,
     Node,
+    Styled,
     english_kind,
     hebrew_kind,
+    is_pointed,
     parse_segment,
+    plain_text,
+    split_leading,
 )
 from opensiddur.importer.sefaria.source import PATH_SEPARATOR, Leaf, segments_hash
 
@@ -58,6 +63,9 @@ class Pair:
     en_index: int | None
     he: tuple[Node, ...]
     en: tuple[Node, ...]
+    #: a label set apart from the head of its paragraph (split_leading_labels): it governs the
+    #: rest of that paragraph, not the passage
+    paragraph_label: bool = False
 
     @cached_property
     def he_kind(self) -> HebrewKind:
@@ -190,6 +198,50 @@ def align_work(work_key: str, leaves: tuple[Leaf, ...],
     return alignments
 
 
+def _mid_label(nodes: tuple[Node, ...], is_label: Callable[[str], bool]) -> int | None:
+    """Where a known condition label stands inside a paragraph's words (``מַשִּׁיב הָרֽוּחַ
+    וּמוֹרִיד הַגֶּֽשֶׁם: <small>בקיץ:</small> מוֹרִיד הַטָּל``), after words of its own."""
+    for position, node in enumerate(nodes):
+        if (position and isinstance(node, Styled) and node.style == "small"
+                and not is_pointed(plain_text(node.children)) and is_label(plain_text(node.children))
+                and is_pointed(plain_text(nodes[:position])) and is_pointed(plain_text(nodes[position + 1:]))):
+            return position
+    return None
+
+
+def split_leading_labels(alignment: Alignment, is_label: Callable[[str], bool] = lambda text: False) -> Alignment:
+    """A paragraph-layout leaf with its labels and instructions set apart (``Work.layout``): a
+    pair whose Hebrew opens with an unpointed small label before pointed words becomes a pair for
+    the label -- with the English's leading italic run, if it has one -- and a pair for the words.
+    The linear volumes print such a label as a segment of its own, and so it is read the same way.
+    A condition label (``is_label``) inside the words is set apart too, the English staying with
+    the words before it. Every pair keeps the segment's indexes. A label set apart, or a condition
+    label that is a segment of its own, is a ``paragraph_label``: it governs one paragraph."""
+    pairs: list[Pair] = []
+    for pair in alignment.pairs:
+        he = split_leading(pair.he, {"small"}, hebrew=True)
+        if he is None and pair.he_kind is HebrewKind.LABEL and is_label(plain_text(pair.he)):
+            # A condition label that is a segment of its own governs the paragraph after it.
+            pairs.append(dataclasses.replace(pair, paragraph_label=True))
+            continue
+        if he is None:
+            label, words, en_rest = None, pair.he, pair.en
+        else:
+            en = split_leading(pair.en, {"italic", "small"}, hebrew=False)
+            en_label, en_rest = en if en is not None else ((), pair.en)
+            label, words = he
+            pairs.append(Pair(pair.he_index, pair.en_index, label, en_label, paragraph_label=True))
+        while (position := _mid_label(words, is_label)) is not None:
+            pairs.append(Pair(pair.he_index, pair.en_index, words[:position], en_rest))
+            pairs.append(Pair(pair.he_index, pair.en_index, words[position:position + 1], (), paragraph_label=True))
+            words, en_rest = words[position + 1:], ()
+        if label is None and words is pair.he:
+            pairs.append(pair)
+        else:
+            pairs.append(Pair(pair.he_index, pair.en_index, words, en_rest))
+    return Alignment(alignment.leaf, tuple(pairs), alignment.policy, alignment.opens)
+
+
 def join_chapters(leaves: tuple[Leaf, ...], alignments: list[Alignment],
                   joined_paths: Collection[str]) -> tuple[tuple[Leaf, ...], list[Alignment]]:
     """The chapters of each leaf of depth 2 (``Leaf.chapter``) whose path is in ``joined_paths``
@@ -227,7 +279,7 @@ def join_chapters(leaves: tuple[Leaf, ...], alignments: list[Alignment],
             for pair in alignment.pairs:
                 moved = Pair(None if pair.he_index is None else pair.he_index + he_offset,
                              None if pair.en_index is None else pair.en_index + en_offset,
-                             pair.he, pair.en)
+                             pair.he, pair.en, pair.paragraph_label)
                 if opening and moved.he_index is not None:
                     opens.add(moved.he_index)
                 if is_phrase(pair):

@@ -342,6 +342,28 @@ labels:
     when: {holiday-aggregate: {shabbat: true}}
   - label: 'בשנת העיבור עד חדש ניסן'
     when: {hebrew-date: {leap-year: true, month: [7, 13]}}
+  # The Ashkenaz siddur's labels, at the head of the paragraph they govern
+  - label: 'בחורף'
+    when: {holiday-aggregate: {geshem: true}}
+  - label: 'בקיץ'
+    when: {holiday-aggregate: {geshem: false}}
+  - label: 'בימות הגשמים'
+    when: {holiday-aggregate: {tal-umatar: true}}
+  - label: 'בימות החמה'
+    when: {holiday-aggregate: {tal-umatar: false}}
+  - label: 'בעשי"ת יסיים'
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+  - label: 'בשבועות'
+    when: {holiday: {shavuot: true}}
+  - label: 'בחנוכה ופורים אומרים כאן ועל הנסים'
+    when: {any: [{holiday: {hanukkah: true}}, {holiday: {purim-observed: true}}]}
+  - label: 'ילדים האוכלים ביו"כ'
+    when: {holiday: {yom-kippur: true}}
+  - label: 'יחיד אומר'
+    when: {quorum: {minyan: false}}
+  - label: 'בראש חודש ובחוה"מ פסח מדלגין'
+    # "skip on Rosh Chodesh and Chol Hamoed Pesach": the words are said on the other days
+    when: {none: [{holiday: {rosh-hodesh: true}}, {all: [{holiday-aggregate: {chol-hamoed: true}}, {holiday: {pesah: true}}]}]}
 
 inline:
   - label: 'בעשי"ת'

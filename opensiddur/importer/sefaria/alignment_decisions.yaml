@@ -165,3 +165,20 @@ selichot_nusach_lita_linear:
     as_of: {he: 02778b2ddf670dac830be312d391bf2d0d92b98dfb9cb3f09c76bd3af6b3b3c8, en: 0c8e7397e5972ebc38354a1b12006c26c16d5eea31f560a2a3a0e45d9a2e93ee}
     he_only: [68, 69, 70, 71, 72, 73, 74, 75, 76]
     note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+siddur_ashkenaz:
+  "Shabbat / Kabbalat Shabbat / Bameh Madlikin":
+    as_of: {he: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945, en: 1f9625766c5edc06c8446eea5c64fb06e19f67d2ad9f9026b1670c4bb0d25a0d}
+    en_only: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    note: "the English of the passage that closes Bameh Madlikin (Rabbi Elazar said ...), with no Hebrew in this version"
+  "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Yom zeh L'yisrael":
+    as_of: {he: 3be4f5840ebaa9f8282053e37cafb4553fed7e107e47555dc9d11dd6860357de, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+    note: "a song the English version leaves untranslated"
+  "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Tzamah Nafshi":
+    as_of: {he: 6171e261ed71fa2a208ea9c6a993d263ec31eba46fccacbffa097c1e2c3bb10e, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
+    note: "a song the English version leaves untranslated"
+  "Festivals / Rosh Chodesh / Hallel / Psalm 118":
+    as_of: {he: f3b640e0e83630f72bd2d3cca0033a7f288e8fa3b6fd210c7cdce9c24a06b0be, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    note: "Hallel is in the Hebrew supplement only, untranslated"

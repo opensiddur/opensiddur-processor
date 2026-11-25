@@ -461,6 +461,15 @@ class TestScriptureVerses(unittest.TestCase):
         (block,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם", verse) if isinstance(i, TextBlock)]
         self.assertEqual(scripture_verses(block, index), {1: T + "bible:deuteronomy/25/17"})
 
+    def test_a_run_of_verses_another_text_is_named_by_is_its_first_verse(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        verse = "זָכוֹר אֵת אֲשֶׁר עָשָׂה לְךָ עֲמָלֵק בַּדֶּרֶךְ בְּצֵאתְכֶם מִמִּצְרָיִם"
+        index = IncipitIndex()
+        index.add(T + "bible:deuteronomy/25/17", words(verse))
+        index.add(T + "bible:deuteronomy/25/17-19", words(verse))
+        (block,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם", verse) if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {1: T + "bible:deuteronomy/25/17"})
+
 
 class TestMint(unittest.TestCase):
     def test_a_blessing_is_named_after_its_formulas(self):
@@ -802,6 +811,20 @@ class TestKaddishParts(unittest.TestCase):
                               equivalents=table, registered=set())
         self.assertEqual([r.urn.rsplit(":", 1)[-1] for r in outcome.decided][-1], "kaddish/chatzi")
         self.assertEqual(len(outcome.decided), 2)
+
+
+
+class TestParagraphLabels(unittest.TestCase):
+    def test_a_label_set_apart_from_its_paragraph_introduces_nothing(self):
+        from opensiddur.importer.sefaria.align import Pair
+        from opensiddur.importer.sefaria.markup import parse_segment
+        from opensiddur.importer.sefaria.match import introduced_phrases
+        words_ = Pair(1, 1, parse_segment("אֱלֹהֵֽינוּ"), parse_segment("Our God"))
+        label = Pair(2, 2, parse_segment("<small>בשבועות:</small>"), ())
+        rest = Pair(2, 2, parse_segment("חַג הַשָּׁבֻעוֹת"), ())
+        self.assertEqual(introduced_phrases(TextBlock(None, [words_, label, rest])), frozenset({1}))
+        set_apart = Pair(2, 2, label.he, (), paragraph_label=True)
+        self.assertEqual(introduced_phrases(TextBlock(None, [words_, set_apart, rest])), frozenset())
 
 
 if __name__ == "__main__":

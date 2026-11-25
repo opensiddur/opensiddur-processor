@@ -563,6 +563,24 @@ class TestSourceBibl(unittest.TestCase):
             self.assertEqual(bibl.xpath("//tei:bibl/tei:author/text()", namespaces=NS), [WORK.translator])
             self.assertEqual(bibl.xpath("//tei:respStmt", namespaces=NS), [])
 
+    def test_a_paragraph_work_with_a_supplement_says_so(self):
+        import dataclasses
+        from opensiddur.importer.sefaria.tei_builder import SourceInfo, source_bibl
+        from .support import WORK
+        work = dataclasses.replace(WORK, layout="paragraph", supplements={"he": "Second Hebrew"},
+                                   translation_note="An English based on another.")
+        info = SourceInfo("2026-11-01T00:00:00", {"he": "https://x/he", "en": "https://x/en"},
+                          {"he": "a", "en": "b"}, {"he": "c"})
+        he = parse(source_bibl(work, "he", info))
+        self.assertEqual(he.xpath("//tei:idno[@type='sefaria']/text()", namespaces=NS),
+                         [WORK.versions["he"], "Second Hebrew"])
+        notes = he.xpath("//tei:note/text()", namespaces=NS)
+        self.assertIn("An English based on another.", notes)
+        self.assertTrue(any("“Second Hebrew” (md5 c)" in n for n in notes))
+        self.assertTrue(any("one paragraph to a phrase milestone" in n for n in notes))
+        en = parse(source_bibl(work, "en", info))
+        self.assertEqual(len(en.xpath("//tei:idno[@type='sefaria']", namespaces=NS)), 1)
+
 
 class TestFileStem(unittest.TestCase):
     def test_stems(self):

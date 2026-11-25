@@ -234,13 +234,37 @@ def is_numbered(nodes: tuple[Node, ...]) -> bool:
     return bool(NUMBER.match(text)) and not is_pointed(text)
 
 
+def _unbolded(nodes: tuple[Node, ...]) -> tuple[Node, ...]:
+    """The nodes without the words printed in bold."""
+    out: list[Node] = []
+    for node in nodes:
+        if isinstance(node, Styled):
+            if node.style != "bold":
+                out.append(Styled(node.style, _unbolded(node.children)))
+        else:
+            out.append(node)
+    return tuple(out)
+
+
+def _instruction_quoting(nodes: tuple[Node, ...], text: str) -> bool:
+    """A halachic note in small print that quotes the words it is about, pointed (``אם שכח לומר
+    טַל וּמָטָר ונזכר ...``): unpointed at its start and mostly unpointed."""
+    found = text.split()
+    return (has_hebrew(text) and wholly(nodes, {"small"}) and len(found) >= 4
+            and not any(is_pointed(word) for word in found[:2])
+            and sum(1 for word in found if not is_pointed(word)) * 2 >= len(found))
+
+
 def hebrew_kind(nodes: tuple[Node, ...]) -> HebrewKind:
     text = plain_text(nodes)
     if not text:
         return HebrewKind.EMPTY
     if is_numbered(nodes):
         return HebrewKind.LABEL
-    if has_hebrew(text) and not is_pointed(text) and wholly(nodes, {"small"}):
+    if _instruction_quoting(nodes, text):
+        return HebrewKind.LABEL
+    if has_hebrew(text) and wholly(nodes, {"small"}) and not is_pointed(plain_text(_unbolded(nodes))):
+        # (Its pointed words, if any, quoted in bold: "... אומרים הקהל <b>וִיהִי נֹֽעַם</b>")
         # An instruction in small print, however long ("ש"ץ מתחיל בקול רם והצבור עונין
         # אחריו פסוק אחר פסוק ..."): the book prints its texts pointed.
         return HebrewKind.LABEL
@@ -260,6 +284,53 @@ def english_kind(nodes: tuple[Node, ...]) -> EnglishKind:
     if wholly(nodes, {"small", "italic"}):
         return EnglishKind.RUBRIC
     return EnglishKind.TEXT
+
+
+def split_leading(nodes: tuple[Node, ...], styles: set[str], *, hebrew: bool) -> tuple[tuple[Node, ...], tuple[Node, ...]] | None:
+    """A paragraph that opens with a label or instruction and goes on with the words it governs
+    (``<small>בחורף:</small> מַשִּׁיב הָרֽוּחַ``, ``<i>In winter:</i> Who causes the wind``):
+    the leading run printed in ``styles`` (unpointed, in Hebrew), and the rest; None when the
+    paragraph does not open so, or is nothing else."""
+    position = 0
+    while position < len(nodes) and (isinstance(nodes[position], Break) or (
+            isinstance(nodes[position], Text) and not nodes[position].text.strip())):
+        position += 1
+    first = nodes[position] if position < len(nodes) else None
+    if hebrew and isinstance(first, Styled) and first.style in styles:
+        # The label and the words in one run of small print, a line between them
+        # (<small>בחנוכה ופורים אומרים כאן ועל הנסים<br><b>עַל הַנִּסִּים</b> ...</small>)
+        breaks = [k for k, child in enumerate(first.children) if isinstance(child, Break)]
+        if breaks and plain_text(first.children[:breaks[0]]) and not is_pointed(plain_text(first.children[:breaks[0]])) \
+                and is_pointed(plain_text(first.children[breaks[0] + 1:])):
+            return ((Styled(first.style, first.children[:breaks[0]]),),
+                    (Styled(first.style, first.children[breaks[0] + 1:]),) + nodes[position + 1:])
+    end = position
+    while end < len(nodes):
+        node = nodes[end]
+        if isinstance(node, Styled) and node.style in styles and not (hebrew and is_pointed(plain_text(node.children))):
+            end += 1
+        elif isinstance(node, (Break, Footnote)) or (isinstance(node, Text) and not node.text.strip()):
+            end += 1
+        else:
+            break
+    while end > position and not isinstance(nodes[end - 1], Styled):
+        end -= 1
+    if not hebrew and end > position and not plain_text(nodes[position:end]).rstrip().endswith(":"):
+        # An English instruction with names set in roman inside it (<i>From the Musaf of </i>
+        # Shemini Atzeres<i> until ... you should say:</i>): it runs to its last italic words
+        # that end with a colon.
+        ends = [k + 1 for k in range(end, len(nodes))
+                if isinstance(nodes[k], Styled) and nodes[k].style in styles
+                and plain_text(nodes[k].children).rstrip().endswith(":")]
+        if ends and all(isinstance(n, (Text, Break, Footnote)) or (isinstance(n, Styled) and n.style in styles | {"foreign"})
+                        for n in nodes[position:ends[-1]]):
+            end = ends[-1]
+    label, rest = nodes[:end], nodes[end:]
+    if end == position or not plain_text(rest):
+        return None
+    if hebrew and not is_pointed(plain_text(rest)):
+        return None
+    return label, rest
 
 
 #: A label set before the words it governs ("לְר"ח:") is a word or two and a colon.
