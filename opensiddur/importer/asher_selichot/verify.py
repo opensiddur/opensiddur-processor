@@ -17,10 +17,10 @@ from .identities import project_name
 
 def verify(source_root, project_directory):
     source=Path(source_root)/'asher_selichot/scan_reading'
-    payload=json.loads((source/'documentary-streams.json').read_text())
+    payload=json.loads((source/'documentary-streams.json').read_text(encoding="utf-8"))
     expected={(page,lang):text for page,langs in payload.items() for lang,text in langs.items()}
     actual={}
-    data=json.loads((source/'refrain-and-prayers.json').read_text())
+    data=json.loads((source/'refrain-and-prayers.json').read_text(encoding="utf-8"))
     files=0
     for lang in ['he','en']:
         project=Path(project_directory)/project_name(lang)
@@ -208,10 +208,10 @@ def opening_documentary(project):
 
 def verify_opening(source, project_directory):
     """Check the shared service opening, partial verse and printed title pages."""
-    payload=json.loads((source/'opening-documentary-streams.json').read_text())
+    payload=json.loads((source/'opening-documentary-streams.json').read_text(encoding="utf-8"))
     expected={(page,lang):words for page,langs in payload.items() for lang,words in langs.items()}
     actual={}
-    titles=json.loads((source/'title-pages.json').read_text())
+    titles=json.loads((source/'title-pages.json').read_text(encoding="utf-8"))
     for lang in ['he','en']:
         project=project_directory/project_name(lang)
         root=opening_documentary(project)
@@ -243,8 +243,8 @@ def verify_continuation(source, project_directory):
     import unicodedata
     from .first_day import EXPANSION_TARGETS, PRINTED_IN_FULL
     from .identities import TEXTS
-    groups=json.loads((source/'first-day-continuation.json').read_text())['sections']
-    poetry=json.loads((source.parent/'poetry-structure.json').read_text())['units']
+    groups=json.loads((source/'first-day-continuation.json').read_text(encoding="utf-8"))['sections']
+    poetry=json.loads((source.parent/'poetry-structure.json').read_text(encoding="utf-8"))['units']
     count=0
     for lang in ['he','en']:
         project=project_directory/project_name(lang)

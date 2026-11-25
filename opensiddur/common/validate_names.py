@@ -247,7 +247,7 @@ def check_settings(settings_directory: Path) -> Iterator[Problem]:
     directory = Path(settings_directory)
     # One level only: a file anywhere else is misplaced, which books --check reports.
     for path in sorted(directory.glob("*/*.yaml")):
-        where = str(path.relative_to(directory))
+        where = path.relative_to(directory).as_posix()
         try:
             data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         except yaml.YAMLError as exc:

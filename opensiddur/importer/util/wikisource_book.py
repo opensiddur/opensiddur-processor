@@ -70,6 +70,7 @@ def save_manifest(manifest: dict[str, Any], data_dir: Path) -> None:
     path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 
@@ -225,8 +226,9 @@ def download_scan_pages(
         key = page_key(number, digits)
         credits_text = "\n".join(contributors.get(title, []))
 
-        (layout.text_dir / f"{key}.txt").write_text(revision.content, encoding="utf-8")
-        (layout.credits_dir / f"{key}.txt").write_text(credits_text, encoding="utf-8")
+        for path, text in ((layout.text_dir / f"{key}.txt", revision.content),
+                           (layout.credits_dir / f"{key}.txt", credits_text)):
+            path.write_text(text, encoding="utf-8", newline="\n")
 
         recorded[key] = {
             "revid": revision.revid,

@@ -199,11 +199,13 @@ class TestTex(unittest.TestCase):
                          r"50\% of a \emph{genizah} \& {\urlstyle{same}\url{https://example.org/\#top}}")
 
     def test_the_notice_has_the_logo_then_a_line_each(self):
-        tex = distribution_notice_to_tex(DistributionNotice(), Path("/art/logo.png"))
+        logo = Path("/art/logo.png")
+        tex = distribution_notice_to_tex(DistributionNotice(), logo)
         self.assertEqual(
             tex,
             "\\null\\vfill\n"
-            "\\OSDistributionNotice{\\includegraphics[width=1.25in]{/art/logo.png}\\\\{}\n"
+            "\\OSDistributionNotice{\\includegraphics[width=1.25in]{" + logo.resolve().as_posix()
+            + "}\\\\{}\n"
             "Distributed by The Open Siddur Project\\\\{}\n"
             "{\\urlstyle{same}\\url{https://opensiddur.org}}\\\\{}\n"
             "{\\urlstyle{same}\\url{https://github.com/opensiddur}}}\n\n")

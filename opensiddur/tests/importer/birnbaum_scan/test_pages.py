@@ -276,13 +276,13 @@ class CommandLineTestCase(unittest.TestCase):
         printed, fetch, bands = self._run("81", "82")
         self.assertEqual(["81", "82"], [call.args[0] for call in fetch.call_args_list])
         self.assertEqual(2, bands.call_count)
-        self.assertIn("/scan/81.jpg", printed)
-        self.assertIn("/scan/81-1.jpg", printed)
+        self.assertIn(str(Path("/scan/81.jpg")), printed)
+        self.assertIn(str(Path("/scan/81-1.jpg")), printed)
 
     def test_no_bands_fetches_the_page_and_stops_there(self):
         printed, _, bands = self._run("81", "--no-bands")
         bands.assert_not_called()
-        self.assertIn("/scan/81.jpg", printed)
+        self.assertIn(str(Path("/scan/81.jpg")), printed)
 
     def test_passes_the_cutting_options_through(self):
         _, fetch, bands = self._run("81", "--bands", "6", "--scale", "3", "--force")

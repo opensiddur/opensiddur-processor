@@ -72,7 +72,7 @@ class LocalRubricSelectionTests(unittest.TestCase):
                     base=Path(temp.name);(base/'book').mkdir()
                     wrapper=lambda content:f'<tei:TEI xmlns:tei="{TEI}" xmlns:j="{J}" xml:lang="he"><tei:text><tei:body>{content}</tei:body></tei:text></tei:TEI>'
                     original=f'<tei:p><tei:note type="{note_type}" corresp="{URN}" xml:lang="he">קו״ח</tei:note> First tail <tei:note type="{note_type}" corresp="{URN}" xml:lang="he">ק׳</tei:note> Second tail</tei:p>'
-                    (base/'book/local.xml').write_text(wrapper(original))
+                    (base/'book/local.xml').write_text(wrapper(original),encoding='utf-8')
                     other=etree.fromstring(wrapper(f'<tei:note type="{note_type}" corresp="{URN}" xml:lang="en">Congregation:</tei:note>').encode())
                     (base/'book/other.xml').write_bytes(etree.tostring(other));note=other.find('.//{'+TEI+'}note')
                     db=MagicMock(spec=ReferenceDatabase);db.get_references_to.return_value=[]

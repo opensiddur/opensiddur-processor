@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Faults that Windows exposes. Python on Windows has no time-zone database of its own, and
+  `hdate` needs one when it is imported, so `tzdata` is now a dependency there; without it the
+  exporter could not start. The validator lets jing open its temporary files. Every text file
+  the package opens is now read and written as UTF-8 rather than in the locale's encoding,
+  which on Windows read the Hebrew in settings files and the Asher importer's sources as
+  mojibake and made the validator reject valid Hebrew files; a test keeps any new call from
+  leaving the encoding out. The page-break aligner for the 1822 Haggadah facsimile reads
+  pdftotext's output as UTF-8. `write_if_changed`, the Wikisource downloaders and the download
+  manifests write LF line endings, and `write_if_changed` compares bytes, so the Sefaria
+  download no longer fetches unchanged files again, even ones a Windows checkout gave CRLF
+  endings. The feature validator reports paths with forward slashes, as the naming check
+  does. The tests no longer assume POSIX paths, a UTF-8 locale, or that Saxon can open a
+  temporary file that is still open. On Windows the suite now fails only the tests that need
+  jing and the compiled schema.
+
 ### Added
 - **A scan viewer in the electronic book.** With `electronic.scan_viewer`
   (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
@@ -18,7 +34,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the time left, at most every 15 seconds. A slow step in the projects check no longer looks
   the same as a hung one.
 
+### Changed
+- **Miqra al pi ha-Masorah comes from MAM-parsed plus**, the JSON files of MAM-basics
+  (`MAM-parsed/plus/*.json`, pinned to a commit), instead of the TSV export of MAM's frozen
+  Google Sheet. `download` fetches them and MAM's `LICENSE.md` and records the commit in its
+  manifest; `convert` (formerly `convert_tsv`) walks the parsed templates with a closed dispatch
+  that rejects an unknown template; the humash reads its aliyot from the same files.
+  When GitHub rate-limits it, `download` waits as asked, at most a minute at a time; a
+  longer wait fails at once, saying when to try again. `convert` converts every book
+  before it writes any, so that a missing book or a rejected template stops it before anything
+  is written and `--only-book` writes the same file as a full run. `convert --check` reads and
+  converts the whole download without writing anything, for use after moving the pin. From the
+  same text the output is unchanged except that every file's source note (`tei:sourceDesc`)
+  names MAM-parsed plus instead of the Google Sheet, that the index also names the commit and
+  quotes MAM's credit to its editors and its attributions instead of the sheet's README tab,
+  and that words the wikitext front
+  end garbled are as MAM has them: the speaker headings of Job and the title of Proverbs 10:1,
+  the spaces documented in Deuteronomy 23:8, Ezra 2:69 and Nehemiah 3:2, 3:10 and 7:68, the
+  accents of the ten words with geresh or gershayim and telisha gedola, the inverted nuns of
+  Psalms 107, כׇּ֥ל in Psalms 35:10 and Proverbs 19:7, and the sheva of ירושלמה. Six qere-only
+  words in documented passages, which had become Wikisource links, are words again, and the
+  other 11 ketiv-only and qere-only forms have MAM's one pair of parentheses or brackets
+  instead of three. Deuteronomy 11:21's scroll-difference note is now marked before the sof
+  pasuq. With its title restored, Proverbs 10:1 carries the ole-we-yored of שְׁלֹ֫מֹ֥ה, so like
+  the WLC's it is no longer divided into half-verses (`proverbs/10/1/a` and `/b`): in the poetic
+  books a verse with ole-we-yored is not divided at the etnachta. `openpyxl` is no longer a
+  dependency. The sourcetexts commit that adds the download
+  needs the `.gitattributes` line `sources/miqra_al_pi_hamasorah/** -text`, since `download`
+  and `convert` compare the files byte for byte.
+
 ### Fixed
+- The monthly Sefaria update (`opensiddur.importer.sefaria.update`) no longer stops with a
+  traceback when Sefaria's new text makes a misprint correction or an alignment decision stale.
+  Such a leaf is reported for review, under its own heading, and its work is not converted. If a
+  conversion still fails on one, the report says so for that work and the other works are still
+  converted and reported.
 - Scan links no longer link pages of another printing among the pages of the one the book
   uses. In a Minchah Amidah, a blessing printed at Minchah with no page break inside it had
   been given the Shacharit page's link. Where the edition prints the unit around a text, only

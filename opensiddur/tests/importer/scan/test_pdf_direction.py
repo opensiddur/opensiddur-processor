@@ -33,7 +33,7 @@ class DirectionTests(unittest.TestCase):
 
     def test_measured_direction_and_reversal_control(self):
         with TemporaryDirectory() as tmp:
-            root=Path(tmp);tex=root/'source.tex';tex.write_text('אבגדה')
+            root=Path(tmp);tex=root/'source.tex';tex.write_text('אבגדה',encoding='utf-8')
             corpus=d.corpus_of(tex);self.assertEqual(corpus,{'אבגד','בגדה'})
             extracted=self.extract(root,'הדגבא.אב')
             self.assertEqual(d.check(extracted,corpus),([],1))

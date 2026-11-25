@@ -35,7 +35,7 @@ class TestSchematronValidate(unittest.TestCase):
         valid_xml = '<root><required>present</required></root>'
         
         # Test with string input (no temp file needed)
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(schematron_xslt)
             f.flush()
             
@@ -69,7 +69,7 @@ class TestSchematronValidate(unittest.TestCase):
         # XML that should fail (missing required attribute)
         invalid_xml = '<root><item>content</item></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(schematron_xslt)
             f.flush()
             
@@ -109,7 +109,7 @@ class TestSchematronValidate(unittest.TestCase):
         # XML missing both title and author
         invalid_xml = '<root><content>data</content></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(schematron_xslt)
             f.flush()
             
@@ -145,7 +145,7 @@ class TestSchematronValidate(unittest.TestCase):
         # XML with deprecated element
         xml_with_issue = '<root><deprecated>old stuff</deprecated></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(schematron_xslt)
             f.flush()
             
@@ -270,7 +270,7 @@ class TestRelaxNGValidate(unittest.TestCase):
         
         valid_xml = '<root>content</root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.rng') as schema_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.rng', delete_on_close=False) as schema_f:
             schema_f.write(relaxng_schema)
             schema_f.flush()
             
@@ -318,7 +318,7 @@ class TestValidateFunction(unittest.TestCase):
         # Valid XML
         valid_xml = '<root><item>content</item></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as sch_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as sch_f:
             sch_f.write(schematron_xslt)
             sch_f.flush()
             
@@ -359,7 +359,7 @@ class TestValidateFunction(unittest.TestCase):
         # Invalid for RelaxNG (missing required element)
         invalid_xml = '<root><optional>content</optional></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as sch_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as sch_f:
             sch_f.write(schematron_xslt)
             sch_f.flush()
             
@@ -409,7 +409,7 @@ class TestValidateFunction(unittest.TestCase):
         # Invalid for Schematron (missing mandatory)
         invalid_xml = '<root><optional>content</optional></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as sch_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as sch_f:
             sch_f.write(schematron_xslt)
             sch_f.flush()
             
@@ -458,7 +458,7 @@ class TestValidateFunction(unittest.TestCase):
         # Invalid for both validators
         invalid_xml = '<root><other>content</other></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as sch_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as sch_f:
             sch_f.write(schematron_xslt)
             sch_f.flush()
             
@@ -497,8 +497,8 @@ class TestValidateFunction(unittest.TestCase):
         
         valid_xml = '<?xml version="1.0"?><root>content</root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml') as xml_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as sch_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete_on_close=False) as xml_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as sch_f:
             
             xml_f.write(valid_xml)
             xml_f.flush()
@@ -541,8 +541,8 @@ class TestValidateFunction(unittest.TestCase):
         
         valid_xml = '<root><item>content</item></root>'
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.rng') as rng_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as sch_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.rng', delete_on_close=False) as rng_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as sch_f:
             
             rng_f.write(relaxng_schema)
             rng_f.flush()

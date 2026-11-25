@@ -82,7 +82,7 @@ def corrected(text, asher_source):
     """Reading text as the PDF sets it: each misprint in corrections.json read corrected,
     the exporter's default. `asher_source` is sourcetexts' sources/asher_selichot."""
     path = Path(asher_source) / 'scan_reading/corrections.json'
-    for c in (json.loads(path.read_text())['corrections'] if path.exists() else []):
+    for c in (json.loads(path.read_text(encoding="utf-8"))['corrections'] if path.exists() else []):
         if 'follows' in c or c.get('exact'):
             continue
         before, after = c.get('before', ''), c.get('after', '')

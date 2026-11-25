@@ -88,7 +88,8 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Flatten each TSV row into nav markers + verse runs. -->
+  <!-- Flatten each row (one verse of MAM-parsed plus: its columns C, D and E) into nav markers +
+       verse runs. -->
   <xsl:template match="miqra:row" mode="flatten">
     <!-- Column C: only parashah markers structure paragraphs; // line breaks are cosmetic.
          A break the source wrapped in {{נוסח}} — because another witness reads it
@@ -394,8 +395,9 @@
   </xsl:template>
 
   <!-- Dual cantillation (מ:כפול): the two readings are alternate wordings of the same text,
-       exactly one of which is read, which is what j:option is for. templates.tsv documents the
-       strand labels: א is ta'am tachton (פשוטה at Gen 35:22), ב is ta'am elyon (מדרשית).
+       exactly one of which is read, which is what j:option is for. MAM-parsed documents the
+       strand labels (mpplus_dualcant.html): א is ta'am tachton (פשוטה at Gen 35:22), ב is ta'am
+       elyon (מדרשית).
        The corresp URNs are fixed rather than per-passage, so one setting picks the reading
        everywhere it occurs. Parashah-only spans never reach here; see mode="hoist". -->
   <xsl:template match="miqra:dual-accent" mode="inline">

@@ -177,8 +177,8 @@ def download_source_pages(
 
         text_path.parent.mkdir(parents=True, exist_ok=True)
         credits_path.parent.mkdir(parents=True, exist_ok=True)
-        text_path.write_text(revision.content, encoding="utf-8")
-        credits_path.write_text(credits_text, encoding="utf-8")
+        text_path.write_text(revision.content, encoding="utf-8", newline="\n")
+        credits_path.write_text(credits_text, encoding="utf-8", newline="\n")
 
         redirect, target = is_redirect(revision.content)
         recorded[title] = {
@@ -274,6 +274,7 @@ def save_structure(structure: dict[str, Any], sourcetexts_root: Path | None = No
     path.write_text(
         json.dumps(structure, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return path
 

@@ -469,11 +469,18 @@ latest commit. It downloads, then compares each leaf of the new manifest with th
 |---|---|---|
 | unchanged | same segments | nothing |
 | text-changed | different words, same segment counts | reconverted; its texts' records lapse and are re-decided, phrase numbers kept |
+| curated | text-changed, where a misprint correction of the changed version (`corrections.yaml`) or an alignment decision whose `as_of` is not the new leaf's (`alignment_decisions.yaml`) applies | reported under "Text changed where a misprint correction or alignment decision applies (review before converting)"; the entry is removed, moved or re-decided before converting |
 | resegmented | a version's segment count changed | reported; the alignment decision and phrase numbers are reviewed before converting |
 | added / removed | the schema gained or lost a leaf | reported; the structure table must place it |
 | metadata | a version's title, licence or URL changed | reported; a licence change is decided before converting |
 
-With nothing to review, the work is converted with `--register`. The report,
+A resegmented leaf with a correction or decision is noted as such in its line of the report: a
+correction's segment number may now point at a different segment that holds the same words.
+
+With nothing to review, the work is converted with `--register`. If the conversion still refuses
+a correction or an alignment decision, the work's section of the report says "Not converted:"
+with the error, and the run goes on to the next work. The command exits non-zero when any work
+needs review or failed to convert. The report,
 `output/sefaria_update_<date>.md`, becomes the description of the run's paired pull requests
 (sourcetexts, processor for decision files and registry lines, projects).
 

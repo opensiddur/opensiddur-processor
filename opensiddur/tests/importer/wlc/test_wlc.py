@@ -45,13 +45,13 @@ class TestWLCPathFunctions(unittest.TestCase):
         self.assertIsInstance(result, Path)
         
         # Verify it points to sources/wlc under the configured sourcetexts root
-        self.assertTrue(str(result).endswith('sources/wlc'))
+        self.assertTrue(str(result).endswith(str(Path('sources/wlc'))))
         self.assertEqual(result, SOURCETEXTS_ROOT / 'wlc')
 
     def test_get_source_directory_custom_sourcetexts_root(self):
         custom = Path('/tmp/opensiddur-sourcetexts')
         result = get_source_directory(custom)
-        self.assertEqual(result, custom / 'wlc')
+        self.assertEqual(result, custom.resolve() / 'wlc')
     
     def test_get_xslt_directory(self):
         """Test that get_xslt_directory returns the wlc module directory"""
@@ -93,7 +93,7 @@ class TestWLCMain(unittest.TestCase):
         
         # Set up mock paths
         mock_project_dir = Path('/mock/project/wlc')
-        mock_source_dir = Path('/mock/sources/wlc')
+        mock_source_dir = Path('/mock/sources/wlc').resolve()
         mock_sourcetexts_root = Path('/mock/sources')
         mock_xslt_dir = Path('/mock/opensiddur/importer/wlc')
         

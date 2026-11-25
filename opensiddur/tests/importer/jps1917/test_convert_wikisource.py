@@ -1072,7 +1072,7 @@ class TestValidateAndWriteTeiFile(unittest.TestCase):
         
         # Verify file was opened with correct path
         expected_path = Path(self.temp_dir) / JPS_PROJECT / "my_book.xml"
-        mock_file.assert_called_once_with(expected_path, "w")
+        mock_file.assert_called_once_with(expected_path, "w", encoding="utf-8")
     
     @patch('opensiddur.importer.jps1917.convert_wikisource.validate')
     @patch('opensiddur.importer.jps1917.convert_wikisource.prettify_xml')

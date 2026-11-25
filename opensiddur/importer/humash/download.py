@@ -98,6 +98,7 @@ def download(
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     logger.info("Wrote %d files and a manifest to %s", len(entries), data_dir)
     return data_dir

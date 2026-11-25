@@ -49,13 +49,13 @@ class ComparisonTests(unittest.TestCase):
     def test_opt_in_policy_writes_only_new_verdicts_and_requires_destination(self):
         with TemporaryDirectory() as tmp:
             root=Path(tmp);reading=root/'reading.txt';other=root/'other.txt';verdicts=root/'verdicts.json'
-            reading.write_text('כָל');other.write_text('כׇל')
+            reading.write_text('כָל',encoding='utf-8');other.write_text('כׇל',encoding='utf-8')
             args=[str(reading),str(other),'--settle-qamats-qatan']
             with self.assertRaises(SystemExit):c.main(args)
             for expected in ['1 newly recorded','0 newly recorded']:
                 with redirect_stdout(io.StringIO()) as log:
                     self.assertEqual(c.main(args+['--verdicts',str(verdicts)]),0)
                 self.assertIn(expected,log.getvalue())
-            saved=json.loads(verdicts.read_text());key=next(iter(saved));saved[key]=c.READING;verdicts.write_text(json.dumps(saved))
+            saved=json.loads(verdicts.read_text(encoding='utf-8'));key=next(iter(saved));saved[key]=c.READING;verdicts.write_text(json.dumps(saved))
             with redirect_stdout(io.StringIO()):c.main(args+['--verdicts',str(verdicts)])
-            self.assertEqual(json.loads(verdicts.read_text())[key],c.READING)
+            self.assertEqual(json.loads(verdicts.read_text(encoding='utf-8'))[key],c.READING)

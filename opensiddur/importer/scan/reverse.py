@@ -78,7 +78,7 @@ def main(argv=None):
     parser.add_argument('--include-notes', action='store_true')
     args = parser.parse_args(argv)
     import json
-    readings = {(page, lang): text for page, langs in json.loads(args.readings.read_text()).items()
+    readings = {(page, lang): text for page, langs in json.loads(args.readings.read_text(encoding="utf-8")).items()
                 for lang, text in langs.items()}
     actual = {}
     for path in args.xml:

@@ -141,7 +141,7 @@ def dependency(lang,project,name,pages):
 
 
 def build(source_root,project_directory):
-    data=json.loads((Path(source_root)/'asher_selichot/scan_reading/refrain-and-prayers.json').read_text())
+    data=json.loads((Path(source_root)/'asher_selichot/scan_reading/refrain-and-prayers.json').read_text(encoding="utf-8"))
     documents=[]
     for lang in ['he','en']:
         project=project_name(lang);out=Path(project_directory)/project
@@ -181,10 +181,10 @@ def build(source_root,project_directory):
     by_path = {f'{path.parent.name}/{path.name}': root for path, root in documents}
     corrections = readings/'corrections.json'
     if corrections.exists():
-        apply_corrections(by_path, json.loads(corrections.read_text())['corrections'])
+        apply_corrections(by_path, json.loads(corrections.read_text(encoding="utf-8"))['corrections'])
     editorial = readings/'editorial_notes.json'
     if editorial.exists():
-        apply_editorial_notes(by_path, json.loads(editorial.read_text())['notes'])
+        apply_editorial_notes(by_path, json.loads(editorial.read_text(encoding="utf-8"))['notes'])
     documents, renamed = respelled(documents)
     documents, printed_again = unify(documents)
     obsolete = [Path(project_directory)/project_name(lang)/(name+'.xml')

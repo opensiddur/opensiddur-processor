@@ -126,7 +126,7 @@ class TestGetCredits(unittest.TestCase):
         
         # Should open the correct file
         actual_call = str(mock_file.call_args[0][0])
-        self.assertTrue(actual_call.endswith('credits/0025.txt'), f"Expected path ending with credits/0025.txt, got: {actual_call}")
+        self.assertTrue(actual_call.endswith(str(Path('credits/0025.txt'))), f"Expected path ending with credits/0025.txt, got: {actual_call}")
     
     @patch('builtins.open', new_callable=mock_open, read_data='Line 1\nLine 2')
     def test_get_credits_success_with_string(self, mock_file):
@@ -139,7 +139,7 @@ class TestGetCredits(unittest.TestCase):
         
         # Should open the correct file (0001.txt)
         actual_call = str(mock_file.call_args[0][0])
-        self.assertTrue(actual_call.endswith('credits/0001.txt'), f"Expected path ending with credits/0001.txt, got: {actual_call}")
+        self.assertTrue(actual_call.endswith(str(Path('credits/0001.txt'))), f"Expected path ending with credits/0001.txt, got: {actual_call}")
     
     @patch('builtins.open', side_effect=FileNotFoundError)
     def test_get_credits_file_not_found_returns_none(self, mock_file):
@@ -237,14 +237,14 @@ class TestPageNumberFormatting(unittest.TestCase):
 
 class TestHaggadahDataDirectories(unittest.TestCase):
     def test_feinstein_haggadah_data_directory(self) -> None:
-        root = Path("/tmp/sourcetexts")
+        root = Path("/tmp/sourcetexts").resolve()
         self.assertEqual(
             feinstein_haggadah_data_directory(root),
             root / "feinstein_haggadah_2009",
         )
 
     def test_heidenheim_haggadah_data_directory(self) -> None:
-        root = Path("/tmp/sourcetexts")
+        root = Path("/tmp/sourcetexts").resolve()
         self.assertEqual(
             heidenheim_haggadah_data_directory(root),
             root / "heidenheim_haggadah_1822",
@@ -286,7 +286,7 @@ class TestBirnbaumSourceDirectories(unittest.TestCase):
     """The source and external trees hang off the Birnbaum data directory"""
 
     def test_source_and_external_trees_are_separate(self):
-        root = Path("/tmp/sources")
+        root = Path("/tmp/sources").resolve()
         self.assertEqual(
             birnbaum_siddur_source_text_directory(root),
             root / "birnbaum_siddur" / "source" / "text",
@@ -301,7 +301,7 @@ class TestBirnbaumEnglishAndArchiveDirectories(unittest.TestCase):
     """The English and Internet Archive layers hang off the same data directory"""
 
     def test_the_three_layers_are_separate_trees(self):
-        root = Path("/tmp/sources")
+        root = Path("/tmp/sources").resolve()
         book = root / "birnbaum_siddur"
         self.assertEqual(birnbaum_siddur_en_text_directory(root), book / "en" / "text")
         self.assertEqual(
@@ -318,7 +318,7 @@ class TestBirnbaumEnglishAndArchiveDirectories(unittest.TestCase):
     def test_the_correspondence_table_sits_beside_the_other_indexes(self):
         # pages.json is derived from all three layers, so it belongs at the top of
         # the book's directory rather than inside any one of them.
-        root = Path("/tmp/sources")
+        root = Path("/tmp/sources").resolve()
         self.assertEqual(
             birnbaum_siddur_correspondence_path(root),
             root / "birnbaum_siddur" / "pages.json",

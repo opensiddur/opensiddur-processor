@@ -2,7 +2,7 @@
 (``opensiddur/importer/miqra_al_pi_hamasorah/miqra_to_tei.xslt``).
 
 These run the transformation directly over hand-written intermediate XML, so
-they exercise the stylesheet without depending on the shape of the real TSV
+they exercise the stylesheet without depending on the shape of the real
 sources.
 """
 
@@ -11,7 +11,7 @@ import unittest
 
 from lxml import etree
 
-from opensiddur.importer.miqra_al_pi_hamasorah.convert_tsv import intermediate_to_tei
+from opensiddur.importer.miqra_al_pi_hamasorah.convert import intermediate_to_tei
 
 TEI_NS = "http://www.tei-c.org/ns/1.0"
 J_NS = "http://jewishliturgy.org/ns/jlptei/2"
@@ -39,8 +39,7 @@ def _row(
     scaffold: str = "",
 ) -> str:
     return (
-        f'<miqra:row source="s" pageKey="p" rowId="{verse}"'
-        f' chapter="{chapter}" verse="{verse}">'
+        f'<miqra:row chapter="{chapter}" verse="{verse}">'
         f"<miqra:nav>{nav}</miqra:nav><miqra:scaffold>{scaffold}</miqra:scaffold>"
         f"<miqra:text>{text}</miqra:text>"
         "</miqra:row>"
@@ -100,7 +99,7 @@ class TestDualAccent(unittest.TestCase):
         self.assertEqual(
             [TAAM_TACHTON, TAAM_ELYON], [o.get("corresp") for o in options]
         )
-        # templates.tsv documents א as ta'am tachton and ב as ta'am elyon.
+        # MAM-parsed documents א as ta'am tachton and ב as ta'am elyon (mpplus_dualcant.html).
         self.assertEqual("תחתון", options[0].text)
         self.assertEqual("עליון", options[1].text)
 

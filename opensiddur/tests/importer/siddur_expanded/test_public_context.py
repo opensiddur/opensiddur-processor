@@ -22,7 +22,7 @@ class TestPublicContext(unittest.TestCase):
     def compile(self, body, quorum):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp); (root/'fixture').mkdir()
-            (root/'fixture/index.xml').write_text(f'<root xmlns:tei="{T}" xmlns:j="{J}">{body}</root>')
+            (root/'fixture/index.xml').write_text(f'<root xmlns:tei="{T}" xmlns:j="{J}">{body}</root>',encoding='utf-8')
             reset_linear_data(); self.addCleanup(reset_linear_data)
             data=get_linear_data(); data.xml_cache.base_path=root
             CompilerProcessor.load_init_settings(data,yaml_to_declaration_entries({

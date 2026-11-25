@@ -209,7 +209,7 @@ The compiler uses a **processing context state machine** — see `specs/COMPILER
 - `jps1917/`: JPS 1917 Bible translation from Wikisource (MediaWiki → JLPTEI)
 - `birnbaum_siddur/`: Birnbaum ha-Siddur ha-Shalem, 1949, from three sources over one scan — Hebrew Wikisource (`wikisource.py`), English Wikisource (`en_wikisource.py`) and the Internet Archive's OCR (`internet_archive.py`), reconciled into `pages.json` by `correspondence.py` and sequenced by `download.py`
 - `wlc/`: Westminster Leningrad Codex (structured data → JLPTEI via XSLT)
-- `miqra_al_pi_hamasorah/`: Miqra al pi ha-Masorah (TSV/Wikidata → JLPTEI via XSLT)
+- `miqra_al_pi_hamasorah/`: Miqra al pi ha-Masorah (MAM-parsed plus JSON from MAM-basics → JLPTEI via XSLT)
 
 - `util/wikisource.py`, `util/wikisource_book.py`, `util/internet_archive.py`: shared, book-agnostic clients for the Action API and archive.org, and the per-page download/manifest loop above them. Both clients honour `Retry-After`, back off exponentially, pace serially and identify themselves with a reachable address.
 

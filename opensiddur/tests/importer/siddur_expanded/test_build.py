@@ -67,7 +67,7 @@ class TestExpandedBuild(unittest.TestCase):
             f'<tei:TEI xmlns:tei="{T}" xmlns:j="{J}"><tei:text><tei:body>'
             + ''.join(f'<tei:div corresp="{TEXT+urn}">{body}</tei:div>'
                       for urn, body in sources.items())
-            + '</tei:body></tei:text></tei:TEI>')
+            + '</tei:body></tei:text></tei:TEI>', encoding='utf-8')
         span = ReadingSpan(UNIT_ALIYAH, '1', VerseRef('genesis', 1, 1), VerseRef('genesis', 1, 5))
         entries = [Entry('morning_fixture', 'Morning fixture', SHABBAT, torah=[span],
                          haftarah=TEXT+'bible:haftarah/fixture'),

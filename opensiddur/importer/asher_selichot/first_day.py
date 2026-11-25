@@ -195,10 +195,10 @@ def documents(source):
     include_third_day = (source/'third-day.json').exists()
     additional_days = tuple(day for day in ['fourth','fifth','sixth','seventh'] if (source/(day+'-day.json')).exists())
     structure = source.parent/'poetry-structure.json'
-    poetry = json.loads(structure.read_text())['units'] if structure.exists() else {}
-    title_data = json.loads((source/'title-pages.json').read_text())
-    reading = json.loads((source/'first-day-opening.json').read_text())
-    continuation = json.loads((source/'first-day-continuation.json').read_text())['sections']
+    poetry = json.loads(structure.read_text(encoding="utf-8"))['units'] if structure.exists() else {}
+    title_data = json.loads((source/'title-pages.json').read_text(encoding="utf-8"))
+    reading = json.loads((source/'first-day-opening.json').read_text(encoding="utf-8"))
+    continuation = json.loads((source/'first-day-continuation.json').read_text(encoding="utf-8"))['sections']
     for lang in ['he','en']:
         project = project_name(lang)
         yield project, 'index.xml', entry(lang, project, title_data, book=True, include_second_day=include_second_day, include_third_day=include_third_day, additional_days=additional_days, include_erev=(source/'erev-rosh-hashanah.json').exists(), include_gedaliah=(source/'tzom-gedaliah.json').exists(), include_penitential_second=(source/'penitential-second-day.json').exists(), penitential_days=tuple(d for d in ['third','fourth','fifth'] if (source/('penitential-'+d+'-day.json')).exists()), include_erev_yom_kippur=(source/'erev-yom-kippur.json').exists(), remaining_services=tuple(d for d in ['monday-fast','thursday-fast','last-monday-fast','tenth-tevet','esther-fast','tammuz-fast','yom-kippur-katan','circumcision'] if (source/(d+'.json')).exists()))

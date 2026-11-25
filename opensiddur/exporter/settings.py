@@ -399,7 +399,7 @@ def read_settings(
     check_projects: bool = True,
 ) -> SettingsYaml:
     """ Read and validate a settings file, without loading it into linear data. """
-    with open(settings_file, 'r') as f:
+    with open(settings_file, 'r', encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return validate_settings(data, project_directory, resolve_fonts, check_projects)
 

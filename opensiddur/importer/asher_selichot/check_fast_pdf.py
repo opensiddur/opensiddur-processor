@@ -17,8 +17,8 @@ from opensiddur.common.constants import SOURCETEXTS_ROOT
 
 def check(tree, day, source_root=SOURCETEXTS_ROOT, expanded=False):
     source=Path(source_root)/'asher_selichot/scan_reading'
-    manifest=json.loads((source/(day+'.json')).read_text())
-    units=[json.loads((source/name).read_text())for name in manifest['readings']]
+    manifest=json.loads((source/(day+'.json')).read_text(encoding="utf-8"))
+    units=[json.loads((source/name).read_text(encoding="utf-8"))for name in manifest['readings']]
     poem=next(u for u in units if u['kind']=='pizmon')
     he,en,headings=glyph_rows(tree)
     if not headings:
@@ -89,8 +89,8 @@ def controls(tree,day,source_root,expanded):
     except ValueError:pass
     else:raise AssertionError('Missing fast footnote escaped detection')
     broken=copy.deepcopy(tree);shifted=0
-    manifest=json.loads((Path(source_root)/'asher_selichot/scan_reading'/(day+'.json')).read_text())
-    poem=next(u for name in manifest['readings'] if (u:=json.loads((Path(source_root)/'asher_selichot/scan_reading'/name).read_text()))['kind']=='pizmon')
+    manifest=json.loads((Path(source_root)/'asher_selichot/scan_reading'/(day+'.json')).read_text(encoding="utf-8"))
+    poem=next(u for name in manifest['readings'] if (u:=json.loads((Path(source_root)/'asher_selichot/scan_reading'/name).read_text(encoding="utf-8")))['kind']=='pizmon')
     needle=plain(' '.join(poem['stanzas'][1]['fragments'][0]['en']['text'].split()[:4]))
     _,rows,heads=glyph_rows(tree)
     target=next((page,y)for page,y,words in rows if needle in words and (page,y)>heads[-1])

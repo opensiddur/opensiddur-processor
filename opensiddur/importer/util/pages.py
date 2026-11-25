@@ -172,9 +172,9 @@ def miqra_al_pi_hamasorah_data_directory(sourcetexts_root: Path | None = None) -
     return root / "miqra_al_pi_hamasorah"
 
 
-def miqra_al_pi_hamasorah_sheets_directory(sourcetexts_root: Path | None = None) -> Path:
-    """Per-tab TSV files from the Google Sheet export."""
-    return miqra_al_pi_hamasorah_data_directory(sourcetexts_root) / "sheets"
+def miqra_al_pi_hamasorah_plus_directory(sourcetexts_root: Path | None = None) -> Path:
+    """MAM-parsed plus JSON files, one per book of the 24, from MAM-basics."""
+    return miqra_al_pi_hamasorah_data_directory(sourcetexts_root) / "plus"
 
 
 def feinstein_haggadah_data_directory(sourcetexts_root: Path | None = None) -> Path:

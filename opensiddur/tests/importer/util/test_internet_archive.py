@@ -26,6 +26,7 @@ from opensiddur.importer.util.internet_archive import (
     resolve_agent_model,
     slice_searchtext,
     user_agent,
+    write_if_changed,
 )
 
 IDENTIFIER = "SyntheticItem"
@@ -379,6 +380,31 @@ class ScandataTestCase(unittest.TestCase):
     def test_unparseable_scandata_is_rejected(self):
         with self.assertRaises(InternetArchiveError):
             leaf_count_from_scandata(self.write("<book>"))
+
+
+class WriteIfChangedTestCase(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.path = Path(self.directory.name) / "sub" / "he.json"
+
+    def test_writes_a_new_file_with_lf_endings(self):
+        self.assertTrue(write_if_changed(self.path, "א\nב\n"))
+        self.assertEqual("א\nב\n".encode("utf-8"), self.path.read_bytes())
+
+    def test_leaves_an_identical_file_alone(self):
+        self.path.parent.mkdir()
+        self.path.write_bytes("א\n".encode("utf-8"))
+        self.assertFalse(write_if_changed(self.path, "א\n"))
+
+    def test_rewrites_a_file_that_differs_only_in_crlf_endings(self):
+        # What a Windows checkout with core.autocrlf leaves on disk. Decoded as text it
+        # equals the new text, but its bytes, and so its SHA-256, do not.
+        self.path.parent.mkdir()
+        self.path.write_bytes("א\r\nב\r\n".encode("utf-8"))
+        self.assertTrue(write_if_changed(self.path, "א\nב\n"))
+        self.assertEqual("א\nב\n".encode("utf-8"), self.path.read_bytes())
+        self.assertFalse(write_if_changed(self.path, "א\nב\n"))
 
 
 if __name__ == "__main__":

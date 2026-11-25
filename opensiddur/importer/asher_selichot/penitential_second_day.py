@@ -51,8 +51,8 @@ def verify_compiled(tree):
 
 
 def readings(source):
-    manifest = json.loads((source/'penitential-second-day.json').read_text())
-    units = [json.loads((source/name).read_text()) for name in manifest['readings']]
+    manifest = json.loads((source/'penitential-second-day.json').read_text(encoding="utf-8"))
+    units = [json.loads((source/name).read_text(encoding="utf-8")) for name in manifest['readings']]
     if not manifest['complete'] or units[0]['id'] != 'opening_instruction' or units[-1]['id'] != 'conclusion':
         raise ValueError('second penitential day reading boundaries are incomplete')
     for lang,start in [('he',210),('en',211)]:
@@ -182,7 +182,7 @@ def documents(source):
 
 
 def verify_evidence(source,units):
-    records=json.loads((source.parent/'penitential-second-day-proofreading.json').read_text())['readings']
+    records=json.loads((source.parent/'penitential-second-day-proofreading.json').read_text(encoding="utf-8"))['readings']
     if [r['id'] for r in records]!=[u['id'] for u in units]:raise ValueError('Stale second penitential day proofreading scope')
     for r in records:
         for key,prefix in [('initial_sha256','initial/'),('assembled_sha256','assembled-first-pass/'),('working_sha256','')]:

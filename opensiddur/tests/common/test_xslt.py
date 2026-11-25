@@ -30,7 +30,7 @@ class TestXSLTTransformString(unittest.TestCase):
     <item>Hello World</item>
 </root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -55,7 +55,7 @@ class TestXSLTTransformString(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root><item>Test</item></root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -89,7 +89,7 @@ class TestXSLTTransformString(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root/>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -132,7 +132,7 @@ class TestXSLTTransformString(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root/>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -171,7 +171,7 @@ class TestXSLTTransformString(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root/>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -201,7 +201,7 @@ class TestXSLTTransformString(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root/>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -244,7 +244,7 @@ class TestXSLTTransformString(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root/>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(xslt_content)
             f.flush()
             xslt_file = Path(f.name)
@@ -279,8 +279,8 @@ class TestXSLTTransform(unittest.TestCase):
     <item>Test Content</item>
 </root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as xslt_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xml') as input_f, \
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as xslt_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete_on_close=False) as input_f, \
              tempfile.NamedTemporaryFile(mode='r', suffix='.xml', delete=False) as output_f:
             
             # Write XSLT and input files
@@ -291,6 +291,7 @@ class TestXSLTTransform(unittest.TestCase):
             input_f.flush()
             
             output_path = Path(output_f.name)
+            output_f.close()
             
             try:
                 # Perform transformation
@@ -323,8 +324,8 @@ class TestXSLTTransform(unittest.TestCase):
     <message>Stdout Test</message>
 </root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as xslt_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xml') as input_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as xslt_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete_on_close=False) as input_f:
             
             # Write XSLT and input files
             xslt_f.write(xslt_content)
@@ -377,8 +378,8 @@ class TestXSLTTransform(unittest.TestCase):
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <root>Test</root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as xslt_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xml') as input_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as xslt_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete_on_close=False) as input_f:
             
             xslt_f.write(xslt_content)
             xslt_f.flush()
@@ -406,8 +407,8 @@ class TestXSLTTransform(unittest.TestCase):
     <unclosed>
 </root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as xslt_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xml') as input_f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as xslt_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete_on_close=False) as input_f:
             
             xslt_f.write(xslt_content)
             xslt_f.flush()
@@ -437,8 +438,8 @@ class TestXSLTTransform(unittest.TestCase):
     <text>שלום עולם</text>
 </root>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', encoding='utf-8') as xslt_f, \
-             tempfile.NamedTemporaryFile(mode='w', suffix='.xml', encoding='utf-8') as input_f, \
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', encoding='utf-8', delete_on_close=False) as xslt_f, \
+             tempfile.NamedTemporaryFile(mode='w', suffix='.xml', encoding='utf-8', delete_on_close=False) as input_f, \
              tempfile.NamedTemporaryFile(mode='r', suffix='.xml', encoding='utf-8', delete=False) as output_f:
             
             # Write files
@@ -449,6 +450,7 @@ class TestXSLTTransform(unittest.TestCase):
             input_f.flush()
             
             output_path = Path(output_f.name)
+            output_f.close()
             
             try:
                 # Perform transformation

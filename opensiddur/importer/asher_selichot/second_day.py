@@ -83,7 +83,7 @@ def pizmon(lang, project, reading, refrain):
 
 def conclusion(parent, source, day_name="second"):
     """Transclude the closing prayers without importing a first-day heading/context."""
-    closing = json.loads((source/'first-day-continuation.json').read_text())['sections']['closing']
+    closing = json.loads((source/'first-day-continuation.json').read_text(encoding="utf-8"))['sections']['closing']
     for group in closing:
         if group['id']=='reader_kaddish':continue
         if group['kind']=='rubric':
@@ -101,7 +101,7 @@ def conclusion(parent, source, day_name="second"):
 
 def numbered_documents(source, day_name):
     day_urn = 'urn:x-opensiddur:text:siddur:selichot/'+day_name+'_day'
-    data = json.loads((source/(day_name+'-day.json')).read_text())
+    data = json.loads((source/(day_name+'-day.json')).read_text(encoding="utf-8"))
     for lang in ['he','en']:
         project = project_name(lang)
         root, text = document(lang, project, data['heading'][lang], day_urn)
@@ -144,7 +144,7 @@ def verify_numbered_readings(source, project_directory, day_name):
     from opensiddur.importer.scan.reverse import streams, check
     normalize = lambda value: ' '.join(unicodedata.normalize('NFKD', value).split())
     day_urn = 'urn:x-opensiddur:text:siddur:selichot/'+day_name+'_day'
-    data = json.loads((source/(day_name+'-day.json')).read_text())
+    data = json.loads((source/(day_name+'-day.json')).read_text(encoding="utf-8"))
     for lang in ['he', 'en']:
         project = project_directory/project_name(lang)
         root = etree.parse(str(project/(day_name+'_day.xml'))).getroot()
@@ -179,7 +179,7 @@ def verify_numbered_readings(source, project_directory, day_name):
                         if [n.get('target') for n in unit.findall('{http://jewishliturgy.org/ns/jlptei/2}transclude')] != [spelled_urn(t) for t in expected_targets]:
                             raise ValueError('Numbered-day referenced prayer range changed')
                     else:
-                        closing = json.loads((source/'first-day-continuation.json').read_text())['sections']['closing']
+                        closing = json.loads((source/'first-day-continuation.json').read_text(encoding="utf-8"))['sections']['closing']
                         expected_targets = []
                         for group in closing:
                             if group['id'] == 'reader_kaddish':continue
