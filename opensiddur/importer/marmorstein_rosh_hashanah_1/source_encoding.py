@@ -149,8 +149,31 @@ def apply_source_encoding(root, unit, lang):
     config = unit.get('source_encoding', {}).get(lang, {})
     _keys(config, {'interpretations', 'reference_terminators_outside_container',
                   'remove_prayer_footnote_marker', 'commentary_pages',
-                  'bibliography_page_range', 'continuous_quotation_chapter'})
+                  'bibliography_page_range', 'continuous_quotation_chapter', 'divine_names'})
     _interpretations(root, unit, config.get('interpretations', []))
+    names = config.get('divine_names', [])
+    if not isinstance(names, list) or any(not isinstance(name, str) or not name.strip()
+                                          for name in names):
+        raise ValueError('Configured Divine Names must be nonempty source strings')
+    body = root.find('.//{'+T+'}body')
+    for name in names:
+        matches = [(node, slot) for node in body.iter() for slot in ('text', 'tail')
+                   if name in (getattr(node, slot) or '')
+                   and not any(ancestor.tag == '{'+J+'}divineName'
+                               for ancestor in ([node] if slot == 'text' else [])
+                               + list(node.iterancestors()))]
+        node, slot = _one(matches, 'Configured Divine Name')
+        value = getattr(node, slot)
+        if value.count(name) != 1:
+            raise ValueError('Configured Divine Name is ambiguous')
+        before, _, after = value.partition(name)
+        marked = etree.Element('{'+J+'}divineName')
+        marked.text, marked.tail = name, after
+        setattr(node, slot, before)
+        if slot == 'text':
+            node.insert(0, marked)
+        else:
+            node.addnext(marked)
     if 'reference_terminators_outside_container' in config:
         if type(config['reference_terminators_outside_container']) is not bool:
             raise ValueError('Reference terminator flag must be a boolean')

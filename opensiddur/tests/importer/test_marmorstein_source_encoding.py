@@ -69,6 +69,22 @@ class SourceEncodingTests(unittest.TestCase):
     def words(self, root):
         return ' '.join(''.join(root.find('.//{'+b.TEI+'}body').itertext()).split())
 
+    def test_explicit_divine_name_marks_only_the_reviewed_source_span(self):
+        unit = self.unit()
+        unit['languages']['he'] = [{'paragraph': 1, 'fragments': [
+            {'scan': 's1', 'printed_page': '1', 'text': 'ברוך ה׳ אחד'}]}]
+        unit['source_encoding']['he'] = {'divine_names': ['ה׳']}
+        document = b.unit_document(unit, 'he', True)
+        names = document.xpath('//j:divineName', namespaces={'j': 'http://jewishliturgy.org/ns/jlptei/2'})
+        self.assertEqual([node.text for node in names], ['ה׳'])
+        self.assertEqual(self.words(document), 'ברוך ה׳ אחד')
+        unit['languages']['he'][0]['fragments'][0]['text'] += ' ה׳'
+        with self.assertRaisesRegex(ValueError, 'ambiguous'):
+            b.unit_document(unit, 'he', True)
+        unit['source_encoding']['he']['divine_names'] = ['']
+        with self.assertRaisesRegex(ValueError, 'nonempty'):
+            b.unit_document(unit, 'he', True)
+
     def test_outer_omission_does_not_swallow_next_stanza(self):
         document = b.unit_document(self.unit(), 'he', True)
         result = self.compile(document, {OUTER: False, INNER: True})
