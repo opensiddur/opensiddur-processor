@@ -75,6 +75,9 @@ def source_notes(parent, readings, *, description=False):
     if len(readings) == 2 and len({r['language'] for r in readings}) == 2:
         note = element(parent, 'note', type='description' if description or any(
             r.get('role') for r in readings) else 'instruction')
+        roles = {r.get('role') for r in readings}
+        if len(roles) == 1 and None not in roles:
+            note.set('corresp', 'urn:x-opensiddur:instruction:role/'+roles.pop())
         for reading in readings:
             temporary = etree.Element(f'{{{TEI}}}div')
             source = source_note(temporary, reading, description=description)
@@ -108,9 +111,15 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
             source_notes(parent, readings_for(item, lang, expanded),
                          description=item.get('rubric_kind') == 'description')
         elif kind == 'direction':
-            container = (element(element(parent, 'div'), 'p')
-                         if expanded and item.get('separate_heading') else parent)
-            source_notes(container, readings_for(item, lang, expanded), description=expanded)
+            if expanded and item.get('separate_heading'):
+                container = element(parent, 'div')
+                for reading in readings_for(item, lang, expanded):
+                    heading = element(container, 'head', reading['text'])
+                    heading.set(XML+'lang', reading['language'])
+                    if 'scan_page' in reading:
+                        heading.set('facs', page_image_url(IDENTIFIER, reading['scan_page']-1))
+            else:
+                source_notes(parent, readings_for(item, lang, expanded), description=expanded)
             if expanded:
                 for target in item['targets']:
                     element(parent, 'j:transclude', type='external', target=target)
@@ -264,6 +273,36 @@ def documentary_documents(recipe, units, lang):
     return root, service
 
 
+def dependency_provenance(root, *, separate_intro=False):
+    """Expose the existing donor facsimile within whole and partial text ranges."""
+    div = root.find(f'{{{TEI}}}text/{{{TEI}}}body/{{{TEI}}}div')
+    if div is None or not div.get('facs'):
+        raise ValueError('Dependency needs an existing source facsimile')
+    attributes = {'ed': '1965', 'facs': div.get('facs')}
+    scope = root.find(f'.//{{{TEI}}}biblScope[@unit="pages"]')
+    if scope is not None and scope.get('from') == scope.get('to'):
+        attributes['n'] = scope.get('from')
+    if not len(div) or div[0].tag != f'{{{TEI}}}pb':
+        div.insert(0, etree.Element(f'{{{TEI}}}pb', **attributes))
+    for milestone in div.findall(f'.//{{{TEI}}}milestone'):
+        if milestone.get('corresp', '').endswith(('/yehe_shelama', '/oseh_shalom')):
+            following = milestone.getnext()
+            if following is None or following.tag != f'{{{TEI}}}pb':
+                following = etree.Element(f'{{{TEI}}}pb', **attributes)
+                milestone.addnext(following)
+            if following.get('facs') == attributes['facs'] and milestone.tail:
+                following.tail = milestone.tail + (following.tail or '')
+                milestone.tail = None
+    if separate_intro:
+        for note in list(div.findall(f'{{{TEI}}}note')):
+            position = div.index(note)
+            div.remove(note)
+            paragraph = etree.Element(f'{{{TEI}}}p')
+            paragraph.append(note)
+            div.insert(position, paragraph)
+    return root
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-root', type=Path, default=SOURCETEXTS_ROOT)
@@ -314,6 +353,12 @@ def main(argv=None):
     targets.append((expanded_path.parent/'second_night.xml', root))
     targets.append((expanded_path.parent/'kaddish_titqabbal.xml',
                     titqabbal_document(args.project_directory, recipe['titqabbal_source_sha256'])))
+    for filename, hashes in recipe.get('dependency_provenance_sha256', {}).items():
+        donor = args.project_directory/FIRST_DAY/filename
+        if hashlib.sha256(donor.read_bytes()).hexdigest() not in hashes:
+            raise ValueError('Stale dependency provenance input: '+filename)
+        targets.append((donor, dependency_provenance(
+            etree.parse(str(donor)).getroot(), separate_intro=filename == 'yigdal.xml')))
     for target in write_documents(targets, validator=validate):
         print(target)
     return 0

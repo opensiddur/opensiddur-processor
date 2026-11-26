@@ -3,7 +3,7 @@ import unittest
 from lxml import etree
 
 from opensiddur.importer.marmorstein_rosh_hashanah_2.evening import (
-    documentary_documents, render_sequence, settings,
+    dependency_provenance, documentary_documents, render_sequence, settings,
 )
 
 NS = {'t': 'http://www.tei-c.org/ns/1.0', 'j': 'http://jewishliturgy.org/ns/jlptei/2'}
@@ -17,6 +17,19 @@ class EveningSequenceTests(unittest.TestCase):
 
     def render(self, sequence, *, lang='he', expanded=False):
         render_sequence(self.root, sequence, lang, expanded=expanded, units=self.units)
+
+    def test_dependency_marker_precedes_range_words_and_is_idempotent(self):
+        root = etree.fromstring('''<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>
+          <div facs="https://scan.example/leaf"><p><milestone unit="prayer-part"
+          corresp="urn:x-opensiddur:text:prayer:kaddish/yatom/yehe_shelama"/>Range words</p>
+          </div></body></text></TEI>''')
+        dependency_provenance(root)
+        marker = root.xpath('//t:milestone', namespaces=NS)[0]
+        self.assertIsNone(marker.tail)
+        self.assertEqual(marker.getnext().tail, 'Range words')
+        before = etree.tostring(root)
+        dependency_provenance(root)
+        self.assertEqual(etree.tostring(root), before)
 
     def test_missing_documentary_translation_has_no_placeholder_but_expansion_shares_order(self):
         sequence = [{'kind': 'module', 'file': 'invented'}]
@@ -36,11 +49,11 @@ class EveningSequenceTests(unittest.TestCase):
         self.assertTrue(all(p.get('corresp').endswith('/reader') for p in phrases))
         self.assertEqual(phrases[0].xpath('string(t:choice/t:abbr)', namespaces=NS), 'ח׳')
 
-    def test_expanded_heading_direction_is_a_separate_structural_paragraph(self):
+    def test_expanded_heading_direction_is_a_structural_heading(self):
         self.render([{'kind': 'direction', 'separate_heading': True,
                       'readings': {'he': {'text': 'Heading', 'language': 'he'}},
                       'targets': ['urn:x-opensiddur:text:poem:invented']}], expanded=True)
-        self.assertEqual(len(self.root.xpath('t:div/t:p/t:note', namespaces=NS)), 1)
+        self.assertEqual(self.root.xpath('string(t:div/t:head)', namespaces=NS), 'Heading')
         self.assertEqual(etree.QName(self.root[1]).localname, 'transclude')
 
     def test_motzaei_scope_stops_before_following_blessing(self):
