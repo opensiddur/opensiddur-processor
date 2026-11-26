@@ -278,3 +278,12 @@ specification and source records retain their detailed evidence and exceptions.
 - Verify merge state, update the continuing checkout, and refresh the accepted
   artifact manifest before closeout. Use the managed archive operation and
   report remaining limitations without reopening settled source readings.
+
+### Citation marker attachment
+
+Inspect the position of every note marker beside its intended text anchor,
+including full-width RTL paragraphs. Correct numbering and note order alone
+do not prove attachment. When the default interlinear placement drifts, test
+the existing `typography.notes.anchor: superscript` setting and independently
+review the rebuilt configured outputs before accepting them. Record the chosen
+book setting and preserve the rejected-output evidence.

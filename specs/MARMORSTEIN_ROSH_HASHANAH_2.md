@@ -159,3 +159,14 @@ artifacts unchanged. Bind the renamed publication URNs, bibliography pointers an
 new index entry points through an independent equivalence review before claiming
 that the migrated presentation is accepted. The scans5–24 batch covers תפלה and
 the complete second-night evening service through Aleinu.
+
+## Documentary citation markers
+
+Use `typography.notes.anchor: superscript` in this volume's documentary output
+profiles. In the Deuteronomy11:13–21 Hebrew excerpt, the default zero-width
+interlinear marker drifted away from its text anchor. The supported superscript
+setting keeps the marker attached; the four remaining-Shema Hebrew/parallel
+PDF/HTML excerpts passed independent presentation review with this setting.
+This is a configured-output decision, not a change to the exporter default.
+The source record `batches/maariv_s5_s24/shema_remaining_presentation_review.json`
+binds the reviewed outputs; its excerpt approval does not accept complete scans.
