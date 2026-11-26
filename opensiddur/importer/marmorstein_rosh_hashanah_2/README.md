@@ -49,3 +49,18 @@ inputs by hash. This command writes only named excerpt modules, never index.xml;
 it removes a previously generated counterpart if its recipe now records an absent
 translation, after all current documents validate. These draft modules do not
 accept a complete scan or add words to the documentary/expanded service.
+
+Complete ranges within a biblical chapter use a separate hash-bound recipe:
+
+```bash
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers \
+  --draft --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project \
+  --recipe batches/maariv_s5_s24/scripture_ranges.json
+```
+
+Each witness supplies its actual verse identities and page breaks. A page break
+can occur inside different verses in the two languages; its surrounding text
+controls spacing, including a Hebrew maqaf join. A missing translated verse stays
+absent. Range documents expose exact verse milestones, retain initial facsimile
+provenance, and do not advertise a complete chapter or fabricate printed citations.

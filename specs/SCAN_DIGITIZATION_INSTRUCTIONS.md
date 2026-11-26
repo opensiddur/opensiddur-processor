@@ -194,6 +194,9 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Check a canonical range's opening provenance as well as internal page breaks:
   its source page marker may live on a documentary heading outside the selected
   range. Do not reset backlink state at every file to conceal that problem.
+  An ancestor's facs alone can be lost during extraction. Preserve the opening
+  source on each reusable verse span, and probe an interior verse after a page
+  break separately in each language.
 - Keep related subsections under a structural parent for bookmarks, contents
   and electronic navigation. Editorial wrappers need proper credit; preserve
   source headings and canonical text identities inside them.

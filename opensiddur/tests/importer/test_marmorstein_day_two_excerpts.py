@@ -1,5 +1,6 @@
 """Draft excerpt invariants with invented text and source inputs."""
 import hashlib
+import copy
 import json
 from pathlib import Path
 import tempfile
@@ -95,6 +96,99 @@ class ExcerptTests(unittest.TestCase):
         self.recipe['input_sha256'] = {}
         with self.assertRaisesRegex(ValueError, 'at least one source input'):
             self.run_builder()
+
+    def test_range_keeps_language_page_boundaries_inside_their_own_verses(self):
+        unit = self.recipe['units'][0]
+        unit['urn'] = 'urn:x-opensiddur:text:bible:psalms/7/2-/7/3'
+        del unit['verse']
+        del unit['verse_urn']
+        for lang, scan, printed_end, contents in [
+            ('he', 23, '10', [['אב־', {'page_break': {
+                'scan_page': 25, 'printed_page': '10'}}, 'גד'], ['הו']]),
+            ('en', 24, '11', [['An opening.'], ['Tell ', {'page_break': {
+                'scan_page': 28, 'printed_page': '11'}}, 'it.']]),
+        ]:
+            unit[lang] = {'scan_page': scan, 'printed_page': '9',
+                          'printed_page_end': printed_end, 'verses': [
+                              {'verse': str(number),
+                               'verse_urn': f'urn:x-opensiddur:text:bible:psalms/7/{number}',
+                               'content': content}
+                              for number, content in zip([2, 3], contents)]}
+        alternate = self.source/'ranges.json'
+        alternate.write_text(json.dumps(self.recipe), encoding='utf-8')
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            main(['--draft', '--source-root', str(self.base/'sources'),
+                  '--project-directory', str(self.base/'projects'), '--recipe', 'ranges.json'])
+        docs = [etree.parse(str(self.base/'projects'/PROJECTS[lang]/'invented_prayer.xml'))
+                for lang in ['he', 'en']]
+        for doc in docs:
+            self.assertEqual(doc.xpath('//t:body/t:div/@corresp', namespaces=NS), [])
+            self.assertEqual(doc.xpath('//t:milestone[@unit="chapter"]/@corresp', namespaces=NS), [])
+            self.assertEqual(doc.xpath('//t:milestone[@unit="verse"]/@corresp', namespaces=NS),
+                             ['urn:x-opensiddur:text:bible:psalms/7/2',
+                              'urn:x-opensiddur:text:bible:psalms/7/3'])
+            self.assertEqual(doc.xpath('//t:note', namespaces=NS), [])
+        self.assertEqual(docs[0].xpath('string(//t:body//t:p)', namespaces=NS), 'אב־גד הו')
+        self.assertEqual(docs[1].xpath('string(//t:body//t:p)', namespaces=NS), 'An opening. Tell it.')
+        for doc, verse, leaf, last_page in [(docs[0], '2', 'n24', '10'),
+                                           (docs[1], '3', 'n27', '11')]:
+            self.assertEqual(doc.xpath('string(//t:seg[t:pb]/@source)', namespaces=NS),
+                             f'urn:x-opensiddur:text:bible:psalms/7/{verse}')
+            self.assertIn(leaf, doc.xpath('string(//t:seg/t:pb/@facs)', namespaces=NS))
+            self.assertEqual(doc.xpath('string(//t:biblScope/@to)', namespaces=NS), last_page)
+        self.assertIn('n22', docs[0].xpath('string((//t:body//t:seg)[1]/@facs)', namespaces=NS))
+        self.assertIn('n24', docs[0].xpath('string((//t:body//t:seg)[2]/@facs)', namespaces=NS))
+        self.assertIn('n23', docs[1].xpath('string((//t:body//t:seg)[2]/@facs)', namespaces=NS))
+
+    def test_verse_beginning_after_page_break_retains_new_source(self):
+        unit = self.recipe['units'][0]
+        unit['he']['verses'] = [{
+            'verse': '2', 'verse_urn': unit['verse_urn'],
+            'content': [' ', {'page_break': {'scan_page': 25, 'printed_page': '10'}},
+                        '', {'page_break': {'scan_page': 27, 'printed_page': '11'}}, 'אב']}]
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        doc = etree.parse(str(self.base/'projects'/PROJECTS['he']/'invented_prayer.xml'))
+        self.assertIn('n26', doc.xpath('string(//t:body//t:seg/@facs)', namespaces=NS))
+        self.assertEqual(len(doc.xpath('//t:body//t:seg/t:pb', namespaces=NS)), 2)
+
+    def test_invalid_ranges_cannot_remove_or_replace_any_witness(self):
+        original = copy.deepcopy(self.recipe)
+        for failure in ['empty', 'duplicate', 'bad_page']:
+            with self.subTest(failure=failure):
+                self.recipe = copy.deepcopy(original)
+                unit = self.recipe['units'][0]
+                verse = {'verse': '2', 'verse_urn': unit['verse_urn'], 'content': ['אב']}
+                unit['he']['verses'] = [verse]
+                if failure == 'empty':
+                    unit['he']['verses'] = []
+                elif failure == 'duplicate':
+                    unit['he']['verses'].append(copy.deepcopy(verse))
+                else:
+                    verse['content'].append({'page_break': {
+                        'scan_page': 0, 'printed_page': '10'}})
+                stale = self.base/'projects'/PROJECTS['en']/'invented_prayer.xml'
+                stale.write_text('Retain existing witness', encoding='utf-8')
+                with self.assertRaises(ValueError):
+                    self.run_builder()
+                self.assertEqual(stale.read_text(encoding='utf-8'), 'Retain existing witness')
+                self.assertFalse((self.base/'projects'/PROJECTS['he']/'invented_prayer.xml').exists())
+
+    def test_partial_range_translation_does_not_invent_a_missing_verse(self):
+        unit = self.recipe['units'][0]
+        verses = [{'verse': str(n), 'verse_urn': f'urn:x-opensiddur:text:bible:psalms/7/{n}',
+                   'content': [f'Invented verse {n}.']} for n in [2, 3]]
+        unit['he']['verses'] = verses
+        unit['en'] = {'scan_page': 24, 'printed_page': '9', 'verses': [verses[1]]}
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        english = etree.parse(str(self.base/'projects'/PROJECTS['en']/'invented_prayer.xml'))
+        self.assertEqual(english.xpath('//t:milestone[@unit="verse"]/@corresp', namespaces=NS),
+                         ['urn:x-opensiddur:text:bible:psalms/7/3'])
+        self.assertEqual(english.xpath('string(//t:body//t:seg)', namespaces=NS), 'Invented verse 3.')
 
     def test_schema_failure_does_not_remove_missing_counterpart(self):
         path = self.base/'projects'/PROJECTS['en']/'invented_prayer.xml'
