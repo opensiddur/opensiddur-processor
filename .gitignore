@@ -31,4 +31,5 @@ output/
 dist/
 
 # Generated db
-database/.ruff_cache/
+database/
+.ruff_cache/
