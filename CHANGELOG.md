@@ -7,6 +7,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-26
+
+**Highlights.** Three Metsudah works are imported from Sefaria, aligned phrase by phrase with the
+texts already in the corpus: the weekday siddur, the Shabbat siddur and the Selichot (#307).
+Heidenheim–Marmorstein's Rosh ha-Shanah, volume I, is digitized from its scans, with an
+expanded maḥzor built on it (#296). Page breaks of scanned editions link to the scans of their
+pages, and the electronic book can show a scan beside the text (#303). The humash prints each
+festival reading's aliyot in the order read, and the maftir of Shabbat Chol HaMoed Sukkot by
+the day and the place. Miqra al pi ha-Masorah is imported from MAM-parsed plus. Many layout
+faults in the printed and electronic books are fixed, among them parallel columns and line
+numbers under TeX Live 2024. The package runs on Windows, and ruff runs in CI.
+
+Some URNs are renamed, with no aliases (see *Changed*); settings and texts that use them must
+be updated.
+
+### Added
+- **The maftir of Shabbat Chol HaMoed Sukkot by the day.** The humash printed all five of
+  hebcal's maftirs for that Shabbat whatever a volume declared. Each is now printed with its own
+  citation under a condition on the day of Sukkot (`opensiddur:holiday` `sukkot`) and on
+  `opensiddur:israel`, following hebcal's numbering of the days of Chol HaMoed: the first
+  maftir is read on the third day of Sukkot in the Diaspora and on the second in Israel. A
+  volume that declares a date and a location prints only that Shabbat's maftir. One that
+  declares no location, with or without a date, still prints all five, each headed with its
+  day, since the day of a festival is derived only for a place.
+- **A scan viewer in the electronic book.** With `electronic.scan_viewer`
+  (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
+  book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
+  panned (drag, arrow keys). The reader can switch layouts, and the book remembers the choice.
+  Archive.org and Wikisource scans are shown as images; HebrewBooks pages as their one-page PDF.
+- Schema validation, the reference-database sync and URN reference validation log their
+  progress to stderr: how many files or projects are done, the time elapsed and an estimate of
+  the time left, at most every 15 seconds. A slow step in the projects check no longer looks
+  the same as a hung one.
+- **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)
+  at each page break of a scanned source edition. The symbol links to the scan of that page.
+  It goes in the line or in the margin, in the PDF and in the electronic book. Where an edition
+  prints a text in several places and marks a page break for each, only the page breaks of
+  the printing the book uses are linked.
+- The JPS 1917 importer links each page break to its page of the Wikisource scan.
+- **The Metsudah siddurim and Selichot, from Sefaria** (#307). `opensiddur.importer.sefaria`
+  downloads a work from Sefaria, divides it into texts, and aligns its Hebrew and English phrase
+  by phrase (the `metsudah:` phrase namespace). A text that the corpus already has (from
+  Birnbaum, Asher or opensiddur.org) gets that text's URN. Calendar rubrics and inline
+  alternatives become conditions from a curated table. Alignment decisions are recorded, so a
+  rerun repeats them, and a monthly update brings a work up to date with Sefaria's text. There
+  are three works so far: the weekday siddur (#308), the Shabbat siddur, Sefard (#314), and
+  the Selichot, Nusach Lita, matched to Asher's Selichoth (#317).
+- **Heidenheim–Marmorstein's Rosh ha-Shanah, volume I**, digitized from its scans, and an
+  expanded maḥzor composed from it with the other editions (#296, `specs/MARMORSTEIN_ROSH_HASHANAH_1.md`).
+  The exporter gained what the volume needed: scripture-backed liturgical units, full printed
+  Divine Names, audience conditions, occurrence-specific source corrections, combined speaker
+  roles, and sparse bilingual ranges with refrain spans. `specs/SCAN_DIGITIZATION_INSTRUCTIONS.md`
+  records what the digitization taught (#330).
+- TEI character highlights are rendered in the PDF and the electronic book (#298).
+- Edition-qualified text references in exports link to their targets (#301).
+- `ruff check` runs in CI (#339). Its rules are E4, E7, E9, F, B, I, UP and PLE, the same as
+  opensiddur-infra (#342).
+- `AGENTS.md` documents the contributor conventions (#321).
+
+### Changed
+- **Renamed URNs.** Before 1.0 a renamed URN replaces the old one outright, with no alias:
+  - `prayer:hallel/yehalelukha` is `prayer:hallel/yehallelukha`, which doubles the dagesh
+    hazak as the transliteration table does (#335).
+  - `prayer:eruv_tavshilin/blessing` is `prayer:eruv/blessing`: one blessing is said over every
+    kind of eruv (#314).
+  - A text that Metsudah shares with an opensiddur.org post or with Birnbaum has one URN, with
+    no author in it, for example `prayer:kegavna` and `poem:azammer_bishvachin`. Zemirot are
+    `poem:` texts, and the three Atkinu texts are parts of `prayer:atqinu_seudata` (#314).
+  - In Asher's Selichoth, `prayer:dirshu_adonai_behimmatzeo` is now
+    `prayer:dirshu_adonai_behimmatzo`, and El Erekh Appayim Attah is
+    `prayer:el_erekh_appayim_attah`, a separate text from `prayer:el_erekh_appayim`. A text Asher
+    prints twice in different words (Adon Din, Adon Befaqdekha, the fast-day Yisrael Nosha) is
+    one URN with an `opensiddur:variant` for the later printing (#317).
+- **Miqra al pi ha-Masorah comes from MAM-parsed plus**, the JSON files of MAM-basics
+  (`MAM-parsed/plus/*.json`, pinned to a commit), instead of the TSV export of MAM's frozen
+  Google Sheet. `download` fetches them and MAM's `LICENSE.md` and records the commit in its
+  manifest; `convert` (formerly `convert_tsv`) walks the parsed templates with a closed dispatch
+  that rejects an unknown template; the humash reads its aliyot from the same files.
+  When GitHub rate-limits it, `download` waits as asked, at most a minute at a time; a
+  longer wait fails at once, saying when to try again. `convert` converts every book
+  before it writes any, so that a missing book or a rejected template stops it before anything
+  is written and `--only-book` writes the same file as a full run. `convert --check` reads and
+  converts the whole download without writing anything, for use after moving the pin. From the
+  same text the output is unchanged except that every file's source note (`tei:sourceDesc`)
+  names MAM-parsed plus instead of the Google Sheet, that the index also names the commit and
+  quotes MAM's credit to its editors and its attributions instead of the sheet's README tab,
+  and that words the wikitext front
+  end garbled are as MAM has them: the speaker headings of Job and the title of Proverbs 10:1,
+  the spaces documented in Deuteronomy 23:8, Ezra 2:69 and Nehemiah 3:2, 3:10 and 7:68, the
+  accents of the ten words with geresh or gershayim and telisha gedola, the inverted nuns of
+  Psalms 107, כׇּ֥ל in Psalms 35:10 and Proverbs 19:7, and the sheva of ירושלמה. Six qere-only
+  words in documented passages, which had become Wikisource links, are words again, and the
+  other 11 ketiv-only and qere-only forms have MAM's one pair of parentheses or brackets
+  instead of three. Deuteronomy 11:21's scroll-difference note is now marked before the sof
+  pasuq. With its title restored, Proverbs 10:1 carries the ole-we-yored of שְׁלֹ֫מֹ֥ה, so like
+  the WLC's it is no longer divided into half-verses (`proverbs/10/1/a` and `/b`): in the poetic
+  books a verse with ole-we-yored is not divided at the etnachta. `openpyxl` is no longer a
+  dependency. The sourcetexts commit that adds the download
+  needs the `.gitattributes` line `sources/miqra_al_pi_hamasorah/** -text`, since `download`
+  and `convert` compare the files byte for byte.
+
 ### Fixed
 - Parallel two-column PDFs keep their columns in order and their line numbers in the outer
   margins under TeX Live 2024 (Debian trixie). There the right column's language switch did
@@ -65,56 +166,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before it was placed inside the note. No part declared today is in a book's last verse. A
   document that ends inside `tei:text` now raises `ValueError` instead of being read to its
   end.
-
-### Added
-- **The maftir of Shabbat Chol HaMoed Sukkot by the day.** The humash printed all five of
-  hebcal's maftirs for that Shabbat whatever a volume declared. Each is now printed with its own
-  citation under a condition on the day of Sukkot (`opensiddur:holiday` `sukkot`) and on
-  `opensiddur:israel`, following hebcal's numbering of the days of Chol HaMoed: the first
-  maftir is read on the third day of Sukkot in the Diaspora and on the second in Israel. A
-  volume that declares a date and a location prints only that Shabbat's maftir. One that
-  declares no location, with or without a date, still prints all five, each headed with its
-  day, since the day of a festival is derived only for a place.
-- **A scan viewer in the electronic book.** With `electronic.scan_viewer`
-  (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
-  book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
-  panned (drag, arrow keys). The reader can switch layouts, and the book remembers the choice.
-  Archive.org and Wikisource scans are shown as images; HebrewBooks pages as their one-page PDF.
-- Schema validation, the reference-database sync and URN reference validation log their
-  progress to stderr: how many files or projects are done, the time elapsed and an estimate of
-  the time left, at most every 15 seconds. A slow step in the projects check no longer looks
-  the same as a hung one.
-
-### Changed
-- **Miqra al pi ha-Masorah comes from MAM-parsed plus**, the JSON files of MAM-basics
-  (`MAM-parsed/plus/*.json`, pinned to a commit), instead of the TSV export of MAM's frozen
-  Google Sheet. `download` fetches them and MAM's `LICENSE.md` and records the commit in its
-  manifest; `convert` (formerly `convert_tsv`) walks the parsed templates with a closed dispatch
-  that rejects an unknown template; the humash reads its aliyot from the same files.
-  When GitHub rate-limits it, `download` waits as asked, at most a minute at a time; a
-  longer wait fails at once, saying when to try again. `convert` converts every book
-  before it writes any, so that a missing book or a rejected template stops it before anything
-  is written and `--only-book` writes the same file as a full run. `convert --check` reads and
-  converts the whole download without writing anything, for use after moving the pin. From the
-  same text the output is unchanged except that every file's source note (`tei:sourceDesc`)
-  names MAM-parsed plus instead of the Google Sheet, that the index also names the commit and
-  quotes MAM's credit to its editors and its attributions instead of the sheet's README tab,
-  and that words the wikitext front
-  end garbled are as MAM has them: the speaker headings of Job and the title of Proverbs 10:1,
-  the spaces documented in Deuteronomy 23:8, Ezra 2:69 and Nehemiah 3:2, 3:10 and 7:68, the
-  accents of the ten words with geresh or gershayim and telisha gedola, the inverted nuns of
-  Psalms 107, כׇּ֥ל in Psalms 35:10 and Proverbs 19:7, and the sheva of ירושלמה. Six qere-only
-  words in documented passages, which had become Wikisource links, are words again, and the
-  other 11 ketiv-only and qere-only forms have MAM's one pair of parentheses or brackets
-  instead of three. Deuteronomy 11:21's scroll-difference note is now marked before the sof
-  pasuq. With its title restored, Proverbs 10:1 carries the ole-we-yored of שְׁלֹ֫מֹ֥ה, so like
-  the WLC's it is no longer divided into half-verses (`proverbs/10/1/a` and `/b`): in the poetic
-  books a verse with ole-we-yored is not divided at the etnachta. `openpyxl` is no longer a
-  dependency. The sourcetexts commit that adds the download
-  needs the `.gitattributes` line `sources/miqra_al_pi_hamasorah/** -text`, since `download`
-  and `convert` compare the files byte for byte.
-
-### Fixed
 - The monthly Sefaria update (`opensiddur.importer.sefaria.update`) no longer stops with a
   traceback when Sefaria's new text makes a misprint correction or an alignment decision stale.
   Such a leaf is reported for review, under its own heading, and its work is not converted. If a
@@ -142,14 +193,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   3,606 verses, all but 23 of them in Psalms, Proverbs and Job, begin their second half one
   word earlier (46 of them two words earlier), and 15 verses, in which line breaks joined every
   word of the second half to the last word of the first, are divided where they were not.
+- Printed book layout:
+  - Parallel PDFs: column flow, heading direction and note placement (#297). Running-head
+    marks no longer displace parallel lines.
+  - Rubric overflow, overlapping note marks, actor cues kept with their prayer, conditional
+    separator rules on their own lines, and anchored notes kept beside their text (#310).
+  - Paragraph, heading and apparatus boundaries. A standalone rubric in the other language is
+    set in its own paragraph direction (#318).
+  - PDF page anchors stay distinct across folio resets (#332).
+  - Scan-link margins are placed at shipout, and a bilingual rubric shared by both columns is
+    set across them with its characters in order (#344).
+- Rubrics and text in both exports:
+  - When a rubric's edition wins the instruction selection, its local wording is kept.
+    Run-in rubric labels are separated from the words after them (#313), and so are copied
+    parallel rubrics (#315).
+  - Divine Name tags survive inline transclusion (#312).
+  - A named alternate wording is selected at the scope where it is declared (#311).
+  - Unrelated transclusions are kept out of parallel text pairs (#309).
+  - Marker mode omits poetry line shells before a range (#300). Empty optional poetry lines
+    and the spacing around omissions are suppressed (#324).
+  - Long source identifiers wrap in electronic colophons (#310).
+- Source page markers survive empty parallel fragments, and reference validation accepts an
+  optional edition page destination that is absent (#301). Scan links within visible source
+  rubrics are kept (#327).
 
-### Added
-- **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)
-  at each page break of a scanned source edition. The symbol links to the scan of that page.
-  It goes in the line or in the margin, in the PDF and in the electronic book. Where an edition
-  prints a text in several places and marks a page break for each, only the page breaks of
-  the printing the book uses are linked.
-- The JPS 1917 importer links each page break to its page of the Wikisource scan.
+### Pinned sources
+
+- `opensiddur-projects`: d854d7c86eac05ca78aef1a7b0ebf0d9ad403a54
+- `sourcetexts`: c7a7be01582fd054219daa5428febeb367a53bb5
 
 ## [0.7.0] - 2026-11-08
 
