@@ -38,6 +38,10 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Images settle readings. OCR, familiar prayer wording and other editions are
   discovery aids, not substitutes for reading the page. Preserve pointing,
   abbreviations, punctuation, defective spelling, language and source order.
+- Preflight generated snippets before sending them for review. Fully decode
+  image files before parallel cropping, or use independent decoded images;
+  shared lazy decoders can corrupt crops. Inspect representative crops and
+  their upper/lower margins, and exclude failed image preparations from approval.
 - Preserve immutable independent readings even after adjudication. Encode clear
   source mistakes with `tei:choice/tei:sic` and `tei:corr`, retaining the printed
   reading and an evidenced correction. Do not silently modernize archaic forms.
@@ -140,6 +144,13 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Persist answers against their question IDs and exact occurrences immediately.
   Consult that record before asking again. A corrected answer supersedes its
   earlier value without erasing the history.
+- When applying a reading, bind the occurrence to its verse or surrounding words
+  as well as its word index. A search for a bare word can skip an earlier
+  maqaf-linked occurrence and silently select a later one. Verify the indexed
+  context against the source crop before recording the application.
+- Give read-only reviewers the exact paths of adjudication records and complete,
+  tightly enlarged source crops. Do not rely on directory discovery or assume a
+  full-page image will display large enough to distinguish fine marks.
 - For defective Jerusalem with two vowels under lamed, encode the source patah
   or qamatz, then meteg U+05BD, CGJ U+034F, hiriq U+05B4. If a printed yod carries
   the hiriq, encode lamed + its vowel/meteg, then yod + hiriq, without that CGJ.
