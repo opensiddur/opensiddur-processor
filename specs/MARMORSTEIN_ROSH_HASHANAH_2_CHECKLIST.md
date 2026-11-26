@@ -167,3 +167,21 @@ presentation review are still required; accepted coverage remains4/385.
 
 The source batch checklist is the current gate status and acceptance record.
 Historical counts and pending gates above describe their earlier checkpoints.
+
+
+## Morning installment: scans25–45
+
+- [x] Complete hash-bound primary and independent readings and adjudication.
+- [x] Encode103 documentary witnesses across62 source units; preserve missing
+      translations and legitimate source variants.
+- [x] Reuse canonical identities through selected shared printings; preserve
+      earlier Night gaps and apply the separately reviewed eight-mark amendment.
+- [x] Build documentary and expanded morning sequences; verify27 combinations
+      of rite, gender and Shabbat settings and correct German study-block order.
+- [x] Validate current XML, names, features, registry and shipped profiles;
+      independently review generators and actual compiled content.
+- [x] Integrate merged exporter PR347 and retain its closeout evidence.
+
+Final PDF/HTML and complete-scan acceptance are recorded in the source batch
+checklist and hash-bound acceptance record, not inferred from generation or these
+implementation milestones. Next material begins at scan46 after that gate closes.

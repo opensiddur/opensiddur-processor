@@ -5,8 +5,11 @@ Each page batch must complete its source, encoding, order and presentation gates
 before acceptance is recorded and the next batch begins.
 
 Current acceptance is recorded in the source repository's `progress.json` and
-`batches/maariv_s5_s24/checklist.json`. The opening implementation covers scans
-1–24 of 385; scan 25 begins morning material. Startup checkpoints below are historical.
+the active per-batch checklist. The morning installment covers scans25–45 of385,
+through the study passages before Barukh She-amar, with documentary source
+printings and one expanded recitation sequence. Its final acceptance record is
+`batches/morning_s25_s45/acceptance.json` when all gates have closed. Startup
+checkpoints below are historical.
 
 ## Scope and source
 
