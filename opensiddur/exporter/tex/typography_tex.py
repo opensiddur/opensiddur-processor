@@ -907,7 +907,7 @@ def _parallel_section(config: TypographyConfig, has_parallel: bool) -> list[str]
         rf"\columnsposition{{{_COLUMN_POSITIONS[parallel.column_position]}}}",
         # Match reledpar's actual column positioning and separator glue.
         r"\makeatletter",
-        r"\newcommand{\OSBilingualRubric}[2]{\leavevmode\hbox dir TLT to \textwidth{"
+        r"\newcommand{\OSBilingualRubric}[2]{\noindent\hbox dir TLT to \textwidth{"
         r"\ifdefstring{\columns@position}{L}{}{\hfill}"
         r"\parbox[t]{\Lcolwidth}{#1}\print@columnseparator"
         r"\parbox[t]{\Rcolwidth}{#2}"

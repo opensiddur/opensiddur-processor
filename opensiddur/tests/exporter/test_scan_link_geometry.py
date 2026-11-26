@@ -152,20 +152,30 @@ class TestScanLinkGeometry(unittest.TestCase):
                 self.assertFalse(link.overlaps(number), f"{link} is set on {number}")
 
     def test_shared_bilingual_rubric_typesets_above_matching_columns(self):
-        note = ('<tei:note type="description"><tei:foreign xml:lang="he">חזן</tei:foreign>'
+        note = ('<tei:note type="description"><tei:foreign xml:lang="de-Hebr">חזן:</tei:foreign>'
                 '<tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>')
         xml = _PARALLEL.replace('<tei:body>', '<tei:body>' + note)
         for position in ['left', 'center', 'right']:
-            with self.subTest(position=position):
-                links, words, log = self._margin(
-                    xml, parallel={"layout": "pairs", "column_position": position})
-                self.assertNotIn('! LaTeX Error:', log)
-                self.assertEqual(len(links), 2)
-                reader = next(w for w in words if w.text == 'Reader')
-                hebrew = next(w for w in words if any('א' <= c <= 'ת' for c in w.text))
-                first_english = next(w for w in words if w.text.startswith('word'))
-                self.assertLess(hebrew.x1, reader.x0)
-                self.assertAlmostEqual(reader.x0, first_english.x0, delta=1)
+            for order in ['primary_first', 'primary_last']:
+                with self.subTest(position=position, order=order):
+                    ordered = xml.replace('primary_first', order)
+                    links, words, log = self._margin(
+                        ordered, parallel={"layout": "pairs", "column_position": position},
+                        paragraphs={"indent": "12pt"})
+                    self.assertNotIn('! LaTeX Error:', log)
+                    self.assertEqual(len(links), 2)
+                    reader = next(w for w in words if w.text == 'Reader')
+                    def same_row(word):
+                        return not (word.y1 <= reader.y0 or word.y0 >= reader.y1)
+                    label_hebrew = [w for w in words if same_row(w)
+                                    and any('א' <= c <= 'ת' for c in w.text)]
+                    body_hebrew = [w for w in words if not same_row(w)
+                                   and any('א' <= c <= 'ת' for c in w.text)]
+                    body_english = [w for w in words if w.text.startswith('word')]
+                    label_edge = max(w.x1 for w in label_hebrew)
+                    self.assertEqual(label_edge < reader.x0, order == 'primary_first')
+                    self.assertAlmostEqual(label_edge, max(w.x1 for w in body_hebrew), delta=1)
+                    self.assertAlmostEqual(reader.x0, min(w.x0 for w in body_english), delta=1)
 
     def test_a_hebrew_text_has_its_links_in_the_margin(self):
         links, words, log = self._margin(_SINGLE)
