@@ -93,9 +93,9 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
 
 - [x] Batch B scope: scans5–24, תפלה and full second-night Maariv through Aleinu;
       scan25 begins morning material. Twenty images and overlapping bands cached.
-- [ ] Finish primary reading/comparison of batch B. All20 primary drafts saved before consulting their
-      corresponding blind readings; full Claude Opus5.5 medium response preserved.
-      Fine-mark adjudication, encoding and remaining gates are pending.
+- [x] Finish primary reading/comparison of all20 source pages in batch B; preserve
+      independent blind readings, dedicated reader evidence and user adjudications.
+      The source gate is closed; encoding, service and export gates remain pending.
 - [x] Close the independently reviewed project-separation equivalence record for
       the user-approved volume-two project pair. Historical four-scan source
       acceptance remains; migrated presentation approved after fixing counterpart
@@ -133,10 +133,8 @@ Complete accepted scans remain **4/385**. Excerpt approval and complete source
 readings do not change that count while service, encoding or presentation gates
 for a complete scan remain open.
 
-The complete source5–24 image audit and application verification are complete
-except the initial small rubric mark on scan16 (question977). All other source
-readings are independently approved, including opening5–7. Hashkivenu and half
-Kaddish have independent source/encoding/alignment approval, including local
-Aramaic paragraph language; their exports and service/seasonal audit remain open.
-The progress ledger records23 approved source readings among scans1–24 separately
-from the unchanged4/385 complete accepted scans.
+The complete source5–24 image audit, adjudication and application verification
+are approved with no unresolved reading questions. User977 confirmed patah under
+alef in the small scan16 rubric. The source ledger now records24 approved source
+readings among scans1–24, separately from4/385 complete accepted scans. Remaining
+encoding, service/conditional/expanded order and export gates remain open.
