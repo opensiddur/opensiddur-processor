@@ -2004,3 +2004,12 @@ class ExpandedEditionPinTest(unittest.TestCase):
         self.assertEqual(len(EXPANDED_EDITION_PINS), 2)
         for target in EXPANDED_EDITION_PINS:
             self.assertEqual(expanded_reference({'target': target}), {'target': target})
+
+    def test_the_expanded_order_writes_references_without_a_pin(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import expanded_order
+        parent = etree.Element('{http://www.tei-c.org/ns/1.0}div')
+        expanded_order(parent, [
+            {'reference': {'target': 'urn:x-opensiddur:text:prayer:hamotzi@hasiddur_hashalem-birnbaum-1949-he'}},
+        ], {}, {})
+        targets = [e.get('target') for e in parent.iter('{http://jewishliturgy.org/ns/jlptei/2}transclude')]
+        self.assertEqual(targets, ['urn:x-opensiddur:text:prayer:hamotzi'])

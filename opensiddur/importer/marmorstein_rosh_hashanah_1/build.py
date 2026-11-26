@@ -946,8 +946,10 @@ def transclude_unit(parent, unit, readings, *, project=None, documentary=False):
 # The expanded mahzor leaves the edition of each prayer to the volume's transclusion priorities.
 # These two are the exceptions: both are said outside the Ten Days of Repentance (the weekday
 # Minchah before the festival, and Kabbalat Shabbat's Mourner's Kaddish outside the Ten Days),
-# and the edition the volume prefers, Heidenheim, prints only the Ten Days Kaddish. Pinned, they
-# take Birnbaum's calendar-responsive wording, and no festival English fills their translation.
+# and the edition the volume prefers, Heidenheim, prints only the Ten Days Kaddish: its Half
+# Kaddish is gated to the Ten Days and its Mourner's Kaddish has their wording. Pinned, they take
+# Birnbaum's calendar-responsive wording. (A pin decides only the Hebrew: the parallel English is
+# looked up by the URN alone.)
 EXPANDED_EDITION_PINS = frozenset({
     'urn:x-opensiddur:text:prayer:kaddish/chatzi@hasiddur_hashalem-birnbaum-1949-he',
     'urn:x-opensiddur:text:prayer:kaddish/yatom@hasiddur_hashalem-birnbaum-1949-he',

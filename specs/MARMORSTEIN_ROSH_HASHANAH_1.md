@@ -361,8 +361,10 @@ are reused. Pure Bible excerpts remain free of occurrence conditions. Shabbat
 and minyan guards belong to service order; the printed fixed Ten Days Kaddish
 witness carries its own calendar scope. Preparatory Elul 29 Kaddish remains
 bound to the compatible Birnbaum Hebrew dependency, whose component references
-are now self-qualified. This prevents festival English from filling an absent
-preparatory translation and retains Birnbaum’s calendar-responsive wording.
+are now self-qualified. This retains Birnbaum’s calendar-responsive wording.
+(The pin decides only the Hebrew: the parallel English is looked up by the URN
+alone, and none is set there because the festival English Half Kaddish carries
+its own Ten Days scope.)
 
 The literal חזן label lies before the first prayer-part milestone. Instructions
 use semantic types without rend attributes. Partial chapter context does not
