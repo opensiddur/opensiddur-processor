@@ -84,8 +84,10 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
       day-two URNs resolve in both projects. Synthetic tests:26 passed,14 subtests.
 - [x] Generate and inspect both front-matter PDF/HTML variants and all four scan links;
       test paratext omission and prove preservation of original index content.
-- [ ] Obtain independent presentation review and close all blocking findings.
-- [ ] Freeze accepted payload/artifact hashes and mark the four leaves accepted.
+- [x] Obtain independent presentation review and close all blocking findings;
+      preserve its explicitly accepted nonblocking presentation limitations.
+- [x] Freeze source, layout, index, generated XML, PDF/HTML, screenshot and log hashes;
+      mark scans1–4 accepted (4/385).
 
 ## Next and final work
 

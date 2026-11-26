@@ -4,6 +4,9 @@ Track execution in the [working checklist](MARMORSTEIN_ROSH_HASHANAH_2_CHECKLIST
 Each page batch must complete its source, encoding, order and presentation gates
 before acceptance is recorded and the next batch begins.
 
+**Current acceptance: scans1–4, 4/385 complete scans.** All front-matter batch gates
+are closed; the next batch begins at scan5. Startup checkpoints below are historical.
+
 ## Scope and source
 
 Continue issue [214](https://github.com/opensiddur/opensiddur-processor/issues/214)

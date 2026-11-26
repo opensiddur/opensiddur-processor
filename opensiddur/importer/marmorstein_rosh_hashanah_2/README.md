@@ -5,7 +5,8 @@ Read `specs/SCAN_DIGITIZATION_INSTRUCTIONS.md` and
 
 The startup imports the complete 385-leaf inventory and OCR candidates, caches
 images separately, and builds **draft front matter only**. It does not yet
-assemble the service, provide second-day export settings, or claim acceptance.
+assemble the service, provide second-day export settings, or claim full-volume acceptance. Scans1–4 have completed their separate batch acceptance;
+the remaining381 scans are unaccepted.
 The Hebrew cover emblem and title signature were settled by user adjudications860–861. The blind
 review's omissions and effort-report discrepancy are recorded in source evidence.
 
