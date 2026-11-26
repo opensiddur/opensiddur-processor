@@ -1842,12 +1842,14 @@ def _opened_by_full_stop(found: dict[tuple[int, int], str], places: list[tuple[t
     return kept
 
 
-def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[tuple[int, int], str]:
+def scripture_verses(block: TextBlock, index: IncipitIndex, urn: str | None = None) -> dict[tuple[int, int], str]:
     """The verses of scripture a text quotes, by the place each opens (:func:`verse_places`):
     (phrase position, segment) -> ``bible:`` verse URN. A verse is found at a place that opens
     like it (six words, confirmed over its collected opening, as :func:`lookup` confirms); a
     half-verse found first is its verse when it is the first half, and a run of verses found
-    first its first verse."""
+    first its first verse. Of verses worded alike, the one after the verse found before is
+    taken, or else the one in the chapter of ``urn``, the text's own, where it is scripture."""
+    chapter = _chapter_of(urn) if urn else None
     places = verse_places(block)
     place_words = [words(text) for _, text in places]
     found: dict[tuple[int, int], str] = {}
@@ -1873,6 +1875,24 @@ def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[tuple[int, i
                 # first verse: the verse found here.
                 urn = urn.rsplit("/", 1)[0] + "/" + path[2].split("-", 1)[0]
             verses.add(urn)
+        if len(verses) > 1 and found:
+            # Verses worded alike (Exodus 20:9 and Deuteronomy 5:13): the one after the verse before.
+            verses &= {_following_verse(list(found.values())[-1])}
+        if len(verses) > 1 and chapter:
+            verses = {verse for verse in verses if _chapter_of(verse) == chapter}
         if len(verses) == 1:
             found[places[start][0]] = verses.pop()
     return _opened_by_full_stop(found, places, index)
+
+
+def _chapter_of(urn: str) -> str | None:
+    """The chapter of a ``bible:`` chapter, verse or run of verses (``bible:exodus/20/8-11`` ->
+    ``bible:exodus/20``), or None."""
+    namespace, path = _namespace_and_path(urn)
+    return urn.rsplit("/", len(path) - 2)[0] if namespace == "bible" and len(path) >= 2 else None
+
+
+def _following_verse(urn: str) -> str:
+    """The verse after ``urn`` in its chapter (``bible:exodus/20/8`` -> ``bible:exodus/20/9``)."""
+    head, _, number = urn.rpartition("/")
+    return f"{head}/{int(number) + 1}" if number.isdigit() else urn

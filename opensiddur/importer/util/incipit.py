@@ -144,6 +144,10 @@ class IncipitIndex:
     #: Texts whose scope is a milestone inside another text's words (a verse Ashrei quotes),
     #: rather than a division of their own.
     milestone_scoped: set[str] = field(default_factory=set)
+    #: A verse's own words as a Bible holds them, where a prayer book that words it otherwise
+    #: (Tachanun's אל תפן אל קשינו for Deuteronomy 9:27's אל קשי העם הזה) was read first.
+    #: Texts are still found by their first holding's opening.
+    bible_words: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
     def included(self, urn: str) -> set[str]:
         """Every text ``urn`` transcludes, and every text those transclude."""
@@ -165,7 +169,10 @@ class IncipitIndex:
         return self.closing_of.get(urn, ())
 
     def own_opening(self, urn: str) -> tuple[str, ...]:
-        """The collected opening, without the words past the text's end."""
+        """The collected opening, without the words past the text's end: a verse's, as the Bible
+        holds it."""
+        if urn in self.bible_words:
+            return self.bible_words[urn]
         opening = self.incipit_of.get(urn, ())
         length = self.length_of.get(urn)
         return opening if length is None else opening[:length]
@@ -254,7 +261,8 @@ class IncipitIndex:
                 "closing_of": {urn: list(words) for urn, words in sorted(self.closing_of.items())},
                 "ends_with": dict(sorted(self.ends_with.items())),
                 "includes": {urn: sorted(targets) for urn, targets in sorted(self.includes.items())},
-                "milestone_scoped": sorted(self.milestone_scoped)}
+                "milestone_scoped": sorted(self.milestone_scoped),
+                "bible_words": {urn: list(words) for urn, words in sorted(self.bible_words.items())}}
 
     @classmethod
     def from_json(cls, data: dict) -> "IncipitIndex":
@@ -271,17 +279,20 @@ class IncipitIndex:
         index.includes = ({urn: set(targets) for urn, targets in data.get("includes", {}).items()}
                           if "incipits" in data else {})
         index.milestone_scoped = set(data.get("milestone_scoped", ())) if "incipits" in data else set()
+        index.bible_words = {urn: tuple(words) for urn, words in data.get("bible_words", {}).items()}
         index.open_with_parts()
         return index
 
 
-def index_document(index: IncipitIndex, root: etree._Element) -> None:
+def index_document(index: IncipitIndex, root: etree._Element, bible: bool = False) -> None:
     """Add the opening words of each ``@corresp`` scope in one document.
 
     A scope's opening is collected past its end, up to :data:`COLLECTED_WORDS`, so that a
     short part is still found by the words around it; how many of them are its own -- where
     the scope ends first: its element's end, or the next milestone of its unit -- is recorded
-    in :attr:`IncipitIndex.length_of`.
+    in :attr:`IncipitIndex.length_of`. A ``bible`` document (a Bible's) decides the words and the
+    length of the verses it holds (:attr:`IncipitIndex.bible_words`), wherever a prayer that
+    quotes one is read first.
     """
     # Each scope being collected: its URN, the words so far, how many of them are its own
     # (None while it is open), and what ends it: an element, or a milestone unit.
@@ -292,7 +303,16 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
         if urn in index.incipit_of:
             # The first holding of a text decides its length, long or short: a later document
             # that quotes part of it (Kiddush Levana's half of Exodus 15:16, after Birnbaum's Az
-            # Yashir holds it whole) does not shorten it.
+            # Yashir holds it whole) does not shorten it. A Bible decides a verse's own words and
+            # length, though the verse is still found by the first holding's opening.
+            if bible and urn.startswith(TEXT_PREFIX + "bible:"):
+                verse = tuple(collected[:COLLECTED_WORDS if own is None else own])
+                if len(verse) >= SHORT_INCIPIT_WORDS and verse != index.own_opening(urn):
+                    index.bible_words[urn] = verse
+                if own is None:
+                    index.length_of.pop(urn, None)
+                else:
+                    index.length_of[urn] = own
             return
         index.add(urn, collected)
         if own is not None and urn not in index.length_of:
@@ -393,15 +413,23 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
             feed(element.tail)
             return
         local = etree.QName(element).localname
-        if local in ("teiHeader", "standOff", "note"):
+        if local in ("teiHeader", "standOff", "note", "written"):
+            # (a ketiv is not said: a prayer book prints the qere, j:read)
             end_word()
             feed(element.tail)
             return
+        if bible and local == "option" and any(isinstance(before.tag, str) and etree.QName(before).localname == "option"
+                                               for before in element.itersiblings(preceding=True)):
+            # A Bible's options are one text accented two ways (Miqra al pi ha-Masorah's upper and
+            # lower cantillation of the Decalogue): its words are the first's.
+            feed(element.tail)
+            return
         if (local in BOUNDARY_ELEMENTS or element.get("corresp", "").startswith(TEXT_PREFIX)
-                or (len(element) == 0 and not element.text)):
+                or (len(element) == 0 and not element.text and not (bible and local == "anchor"))):
             # An empty element (a note's anchor, a page break) stands between words, though
             # some sources set it with no space; only an element with words in it
-            # (j:divineName) can be inside one.
+            # (j:divineName) can be inside one. A Bible's note anchors mark a letter, inside a
+            # word (the WLC's שֵׁ֣֤<tei:anchor/>שֶׁת).
             end_word()
         if local == "transclude":
             transclusion(element.get("target", ""))
@@ -465,14 +493,8 @@ def project_language(project: Path) -> str:
     return etree.parse(str(index_file)).getroot().get("{http://www.w3.org/XML/1998/namespace}lang", "")
 
 
-#: Projects that are their texts' own source, read before the rest: the first holding of a text
-#: decides its length, and a verse's length is the Bible's, not a prayer's that quotes it.
-SOURCE_PROJECTS = ("tanakh-",)
-
-
-def reading_order(project: Path) -> tuple[bool, str]:
-    """Source projects first, then the rest by name."""
-    return (not project.name.startswith(SOURCE_PROJECTS), project.name)
+#: The Bible's projects: a verse's length is theirs, not that of a prayer that quotes it.
+BIBLE_PROJECTS = ("tanakh-",)
 
 
 def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
@@ -481,13 +503,14 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
     (an importer leaves out its own projects, which are not evidence of themselves)."""
     index = IncipitIndex()
     excluded = {Path(p) for p in exclude}
-    for project in sorted((p for p in project_directory.iterdir() if p.is_dir()), key=reading_order):
+    for project in sorted(p for p in project_directory.iterdir() if p.is_dir()):
         if project in excluded:
             continue
         if project_language(project).split("-")[0] not in HEBREW_LANGUAGES:
             continue
         for xml_file in sorted(project.glob("*.xml")):
-            index_document(index, etree.parse(str(xml_file)).getroot())
+            index_document(index, etree.parse(str(xml_file)).getroot(),
+                           bible=project.name.startswith(BIBLE_PROJECTS))
     index.open_with_parts()
     return index
 
@@ -503,7 +526,8 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #: 8: a word split across elements is one word; a prefixed divine name keeps its prefix; a
 #:    paseq separates words.
 #: 9: a text's first holding decides its length, though a later one holds it shorter.
-#: 10: the Bible's projects are read first, so a verse's length is the Bible's.
+#: 10: a verse's own words and length are the Bible's; a ketiv is not indexed; a Bible's note
+#:     anchors do not end words, and only the first of its options is read.
 INDEX_VERSION = 10
 
 

@@ -194,7 +194,7 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             if record.kind not in ("existing", "new"):
                 continue
             found: dict[tuple[int, int], str] = {}
-            for place, urn in sorted(scripture_verses(block, index).items()):
+            for place, urn in sorted(scripture_verses(block, index, record.urn).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
                 if urn not in marked:  # a verse repeated, even within one text, is marked once

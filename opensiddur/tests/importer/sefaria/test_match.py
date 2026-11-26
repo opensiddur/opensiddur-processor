@@ -546,6 +546,24 @@ class TestScriptureVerses(unittest.TestCase):
         self.assertEqual(scripture_verses(block, index), {(0, 0): T + "bible:exodus/31/17"})
 
 
+    def test_of_verses_worded_alike_the_one_after_the_verse_before_is_found(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        eighth = "זָכוֹר אֶת יוֹם הַשַּׁבָּת לְקַדְּשׁוֹ"
+        ninth = "שֵׁשֶׁת יָמִים תַּעֲבֹד וְעָשִׂיתָ כָּל מְלַאכְתֶּךָ"
+        index = IncipitIndex()
+        index.add(T + "bible:exodus/20/8", words(f"{eighth} {ninth}"))
+        index.add(T + "bible:exodus/20/9", words(ninth))
+        index.add(T + "bible:deuteronomy/5/13", words(ninth))
+        (block,) = [i for i in items(f"<b>זָכוֹר</b> {eighth.split(' ', 1)[1]}:", f"{ninth}:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index),
+                         {(0, 0): T + "bible:exodus/20/8", (1, 0): T + "bible:exodus/20/9"})
+        # ... with no verse before, neither is, unless the text is scripture of the one's chapter
+        (alone,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן", f"{ninth}:") if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(alone, index), {})
+        self.assertEqual(scripture_verses(alone, index, T + "bible:exodus/20/8-11"), {(1, 0): T + "bible:exodus/20/9"})
+
+
 class TestMint(unittest.TestCase):
     def test_a_blessing_is_named_after_its_formulas(self):
         text = "בָּרוּךְ אַתָּה יְהֹוָה אֱלֹהֵֽינוּ מֶֽלֶךְ הָעוֹלָם אֲשֶׁר קִדְּשָֽׁנוּ בְּמִצְוֹתָיו וְצִוָּֽנוּ עַל מִצְוַת צִיצִית"
