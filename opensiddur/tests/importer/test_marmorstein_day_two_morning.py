@@ -4,9 +4,11 @@ import unittest
 from lxml import etree
 
 from opensiddur.importer.marmorstein_rosh_hashanah_2.morning import (
+    MORNING_URN,
     XML,
     T,
     conditional,
+    documentary_documents,
     instruction,
     transclude,
 )
@@ -25,6 +27,24 @@ class TestMorningServiceHelpers(unittest.TestCase):
         node=conditional(parent,'selected','shabbat',label={'he':'בשבת','en':'On Shabbat'})
         self.assertEqual([etree.QName(n).localname for n in node],['note','all'])
         self.assertEqual([n.get(XML+'lang')for n in node[0]],['he','en'])
+
+    def test_unpaired_tallit_ending_precedes_shared_prayer_boundary(self):
+        root=etree.Element(T+'TEI')
+        entry=etree.SubElement(etree.SubElement(etree.SubElement(root,T+'text'),T+'body'),T+'div')
+        tallit=etree.SubElement(entry,T+'div')
+        tallit.set(XML+'id','morning_tallit')
+        etree.SubElement(tallit,T+'p').text='untranslated ending'
+        for key in ['preliminaries','blessings']:
+            node=etree.SubElement(entry,T+'div')
+            node.set(XML+'id','morning_'+key)
+            etree.SubElement(node,T+'head').text=key
+        etree.SubElement(entry,'{http://jewishliturgy.org/ns/jlptei/2}endDeclare',target='#morning_printings')
+        result,service=documentary_documents(root,'en')
+        self.assertIs(result,root)
+        self.assertIs(entry[0],tallit)
+        self.assertEqual(entry[1].get('target'),MORNING_URN+'/prayers@prayerbook_for_the_new_year_second_day-marmorstein-1965-en')
+        self.assertEqual(etree.QName(entry[2]).localname,'endDeclare')
+        self.assertEqual([n.get(XML+'id') for n in service.findall('.//'+T+'body/'+T+'div/'+T+'div')],['morning_preliminaries','morning_blessings'])
 
     def test_printed_page_number_is_not_retained_as_navigation_text(self):
         parent=etree.Element(T+'div')

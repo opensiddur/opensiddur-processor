@@ -234,6 +234,27 @@ def sequence_document(plan, units, shared, features, lang, *, expanded=False, ex
     return root
 
 
+def documentary_documents(root, lang):
+    """Flush the unpaired tallit ending before the paired Prayers heading."""
+    urn = MORNING_URN+'/prayers'
+    service, body = witness_header(lang, PROJECTS[lang],
+                                  'תפלות' if lang == 'he' else 'Prayers', urn, draft=True)
+    target = element(body, 'div', corresp=urn)
+    entry = root.find('.//'+T+'body/'+T+'div')
+    groups = [node for node in entry if node.get(XML+'id') in
+              ('morning_preliminaries', 'morning_blessings')]
+    if len(groups) != 2:
+        raise ValueError('Morning documentary service needs both prayer sections')
+    position = list(entry).index(groups[0])
+    for group in groups:
+        entry.remove(group)
+        target.append(group)
+    call = transclude(entry, urn, project=PROJECTS[lang])
+    entry.remove(call)
+    entry.insert(position, call)
+    return root, service
+
+
 def write_profiles(settings_directory):
     """Keep book profiles reproducible after the earlier evening build stage."""
     he = settings_directory/PROJECTS['he']
@@ -268,7 +289,11 @@ def main(argv=None):
     shared=json.loads((batch/'shared_printings.json').read_text())
     features=json.loads((batch/'shared_features.json').read_text())
     index=etree.parse(str(args.project_directory/EXPANDED/'index.xml')).getroot()
-    documents=[(args.project_directory/PROJECTS[lang]/'morning.xml',sequence_document(plan,units,shared,features,lang))for lang in ('he','en')]
+    documents = []
+    for lang in ('he', 'en'):
+        root, service = documentary_documents(sequence_document(plan, units, shared, features, lang), lang)
+        documents.extend([(args.project_directory/PROJECTS[lang]/'morning.xml', root),
+                          (args.project_directory/PROJECTS[lang]/'morning_prayers_service.xml', service)])
     documents.append((args.project_directory/EXPANDED/'second_day_morning.xml',sequence_document(plan,units,shared,features,'he',expanded=True,expanded_index=index)))
     for project in PROJECTS.values():
         path=args.project_directory/project/'index.xml'
