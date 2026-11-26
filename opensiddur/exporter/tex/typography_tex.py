@@ -24,6 +24,7 @@ nothing else. A macro the stylesheet relies on is therefore *defined* here, with
 from __future__ import annotations
 
 from opensiddur.exporter.tex.escape import escape_tex
+from opensiddur.exporter.tex.scan_links import MARGIN_PLACEMENT_LUA
 from opensiddur.exporter.typography import (
     HEBREW_FAMILY,
     LATIN_FAMILY,
@@ -977,14 +978,22 @@ def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[s
                   else "1em")
     lines += [
         r"\usepackage{zref-savepos}",
+        r"\usepackage{zref-abspage}",
+        r"\directlua{" + MARGIN_PLACEMENT_LUA + "}",
         r"\makeatletter",
         # The number of the page a place is on, as the output routine reads it to choose
         # the odd or even margins (and reledmac, inner from outer): the page counter at
         # shipout, not the absolute page, since a title page restarts the counter.
         r"\zref@newprop{OSScanLinkPage}[1]{\number\c@page}",
         r"\zref@addprop{savepos}{OSScanLinkPage}",
+        r"\zref@addprop{savepos}{abspage}",
+        r"\newbox\OSScanLink@measure",
+        r"\newdimen\OSScanLink@collisionX",
+        r"\newdimen\OSScanLink@collisionY",
         r"\newcount\OSScanLink@serial",
         r"\newdimen\OSScanLink@edge",
+        r"\newdimen\OSScanLink@top",
+        r"\newdimen\OSScanLink@bottom",
         rf"\newcommand{{\OSScanLinkSep}}{{{separation}}}",
         r"\newif\ifOSScanLink@left",
         # left | right | inner | outer, on the page \OSScanLink@page; inner and outer as
@@ -1010,11 +1019,26 @@ def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[s
         r"  \ifodd\OSScanLink@page\relax\advance\OSScanLink@edge\oddsidemargin",
         r"  \else\advance\OSScanLink@edge\evensidemargin\fi",
         r"  \ifOSScanLink@left\else\advance\OSScanLink@edge\textwidth\fi",
+        r"  \OSScanLink@top=\dimexpr\paperheight-1in-\voffset-\topmargin-\headheight-\headsep\relax",
+        r"  \OSScanLink@bottom=\dimexpr\OSScanLink@top-\textheight-\maxdepth\relax",
+        # Place symbols independently of the body, preserving wrapping on every pass.
+        # Two source boundaries on one output line must remain separately clickable.
+        r"  \setbox\OSScanLink@measure=\hbox dir TLT{\OSScanLinkStyle{\OSScanLinkSymbol}}%",
+        r"  \directlua{local dx,dy=OSScanLinks.place("
+        r"\zref@extractdefault{\OSScanLink@label}{abspage}{0},"
+        r"\number\OSScanLink@edge,\zposy{\OSScanLink@label},"
+        r"\ifOSScanLink@left true\else false\fi,"
+        r"\number\paperwidth,\number\paperheight,"
+        r"\number\wd\OSScanLink@measure,\number\ht\OSScanLink@measure,"
+        r"\number\dp\OSScanLink@measure,"
+        r"\number\dimexpr\OSScanLinkSep\relax,\number\dimexpr4pt\relax,\number\OSScanLink@bottom,\number\OSScanLink@top);"
+        r'tex.setdimen("OSScanLink@collisionX",dx);'
+        r'tex.setdimen("OSScanLink@collisionY",dy)}%',
         # Laid out left to right whatever the text's direction, so the kern goes right.
         r"  \hbox dir TLT to \z@{\kern\dimexpr\OSScanLink@edge"
         r"-\zposx{\OSScanLink@label}sp\relax",
-        r"    \ifOSScanLink@left\llap{\OSScanLink{#1}\kern\OSScanLinkSep}%",
-        r"    \else\rlap{\kern\OSScanLinkSep\OSScanLink{#1}}\fi\hss}}",
+        r"    \ifOSScanLink@left\llap{\raisebox{\OSScanLink@collisionY}[0pt][0pt]{\hbox{\OSScanLink{#1}}}\kern\dimexpr\OSScanLinkSep+\OSScanLink@collisionX\relax}%",
+        r"    \else\rlap{\kern\dimexpr\OSScanLinkSep+\OSScanLink@collisionX\relax\raisebox{\OSScanLink@collisionY}[0pt][0pt]{\hbox{\OSScanLink{#1}}}}\fi\hss}}",
         r"\makeatother",
     ]
     return lines

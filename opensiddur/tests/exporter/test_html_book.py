@@ -1260,11 +1260,12 @@ class TestScanLinkCss(unittest.TestCase):
 
     def test_margin_is_kept_inside_the_row_and_only_on_wide_screens(self):
         css = self._css(placement="margin")
-        margin = css[css.index("@media (min-width: 40.001rem) { .os-book"):]
+        margin = css[css.index("@media (min-width: 40.001rem) { @supports (float: inline-start) { .os-book"):]
         self.assertIn(".par { padding-inline: 1.6rem; }", margin)
         self.assertIn(".col { position: relative; --scan-link-offset: -1.6rem; }", margin)
-        self.assertIn(".scan-link-margin { position: absolute; "
-                      "inset-inline-start: var(--scan-link-offset); }", margin)
+        self.assertIn(".scan-link-margin { float: inline-start; clear: inline-start; width: 1em; ", margin)
+        self.assertIn("margin-inline-start: var(--scan-link-offset); ", margin)
+        self.assertIn("margin-inline-end: calc(-1em - var(--scan-link-offset)); }", margin)
 
 
 class TestRunInRubricTextSpace(unittest.TestCase):
