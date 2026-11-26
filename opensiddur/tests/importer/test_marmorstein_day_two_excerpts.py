@@ -41,6 +41,69 @@ class ExcerptTests(unittest.TestCase):
         return main(['--draft', '--source-root', str(self.base/'sources'),
                      '--project-directory', str(self.base/'projects')])
 
+    def test_prayer_parts_follow_paragraphs_and_terminate_quotation_scope(self):
+        unit = self.recipe['units'][0]
+        unit['he'] = {'scan_page': 23, 'printed_page': '9', 'parts': [
+            {'urn': unit['urn']+'/opening', 'content': ['First ']},
+            {'urn': unit['urn']+'/quote', 'content': [{'quotation': {
+                'chapter': '7', 'verse': '2',
+                'urn': 'urn:x-opensiddur:text:bible:psalms/7/2',
+                'content': ['Quotation ', {'divine_name': 'יְיָ'}]}}, ' following.']},
+            {'urn': unit['urn']+'/seal', 'new_paragraph': True, 'content': ['Seal.']}]}
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        root = etree.parse(str(self.base/'projects'/PROJECTS['he']/'invented_prayer.xml'))
+        paragraphs = root.xpath('//t:body//t:p', namespaces=NS)
+        self.assertEqual(len(paragraphs), 2)
+        self.assertEqual(''.join(paragraphs[0].itertext()), 'First Quotation יְיָ following.')
+        quote = paragraphs[0].find('t:seg', NS)
+        self.assertIn('/page/n22', quote.get('facs'))
+        self.assertEqual(quote.getnext().get('unit'), 'verse')
+        self.assertIsNone(quote.getnext().get('corresp'))
+        self.assertEqual(quote.getnext().getnext().get('unit'), 'chapter')
+        self.assertEqual(quote.getnext().getnext().tail, ' following.')
+        self.assertEqual(paragraphs[-1][-1].get('unit'), 'prayer-part')
+        self.assertIsNone(paragraphs[-1][-1].get('corresp'))
+
+    def test_paragraph_continuation_keeps_the_existing_prayer_part_scope(self):
+        unit = self.recipe['units'][0]
+        unit['he'] = {'scan_page': 23, 'printed_page': '9', 'parts': [
+            {'urn': unit['urn']+'/opening', 'content': ['First paragraph.']},
+            {'new_paragraph': True, 'content': ['Its continuation.']}]}
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        root = etree.parse(str(self.base/'projects'/PROJECTS['he']/'invented_prayer.xml'))
+        self.assertEqual(root.xpath('//t:milestone[@unit="prayer-part"]/@corresp',
+                                    namespaces=NS), [unit['urn']+'/opening'])
+        self.assertEqual(len(root.xpath('//t:body//t:p', namespaces=NS)), 2)
+
+    def test_prayer_quotation_source_tracks_a_preceding_page_break(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import prayer_document
+        unit = self.recipe['units'][0]
+        witness = {'scan_page': 23, 'printed_page': '9', 'parts': [
+            {'urn': unit['urn']+'/a', 'content': ['Before ',
+             {'page_break': {'scan_page': 25, 'printed_page': '10'}}]},
+            {'urn': unit['urn']+'/b', 'content': [{'quotation': {
+                'urn': 'urn:x-opensiddur:text:bible:psalms/7/2',
+                'chapter': '7', 'verse': '2', 'content': ['After']}}]}]}
+        root = prayer_document(unit, 'he', witness)
+        self.assertIn('/page/n24', root.xpath('string(//t:seg/@facs)', namespaces=NS))
+        witness['parts'][1]['content'][0]['quotation']['verse'] = '3'
+        with self.assertRaisesRegex(ValueError, 'disagrees'):
+            prayer_document(unit, 'he', witness)
+
+    def test_prayer_rejects_empty_and_duplicate_parts_before_writes(self):
+        unit = self.recipe['units'][0]
+        for parts in [[], [{'urn': unit['urn']+'/a', 'content': ['a']},
+                           {'urn': unit['urn']+'/a', 'content': ['b']}]]:
+            with self.subTest(parts=parts):
+                unit['he'] = {'scan_page': 23, 'printed_page': '9', 'parts': parts}
+                with self.assertRaises(ValueError):
+                    self.run_builder()
+                self.assertFalse((self.base/'projects'/PROJECTS['he']/'invented_prayer.xml').exists())
+
     def test_exact_scope_semantics_and_absent_translation_cleanup(self):
         stale = self.base/'projects'/PROJECTS['en']/'invented_prayer.xml'
         stale.write_text('Previously generated counterpart', encoding='utf-8')

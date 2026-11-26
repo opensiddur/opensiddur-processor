@@ -70,3 +70,12 @@ remaining two Shema paragraphs. Printed citations become
 notes targeting the first verse actually present in each witness. Source evidence
 keeps the original citation spelling and parentheses; display references use a
 chapter:verse separator without enclosing parentheses.
+
+Liturgical modules use `--recipe batches/maariv_s5_s24/emet_veemunah_units.json`.
+A witness supplies `parts`: each canonical `urn` starts a prayer-part milestone;
+`new_paragraph: true` preserves a printed paragraph boundary independently. A
+continuation may omit `urn` to keep the current part across paragraphs. Bounded
+`quotation` content supplies `urn`, `chapter`, `verse` and `content`, with explicit
+chapter/verse terminators and current-page provenance. Contextual role and ritual
+instructions belong in the service spine. Recipes must mark actual Divine Name
+words; matching two adjacent yods inside an ordinary word is not sufficient.

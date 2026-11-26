@@ -299,3 +299,11 @@ cases the dedicated reader cannot confidently settle, with the question before
 its enlarged image. Offer an open reading when candidate choices may be wrong.
 This question-level adjudication does not replace full-page independent reading,
 guideline/alignment/order review or the remaining acceptance gates.
+
+### Divine Name word boundaries
+
+Check the semantic markup as well as concatenated text. A substring search for
+two yods can wrongly mark an ordinary word such as בחיים without changing its
+visible letters. Identify actual Divine Name tokens, inspect surrounding words
+and legitimate attached prefixes, and review every generated `j:divineName`.
+Exact-text comparison alone cannot catch this error.

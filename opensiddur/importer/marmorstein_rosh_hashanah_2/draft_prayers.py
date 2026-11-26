@@ -39,14 +39,8 @@ def append_content(parent, content):
     return last_page
 
 
-def excerpt_document(unit, lang, witness):
-    """Use this volume's credits; put contextual rubrics in the later service spine."""
-    is_range = 'verses' in witness
-    verses = witness['verses'] if is_range else [{
-        'verse': unit['verse'], 'verse_urn': unit['verse_urn'],
-        'content': witness['content']}]
-    if not verses:
-        raise ValueError('An excerpt needs at least one verse')
+def excerpt_header(unit, lang, witness):
+    """Share source credits and volume-specific bibliography across draft modules."""
     root = opening_document(lang, [], {})
     desc = root.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc')
     desc.find(f'{{{TEI}}}titleStmt/{{{TEI}}}title').text = unit['titles'][lang]
@@ -61,6 +55,85 @@ def excerpt_document(unit, lang, witness):
     element(bibl, 'biblScope', unit='pages', **{
         'from': witness['printed_page'],
         'to': witness.get('printed_page_end', witness['printed_page'])})
+    return root
+
+
+def append_prayer_content(parent, content, scan_page):
+    """Keep Biblical scopes bounded independently of a prayer's alignment parts."""
+    for item in content:
+        if isinstance(item, dict) and set(item) == {'quotation'}:
+            quote = item['quotation']
+            if set(quote) != {'urn', 'chapter', 'verse', 'content'}:
+                raise ValueError('Unsupported prayer quotation')
+            if not quote['urn'].endswith('/'+str(quote['chapter'])+'/'+str(quote['verse'])):
+                raise ValueError('Quotation chapter/verse disagrees with its URN')
+            start_page = scan_page
+            for piece in quote['content']:
+                if isinstance(piece, str) and not piece.strip():
+                    continue
+                if isinstance(piece, dict) and set(piece) == {'page_break'}:
+                    start_page = piece['page_break']['scan_page']
+                    continue
+                break
+            element(parent, 'milestone', unit='chapter', n=quote['chapter'])
+            element(parent, 'milestone', unit='verse', n=quote['verse'],
+                    corresp=quote['urn'])
+            span = element(parent, 'seg', source=quote['urn'],
+                           facs=page_image_url(IDENTIFIER, start_page-1))
+            last_page = append_content(span, quote['content'])
+            if last_page is not None:
+                scan_page = last_page
+            element(parent, 'milestone', unit='verse')
+            element(parent, 'milestone', unit='chapter')
+        else:
+            last_page = append_content(parent, [item])
+            if last_page is not None:
+                scan_page = last_page
+    return scan_page
+
+
+def prayer_document(unit, lang, witness):
+    """Preserve source paragraphs while aligning reusable canonical prayer parts."""
+    parts = witness['parts']
+    if not parts:
+        raise ValueError('A prayer needs at least one part')
+    root = excerpt_header(unit, lang, witness)
+    text = root.find(f'{{{TEI}}}text')
+    text.clear()
+    div = element(element(text, 'body'), 'div', corresp=unit['urn'])
+    element(div, 'pb', ed='1965', n=witness['printed_page'],
+            facs=page_image_url(IDENTIFIER, witness['scan_page']-1))
+    paragraph = None
+    seen_parts = set()
+    current_page = witness['scan_page']
+    for part in parts:
+        urn = part.get('urn')
+        if urn is None and not seen_parts:
+            raise ValueError('A prayer must begin with a canonical part')
+        if urn in seen_parts:
+            raise ValueError('Duplicate prayer part')
+        if urn is not None:
+            seen_parts.add(urn)
+        if paragraph is None or part.get('new_paragraph', False):
+            paragraph = element(div, 'p')
+        if urn is not None:
+            element(paragraph, 'milestone', unit='prayer-part', corresp=urn)
+        current_page = append_prayer_content(paragraph, part['content'], current_page)
+    element(paragraph, 'milestone', unit='prayer-part')
+    return root
+
+
+def excerpt_document(unit, lang, witness):
+    """Use this volume's credits; put contextual rubrics in the later service spine."""
+    if 'parts' in witness:
+        return prayer_document(unit, lang, witness)
+    is_range = 'verses' in witness
+    verses = witness['verses'] if is_range else [{
+        'verse': unit['verse'], 'verse_urn': unit['verse_urn'],
+        'content': witness['content']}]
+    if not verses:
+        raise ValueError('An excerpt needs at least one verse')
+    root = excerpt_header(unit, lang, witness)
     if 'citation' in witness:
         standoff = element(root, 'standOff', type='notes')
         # Place standoff before text, following the document model and existing books.
