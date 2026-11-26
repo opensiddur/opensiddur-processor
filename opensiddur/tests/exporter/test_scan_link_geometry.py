@@ -68,7 +68,7 @@ class Box:
                      "requires a real lualatex installation and pdftotext")
 class TestScanLinkGeometry(unittest.TestCase):
 
-    def _typeset(self, xml: str, typography: dict):
+    def _typeset(self, xml: str, typography: dict, *, all_pages=False):
         """The first page's links (as boxes in pdftotext's coordinates, top down), its
         words, and the run's log."""
         root = etree.fromstring(xml)
@@ -84,20 +84,49 @@ class TestScanLinkGeometry(unittest.TestCase):
             self.assertTrue((work / "t.pdf").exists(),
                             f"lualatex produced no PDF:\n{done.stdout[-2000:]}")
             log = (work / "t.log").read_text(encoding="utf-8", errors="replace")
-            page = PdfReader(work / "t.pdf").pages[0]
-            height = float(page.mediabox.height)
-            links = []
-            for annotation in page.get("/Annots") or []:
-                annotation = annotation.get_object()
-                uri = annotation.get("/A", {}).get("/URI")
-                if uri:
-                    x0, y0, x1, y1 = (float(v) for v in annotation["/Rect"])
-                    links.append(Box(x0, height - y1, x1, height - y0, uri))
-            bbox = subprocess.run(["pdftotext", "-f", "1", "-l", "1", "-bbox", "t.pdf", "-"],
-                                  cwd=work, capture_output=True, text=True).stdout
-        words = [Box(*(float(m.group(i)) for i in range(1, 5)), m.group(5))
-                 for m in _WORD.finditer(bbox) if m.group(5).strip()]
-        return links, words, log
+            self.assertNotIn("undefined references", log)
+            self.assertNotIn("Label(s) may have changed", log)
+            results = []
+            for number, page in enumerate(PdfReader(work / "t.pdf").pages, 1):
+                height = float(page.mediabox.height)
+                links = []
+                for annotation in page.get("/Annots") or []:
+                    annotation = annotation.get_object()
+                    uri = annotation.get("/A", {}).get("/URI")
+                    if uri:
+                        x0, y0, x1, y1 = (float(v) for v in annotation["/Rect"])
+                        links.append(Box(x0, height - y1, x1, height - y0, uri))
+                bbox = subprocess.run(
+                    ["pdftotext", "-f", str(number), "-l", str(number),
+                     "-bbox", "t.pdf", "-"], cwd=work, capture_output=True, text=True).stdout
+                words = [Box(*(float(m.group(i)) for i in range(1, 5)), m.group(5))
+                         for m in _WORD.finditer(bbox) if m.group(5).strip()]
+                results.append((links, words, log))
+                if not all_pages:
+                    break
+        return results if all_pages else results[0]
+
+    def test_buffered_paragraphs_use_the_margin_of_their_shipped_page(self):
+        # reledmac prepares paragraphs before the page they eventually occupy.
+        # Wide alternating margins expose a page counter captured too early.
+        xml = _document("".join(
+            f"<tei:p>{_pb(n)}{_HEBREW}</tei:p>" for n in range(1, 41)))
+        pages = self._typeset(xml, {
+            "markers": {"scan_links": {"placement": "margin"}},
+            "line_numbers": {"enabled": False},
+        }, all_pages=True)
+        self.assertGreaterEqual(len(pages), 3)
+        self.assertEqual(sum(len(links) for links, _, _ in pages), 40)
+        for number, (links, words, _) in enumerate(pages, 1):
+            self.assertOutsideTheText(links, words)
+            text = self._text(words)
+            left, right = min(w.x0 for w in text), max(w.x1 for w in text)
+            arrows = [w for w in words if w.text == "↗"]
+            for link in links:
+                self.assertTrue(any(link.overlaps(arrow) for arrow in arrows), repr(link))
+                gap = left - link.x1 if number % 2 else link.x0 - right
+                self.assertGreater(gap, 3, repr(link))
+                self.assertLess(gap, 20, repr(link))
 
     @staticmethod
     def _text(words):
@@ -121,6 +150,32 @@ class TestScanLinkGeometry(unittest.TestCase):
                 self.assertFalse(link.overlaps(word), f"{link} is set on {word}")
             for number in numbers:
                 self.assertFalse(link.overlaps(number), f"{link} is set on {number}")
+
+    def test_shared_bilingual_rubric_typesets_above_matching_columns(self):
+        note = ('<tei:note type="description"><tei:foreign xml:lang="de-Hebr">חזן:</tei:foreign>'
+                '<tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>')
+        xml = _PARALLEL.replace('<tei:body>', '<tei:body>' + note)
+        for position in ['left', 'center', 'right']:
+            for order in ['primary_first', 'primary_last']:
+                with self.subTest(position=position, order=order):
+                    ordered = xml.replace('primary_first', order)
+                    links, words, log = self._margin(
+                        ordered, parallel={"layout": "pairs", "column_position": position},
+                        paragraphs={"indent": "12pt"})
+                    self.assertNotIn('! LaTeX Error:', log)
+                    self.assertEqual(len(links), 2)
+                    reader = next(w for w in words if w.text == 'Reader')
+                    def same_row(word, reference=reader):
+                        return not (word.y1 <= reference.y0 or word.y0 >= reference.y1)
+                    label_hebrew = [w for w in words if same_row(w)
+                                    and any('א' <= c <= 'ת' for c in w.text)]
+                    body_hebrew = [w for w in words if not same_row(w)
+                                   and any('א' <= c <= 'ת' for c in w.text)]
+                    body_english = [w for w in words if w.text.startswith('word')]
+                    label_edge = max(w.x1 for w in label_hebrew)
+                    self.assertEqual(label_edge < reader.x0, order == 'primary_first')
+                    self.assertAlmostEqual(label_edge, max(w.x1 for w in body_hebrew), delta=1)
+                    self.assertAlmostEqual(reader.x0, min(w.x0 for w in body_english), delta=1)
 
     def test_a_hebrew_text_has_its_links_in_the_margin(self):
         links, words, log = self._margin(_SINGLE)
@@ -159,6 +214,14 @@ class TestScanLinkGeometry(unittest.TestCase):
             gap = min(max(w.x0 - link.x1, link.x0 - w.x1)
                       for w in self._text(self._line(link, words)))
             self.assertLess(gap, 6, f"{link} is not in its line")
+
+    def test_inline_hebrew_link_hitboxes_cover_the_visible_arrows(self):
+        links, words, _ = self._typeset(
+            _SINGLE, {"markers": {"scan_links": {"placement": "inline"}}})
+        arrows = [w for w in words if w.text == "↗"]
+        self.assertEqual(len(arrows), len(links))
+        for link in links:
+            self.assertTrue(any(link.overlaps(arrow) for arrow in arrows), repr(link))
 
     def test_the_symbol_is_in_the_font(self):
         _, _, log = self._margin(_SINGLE)

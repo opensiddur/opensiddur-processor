@@ -70,6 +70,7 @@
          facing pages or in columns; interleaved sets it in one reledmac stream, each
          block followed by its translation. -->
     <xsl:param name="layout" as="xs:string" required="yes"/>
+    <xsl:variable name="first-parallel" select="(//p:parallel)[1]"/>
     <xsl:variable name="interleaved" as="xs:boolean" select="$layout = 'interleaved'"/>
     <xsl:variable name="facing-pages" as="xs:boolean" select="$layout = 'pages'"/>
     <!-- footnote | endnote | none — where the text of an editorial note goes.
@@ -4288,7 +4289,28 @@ end
          inline; only top-level runs in block instructions are separated. -->
     <xsl:template name="note-direction-runs">
         <xsl:param name="separate" as="xs:boolean"/>
+        <xsl:variable name="pair" select="(following::p:parallel[1], preceding::p:parallel[1], $first-parallel)[1]"/>
+        <xsl:variable name="primary-lang" select="string($pair/p:parallelItem[@role='primary']/@xml:lang)"/>
+        <xsl:variable name="primary" select="tei:foreign[f:is-rtl-lang(string(@xml:lang)) = f:is-rtl-lang($primary-lang)]"/>
+        <xsl:variable name="secondary" select="tei:foreign[f:is-rtl-lang(string(@xml:lang)) ne f:is-rtl-lang($primary-lang)]"/>
         <xsl:choose>
+            <xsl:when test="$separate and $layout='pairs' and exists($pair)
+                            and not(ancestor::p:parallelItem)
+                            and not(@f:parallel-block='true' or @f:note-lang)
+                            and empty(text()[normalize-space()])
+                            and count(tei:foreign)=2
+                            and empty(*[not(self::tei:foreign)])
+                            and count($primary)=1 and count($secondary)=1">
+                <!-- A shared bilingual rubric follows the actual column order,
+                     rather than putting each language above the opposite column. -->
+                <xsl:text>\OSBilingualRubric{</xsl:text>
+                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $secondary else $primary)/@xml:lang))) then '\pardir TRT\textdir TRT\raggedright ' else '\pardir TLT\textdir TLT\raggedright '"/>
+                <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $secondary else $primary" mode="emit"/>
+                <xsl:text>}{</xsl:text>
+                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $primary else $secondary)/@xml:lang))) then '\pardir TRT\textdir TRT\raggedright ' else '\pardir TLT\textdir TLT\raggedright '"/>
+                <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $primary else $secondary" mode="emit"/>
+                <xsl:text>}</xsl:text>
+            </xsl:when>
             <xsl:when test="$separate and empty(text()[normalize-space()])
                             and exists(tei:foreign[@xml:lang])
                             and empty(*[not(self::tei:foreign[@xml:lang])])">
