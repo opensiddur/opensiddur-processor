@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- The expanded siddur reads the right maftir on Shabbat Chol HaMoed Sukkot in Israel. It
+  chose the day's maftir by the Diaspora's count alone, so in Israel, where Chol HaMoed begins
+  a day earlier, it read the maftir of the day before: the first instead of the second when
+  that Shabbat is the third day of Sukkot, the third instead of the fourth on the fifth, the
+  fourth instead of the fifth on the sixth. It now follows hebcal's count in each place, as
+  the humash does.
 - Source-scan links no longer repeat at each paragraph or transcluded module while the
   same column remains on the same source page. Returning to a different page keeps its
   link; optional passages and instructions cannot hide a required later link.

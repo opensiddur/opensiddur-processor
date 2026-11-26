@@ -12,6 +12,7 @@ from opensiddur.importer.humash.readings import festival_readings, haftarot, tri
 from opensiddur.importer.humash.names import PARSHA_NAMES, PAIR_MEMBERS, PAIR_FOR_MEMBER, vocalized_name
 from opensiddur.importer.humash.refs import UNIT_ALIYAH, UNIT_WEEKDAY, UNIT_MAFTIR
 from opensiddur.importer.humash.festival_names import hebrew_name
+from opensiddur.importer.humash.build import DAY_MAFTIR_SUKKOT_DAY
 from .xml import *
 
 SHABBAT=aggregate('shabbat'); YT=aggregate('yom-tov'); CH=aggregate('chol-hamoed')
@@ -52,6 +53,18 @@ def parsha_english(slug):
 def parsha_condition(slug,next_reading=False):
     suffix='next-parsha' if next_reading else 'parsha'; value=parsha_value(slug)
     return any_of(all_of(IL,feature('torah-reading','israel-'+suffix,value)),all_of(DIASPORA,feature('torah-reading','diaspora-'+suffix,value)))
+
+def day_maftir_condition(offset):
+    """When maftir_day<offset> is the maftir of Shabbat Chol HaMoed Sukkot.
+
+    hebcal numbers these maftirs by the day of Chol HaMoed, which begins on the third day of
+    Sukkot in the Diaspora and on the second in Israel; the humash conditions its own copy
+    of them the same way (humash.build.DAY_MAFTIR_SUKKOT_DAY).
+    """
+    return any_of(*(
+        all_of(IL if israel else DIASPORA,holiday('sukkot',offset+first))
+        for israel,first in DAY_MAFTIR_SUKKOT_DAY.items()
+    ))
 
 def festival_cases():
     """Each named reading's eligibility, before choosing its weekday variant."""
@@ -141,7 +154,7 @@ def manifest(sourcetexts_root):
         if name=='Sukkot Shabbat Chol ha-Moed':
             for offset in range(1,6):
                 selected=[s for s in maftir if s.label==f'maftir_day{offset}']
-                entries.append(Entry(slug+f'_day{offset}',name,all_of(pred,holiday('sukkot',offset+2)),torah=main,maftir=selected,haftarah=f'urn:x-opensiddur:text:bible:reading/{slug}/haftarah',hebrew_title=hebrew_name(name)))
+                entries.append(Entry(slug+f'_day{offset}',name,all_of(pred,day_maftir_condition(offset)),torah=main,maftir=selected,haftarah=f'urn:x-opensiddur:text:bible:reading/{slug}/haftarah',hebrew_title=hebrew_name(name)))
             continue
         entries.append(Entry(slug,name,pred,service_name,'supplement' if supplement else 'replace',main,maftir,f'urn:x-opensiddur:text:bible:reading/{slug}/haftarah' if r['haftarot'] else None,hebrew_title=hebrew_name(name)))
     # Israel reads that day's single offering four times on weekday Chol HaMoed.
