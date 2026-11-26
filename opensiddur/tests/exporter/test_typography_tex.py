@@ -759,7 +759,7 @@ class TestScanLinks(unittest.TestCase):
 
     def test_the_link_hides_its_border(self):
         self.assertIn(r"\newcommand{\OSScanLink}[1]{\leavevmode{\hypersetup{hidelinks}"
-                      r"\href{#1}{\OSScanLinkStyle{\OSScanLinkSymbol}}}}", self._scan("inline"))
+                      r"\hbox dir TLT{\href{#1}{\OSScanLinkStyle{\OSScanLinkSymbol}}}}}", self._scan("inline"))
 
     def test_inline_needs_no_positions(self):
         tex = self._scan("inline")

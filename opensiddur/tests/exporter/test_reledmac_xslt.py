@@ -5489,12 +5489,24 @@ class TestSharedBilingualRubric(unittest.TestCase):
                 xml = f'''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
                   xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
                   <tei:text><tei:body><tei:div>
-                    <tei:note type="description"><tei:foreign xml:lang="he">חזן</tei:foreign><tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>
+                    <tei:note type="description"><tei:foreign xml:lang="de-Hebr">חזן</tei:foreign><tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>
                     <p:parallel column-order="{order}">
                       <p:parallelItem role="primary" xml:lang="he"><tei:p>עברית</tei:p></p:parallelItem>
                       <p:parallelItem role="parallel" xml:lang="en"><tei:p>English</tei:p></p:parallelItem>
                     </p:parallel></tei:div></tei:body></tei:text></tei:TEI>'''
                 tex = _transform(xml)
-                self.assertIn(r'\parbox[t]{\Lcolwidth}', tex)
-                row = tex.split(r'\hbox dir TLT to \linewidth', 1)[1]
+                self.assertIn(r'\OSBilingualRubric{', tex)
+                row = tex.split(r'\OSBilingualRubric{', 1)[1]
                 self.assertEqual(row.index('חזן') < row.index('Reader'), order == 'primary_first')
+
+    def test_column_rubric_does_not_expand_to_a_page_wide_pair(self):
+        xml = '''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
+          xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
+          <tei:text><tei:body><p:parallel column-order="primary_first">
+            <p:parallelItem role="primary" xml:lang="he"><tei:div>
+              <tei:note type="instruction"><tei:foreign xml:lang="he">חזן</tei:foreign><tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>
+              <tei:p>עברית</tei:p></tei:div></p:parallelItem>
+            <p:parallelItem role="parallel" xml:lang="en"><tei:p>English</tei:p></p:parallelItem>
+          </p:parallel></tei:body></tei:text></tei:TEI>'''
+        tex = _transform(xml)
+        self.assertNotIn(r'\OSBilingualRubric{', tex)

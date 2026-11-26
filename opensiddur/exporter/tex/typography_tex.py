@@ -905,6 +905,14 @@ def _parallel_section(config: TypographyConfig, has_parallel: bool) -> list[str]
         # reledpar's own default sets the block against the right edge of the
         # type area, which can leave no right margin for the numbers at all.
         rf"\columnsposition{{{_COLUMN_POSITIONS[parallel.column_position]}}}",
+        # Match reledpar's actual column positioning and separator glue.
+        r"\makeatletter",
+        r"\newcommand{\OSBilingualRubric}[2]{\leavevmode\hbox dir TLT to \textwidth{"
+        r"\ifdefstring{\columns@position}{L}{}{\hfill}"
+        r"\parbox[t]{\Lcolwidth}{#1}\print@columnseparator"
+        r"\parbox[t]{\Rcolwidth}{#2}"
+        r"\ifdefstring{\columns@position}{R}{}{\hfill}}}",
+        r"\makeatother",
     ]
 
 
@@ -963,7 +971,7 @@ def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[s
         rf"\newcommand{{\OSScanLinkSymbol}}{{{escape_tex(scan_links.symbol)}}}",
         # hidelinks in a group: no coloured box around the symbol, for this link only.
         r"\newcommand{\OSScanLink}[1]{\leavevmode{\hypersetup{hidelinks}"
-        r"\href{#1}{\OSScanLinkStyle{\OSScanLinkSymbol}}}}",
+        r"\hbox dir TLT{\href{#1}{\OSScanLinkStyle{\OSScanLinkSymbol}}}}}",
     ]
     if scan_links.placement is not ScanLinkPlacement.MARGIN:
         lines.append(r"\newcommand{\OSScanLinkMargin}[1]{\OSScanLink{#1}}")
