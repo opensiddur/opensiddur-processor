@@ -144,6 +144,10 @@ to other editions; apply the edition-specific decisions below only to this book.
   or qamatz, then meteg U+05BD, CGJ U+034F, hiriq U+05B4. If a printed yod carries
   the hiriq, encode lamed + its vowel/meteg, then yod + hiriq, without that CGJ.
   Read patah versus qamatz from each occurrence.
+- Choose cantillation codepoints by the printed sign and placement, not only
+  Unicode character names. Postpositive zarqa uses U+05AE (named ZINOR);
+  U+0598 (named ZARQA) is used for above-letter tsinnorit. See
+  [Unicode's character-name anomaly note](https://www.unicode.org/notes/tn27/tn27-1.html#appA).
 - Bind approvals to the exact reading, realization, structure, settings and
   artifact hashes they cover. Changed text invalidates its previous approval.
   A mechanically proven unchanged payload may retain its approval only with an
