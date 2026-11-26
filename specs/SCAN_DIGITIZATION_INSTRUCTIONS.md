@@ -48,6 +48,10 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Distinguish an absent printed mark from an editorial normalization required by
   project conventions. Record the latter explicitly; do not describe it as a
   mark seen in the image. Preserve Divine Name semantics through transclusion.
+- When an authorized comparison reconstructs illegible pointing, record the
+  reconstruction, exact reference passage and witness. Keep the edition's
+  independently verified neighboring readings; damage alone is not a sic/corr
+  error, and a reconstructed mark must not be described as clearly printed.
 - Credit source authorship, translation, scan preparation and digitization
   separately, with their respective bibliography and licences.
 
