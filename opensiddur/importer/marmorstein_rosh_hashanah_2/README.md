@@ -64,3 +64,9 @@ can occur inside different verses in the two languages; its surrounding text
 controls spacing, including a Hebrew maqaf join. A missing translated verse stays
 absent. Range documents expose exact verse milestones, retain initial facsimile
 provenance, and do not advertise a complete chapter or fabricate printed citations.
+
+The recipe `batches/maariv_s5_s24/shema_remaining_ranges.json` covers the
+remaining two Shema paragraphs. Printed citations become
+notes targeting the first verse actually present in each witness. Source evidence
+keeps the original citation spelling and parentheses; display references use a
+chapter:verse separator without enclosing parentheses.

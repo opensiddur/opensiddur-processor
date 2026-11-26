@@ -41,6 +41,12 @@ def append_content(parent, content):
 
 def excerpt_document(unit, lang, witness):
     """Use this volume's credits; put contextual rubrics in the later service spine."""
+    is_range = 'verses' in witness
+    verses = witness['verses'] if is_range else [{
+        'verse': unit['verse'], 'verse_urn': unit['verse_urn'],
+        'content': witness['content']}]
+    if not verses:
+        raise ValueError('An excerpt needs at least one verse')
     root = opening_document(lang, [], {})
     desc = root.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc')
     desc.find(f'{{{TEI}}}titleStmt/{{{TEI}}}title').text = unit['titles'][lang]
@@ -60,11 +66,10 @@ def excerpt_document(unit, lang, witness):
         # Place standoff before text, following the document model and existing books.
         root.remove(standoff)
         root.insert(1, standoff)
-        note = element(standoff, 'note', type='citation', target=unit['verse_urn'])
-        element(element(note, 'p'), 'ref', witness['citation'], target=unit['verse_urn'])
+        note = element(standoff, 'note', type='citation', target=verses[0]['verse_urn'])
+        element(element(note, 'p'), 'ref', witness['citation'], target=verses[0]['verse_urn'])
     text = root.find(f'{{{TEI}}}text')
     text.clear()
-    is_range = 'verses' in witness
     attributes = {} if is_range else {'corresp': unit['urn']}
     div = element(element(text, 'body'), 'div', **attributes)
     element(div, 'pb', ed='1965', n=witness['printed_page'],
@@ -73,11 +78,6 @@ def excerpt_document(unit, lang, witness):
     # The verse is complete; the chapter is not. Only the exact verse supplies a
     # canonical witness. The chapter milestone retains its bibliographic context.
     element(paragraph, 'milestone', unit='chapter', n=unit['chapter'])
-    verses = witness['verses'] if is_range else [{
-        'verse': unit['verse'], 'verse_urn': unit['verse_urn'],
-        'content': witness['content']}]
-    if not verses:
-        raise ValueError('An excerpt needs at least one verse')
     seen_verses = set()
     current_page = witness['scan_page']
     for index, verse in enumerate(verses):

@@ -141,6 +141,23 @@ class ExcerptTests(unittest.TestCase):
         self.assertIn('n24', docs[0].xpath('string((//t:body//t:seg)[2]/@facs)', namespaces=NS))
         self.assertIn('n23', docs[1].xpath('string((//t:body//t:seg)[2]/@facs)', namespaces=NS))
 
+    def test_range_citation_targets_its_first_printed_verse(self):
+        unit = self.recipe['units'][0]
+        first = unit.pop('verse_urn')
+        unit.pop('verse')
+        unit['he'].pop('content')
+        unit['he']['verses'] = [
+            {'verse': '2', 'verse_urn': first, 'content': ['אב']},
+            {'verse': '3', 'verse_urn': first[:-1]+'3', 'content': ['גד']}]
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        doc = etree.parse(str(self.base/'projects'/PROJECTS['he']/'invented_prayer.xml'))
+        self.assertEqual(doc.xpath('//t:note/@target', namespaces=NS), [first])
+        self.assertEqual(doc.xpath('//t:note//t:ref/@target', namespaces=NS), [first])
+        self.assertEqual(doc.xpath('string(//t:note//t:ref)', namespaces=NS), 'תהלים ז:ב')
+        self.assertEqual(doc.xpath('string(//t:body//t:p)', namespaces=NS), 'אב גד')
+
     def test_verse_beginning_after_page_break_retains_new_source(self):
         unit = self.recipe['units'][0]
         unit['he']['verses'] = [{
