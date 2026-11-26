@@ -11,6 +11,11 @@ from lxml import etree as E
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN, PROJECT_HE
 from .xml import T, J, NS, XID, TEXT, feature, parse_fragment, transclude, serialize
 
+def unpinned(urn):
+    """`urn` without an `@project` suffix naming the edition it must come from."""
+    return urn.split('@', 1)[0] if urn.startswith('urn:') else urn
+
+
 class Composer:
     def __init__(self, project_directory):
         self.directory = Path(project_directory)
@@ -192,6 +197,13 @@ class Composer:
             self.declare_public_context(root)
             replace = replace or {}
             for e in list(root.iter(f'{{{J}}}transclude')):
+                # Birnbaum pins some of its transclusions to itself, so that its own
+                # words are set where another edition mints the same URN. The expanded
+                # siddur is not Birnbaum: which edition supplies the words is the
+                # volume's choice, by its transclusion priorities, so the pin is dropped.
+                for attribute in ('target', 'targetEnd'):
+                    if e.get(attribute):
+                        e.set(attribute, unpinned(e.get(attribute)))
                 target=e.get('target')
                 if target not in omit and target not in replace:
                     self.remove_redundant_heads(e, target)

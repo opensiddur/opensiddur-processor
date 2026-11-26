@@ -151,3 +151,53 @@ class TestComposition(unittest.TestCase):
         original=parse_fragment(self.composer.source(TEXT+'section'))
         self.assertTrue(original.xpath('.//j:conditional/tei:fs[@type="opensiddur:recitation"]',namespaces=NS))
         self.assertFalse(tree.xpath('.//j:declare',namespaces=NS))
+
+
+class TestBirnbaumPinsAreDropped(unittest.TestCase):
+    """Birnbaum pins some transclusions to itself. The expanded siddur leaves the edition to
+    the volume's priorities, so it copies none of those pins."""
+
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        root=Path(self.temp.name)
+        for lang in ['he','en']:
+            pin=f'@hasiddur_hashalem-birnbaum-1949-{lang}'
+            p=root/f'hasiddur_hashalem-birnbaum-1949-{lang}';p.mkdir()
+            p.joinpath('index.xml').write_text(f'''<tei:TEI xmlns:tei="{T}" xmlns:j="{J}"><tei:text><tei:body>
+            <tei:div corresp="{TEXT}service"><j:transclude target="{TEXT}prayer:kaddish/yitgaddal{pin}"/>
+            <j:transclude target="{TEXT}structure{pin}"/>
+            <j:transclude target="{TEXT}bible:psalms/1/1{pin}" targetEnd="{TEXT}bible:psalms/1/3{pin}"/></tei:div>
+            <tei:div corresp="{TEXT}structure"><j:transclude target="{TEXT}prayer:kaddish/yehe_shemeh{pin}"/></tei:div>
+            <tei:div corresp="{TEXT}prayer:kaddish/yitgaddal"><tei:p>Words</tei:p></tei:div>
+            <tei:div corresp="{TEXT}prayer:kaddish/yehe_shemeh"><tei:p>Words</tei:p></tei:div>
+            </tei:body></tei:text></tei:TEI>''',encoding='utf-8')
+        self.composer=Composer(root)
+
+    def test_no_transclusion_keeps_a_pin(self):
+        tree=parse_fragment(self.composer.source(TEXT+'service'))
+        targets=tree.xpath('.//j:transclude/@target|.//j:transclude/@targetEnd',namespaces=NS)
+        self.assertEqual(sorted(targets),sorted([
+            TEXT+'prayer:kaddish/yitgaddal',TEXT+'prayer:kaddish/yehe_shemeh',
+            TEXT+'bible:psalms/1/1',TEXT+'bible:psalms/1/3']))
+
+    def test_a_pinned_structural_unit_is_expanded_like_an_unpinned_one(self):
+        targets=parse_fragment(self.composer.source(TEXT+'service')).xpath(
+            './/j:transclude/@target',namespaces=NS)
+        self.assertFalse([t for t in targets if t.startswith(TEXT+'structure')])
+        self.assertIn(TEXT+'prayer:kaddish/yehe_shemeh',targets)
+
+    def test_omit_and_replace_match_a_pinned_transclusion(self):
+        omitted=parse_fragment(self.composer.source(
+            TEXT+'service',omit={TEXT+'prayer:kaddish/yitgaddal'})).xpath(
+            './/j:transclude/@target',namespaces=NS)
+        self.assertNotIn(TEXT+'prayer:kaddish/yitgaddal',omitted)
+        replaced=self.composer.source(
+            TEXT+'service',replace={TEXT+'prayer:kaddish/yitgaddal':'<tei:p>Replacement</tei:p>'})
+        self.assertIn('Replacement',replaced)
+        self.assertNotIn('yitgaddal',replaced)
+
+    def test_only_a_project_suffix_is_removed(self):
+        from opensiddur.importer.siddur_expanded.compose import unpinned
+        self.assertEqual(unpinned(TEXT+'prayer:x@some-project-he'),TEXT+'prayer:x')
+        self.assertEqual(unpinned(TEXT+'prayer:x'),TEXT+'prayer:x')
+        self.assertEqual(unpinned('#local_id'),'#local_id')
