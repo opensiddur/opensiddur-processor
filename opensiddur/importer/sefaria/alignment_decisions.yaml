@@ -172,8 +172,8 @@ siddur_ashkenaz:
     note: "the blessing's closing (כי אתה שומע), said every day, after the fast-day עננו"
   "Weekday / Maariv / Amidah / Knowledge":
     as_of: {he: 989f3607b770970a61e12b4495018134f7cb1d0f1fdc5ed3b2ec9b41f2177a29, en: 46fa5aacbe96be4e9fc387b68432b363274cbd31ad974fa0202a2fbd432a6d6d}
-    opens: [3]
-    note: "the blessing's closing (חננו מאתך), said every night, after אתה חוננתנו"
+    opens: [2, 3]
+    note: "אתה חוננתנו (small type: after Shabbat or a festival), then the blessing's closing (חננו מאתך), said every night"
   "Shabbat / Shabbat Evening / Master of all worlds":
     as_of: {he: 200c36b3083511638203159e4e0a0b9d6dc73003e3f5ccd0019e86ef1726bbad, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
     he_only: [1, 2, 3, 4, 5, 6]

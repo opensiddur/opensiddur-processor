@@ -40,7 +40,14 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, is_phrase, split_block
 from opensiddur.importer.sefaria.equivalents import Equivalents
-from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, leading_label, plain_text, verse_segments
+from opensiddur.importer.sefaria.markup import (
+    VERSE_ENDINGS,
+    is_numbered,
+    is_pointed,
+    leading_label,
+    plain_text,
+    verse_segments,
+)
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
@@ -1818,20 +1825,20 @@ def verse_places(block: TextBlock) -> list[tuple[tuple[int, int], str]]:
 QUOTED_SLACK = 2
 
 
-def _opened_by_full_stop(found: dict[tuple[int, int], str], places: list[tuple[tuple[int, int], str]],
-                         index: IncipitIndex) -> dict[tuple[int, int], str]:
-    """The verses found, less those found after a full stop inside the verse found before: a
-    full stop also stands inside a verse (Genesis 2:2), and the words after one may open another
-    verse too (Exodus 31:17's כִּי שֵׁשֶׁת יָמִים, Exodus 20:11's opening). A verse opens at one
-    only once the words since the verse before reach that verse's quotation, as far as the
-    index holds it (Nehemiah 9:9, after the whole of 9:8)."""
+def _opened_inside(found: dict[tuple[int, int], str], places: list[tuple[tuple[int, int], str]],
+                   index: IncipitIndex) -> dict[tuple[int, int], str]:
+    """The verses found, less those found inside the verse found before: the words after a full
+    stop, or at a phrase that starts inside a verse, may open another verse too (Exodus 31:17's
+    כִּי שֵׁשֶׁת יָמִים, Exodus 20:11's opening; Numbers 28:18's כָּל מְלֶאכֶת עֲבֹדָה לֹא תַעֲשׂוּ).
+    Except after a sof pasuq, a verse opens only once the words since the verse before reach
+    that verse's quotation, as far as the index holds it (Nehemiah 9:9, after the whole of 9:8)."""
     order = {place: i for i, (place, _) in enumerate(places)}
     place_words = [words(text) for _, text in places]
     kept: dict[tuple[int, int], str] = {}
     previous: tuple[int, str] | None = None
     for place in sorted(found):
         at = order[place]
-        if previous is not None and place[1] and places[at - 1][1].rstrip().endswith("."):
+        if previous is not None and not places[at - 1][1].rstrip().endswith(VERSE_ENDINGS):
             start, urn = previous
             quoted = quoted_words(urn, place_words[start:], index)
             covered = quoted if quoted is not None else len(index.own_opening(urn))
@@ -1877,12 +1884,12 @@ def scripture_verses(block: TextBlock, index: IncipitIndex, urn: str | None = No
             verses.add(urn)
         if len(verses) > 1 and found:
             # Verses worded alike (Exodus 20:9 and Deuteronomy 5:13): the one after the verse before.
-            verses &= {_following_verse(list(found.values())[-1])}
+            verses = verses & {_following_verse(list(found.values())[-1])} or verses
         if len(verses) > 1 and chapter:
             verses = {verse for verse in verses if _chapter_of(verse) == chapter}
         if len(verses) == 1:
             found[places[start][0]] = verses.pop()
-    return _opened_by_full_stop(found, places, index)
+    return _opened_inside(found, places, index)
 
 
 def _chapter_of(urn: str) -> str | None:

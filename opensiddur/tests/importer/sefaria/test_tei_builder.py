@@ -6,7 +6,15 @@ from lxml import etree
 from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.source import Leaf
-from opensiddur.importer.sefaria.tei_builder import Notes, VariantPrinting, _insert_cuts, file_stem, render, text_body
+from opensiddur.importer.sefaria.tei_builder import (
+    Notes,
+    VariantPrinting,
+    _insert_cuts,
+    align_sentences,
+    file_stem,
+    render,
+    text_body,
+)
 from opensiddur.importer.sefaria.markup import parse_segment
 from opensiddur.importer.util.hebrew import to_nfkd
 
@@ -138,6 +146,52 @@ class TestTextBody(unittest.TestCase):
         verse = T + "bible:isaiah/6/3"
         self.assertEqual(self.verse_marks(block, {(0, 0): verse}, {verse: 8}),
                          "[וְקָרָא זֶה אֶל זֶה וְאָמַר: קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ: ]וְעוֹד דָּבָר אַחֵר אַחֲרָיו")
+
+    def test_a_verse_opened_inside_the_phrase_after_a_paragraph_label_closes(self):
+        from opensiddur.importer.sefaria.align import Pair
+        from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
+        table = Conditions(rubrics=(RubricCondition(re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}),))
+
+        def pair(i, he, en):
+            return Pair(i, i, parse_segment(he), parse_segment(en))
+
+        # The label governs the paragraph after it; writing the next closes its conditional.
+        block = TextBlock(None, [pair(1, "<b>פְּתִיחָה</b> אַחַת", "Opening"),
+                                 Pair(None, 2, (), parse_segment("On Sunday:"), paragraph_label=True),
+                                 pair(2, "אַחַת שְׁתַּיִם", "one two"),
+                                 pair(3, "שָׁלֹשׁ: אַרְבַּע חָמֵשׁ:", "three. four five."),
+                                 pair(4, "וְעוֹד דָּבָר", "and more")])
+        first, second = T + "bible:x/1/1", T + "bible:x/1/2"
+        xml = text_body(T + "prayer:x", block, [1, 2, 3, 4], "he", Notes("note"), (),
+                        {(1, 0): first, (2, 1): second}, {}, table)
+        text = re.sub(r'<tei:milestone unit="verse" corresp="[^"]*"/>', "[", xml)
+        text = re.sub(r'<j:endConditional[^>]*/>', "}", re.sub(r'<tei:milestone unit="verse"/>', "]", text))
+        text = " ".join(re.sub(r"<[^>]*>", "", re.sub(r"<j:conditional.*?</j:conditional>", "{", text)).split())
+        self.assertEqual(text, "פְּתִיחָה אַחַת { [ אַחַת שְׁתַּיִם ] } שָׁלֹשׁ: [אַרְבַּע חָמֵשׁ: ] וְעוֹד דָּבָר")
+
+    def test_a_part_of_a_gated_text_is_gated(self):
+        from opensiddur.importer.sefaria.tei_builder import _text_gate
+        gates = {T + "prayer:amidah/attah_chonantanu": "gate"}
+        self.assertEqual(_text_gate(gates, T + "prayer:amidah/attah_chonantanu/text"), "gate")
+        self.assertIsNone(_text_gate(gates, T + "prayer:amidah"))
+
+    def test_sentences_are_aligned_by_length(self):
+        # the second Hebrew sentence is two in English
+        self.assertEqual(align_sentences([10, 10, 10], [11, 5, 5, 10]),
+                         [(0, 1, 0, 1), (1, 2, 1, 3), (2, 3, 3, 4)])
+
+    def test_an_english_cut_falls_where_the_aligned_sentences_meet(self):
+        hebrew = ["אבגד הוזח טיכל:", "מנסע פצקר שתאב:", "גדהו זחטי כלמנ:"]
+        english = "Aaaa bbbb cccc dddd. Ee ff. Gg hh. Iiii jjjj kkkk llll mmmm nnnn oooo pppp."
+        # (by share of the whole, the cut before the third verse would fall inside its English)
+        self.assertEqual(_insert_cuts(english, [(6, 9, "|")], "en", hebrew),
+                         "Aaaa bbbb cccc dddd. Ee ff. Gg hh. |Iiii jjjj kkkk llll mmmm nnnn oooo pppp.")
+        self.assertNotEqual(_insert_cuts(english, [(6, 9, "|")], "en"),
+                            "Aaaa bbbb cccc dddd. Ee ff. Gg hh. |Iiii jjjj kkkk llll mmmm nnnn oooo pppp.")
+
+    def test_a_phrase_opening_with_a_space_in_markup_is_cut_at_its_word(self):
+        xml = '<tei:hi rend="small"> אַחַת שְׁתַּיִם: שָׁלֹשׁ</tei:hi>'
+        self.assertEqual(_insert_cuts(xml, [(2, 3, "|")], "he"), xml.replace("שָׁלֹשׁ", "|שָׁלֹשׁ"))
 
     def test_a_correction_before_a_cut_counts_once(self):
         xml = ('אַחַת <tei:choice><tei:sic>שְׁתַּיִם שָׁלֹשׁ</tei:sic><tei:corr>שְׁתַּיִם:</tei:corr></tei:choice> '

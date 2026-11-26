@@ -546,6 +546,23 @@ class TestScriptureVerses(unittest.TestCase):
         self.assertEqual(scripture_verses(block, index), {(0, 0): T + "bible:exodus/31/17"})
 
 
+    def test_a_phrase_inside_a_verse_does_not_open_another(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        # Exodus 31:17 printed over two phrases, the second opening as Exodus 20:11 does
+        first = "בֵּינִי וּבֵין בְּנֵי יִשְׂרָאֵל אוֹת הִיא לְעֹלָם"
+        second = "כִּי שֵׁשֶׁת יָמִים עָשָׂה יְהֹוָה אֶת הַשָּׁמַיִם וְאֶת הָאָרֶץ"
+        index = IncipitIndex()
+        index.add(T + "bible:exodus/31/17", words(f"{first} {second} וּבַיּוֹם הַשְּׁבִיעִי"))
+        index.add(T + "bible:exodus/20/11", words(f"{second} אֶת הַיָּם וְאֶת כָּל אֲשֶׁר בָּם"))
+        (block,) = [i for i in items(f"<b>בֵּינִי</b> {first.split(' ', 1)[1]}", f"{second} וּבַיּוֹם הַשְּׁבִיעִי:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {(0, 0): T + "bible:exodus/31/17"})
+        # ... but after a sof pasuq, it does
+        (after,) = [i for i in items(f"<b>בֵּינִי</b> {first.split(' ', 1)[1]}:", f"{second} אֶת הַיָּם:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(after, index),
+                         {(0, 0): T + "bible:exodus/31/17", (1, 0): T + "bible:exodus/20/11"})
+
     def test_of_verses_worded_alike_the_one_after_the_verse_before_is_found(self):
         from opensiddur.importer.sefaria.match import scripture_verses
         eighth = "זָכוֹר אֶת יוֹם הַשַּׁבָּת לְקַדְּשׁוֹ"
@@ -562,6 +579,12 @@ class TestScriptureVerses(unittest.TestCase):
         (alone,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן", f"{ninth}:") if isinstance(i, TextBlock)]
         self.assertEqual(scripture_verses(alone, index), {})
         self.assertEqual(scripture_verses(alone, index, T + "bible:exodus/20/8-11"), {(1, 0): T + "bible:exodus/20/9"})
+        # ... or after a verse it does not follow
+        index.add(T + "bible:psalms/1/1", words("אַשְׁרֵי הָאִישׁ אֲשֶׁר לֹא הָלַךְ בַּעֲצַת רְשָׁעִים"))
+        (after,) = [i for i in items("<b>אַשְׁרֵי</b> הָאִישׁ אֲשֶׁר לֹא הָלַךְ בַּעֲצַת רְשָׁעִים:", f"{ninth}:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(after, index, T + "bible:exodus/20/8-11"),
+                         {(0, 0): T + "bible:psalms/1/1", (1, 0): T + "bible:exodus/20/9"})
 
 
 class TestMint(unittest.TestCase):

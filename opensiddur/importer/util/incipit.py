@@ -300,22 +300,30 @@ def index_document(index: IncipitIndex, root: etree._Element, bible: bool = Fals
 
     def finish(entry: list) -> None:
         urn, collected, own = entry[0], entry[1], entry[2]
+        # A Bible decides a verse's own words and length, though the verse is still found by its
+        # first holding's opening. Of two Bibles that differ, the last read decides (by name, the
+        # WLC after Miqra al pi ha-Masorah).
+        verse = bible and urn.startswith(TEXT_PREFIX + "bible:")
         if urn in index.incipit_of:
             # The first holding of a text decides its length, long or short: a later document
             # that quotes part of it (Kiddush Levana's half of Exodus 15:16, after Birnbaum's Az
-            # Yashir holds it whole) does not shorten it. A Bible decides a verse's own words and
-            # length, though the verse is still found by the first holding's opening.
-            if bible and urn.startswith(TEXT_PREFIX + "bible:"):
-                verse = tuple(collected[:COLLECTED_WORDS if own is None else own])
-                if len(verse) >= SHORT_INCIPIT_WORDS and verse != index.own_opening(urn):
-                    index.bible_words[urn] = verse
-                if own is None:
-                    index.length_of.pop(urn, None)
-                else:
-                    index.length_of[urn] = own
+            # Yashir holds it whole) does not shorten it.
+            if verse:
+                own_words = tuple(collected[:COLLECTED_WORDS if own is None else own])
+                if len(own_words) >= SHORT_INCIPIT_WORDS and own_words != index.own_opening(urn):
+                    index.bible_words[urn] = own_words
+                set_length(urn, own)
             return
         index.add(urn, collected)
-        if own is not None and urn not in index.length_of:
+        if verse:
+            set_length(urn, own)  # (over a length a prayer too short to be indexed left)
+        elif own is not None and urn not in index.length_of:
+            index.length_of[urn] = own
+
+    def set_length(urn: str, own: int | None) -> None:
+        if own is None:
+            index.length_of.pop(urn, None)
+        else:
             index.length_of[urn] = own
 
     # Each scope still open: its URN, its last words, what ends it, and the text it has just
@@ -526,9 +534,10 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #: 8: a word split across elements is one word; a prefixed divine name keeps its prefix; a
 #:    paseq separates words.
 #: 9: a text's first holding decides its length, though a later one holds it shorter.
-#: 10: a verse's own words and length are the Bible's; a ketiv is not indexed; a Bible's note
+#: 10: (not released)
+#: 11: a verse's own words and length are the Bible's; a ketiv is not indexed; a Bible's note
 #:     anchors do not end words, and only the first of its options is read.
-INDEX_VERSION = 10
+INDEX_VERSION = 11
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:
