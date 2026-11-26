@@ -1,9 +1,10 @@
 """Shema and its weekday morning blessings, printed 71–82."""
 import re
 from html import escape
-from .common import PRAYER, SIDDUR, SIGIL_SHEMA, pb, cond, endcond, feature, QUORUM
-from .shema_data import ROWS
+
+from .common import PRAYER, QUORUM, SIDDUR, SIGIL_SHEMA, cond, endcond, feature, pb
 from .milestones import Correspondences
+from .shema_data import ROWS
 
 BIBLE = 'urn:x-opensiddur:text:bible:'
 ORDER = ('barekhu', 'yotzer_or', 'ahavah_rabbah', 'shema', 'emet_veyatziv')
@@ -85,7 +86,7 @@ def prayers(lang):
 
 
 def unit_body(project, by_name):
-    from .build_he import declaration, _transclude
+    from .build_he import _transclude, declaration
     lines = [f'<tei:div corresp="{SIDDUR}chol/shacharit/shema">', declaration()]
     for name in ORDER:
         _transclude(lines, by_name, name)

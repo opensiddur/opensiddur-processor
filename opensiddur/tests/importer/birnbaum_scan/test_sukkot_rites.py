@@ -1,9 +1,12 @@
 """Calendar choices and source boundaries for Birnbaum's Sukkot rites."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import sukkot_rites as r
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestSukkotRites(unittest.TestCase):
     def test_all_four_printed_hoshana_schedules(self):

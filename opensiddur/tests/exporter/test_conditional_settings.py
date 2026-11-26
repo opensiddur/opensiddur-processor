@@ -11,11 +11,14 @@ from lxml import etree
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import (
     INIT_DECLARE_ID,
-    yaml_to_declaration_entries,
     parse_declare_element,
+    yaml_to_declaration_entries,
 )
 from opensiddur.exporter.constants import JLPTEI_NAMESPACE, TEI_NS
-from opensiddur.exporter.derived_settings import register_derived_entry, remove_derived_for_contributor
+from opensiddur.exporter.derived_settings import (
+    register_derived_entry,
+    remove_derived_for_contributor,
+)
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
 from opensiddur.exporter.linear import (
     ConditionalSettingEntry,

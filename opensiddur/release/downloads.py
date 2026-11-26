@@ -18,7 +18,6 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -38,10 +37,10 @@ class BookEntry:
     title: str
     """The settings file's `book.title`, or its name if it has none."""
 
-    description: Optional[str] = None
+    description: str | None = None
 
 
-def _text(value) -> Optional[str]:
+def _text(value) -> str | None:
     """ A YAML value as one line of text, or None if it is not a nonempty string. """
     if not isinstance(value, str):
         return None
@@ -128,7 +127,7 @@ def render_downloads(release: dict, books: list[BookEntry]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="python -m opensiddur.release.downloads",
         description="Write the downloads list (DOWNLOADS.md) of a book release.",

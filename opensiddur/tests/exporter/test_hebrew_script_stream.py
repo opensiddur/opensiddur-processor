@@ -1,6 +1,7 @@
 """Explicit Hebrew-script languages must retain direction in parallel columns."""
 import re
 import unittest
+
 from opensiddur.tests.exporter.test_reledmac_xslt import _transform
 
 

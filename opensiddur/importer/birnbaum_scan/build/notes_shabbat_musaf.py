@@ -1,6 +1,7 @@
 """Commentary read on printed 391–422; Kiddush's note is outside this unit."""
 from .notes_minchah import note
-from .shabbat_musaf import ROOT, URNS, TIKANTA, EIN, ANIM, TAMID, TANA, BIBLE
+from .shabbat_musaf import ANIM, BIBLE, EIN, ROOT, TAMID, TANA, TIKANTA, URNS
+
 NOTES = [
  note(ROOT+'/amidah','the prayer added after <tei:hi rend="italic">Shaḥarith</tei:hi>, corresponds to the additional sacrifices on Sabbaths and festive days over and above the regular daily <tei:hi rend="italic">tamid</tei:hi> offered in the Temple.',lemma='מוסף'),
  # The Ki Shem commentary and its Deuteronomy citation are inherited from Minchah.

@@ -1,13 +1,18 @@
 """Synthetic occasion boundaries and filenames for Shabbat/festival Arvit."""
 import unittest
 from unittest.mock import patch
+
 from opensiddur.exporter.condition_eval import TriState
+from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN, PROJECT_HE
 from opensiddur.importer.birnbaum_scan.build.shabbat_arvit import (
-    SHABBAT_AMIDAH, REGALIM, declaration, prayers, units,
+    REGALIM,
+    SHABBAT_AMIDAH,
+    declaration,
+    prayers,
+    units,
 )
-from opensiddur.importer.birnbaum_scan.build.common import PROJECT_HE, PROJECT_EN
-from .test_tachanun_conditions import evaluate
-from .test_tachanun_conditions import fragment
+
+from .test_tachanun_conditions import evaluate, fragment
 
 
 class TestShabbatArvit(unittest.TestCase):

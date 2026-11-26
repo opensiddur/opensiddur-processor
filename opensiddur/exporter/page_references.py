@@ -1,6 +1,8 @@
 """Resolve page and literal text pointers against surviving compiled content."""
 import hashlib
+
 from lxml import etree
+
 from opensiddur.exporter.constants import RUBRIC_NOTE_TYPES
 
 TEI = "http://www.tei-c.org/ns/1.0"

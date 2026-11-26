@@ -1,10 +1,17 @@
 """Synthetic tests of Amidah selection and the common post-Amidah return point."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build.shabbat_amidah import (
-    SERVICE, ROOT, KADDISH, SHABBAT_AMIDAH, READER, extend_service,
+    KADDISH,
+    READER,
+    ROOT,
+    SERVICE,
+    SHABBAT_AMIDAH,
+    extend_service,
 )
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
 
 
 class TestShabbatAmidah(unittest.TestCase):

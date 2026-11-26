@@ -59,12 +59,12 @@ class TestAlignPageBreaksIntegration(unittest.TestCase):
             pdf_dest = root / "heidenheim_haggadah_1822" / "heidenheim_1822.pdf"
             pdf_dest.write_bytes(pdf_path.read_bytes())
 
-            from opensiddur.importer.feinstein_haggadah.page_breaks import (
-                folio_at_facsimile_page,
-            )
             from opensiddur.importer.feinstein_haggadah.align_page_breaks import (
                 align_page_breaks,
                 write_page_breaks,
+            )
+            from opensiddur.importer.feinstein_haggadah.page_breaks import (
+                folio_at_facsimile_page,
             )
 
             mapping = align_page_breaks(sourcetexts_root=root, pdf_path=pdf_dest)

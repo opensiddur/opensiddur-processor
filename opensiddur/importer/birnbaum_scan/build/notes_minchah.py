@@ -1,5 +1,5 @@
 """Commentary printed with Minchah, including the essay on Kaddish (187–188)."""
-from .minchah import ROOT, NACHEM
+from .minchah import NACHEM, ROOT
 
 
 def note(target, text, *, lemma='', kind='commentary', n=''):

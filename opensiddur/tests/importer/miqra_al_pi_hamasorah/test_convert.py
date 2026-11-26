@@ -1,8 +1,7 @@
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-import tempfile
-
 
 from opensiddur.importer.miqra_al_pi_hamasorah.convert import (
     _book_name_he,
@@ -297,7 +296,10 @@ class TestIndexUrnName(unittest.TestCase):
 
 class TestHeaderUrn(unittest.TestCase):
     def test_the_header_names_its_entrypoint(self):
-        from opensiddur.importer.miqra_al_pi_hamasorah.convert import MIQRA_PROJECT, header
+        from opensiddur.importer.miqra_al_pi_hamasorah.convert import (
+            MIQRA_PROJECT,
+            header,
+        )
         self.assertIn(f">urn:x-opensiddur:text:bible:amos@{MIQRA_PROJECT}<",
                       header(None, "Amos", entrypoint="amos", source_note="note"))
         self.assertIn(f">urn:x-opensiddur:text:bible:tanakh@{MIQRA_PROJECT}<",

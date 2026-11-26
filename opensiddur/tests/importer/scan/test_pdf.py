@@ -1,9 +1,11 @@
 """Geometry and text measurement on synthetic PDFs' extracted glyph trees."""
 import copy
-from types import SimpleNamespace
 import unittest
+from types import SimpleNamespace
 from unittest.mock import Mock
+
 from lxml import etree
+
 from opensiddur.importer.scan import pdf
 
 

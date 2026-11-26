@@ -1,8 +1,8 @@
 """Final readings and the addressable complete weekday morning service."""
-from .common import SIDDUR, PRAYER, pb
+from .common import PRAYER, SIDDUR, pb
 from .conclusion import BIBLE, text_xml, transclude
 from .milestones import Correspondences, marked
-from .shacharit_end_data import DECALOGUE, PRINCIPLES, BELIEVE, HOPE, TARGUM
+from .shacharit_end_data import BELIEVE, DECALOGUE, HOPE, PRINCIPLES, TARGUM
 
 SERVICE = SIDDUR + 'chol/shacharit'
 ROOT = SERVICE + '/final_readings'

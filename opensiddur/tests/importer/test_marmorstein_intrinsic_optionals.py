@@ -1,14 +1,19 @@
 """Intrinsic prayer choices survive shared printings without moving instructions."""
-from copy import deepcopy
-from pathlib import Path
 import tempfile
 import unittest
+from copy import deepcopy
+from pathlib import Path
+
 from lxml import etree
-from opensiddur.tests.importer import test_marmorstein_canonical_printings as printing_cases
-fixture = printing_cases.fixture
-P, A, B, NS = printing_cases.P, printing_cases.A, printing_cases.B, printing_cases.NS
+
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import build as b
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import realizations as r
+from opensiddur.tests.importer import (
+    test_marmorstein_canonical_printings as printing_cases,
+)
+
+fixture = printing_cases.fixture
+P, A, B, NS = printing_cases.P, printing_cases.A, printing_cases.B, printing_cases.NS
 F='urn:x-opensiddur:condition:prayer:example/family'
 
 

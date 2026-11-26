@@ -20,9 +20,10 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from collections.abc import Iterator
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from opensiddur.importer.util.pages import (
     birnbaum_siddur_credits_directory,
@@ -346,7 +347,7 @@ def download_book(
         "book_name": BOOK_NAME,
         "namespace": WIKI_NAMESPACE,
         "source_root": SOURCE_ROOT,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "pages": manifest_pages,
         "source_pages": source_pages,
     }

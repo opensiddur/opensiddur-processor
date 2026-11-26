@@ -4,14 +4,12 @@ import unittest
 from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
+import hdate
 from pyluach import dates as pyluach_dates
 from pyluach import parshios
 
-import hdate
-
 from opensiddur.exporter.calendar.compute import (
     AGGREGATE_FEATURES,
-    HOLIDAY_FEATURES,
     FS_GREGORIAN,
     FS_HEBREW_DATE,
     FS_ISRAEL,
@@ -19,6 +17,7 @@ from opensiddur.exporter.calendar.compute import (
     FS_PURIM_OBSERVANCE,
     FS_QUORUM,
     FS_TIME,
+    HOLIDAY_FEATURES,
     SettingSnapshot,
     _datetime_from_snapshot,
     _map_hdate_holidays,
@@ -33,19 +32,24 @@ from opensiddur.exporter.calendar.compute import (
     compute_service_time,
     compute_torah_reading,
 )
-from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
-from opensiddur.exporter.derived_settings import (
-    SettingChangeTrigger,
-    get_active_setting_entry,
-    recalculate_derived_settings,
-)
 from opensiddur.exporter.compiler import CompilerProcessor
+from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.derivation_graph import (
     DERIVATION_SPECS,
     DerivationSpec,
     topological_derivation_order,
 )
-from opensiddur.exporter.linear import NumericValue, Undefined, get_linear_data, reset_linear_data
+from opensiddur.exporter.derived_settings import (
+    SettingChangeTrigger,
+    get_active_setting_entry,
+    recalculate_derived_settings,
+)
+from opensiddur.exporter.linear import (
+    NumericValue,
+    Undefined,
+    get_linear_data,
+    reset_linear_data,
+)
 
 
 def _date_only(found: dict) -> dict:

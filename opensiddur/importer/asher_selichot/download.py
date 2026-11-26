@@ -1,16 +1,22 @@
 """Download Asher evidence and derive a page map from image-verified corrections."""
 
-from opensiddur.importer.scan.metadata import derive_pages
-
 import argparse
 import json
 import os
 from pathlib import Path
+
 from lxml import etree
-from opensiddur.common.constants import SOURCETEXTS_ROOT, OUTPUT_DIRECTORY
+
+from opensiddur.common.constants import OUTPUT_DIRECTORY, SOURCETEXTS_ROOT
+from opensiddur.importer.scan.metadata import derive_pages
 from opensiddur.importer.scan.pages import BookProfile
-from opensiddur.importer.util.internet_archive import (connect, download_file, fetch_metadata,
-    page_image_url, resolve_agent_model, write_if_changed)
+from opensiddur.importer.util.internet_archive import (
+    connect,
+    download_file,
+    fetch_metadata,
+    resolve_agent_model,
+    write_if_changed,
+)
 
 
 def regenerate(profile):

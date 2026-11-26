@@ -1,13 +1,15 @@
 """Cache isolation, download failure handling and image bands on tiny fixtures."""
-from contextlib import redirect_stdout
 import io
 import json
 import os
+import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
 from unittest.mock import Mock, patch
+
 from PIL import Image
+
 from opensiddur.importer.scan import pages as p
 
 

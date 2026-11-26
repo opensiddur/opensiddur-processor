@@ -2,23 +2,34 @@
 import contextlib
 import io
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import Mock, patch
 
-from lxml import etree
 import yaml
+from lxml import etree
 
-from opensiddur.importer.marmorstein_rosh_hashanah_1 import profile, PROJECTS, EXPANDED
-from opensiddur.importer.marmorstein_rosh_hashanah_1.build import build, unit_review_text, words
-from opensiddur.importer.marmorstein_rosh_hashanah_1.download import download, regenerate
-from opensiddur.importer.marmorstein_rosh_hashanah_1.verify import report
-from opensiddur.importer.scan.review import review, reading_hash
-from opensiddur.importer.scan.authoring import printed_text
-from opensiddur.importer.util.internet_archive import write_if_changed
+from opensiddur.exporter.condition_eval import (
+    TriState,
+    evaluate_condition,
+    parse_condition_element,
+)
 from opensiddur.exporter.refdb import find_end_of_mapping
-from opensiddur.exporter.condition_eval import TriState, evaluate_condition, parse_condition_element
+from opensiddur.importer.marmorstein_rosh_hashanah_1 import EXPANDED, PROJECTS, profile
+from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+    build,
+    unit_review_text,
+    words,
+)
+from opensiddur.importer.marmorstein_rosh_hashanah_1.download import (
+    download,
+    regenerate,
+)
+from opensiddur.importer.marmorstein_rosh_hashanah_1.verify import report
+from opensiddur.importer.scan.authoring import printed_text
+from opensiddur.importer.scan.review import reading_hash, review
+from opensiddur.importer.util.internet_archive import write_if_changed
 
 T = '{http://www.tei-c.org/ns/1.0}'
 J = '{http://jewishliturgy.org/ns/jlptei/2}'
@@ -105,7 +116,9 @@ class EditionWiringTest(unittest.TestCase):
                 self.assertEqual(marker.get('facs'), notice.get('facs'))
 
     def test_continuing_rubric_retains_one_note_and_both_scan_boundaries(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            instruction_review_text,
+        )
         instruction = {'scan': 's12', 'printed_page': 'a', 'page_start': True,
             'language': 'he', 'witnesses': ['he'], 'text': 'Example crosses the page',
             'source_pages': [{'scan': 's12', 'printed_page': 'a', 'text': 'Example crosses'},
@@ -131,7 +144,9 @@ class EditionWiringTest(unittest.TestCase):
             self.generate(draft=True)
 
     def test_continuing_instruction_requires_review_on_both_source_pages(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            instruction_review_text,
+        )
         instruction = {'scan': 's12', 'printed_page': 'a', 'page_start': True,
             'language': 'he', 'witnesses': ['he'], 'text': 'Example crosses the page',
             'source_pages': [{'scan': 's12', 'printed_page': 'a', 'text': 'Example crosses'},
@@ -157,7 +172,11 @@ class EditionWiringTest(unittest.TestCase):
 
     def test_paginated_instruction_rejects_untracked_or_inconsistent_pages(self):
         from copy import deepcopy
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import rubric_words, rubric_source_pages
+
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            rubric_source_pages,
+            rubric_words,
+        )
         original = {'scan': 's12', 'printed_page': 'a', 'text': 'One two',
             'source_pages': [{'scan': 's12', 'printed_page': 'a', 'text': 'One'},
                              {'scan': 's13', 'text': 'two'}]}
@@ -237,7 +256,9 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(link.getparent().get('type'), 'optional-page-reference')
 
     def test_editorial_parent_heading_nests_documentary_sections(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import documentary_order
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            documentary_order,
+        )
         order = [{'section': 'collection', 'heading': None,
                   'editorial_heads': {'he': 'אסופה'}, 'order': [
                       {'section': 'day', 'heading': 'day_heading', 'order': []}]}]
@@ -252,7 +273,9 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(root.find(T+'div/'+T+'div/'+T+'head').text, 'יום')
 
     def test_documentary_page_only_occurrence_is_language_specific(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import documentary_order
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            documentary_order,
+        )
         order = [{'page_break': {'en': {'scan': 's13', 'printed_page': '7'}}}]
         english, hebrew = etree.Element(T+'div'), etree.Element(T+'div')
         documentary_order(english, order, {}, {}, 'en', PROJECTS['en'])
@@ -751,7 +774,10 @@ class EditionWiringTest(unittest.TestCase):
         self.assertFalse(en.findall('.//'+J+'transclude'))
 
     def test_uncertain_character_keeps_exact_words_and_the_language_span(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import rubric_words, instruction_review_text
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            instruction_review_text,
+            rubric_words,
+        )
         rubric = {'text': 'ז שבת wordז ז', 'language_spans': [
             {'text': 'שבת', 'language': 'he'}],
             'uncertain_characters': [{'word': 'wordז', 'character': 'ז'}]}
@@ -769,7 +795,10 @@ class EditionWiringTest(unittest.TestCase):
                             reading_hash(instruction_review_text(plain)))
 
     def test_source_actor_rubric_correspondence_is_encoded_and_reviewed(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import rubric_words, instruction_review_text
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            instruction_review_text,
+            rubric_words,
+        )
         rubric={'text':'ק׳','abbreviations':[{'abbr':'ק׳','expan':'קהל'}],
                 'corresp':'urn:x-opensiddur:instruction:role/congregation'}
         note=etree.Element(T+'note')
@@ -914,7 +943,9 @@ class EditionWiringTest(unittest.TestCase):
         self.assertNotEqual(before, unit_review_text(unit, 'en'))
 
     def test_inline_scope_keeps_quotation_milestones_within_its_bounded_span(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import quotation_words
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            quotation_words,
+        )
         parent=etree.Element(T+'p');context=BASE+'example/quotations/exodus_3'
         quote=dict(text='I am that I am',source_reference='urn:x-opensiddur:text:bible:exodus/3/14',
                    chapter_corresp=context,source_reference_corresp=context+'/14',inline_scope=True)
@@ -937,7 +968,9 @@ class EditionWiringTest(unittest.TestCase):
             quotation_words(etree.Element(T+'p'),'I am that I am',[quote],'en')
 
     def test_inline_quotation_rejects_ambiguous_or_overlapping_spans(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import quotation_words
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            quotation_words,
+        )
         quotation = {'text': 'Repeated',
                      'source_reference': 'urn:x-opensiddur:text:bible:psalms/8/10',
                      'chapter_corresp': BASE+'quote/chapter',
@@ -948,7 +981,9 @@ class EditionWiringTest(unittest.TestCase):
             quotation_words(etree.Element(T+'p'), 'Repeated', [quotation, quotation], 'en')
 
     def test_half_verse_quote_maps_only_the_excerpt_and_ends_before_suffix(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import quotation_words
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            quotation_words,
+        )
         verse = 'urn:x-opensiddur:text:bible:isaiah/26/8'
         quote = {'text': 'Quoted clause', 'source_reference': verse,
                  'source_reference_part': {'unit': 'half-verse', 'n': 'a', 'corresp': verse+'/a'}}
@@ -983,6 +1018,7 @@ class EditionWiringTest(unittest.TestCase):
 
     def test_page_start_inside_optional_clause_can_be_deferred_once(self):
         from copy import deepcopy
+
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document
         unit = {'stem': 'example', 'urn': BASE+'example', 'title': {'en': 'Example'},
                 'languages': {'en': [
@@ -1057,7 +1093,9 @@ class EditionWiringTest(unittest.TestCase):
         self.assertNotEqual(reviewed, reading_hash(unit_review_text(unit, 'he')))
 
     def test_prayer_title_keeps_its_language_inside_a_hebrew_script_german_rubric(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import instruction_review_text
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            instruction_review_text,
+        )
         rubric = {'text': 'Before תפילה after', 'language': 'de-Hebr',
                   'language_spans': [{'text': 'תפילה', 'language': 'he'}]}
         self.readings['documentary_instructions'] = {'custom': dict(rubric,
@@ -1956,7 +1994,9 @@ class EditionWiringTest(unittest.TestCase):
         self.assertEqual(result['leaves_fully_transcribed_and_reviewed'], 0)
 
     def test_progress_uses_current_corrections_in_realization_receipts(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import review_payloads
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            review_payloads,
+        )
         from opensiddur.importer.scan.review import reading_hash
         self.save('pages', {'pages': [{'scan_page': n} for n in range(1, 5)]})
         self.readings['units'][0]['review_encoding'] = True
@@ -1982,12 +2022,16 @@ class ExpandedEditionPinTest(unittest.TestCase):
     """The expanded order names no edition, except the two Kaddishes said outside the Ten Days."""
 
     def test_an_unpinned_reference_is_unchanged(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import expanded_reference
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            expanded_reference,
+        )
         reference = {'target': 'urn:x-opensiddur:text:prayer:kaddish/shalem'}
         self.assertEqual(expanded_reference(reference), reference)
 
     def test_a_pinned_reference_loses_its_pin(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import expanded_reference
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            expanded_reference,
+        )
         self.assertEqual(
             expanded_reference({'target': 'urn:x-opensiddur:text:prayer:hamotzi@hasiddur_hashalem-birnbaum-1949-he'}),
             {'target': 'urn:x-opensiddur:text:prayer:hamotzi'})
@@ -1999,7 +2043,8 @@ class ExpandedEditionPinTest(unittest.TestCase):
 
     def test_the_documented_exceptions_keep_their_pin(self):
         from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
-            EXPANDED_EDITION_PINS, expanded_reference,
+            EXPANDED_EDITION_PINS,
+            expanded_reference,
         )
         self.assertEqual(len(EXPANDED_EDITION_PINS), 2)
         for target in EXPANDED_EDITION_PINS:

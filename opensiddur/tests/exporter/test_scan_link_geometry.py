@@ -21,7 +21,7 @@ from lxml import etree
 from pypdf import PdfReader
 
 from opensiddur.exporter.scan_links import mark_scan_links
-from opensiddur.tests.exporter.stylesheet_helpers import NO_NOTICES, transform
+from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 _WORD = re.compile(
     r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')

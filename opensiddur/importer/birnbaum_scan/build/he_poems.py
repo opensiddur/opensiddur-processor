@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of Adon Olam and Yigdal, read off printed pages 11 and 13.
 
 Both poems are set in two columns on the Hebrew page and as two stacked lines
@@ -14,8 +13,8 @@ form of the asymmetry in this unit -- a heading on one side and none on the othe
 """
 import functools
 
-from .common import POEM
 from . import common
+from .common import POEM
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

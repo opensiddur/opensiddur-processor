@@ -2,9 +2,8 @@
 from html import escape
 from itertools import groupby
 
-from .common import (PRAYER, SIDDUR, AGG, HOL,
-                     cond, endcond, feature, pb)
 from .avinu_malkenu_data import ROWS
+from .common import AGG, HOL, PRAYER, SIDDUR, cond, endcond, feature, pb
 
 URN = PRAYER + "avinu_malkenu"
 SIGIL = "1949 chol/shacharit/avinu_malkenu"
@@ -60,7 +59,7 @@ def prayers(lang):
 
 
 def unit_body(project, by_name):
-    from .build_he import declaration, _transclude
+    from .build_he import _transclude, declaration
     parts = [f'<tei:div corresp="{SIDDUR}chol/shacharit/avinu_malkenu">', declaration(),
              cond("avinu_occasion",
                   note="Between Rosh Hashanah and Yom Kippur and on fast days:",

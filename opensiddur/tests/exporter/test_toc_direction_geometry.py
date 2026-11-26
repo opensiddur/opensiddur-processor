@@ -4,7 +4,9 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+
 from lxml import etree
+
 from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 

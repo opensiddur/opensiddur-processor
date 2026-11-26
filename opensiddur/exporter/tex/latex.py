@@ -17,7 +17,6 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 from lxml import etree
 from pydantic import ValidationError
@@ -26,14 +25,9 @@ from pydantic import ValidationError
 project_root = Path(__file__).resolve().parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from opensiddur.common.xslt import xslt_transform_string  # noqa: E402
 from opensiddur.common.constants import PROJECT_DIRECTORY  # noqa: E402
-from opensiddur.exporter.typography import TypographyConfig  # noqa: E402
-from opensiddur.exporter.tex.escape import escape_tex  # noqa: E402
-from opensiddur.exporter.tex.running_heads import (  # noqa: E402
-    build_page_style_tex,
-    escape_with_hebrew_runs,
-)
+from opensiddur.common.xslt import xslt_transform_string  # noqa: E402
+from opensiddur.exporter import metadata, notices  # noqa: E402
 from opensiddur.exporter.cli_common import (  # noqa: E402
     TYPOGRAPHY_SETTINGS_HELP,
     SettingsError,
@@ -42,32 +36,29 @@ from opensiddur.exporter.cli_common import (  # noqa: E402
     prepare_compiled_tree,
     scan_links_wanted,
 )
-from opensiddur.exporter.tex.typography_tex import (  # noqa: E402
-    build_typography_preamble,
-    documentclass_options,
-)
-
 from opensiddur.exporter.metadata import (  # noqa: E402
     ISBN_TYPES,
     ISO_DATE,
-    CreditRecord,
     LicenseRecord,
     RoleCredits,
     SourceRecord,
     build_colophon,
-    extract_credits,
-    group_credits,
-    group_licenses,
-    order_credits,
 )
-from opensiddur.exporter import metadata  # noqa: E402
-from opensiddur.exporter import notices  # noqa: E402
 from opensiddur.exporter.notices import RunKind  # noqa: E402
 from opensiddur.exporter.settings import (  # noqa: E402
     TEX_UNSAFE_PATH_CHARACTERS,
     DistributionNotice,
     DistributionSettings,
 )
+from opensiddur.exporter.tex.running_heads import (  # noqa: E402
+    build_page_style_tex,
+    escape_with_hebrew_runs,
+)
+from opensiddur.exporter.tex.typography_tex import (  # noqa: E402
+    build_typography_preamble,
+    documentclass_options,
+)
+from opensiddur.exporter.typography import TypographyConfig  # noqa: E402
 
 XSLT_FILE = Path(__file__).parent / "reledmac.xslt"
 
@@ -136,7 +127,7 @@ _NOTICE_FILLS = {
 }
 
 
-def distribution_notice_to_tex(notice: Optional[DistributionNotice], logo: Optional[Path]) -> str:
+def distribution_notice_to_tex(notice: DistributionNotice | None, logo: Path | None) -> str:
     """The body of the distribution notice's page, or nothing if the book carries none.
 
     The stylesheet sets it on a page of its own, on the verso of the title page.
@@ -328,11 +319,11 @@ def typography_parameters(typography: TypographyConfig, root: etree._Element) ->
 def transform_xml_to_tex(
     input_file,
     xslt_file: Path = XSLT_FILE,
-    output_file: Optional[str] = None,
-    settings_file: Optional[Path] = None,
-    typography: Optional[TypographyConfig] = None,
+    output_file: str | None = None,
+    settings_file: Path | None = None,
+    typography: TypographyConfig | None = None,
     project_directory: Path | None = None,
-    distribution: Optional[DistributionSettings] = None,
+    distribution: DistributionSettings | None = None,
 ) -> str:
     """Transform a compiled JLPTEI XML file into a LuaLaTeX document.
 

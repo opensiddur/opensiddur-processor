@@ -1,14 +1,18 @@
 """Existing acceptance is fixed before new identities and pointers are introduced."""
-from copy import deepcopy
 import json
-from pathlib import Path
 import unittest
+from copy import deepcopy
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import BOOK
-from opensiddur.importer.marmorstein_rosh_hashanah_1.baseline import validate_baseline, validate_redirection, snapshot
+from opensiddur.importer.marmorstein_rosh_hashanah_1.baseline import (
+    snapshot,
+    validate_baseline,
+    validate_redirection,
+)
 
 BASELINE=Path(__file__).parent/'fixtures/marmorstein_accepted_660.json'
 PARTS=['urn:x-opensiddur:text:prayer:amidah/qedushah/'+x
@@ -65,7 +69,9 @@ class LiteralBaselineTest(unittest.TestCase):
         with self.assertRaises(ValueError):validate_baseline(altered,baseline)
 
     def test_enabling_encoding_review_preserves_legacy_source_and_binds_mapping(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import review_payloads
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            review_payloads,
+        )
         original = {'units': [dict(stem='old', urn='urn:x-opensiddur:text:siddur:example',
             title={'he': 'Example'}, languages={'he': [dict(paragraph=1,
                 fragments=[dict(scan='s1', printed_page='1', text='words', page_start=True)])]})]}

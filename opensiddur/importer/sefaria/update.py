@@ -47,9 +47,22 @@ from pathlib import Path
 from typing import Any
 
 from opensiddur.common.constants import OUTPUT_DIRECTORY
-from opensiddur.importer.sefaria.align import AlignmentError, LeafDecision, load_decisions
-from opensiddur.importer.sefaria.corrections import CorrectionError, SegmentCorrection, load_corrections
-from opensiddur.importer.sefaria.download import MANIFEST_NAME, Client, download, load_manifest
+from opensiddur.importer.sefaria.align import (
+    AlignmentError,
+    LeafDecision,
+    load_decisions,
+)
+from opensiddur.importer.sefaria.corrections import (
+    CorrectionError,
+    SegmentCorrection,
+    load_corrections,
+)
+from opensiddur.importer.sefaria.download import (
+    MANIFEST_NAME,
+    Client,
+    download,
+    load_manifest,
+)
 from opensiddur.importer.sefaria.works import Work, select_works
 
 logger = logging.getLogger(__name__)

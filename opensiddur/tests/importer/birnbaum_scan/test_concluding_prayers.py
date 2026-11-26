@@ -1,10 +1,12 @@
 """Meal choices, wedding order and reusable closing prayers."""
 import unittest
-from lxml import etree
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import concluding_prayers as r
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestConcludingPrayers(unittest.TestCase):
     def test_wedding_wine_order(self):
@@ -50,7 +52,9 @@ class TestConcludingPrayers(unittest.TestCase):
         self.assertNotIn('meein-shalosh-food',en)  # empty facing anchors, no empty brackets
 
     def test_final_scan_numbers_have_direct_evidence(self):
-        from opensiddur.importer.birnbaum_siddur.correspondence import resolve_printed_pages
+        from opensiddur.importer.birnbaum_siddur.correspondence import (
+            resolve_printed_pages,
+        )
         rows=[dict(scan_page=n,printed_page_wikisource=None,printed_page_ia=None) for n in (811,813,815)]
         self.assertEqual(resolve_printed_pages(rows),[])
         self.assertEqual([x['printed_page'] for x in rows],['786','788','790'])

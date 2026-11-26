@@ -1,7 +1,9 @@
 """The full book may contain short stanza anchors before the target poem."""
 import unittest
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.check_pdf import check, HEBREW, ENGLISH
+
+from opensiddur.importer.asher_selichot.check_pdf import ENGLISH, HEBREW, check
 
 
 class PoemPdfTest(unittest.TestCase):

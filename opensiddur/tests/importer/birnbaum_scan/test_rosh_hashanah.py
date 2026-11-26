@@ -1,20 +1,23 @@
 """Rosh Hashanah prayer selection and preservation of biblical boundaries."""
 import unittest
-from lxml import etree as E
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import rosh_hashanah as r
-from .test_tachanun_conditions import evaluate, fragment, NS
+from opensiddur.importer.birnbaum_scan.build.common import AGG, SERVICE
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestRoshHashanah(unittest.TestCase):
     def test_tashlikh_postponed_only_when_day_one_is_shabbat(self):
         for day,weekday,expected in [(1,7,False),(2,1,True),(1,2,True),(2,3,False),(3,4,False)]:
             settings={('opensiddur:hebrew-date','month'):7,('opensiddur:hebrew-date','day'):day,
-                ('opensiddur:day-of-week','hebrew-day'):weekday,(r.AGG,'shabbat'):weekday==7}
+                ('opensiddur:day-of-week','hebrew-day'):weekday,(AGG,'shabbat'):weekday==7}
             self.assertEqual(evaluate(r.TASHLIKH_DAY,settings),TriState.TRUE if expected else TriState.FALSE)
     def test_reader_never_appears_at_maariv_or_without_minyan(self):
         from opensiddur.importer.birnbaum_scan.build.shabbat_amidah import RECITATION
         for service,minyan,rep,expected in [('minha',True,True,True),('maariv',True,True,False),('minha',False,True,False),('minha',True,False,False)]:
-            settings={(r.SERVICE,service):True,(r.SERVICE,'minha'):service=='minha',
+            settings={(SERVICE,service):True,(SERVICE,'minha'):service=='minha',
                 ('opensiddur:quorum','minyan'):minyan,(RECITATION,'repetition'):rep}
             self.assertEqual(evaluate(r.READER,settings),TriState.TRUE if expected else TriState.FALSE)
     def test_kapparot_custom_defaults_to_maybe_and_selects_one(self):

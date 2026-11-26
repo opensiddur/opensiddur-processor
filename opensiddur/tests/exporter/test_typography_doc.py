@@ -16,7 +16,6 @@ from pydantic import BaseModel
 from opensiddur.exporter import typography as typography_module
 from opensiddur.exporter.typography import Styles, TextStyle, TypographyConfig
 
-
 DOC = Path(__file__).resolve().parents[3] / "doc" / "typography.md"
 
 # `page_header` and `page_footer` are running heads, documented as a section of

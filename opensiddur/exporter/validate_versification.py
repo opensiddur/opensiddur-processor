@@ -24,15 +24,18 @@ from __future__ import annotations
 import argparse
 import collections
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Optional
 
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.common.versification import (
-    NUMBERING_COMMON, NUMBERING_LENINGRAD, NUMBERING_MASORAH, NUMBERING_PROJECT,
+    NUMBERING_COMMON,
+    NUMBERING_LENINGRAD,
+    NUMBERING_MASORAH,
+    NUMBERING_PROJECT,
 )
 
 VERSE_URN = re.compile(
@@ -225,7 +228,7 @@ def validate_versification(
     return report
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
         "--project-directory", type=Path, default=PROJECT_DIRECTORY,

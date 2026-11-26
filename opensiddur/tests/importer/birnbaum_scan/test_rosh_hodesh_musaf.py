@@ -1,8 +1,18 @@
 """Rosh Hodesh Musaf gates and separation from other Amidah additions."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
-from opensiddur.importer.birnbaum_scan.build.rosh_hodesh_musaf import ROOT,AMIDAH,URNS,PROJECT_HE,units,LEAP,READER
-from .test_tachanun_conditions import evaluate,fragment,NS
+from opensiddur.importer.birnbaum_scan.build.rosh_hodesh_musaf import (
+    AMIDAH,
+    LEAP,
+    PROJECT_HE,
+    READER,
+    ROOT,
+    URNS,
+    units,
+)
+
+from .test_tachanun_conditions import NS, evaluate, fragment
 
 
 class TestRoshHodeshMusaf(unittest.TestCase):
@@ -39,8 +49,12 @@ class TestRoshHodeshMusaf(unittest.TestCase):
         self.assertEqual(self.built[ROOT].find('.//tei:f[@name="musaf"]/tei:binary',NS).get('value'),'true')
 
     def test_nineteen_blessing_commentary_excludes_musaf(self):
-        from opensiddur.importer.birnbaum_scan.build.notes import WEEKDAY_AMIDAH_NOTE, note
         from lxml import etree
+
+        from opensiddur.importer.birnbaum_scan.build.notes import (
+            WEEKDAY_AMIDAH_NOTE,
+            note,
+        )
         synthetic = dict(kind='commentary', target='urn:test', condition=WEEKDAY_AMIDAH_NOTE, paras=[dict(text='Example.')])
         encoded = fragment(note(synthetic))
         condition = encoded.find('.//j:condition', NS)

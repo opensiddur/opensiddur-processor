@@ -44,14 +44,12 @@ import re
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
-
-from opensiddur.exporter.refdb import file_hash
 
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.common.progress import progress
+from opensiddur.exporter.refdb import file_hash
 from opensiddur.importer.util import validation as _validation
 from opensiddur.importer.util.constants import SCHEMA_RNG_PATH, SCHEMA_SCH_XSLT_PATH
 from opensiddur.importer.util.validation import relaxng_validate, schematron_validate
@@ -141,12 +139,12 @@ class ValidationCache:
     Stored as JSON: ``{"fingerprint": "...", "valid": ["<sha256>", ...]}``.
     """
 
-    def __init__(self, fingerprint: str, valid: Optional[set[str]] = None):
+    def __init__(self, fingerprint: str, valid: set[str] | None = None):
         self.fingerprint = fingerprint
         self.valid: set[str] = set(valid or ())
 
     @classmethod
-    def load(cls, path: Path, fingerprint: str) -> "ValidationCache":
+    def load(cls, path: Path, fingerprint: str) -> ValidationCache:
         """The cache at ``path``, or an empty one.
 
         A missing or unreadable file, or one recorded under a different fingerprint, gives an
@@ -185,8 +183,8 @@ class ValidationCache:
 def iter_target_files(
     *,
     project_directory: Path = PROJECT_DIRECTORY,
-    projects: Optional[list[str]] = None,
-    files_from: Optional[list[Path]] = None,
+    projects: list[str] | None = None,
+    files_from: list[Path] | None = None,
 ) -> tuple[list[Path], list[str]]:
     """Resolve what to validate.
 
@@ -253,7 +251,7 @@ def validate_file(path: Path) -> FileResult:
 
 
 def validate_files(
-    paths: list[Path], cache: Optional[ValidationCache] = None
+    paths: list[Path], cache: ValidationCache | None = None
 ) -> list[FileResult]:
     """Validate each of ``paths``, skipping any whose content ``cache`` records as valid."""
     tracked = progress(paths, "Schema validation", logger=logger)
@@ -299,9 +297,9 @@ def format_annotation(file_path: str, error: str) -> str:
 def validate_schema(
     *,
     project_directory: Path = PROJECT_DIRECTORY,
-    projects: Optional[list[str]] = None,
-    files_from: Optional[list[Path]] = None,
-    cache_path: Optional[Path] = None,
+    projects: list[str] | None = None,
+    files_from: list[Path] | None = None,
+    cache_path: Path | None = None,
 ) -> SchemaReport:
     files, skipped = iter_target_files(
         project_directory=project_directory, projects=projects, files_from=files_from
@@ -320,7 +318,7 @@ def validate_schema(
     return SchemaReport(results=results, skipped_projects=skipped)
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
         "--project-directory",
@@ -361,7 +359,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("-v", "--verbose", action="store_true", help="Also list files that passed.")
     args = parser.parse_args(argv)
 
-    files_from: Optional[list[Path]] = None
+    files_from: list[Path] | None = None
     if args.files_from:
         files_from = [
             Path(line.strip())

@@ -3,47 +3,45 @@
 import difflib
 import logging
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any
+
+from lxml import etree
 from lxml.etree import ElementBase
 
+from opensiddur.exporter.annotation_placement import (
+    place_structural_annotations,
+    place_structural_annotations_in_stream,
+)
 from opensiddur.exporter.compiler import (
     CompilerProcessor,
+    UnresolvedTarget,
+    _AnnotationCommand,
     _ProcessingCommand,
     _ProcessingContext,
-    _AnnotationCommand,
-    UnresolvedTarget,
     transclusion_type_of,
 )
 from opensiddur.exporter.conditional_settings import CONDITIONAL_CONTROL_TAGS
 from opensiddur.exporter.constants import (
-    RUBRIC_NOTE_TYPES,
     JLPTEI_NAMESPACE,
     PROCESSING_NAMESPACE,
+    RUBRIC_NOTE_TYPES,
     STRUCTURAL_BLOCKS,
     TEI_NS,
     XML_NS,
     is_element_node,
 )
 from opensiddur.exporter.linear import LinearData
-from opensiddur.exporter.refdb import UNIT_CONTAINED_BY, ReferenceDatabase
-from opensiddur.exporter.urn import (
-    ResolvedUrnRange,
-    UrnResolver,
-    split_project,
-    with_project,
-)
-from lxml import etree
-
 from opensiddur.exporter.marker_reconstruct import (
     doc_needs_marker_reconstruction,
     reconstruct_markered_document,
 )
-
-from opensiddur.exporter.annotation_placement import (
-    place_structural_annotations,
-    place_structural_annotations_in_stream,
-)
 from opensiddur.exporter.milestone_annotations import place_milestone_annotations
+from opensiddur.exporter.refdb import UNIT_CONTAINED_BY, ReferenceDatabase
+from opensiddur.exporter.urn import (
+    ResolvedUrnRange,
+    split_project,
+    with_project,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +51,7 @@ logger = logging.getLogger(__name__)
 AlignmentKey = str | tuple[str, str]
 
 
-def _alignment_boundaries(elements: list[ElementBase]) -> list[Optional[AlignmentKey]]:
+def _alignment_boundaries(elements: list[ElementBase]) -> list[AlignmentKey | None]:
     """Keys before milestones and the opening/closing markers of bounded units."""
     structural: dict[str, str] = {}
     boundaries = []
@@ -159,10 +157,10 @@ def _carrier_attrs_from_marker_el(el: ElementBase, p_ns: str) -> dict[str, str]:
 
 class ExternalCompilerProcessor(CompilerProcessor):
     def _get_deepest_common_ancestor(self,
-        from_start: Optional[str] = None,
-        to_end: Optional[str] = None,
+        from_start: str | None = None,
+        to_end: str | None = None,
         include_tail_after_end: bool = False
-    ) -> tuple[Optional[ElementBase], Optional[ElementBase], Optional[ElementBase], bool]:
+    ) -> tuple[ElementBase | None, ElementBase | None, ElementBase | None, bool]:
         """
         Get the deepest common ancestor,
         the start element,
@@ -192,11 +190,11 @@ class ExternalCompilerProcessor(CompilerProcessor):
         self,
         project: str,
         file_name: str,
-        from_start: Optional[str] = None,
-        to_end: Optional[str] = None,
+        from_start: str | None = None,
+        to_end: str | None = None,
         include_tail_after_end: bool = False,
-        linear_data: Optional[LinearData] = None,
-        reference_database: Optional[ReferenceDatabase] = None):
+        linear_data: LinearData | None = None,
+        reference_database: ReferenceDatabase | None = None):
         """ Process the given file/project.
         Only start from the given start and end, inclusive.
         Start and end must be in the same file.
@@ -274,10 +272,10 @@ class ExternalCompilerProcessor(CompilerProcessor):
     def _process_element_as_marker(
         self,
         element: ElementBase,
-        root: Optional[ElementBase] = None,
+        root: ElementBase | None = None,
         *,
         copy_text: bool = True,
-        annotations: Optional[list[ElementBase]] = None,
+        annotations: list[ElementBase] | None = None,
     ) -> list[ElementBase]:
         """Compile element as a marker-ified structural element.
 
@@ -422,8 +420,8 @@ class ExternalCompilerProcessor(CompilerProcessor):
     def _split_at_milestones(
         elements: list[ElementBase],
         ns_map: dict,
-        split_at: Optional[set[AlignmentKey]] = None,
-    ) -> list[tuple[Optional[AlignmentKey], list[ElementBase]]]:
+        split_at: set[AlignmentKey] | None = None,
+    ) -> list[tuple[AlignmentKey | None, list[ElementBase]]]:
         """Split at shared milestone and bounded structural correspondences.
 
         Returns a list of (corresp_or_None, [elements]) tuples.
@@ -436,7 +434,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
         """
         p_ns = PROCESSING_NAMESPACE
         open_stack: list[dict[str, Any]] = []  # id, tag, attrs (no xml:id, no p:*)
-        result: list[tuple[Optional[AlignmentKey], list]] = [(None, [])]
+        result: list[tuple[AlignmentKey | None, list]] = [(None, [])]
 
         for el, boundary in zip(elements, _alignment_boundaries(elements)):
             p_start = el.get(f"{{{p_ns}}}start")
@@ -485,11 +483,11 @@ class ExternalCompilerProcessor(CompilerProcessor):
     @staticmethod
     def _assemble_parallel_streams(
         primary: list[ElementBase],
-        primary_lang: Optional[str],
+        primary_lang: str | None,
         primary_project: str,
         primary_file: str,
         parallel: list[ElementBase],
-        parallel_lang: Optional[str],
+        parallel_lang: str | None,
         parallel_project: str,
         parallel_file: str,
         column_order: str,
@@ -583,7 +581,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
                 carrying the same corresp twice) keeps its first segment: the join is on the
                 URN, and two segments cannot both sit beside the other side's one. The rest
                 are dropped, and said to be."""
-                found: dict[Optional[AlignmentKey], list] = {}
+                found: dict[AlignmentKey | None, list] = {}
                 for c, els in segments:
                     if c not in found:
                         found[c] = els
@@ -745,7 +743,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
             (primary_project, primary_file), (parallel_project, parallel_file),
             primary_lang, parallel_lang)
 
-    def _resolve_parallel_range(self, target: str, target_end: Optional[str], parallel_project: str):
+    def _resolve_parallel_range(self, target: str, target_end: str | None, parallel_project: str):
         """Resolve a parallel URN to (project, file_name, from_start, to_end, include_tail).
 
         Resolved as the primary is (`_get_start_and_end_from_ranges`), within
@@ -776,7 +774,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
         return (resolved.start.project, resolved.start.file_name, resolved.start.element_path,
                 end.end_element_path or end.element_path, end.end_includes_tail)
 
-    def _transclude_parallel(self, element: ElementBase, transclude_range: ResolvedUrnRange, transclusion_type: str) -> Optional[ElementBase]:
+    def _transclude_parallel(self, element: ElementBase, transclude_range: ResolvedUrnRange, transclusion_type: str) -> ElementBase | None:
         """Compile a transclusion in parallel mode, returning p:transclude(p:parallel(...)).
 
         Returns None if no parallel project resolves, signalling caller to fall back.
@@ -914,7 +912,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
             self.linear_data.instruction_priority = saved_instr
             self.linear_data.annotation_projects = saved_annotations
 
-    def _root_correspondence_urn(self) -> Optional[str]:
+    def _root_correspondence_urn(self) -> str | None:
         """The URN identifying this document as a whole, for parallel-column matching.
 
         Prefers the @corresp of the body's first tei:div, which is what the reference
@@ -933,7 +931,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
 
         return None
 
-    def _select_root_parallel_project(self) -> Optional[tuple[str, str]]:
+    def _select_root_parallel_project(self) -> tuple[str, str] | None:
         """Pick the project holding this document's counterpart, as (project, file_name).
 
         Correspondence is decided by URN, not by file name: two documents pair up only when
@@ -980,7 +978,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
             ", ".join(self.linear_data.parallel_projects) or "none")
         return None
 
-    def _process_parallel_root(self) -> Optional[list[ElementBase]]:
+    def _process_parallel_root(self) -> list[ElementBase] | None:
         """Compile this file in parallel mode, replacing tei:body with p:parallel content.
 
         Returns None if no parallel project holds a counterpart of this document, signalling
@@ -1157,7 +1155,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
         context['element_path'] = None
         return context
 
-    def _process_element(self, element: ElementBase, root: Optional[ElementBase] = None) -> list[ElementBase]:
+    def _process_element(self, element: ElementBase, root: ElementBase | None = None) -> list[ElementBase]:
         # The final parallel tree no longer contains all source ancestors. Carry
         # their logical heading depth while recursing, including across files.
         depth = self.linear_data.heading_depth
@@ -1176,7 +1174,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
             self._markers_at_start = []
         return result
 
-    def _process_element_with_heading_depth(self, element: ElementBase, root: Optional[ElementBase] = None) -> list[ElementBase]:
+    def _process_element_with_heading_depth(self, element: ElementBase, root: ElementBase | None = None) -> list[ElementBase]:
         """
         Process the given element and return the list of processed elements.
         """
@@ -1331,7 +1329,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
         self._update_processing_context_after(element)
         return processed
 
-    def process(self, root: Optional[ElementBase] = None) -> list[ElementBase]:
+    def process(self, root: ElementBase | None = None) -> list[ElementBase]:
         if root is None:
             root = self.root_tree
         self._gather_file_credits()

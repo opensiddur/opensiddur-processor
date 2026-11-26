@@ -1,7 +1,8 @@
 """All printed commentary and source citations on pages 601–608."""
-from .yizkor import ROOT, SERVICE, URNS
-from .yizkor_data import PAGES
 from .notes_motzaei_shabbat import xml
+from .yizkor import URNS
+from .yizkor_data import PAGES
+
 
 def note(target,kind,text):
     return dict(target=target,kind=kind,lemma='',n='',paras=[dict(text=xml(p)) for p in text.split('\n')])

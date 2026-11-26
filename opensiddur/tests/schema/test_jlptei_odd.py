@@ -3,7 +3,6 @@ from pathlib import Path
 
 from lxml import etree
 
-
 ODD_PATH = Path(__file__).resolve().parents[3] / "schema" / "jlptei.odd.xml"
 
 

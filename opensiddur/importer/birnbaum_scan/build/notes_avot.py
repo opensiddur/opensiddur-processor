@@ -1,6 +1,7 @@
 """Every printed Avot commentary paragraph and source citation, keyed by URN."""
 import re
-from .avot import ROOT, READINGS, records, reference, text_xml
+
+from .avot import READINGS, ROOT, records, reference, text_xml
 
 
 def notes():

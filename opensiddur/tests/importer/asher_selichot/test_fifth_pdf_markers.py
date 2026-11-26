@@ -1,9 +1,14 @@
 """Page layout can put a line number and a footnote marker between prayer words."""
-import unittest
 import subprocess
 import sys
+import unittest
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.check_penitential_fifth_pdf import check, ANCHORS
+
+from opensiddur.importer.asher_selichot.check_penitential_fifth_pdf import (
+    ANCHORS,
+    check,
+)
 
 
 class FifthPdfMarkersTests(unittest.TestCase):

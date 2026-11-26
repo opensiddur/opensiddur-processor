@@ -1,9 +1,16 @@
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
+
 from lxml import etree
 
-from opensiddur.importer.util.validation import schematron_validate, relaxng_validate, validate, validate_with_start, _add_missing_namespaces
+from opensiddur.importer.util.validation import (
+    _add_missing_namespaces,
+    relaxng_validate,
+    schematron_validate,
+    validate,
+    validate_with_start,
+)
 
 
 class TestSchematronValidate(unittest.TestCase):

@@ -2,20 +2,20 @@
 
 import argparse
 import ast
-import io
 import hashlib
+import io
 import logging
-from pathlib import Path
 import re
 import sqlite3
 import sys
 import tokenize
-from typing import Optional
+from pathlib import Path
 
 from lxml import etree
 from lxml.etree import ElementBase
 from pydantic import BaseModel
-from opensiddur.common.constants import PROJECT_DIRECTORY, INDEX_DB_DIRECTORY
+
+from opensiddur.common.constants import INDEX_DB_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.progress import progress
 
 logger = logging.getLogger(__name__)
@@ -185,7 +185,7 @@ def milestone_terminates(element: ElementBase, following: ElementBase) -> bool:
     return following_dividers <= num_dividers
 
 
-def _scope_container(element: ElementBase) -> Optional[ElementBase]:
+def _scope_container(element: ElementBase) -> ElementBase | None:
     """The element a milestone's scope cannot outrun: its outermost tei:div, or else the
     section of the text it is in (tei:body, tei:front or tei:back)."""
     ns_map = {'tei': 'http://www.tei-c.org/ns/1.0'}
@@ -277,18 +277,18 @@ class UrnMapping(BaseModel):
     urn: str
     element_path: str
     element_tag: str
-    element_type: Optional[str]
-    end_element_path: Optional[str] = None
+    element_type: str | None
+    end_element_path: str | None = None
     end_includes_tail: bool = False
 
 class Reference(BaseModel):
     element_path: str
     element_tag: str
-    element_type: Optional[str]
+    element_type: str | None
     target_start: str
-    target_end: Optional[str]
+    target_end: str | None
     target_is_id: bool
-    corresponding_urn: Optional[str]
+    corresponding_urn: str | None
     project: str
     file_name: str
 
@@ -430,7 +430,7 @@ class ReferenceDatabase:
             (REFDB_VERSION,))
         self.conn.commit()
 
-    def get_urn_mappings(self, urn: Optional[str] = None, project: Optional[str] = None) -> list[UrnMapping]:
+    def get_urn_mappings(self, urn: str | None = None, project: str | None = None) -> list[UrnMapping]:
         """Get all URN mappings for a specific URN.
         
         Args:
@@ -466,7 +466,7 @@ class ReferenceDatabase:
             )
             for row in cursor.fetchall()]
     
-    def get_references_to(self, urn: Optional[str] = None, id: Optional[str] = None, project: Optional[str] = None, file_name: Optional[str] = None, *, element_tag: Optional[str] = None) -> list[Reference]:
+    def get_references_to(self, urn: str | None = None, id: str | None = None, project: str | None = None, file_name: str | None = None, *, element_tag: str | None = None) -> list[Reference]:
         """Get a list of all references to a specific URN or ID/file combination.
         
         Args:

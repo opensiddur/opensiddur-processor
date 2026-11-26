@@ -20,8 +20,8 @@ from opensiddur.importer.util.internet_archive import (
     fetch_metadata,
     file_url,
     leaf_count_from_scandata,
-    load_pageindex,
     load_page_numbers,
+    load_pageindex,
     page_image_url,
     resolve_agent_model,
     slice_searchtext,
@@ -390,20 +390,20 @@ class WriteIfChangedTestCase(unittest.TestCase):
 
     def test_writes_a_new_file_with_lf_endings(self):
         self.assertTrue(write_if_changed(self.path, "א\nב\n"))
-        self.assertEqual("א\nב\n".encode("utf-8"), self.path.read_bytes())
+        self.assertEqual("א\nב\n".encode(), self.path.read_bytes())
 
     def test_leaves_an_identical_file_alone(self):
         self.path.parent.mkdir()
-        self.path.write_bytes("א\n".encode("utf-8"))
+        self.path.write_bytes("א\n".encode())
         self.assertFalse(write_if_changed(self.path, "א\n"))
 
     def test_rewrites_a_file_that_differs_only_in_crlf_endings(self):
         # What a Windows checkout with core.autocrlf leaves on disk. Decoded as text it
         # equals the new text, but its bytes, and so its SHA-256, do not.
         self.path.parent.mkdir()
-        self.path.write_bytes("א\r\nב\r\n".encode("utf-8"))
+        self.path.write_bytes("א\r\nב\r\n".encode())
         self.assertTrue(write_if_changed(self.path, "א\nב\n"))
-        self.assertEqual("א\nב\n".encode("utf-8"), self.path.read_bytes())
+        self.assertEqual("א\nב\n".encode(), self.path.read_bytes())
         self.assertFalse(write_if_changed(self.path, "א\nב\n"))
 
 

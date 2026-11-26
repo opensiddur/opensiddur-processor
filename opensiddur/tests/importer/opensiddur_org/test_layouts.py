@@ -9,8 +9,16 @@ from lxml import etree
 
 from opensiddur.importer.opensiddur_org.contributors import Contributors, post_credits
 from opensiddur.importer.opensiddur_org.licences import LICENCES, LicenceDecision
-from opensiddur.importer.opensiddur_org.parse_post import node_text, parse_post, transcluded_urn
-from opensiddur.importer.opensiddur_org.post_decisions import Layout, PostDecisions, load_post_decisions
+from opensiddur.importer.opensiddur_org.parse_post import (
+    node_text,
+    parse_post,
+    transcluded_urn,
+)
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    Layout,
+    PostDecisions,
+    load_post_decisions,
+)
 from opensiddur.importer.opensiddur_org.scope import irregularities, project_columns
 from opensiddur.importer.opensiddur_org.tei_builder import build_project, front_language
 from opensiddur.importer.opensiddur_org.urns import PostUrns

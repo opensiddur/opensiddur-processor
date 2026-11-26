@@ -4,11 +4,12 @@ The Reader's entry points within Nishmat are performance rubrics, not boundaries
 of Shacharit or Pesukei dezimrah. Whole-prayer occasion gates live in the callers.
 """
 import re
-from .common import AGG, feature, PRAYER, SIDDUR, PROJECT_HE, SERVICE, cond, endcond, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml, MINYAN
+
+from . import shabbat_pesukei_data as data
+from .common import AGG, PRAYER, PROJECT_HE, SERVICE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, MINYAN, instruction, text_xml, transclude
 from .milestones import Correspondences, marked
 from .shacharit_end import editorial_head
-from . import shabbat_pesukei_data as data
 
 ROOT = SIDDUR+'shabbat/shacharit'
 PESUKEI = ROOT+'/pesuqei_dezimrah'
@@ -75,7 +76,7 @@ def shared(lang,prayers):
 
 def prayers(lang):
     side=int(lang=='en');result=[]
-    for number,he in data.HE.items():
+    for number in data.HE:
         urn=BIBLE+f'psalms/{number}';title=f'Psalm {number}' if side else 'תהלים '+{19:'יט',34:'לד',90:'צ',91:'צא',135:'קלה',136:'קלו',33:'לג'}[number]
         first,last=data.PAGES[number]
         body=[f'<tei:div corresp="{urn}"><tei:head xml:lang="{lang}">{title}</tei:head>',pb(first+side,sigil=SIGIL),'<tei:p>'];marks=Correspondences()

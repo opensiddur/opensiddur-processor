@@ -6,7 +6,12 @@ from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.importer.asher_selichot.check_pdf import corrected, hebrew_rows, load_glyphs, strip_line_numbers
+from opensiddur.importer.asher_selichot.check_pdf import (
+    corrected,
+    hebrew_rows,
+    load_glyphs,
+    strip_line_numbers,
+)
 
 
 class CorrectedReadingTests(unittest.TestCase):

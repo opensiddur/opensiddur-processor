@@ -14,7 +14,6 @@ from tempfile import TemporaryDirectory
 
 from opensiddur.importer.scan import compare
 
-
 BARUKH = "בָּרוּךְ"
 ATAH = "אַתָּה"
 ADONAI = "יְיָ"

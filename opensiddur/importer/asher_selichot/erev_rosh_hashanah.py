@@ -1,14 +1,33 @@
 """The image-read Erev Rosh Hashanah service and its bilingual cue ranges."""
-from opensiddur.importer.scan.authoring import printed_text
 import copy
 import hashlib
 import json
 import re
 import unicodedata
+
 from lxml import etree
-from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spelled_name, spelled_urn
-from .first_day import (poetic_lines, words_with_notes, mixed_words,
-                        append_words, expansion_scope)
+
+from opensiddur.importer.scan.authoring import printed_text
+
+from .build import (
+    PRAYER,
+    TEI,
+    XML,
+    choice,
+    document,
+    element,
+    marker,
+    pb,
+    spelled_name,
+    spelled_urn,
+)
+from .first_day import (
+    append_words,
+    expansion_scope,
+    mixed_words,
+    poetic_lines,
+    words_with_notes,
+)
 from .identities import RENAMED_URNS, project_name
 from .printings import is_declaration, printing
 
@@ -251,7 +270,7 @@ def verify_evidence(source, units):
 
 def verify_readings(source, project_directory):
     """Compare the documentary XML against page-ordered readings, excluding additions."""
-    from opensiddur.importer.scan.reverse import streams,check
+    from opensiddur.importer.scan.reverse import check, streams
     normalize=lambda s:' '.join(unicodedata.normalize('NFKD',s).split())
     manifest,read=readings(source)
     verify_evidence(source,read)

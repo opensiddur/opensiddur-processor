@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for Birnbaum's footnotes as a standoff apparatus.
 
 Birnbaum's own words are not checked here. They are a reading committed to
@@ -15,8 +14,13 @@ from unittest import mock
 
 from lxml import etree
 
-from opensiddur.importer.birnbaum_scan.build import common, front, notes
-from opensiddur.importer.birnbaum_scan.build import build_en, build_he
+from opensiddur.importer.birnbaum_scan.build import (
+    build_en,
+    build_he,
+    common,
+    front,
+    notes,
+)
 from opensiddur.tests.importer.birnbaum_scan import write_synthetic_front
 
 TEI = "http://www.tei-c.org/ns/1.0"

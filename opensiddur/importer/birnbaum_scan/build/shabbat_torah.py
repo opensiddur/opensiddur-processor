@@ -3,14 +3,15 @@
 Occurrence gates belong to these service units. Common prayer files remain
 independently reusable, including the first Yekum Purkan said in private.
 """
-from .common import PRAYER, SIDDUR, PROJECT_HE, PERSON, AGG, feature, cond, endcond, pb
-from .conclusion import instruction, transclude, text_xml, MINYAN
-from .shacharit_end import editorial_head
+from .common import AGG, PERSON, PRAYER, PROJECT_HE, cond, endcond, feature, pb
+from .conclusion import MINYAN, instruction, text_xml, transclude
 from .milestones import Correspondences
-from .tachanun_conditions import holiday
-from .torah import URNS as WEEKDAY, BIBLE, GOMEL_RUBRIC
 from .shabbat_amidah import SERVICE
 from .shabbat_torah_data import PASSAGES
+from .shacharit_end import editorial_head
+from .tachanun_conditions import holiday
+from .torah import BIBLE, GOMEL_RUBRIC
+from .torah import URNS as WEEKDAY
 
 BIBLICAL_ANCHORS = {('ein_kamokha','ein'), ('al_hakol','shiru')} | {('av_memorial', n) for n in ('harninu','veniqqeiti','lammah','doresh','yadin','minachal')}
 

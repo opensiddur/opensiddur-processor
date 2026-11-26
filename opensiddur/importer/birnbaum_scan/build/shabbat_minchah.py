@@ -1,17 +1,30 @@
 """Shabbat and festival Mincha, printed 437–476; festival Amidah is a later installment."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, SERVICE, AGG, RECITATION, feature, cond, endcond, pb
-from .conclusion import instruction, transclude, text_xml, MINYAN, BIBLE, URNS as CONCLUSION
-from .shacharit_end import editorial_head
-from .milestones import marked, Correspondences
-from .shared_passages import detach_division
-from .shabbat_amidah import READER
-from .shabbat_arvit import SHABBAT_AMIDAH, URNS as ARVIT
-from .tachanun_conditions import date, holiday, ISRAEL, TACHANUN_OMITTED
-from .avinu_malkenu import TEN_DAYS
-from .torah import URNS as TORAH
-from .minchah import SHALOM
+
 from . import shabbat_minchah_data as data
+from .avinu_malkenu import TEN_DAYS
+from .common import (
+    AGG,
+    PRAYER,
+    PROJECT_HE,
+    SERVICE,
+    SIDDUR,
+    cond,
+    endcond,
+    feature,
+    pb,
+)
+from .conclusion import BIBLE, MINYAN, instruction, text_xml, transclude
+from .conclusion import URNS as CONCLUSION
+from .milestones import Correspondences, marked
+from .minchah import SHALOM
+from .shabbat_amidah import READER
+from .shabbat_arvit import SHABBAT_AMIDAH
+from .shabbat_arvit import URNS as ARVIT
+from .shacharit_end import editorial_head
+from .shared_passages import detach_division
+from .tachanun_conditions import ISRAEL, TACHANUN_OMITTED, date, holiday
+from .torah import URNS as TORAH
 
 ROOT = SIDDUR+'shabbat/minchah'
 SIGIL = '1949 shabbat/minchah'

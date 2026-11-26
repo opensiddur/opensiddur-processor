@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The English of the weekday shacharit Amidah, printed pages 82-98.
 
 Taken from the en.wikisource page-by-page transcription of this same print and checked
@@ -7,8 +6,8 @@ on the image. Emits the SAME URNs as the Hebrew project, which is what aligns th
 """
 import functools
 
-from .common import QUORUM, PRAYER, cond, endcond, feature, AGG, HOL, RECITATION
 from . import common
+from .common import AGG, HOL, PRAYER, QUORUM, RECITATION, cond, endcond, feature
 
 #: Every page break in this module belongs to the Amidah's printing. Bound once here
 #: because common.pb takes no default sigil -- see common.SIGIL_AMIDAH.

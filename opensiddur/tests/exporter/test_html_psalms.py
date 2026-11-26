@@ -1,7 +1,16 @@
 """Semantic psalm titles cover nested source transclusions without rewriting prayers."""
 import unittest
+
 from lxml import etree as E
-from opensiddur.exporter.html.psalms import normalize,hebrew_number,psalm_number,T,P,J,LANG
+
+from opensiddur.exporter.html.psalms import (
+    J,
+    P,
+    T,
+    hebrew_number,
+    normalize,
+    psalm_number,
+)
 
 
 def fixture(body):

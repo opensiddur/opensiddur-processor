@@ -1,7 +1,8 @@
 """Printed notes for Birnbaum pages 731–752; continuations joined once."""
-from .lifecycle import URNS, TZIDDUK, KADDISH, CHAPEL, RESHUT, HARACHAMAN, PIDYON, MILAH
+from .lifecycle import CHAPEL, HARACHAMAN, KADDISH, MILAH, PIDYON, RESHUT, TZIDDUK, URNS
 from .lifecycle_data import NOTES as READINGS
 from .notes_motzaei_shabbat import xml as prose_xml
+
 TARGETS={'tzidduq':TZIDDUK,'burial_kaddish':KADDISH,'chapel':CHAPEL,
          'milah_poem':RESHUT,'milah_harachaman':HARACHAMAN,'pidyon':PIDYON}
 

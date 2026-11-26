@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The open questions, and nothing else.
 
 A page's differences are mostly settled the moment they are looked at, and the settled
@@ -25,6 +24,7 @@ import re
 import sys
 
 from opensiddur.importer.scan import compare as cmp
+
 from .pages import BOOK_DIRECTORY
 
 READING_DIRECTORY = BOOK_DIRECTORY / "scan_reading"

@@ -17,6 +17,7 @@ from opensiddur.exporter.conditional_settings import (
     INIT_DECLARE_ID,
     yaml_to_declaration_entries,
 )
+from opensiddur.exporter.constants import JLPTEI_NAMESPACE, TEI_NS
 from opensiddur.exporter.derived_settings import (
     SettingChangeTrigger,
     derived_declare_id,
@@ -24,9 +25,13 @@ from opensiddur.exporter.derived_settings import (
     recalculate_derived_settings,
     register_derived_entry,
 )
-from opensiddur.exporter.constants import JLPTEI_NAMESPACE, TEI_NS
 from opensiddur.exporter.linear import (
-    ConditionalSettingEntry, TwilightValue, Undefined, get_linear_data, reset_linear_data)
+    ConditionalSettingEntry,
+    TwilightValue,
+    Undefined,
+    get_linear_data,
+    reset_linear_data,
+)
 from opensiddur.exporter.settings import load_settings
 
 TEI = TEI_NS

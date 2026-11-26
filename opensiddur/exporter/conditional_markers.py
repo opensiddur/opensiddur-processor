@@ -22,8 +22,12 @@ from dataclasses import dataclass
 
 from lxml import etree
 
-from opensiddur.exporter.conditional_settings import J_CONDITIONAL, J_END_CONDITIONAL, XML_ID
-from opensiddur.exporter.constants import RUBRIC_NOTE_TYPES, PROCESSING_NAMESPACE
+from opensiddur.exporter.conditional_settings import (
+    J_CONDITIONAL,
+    J_END_CONDITIONAL,
+    XML_ID,
+)
+from opensiddur.exporter.constants import PROCESSING_NAMESPACE, RUBRIC_NOTE_TYPES
 
 _PARALLEL_ITEM = f"{{{PROCESSING_NAMESPACE}}}parallelItem"
 

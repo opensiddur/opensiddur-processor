@@ -1,15 +1,20 @@
 """Tests for the InlineCompilerProcessor class."""
 
 import re
-from typing import Optional
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from lxml import etree
+
 from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
-from opensiddur.exporter.linear import LinearData, reset_linear_data, get_linear_data
-from opensiddur.exporter.refdb import Reference, ReferenceDatabase, UrnMapping, find_end_of_mapping
+from opensiddur.exporter.linear import LinearData, reset_linear_data
+from opensiddur.exporter.refdb import (
+    Reference,
+    ReferenceDatabase,
+    find_end_of_mapping,
+)
 from opensiddur.exporter.urn import ResolvedUrn
 
 PROCESSING_NAMESPACE = 'http://jewishliturgy.org/ns/processing'
@@ -1133,7 +1138,7 @@ class TestInlineCompilerProcessorAnnotations(unittest.TestCase):
     </tei:text>
     <tei:standOff>
     </tei:standOff>
-</TEI>'''.encode('utf-8')
+</TEI>'''.encode()
         return self._create_test_file(project, file_name, xml_content)
 
     def _create_note_file(self, project: str, file_name: str, target_urn: str,
@@ -1157,7 +1162,7 @@ class TestInlineCompilerProcessorAnnotations(unittest.TestCase):
             </tei:div>
         </tei:body>
     </tei:text>
-</TEI>'''.encode('utf-8')
+</TEI>'''.encode()
         else:  # editorial
             xml_content = f'''<TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">
     <tei:teiHeader>
@@ -1172,7 +1177,7 @@ class TestInlineCompilerProcessorAnnotations(unittest.TestCase):
             {note_content}
         </tei:note>
     </tei:standOff>
-</TEI>'''.encode('utf-8')
+</TEI>'''.encode()
         return self._create_test_file(project, file_name, xml_content)
 
     def test_editorial_note_in_range(self):

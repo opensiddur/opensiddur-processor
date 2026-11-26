@@ -25,10 +25,10 @@ the book's JSON.
 
 from __future__ import annotations
 
-from copy import deepcopy
 import json
-import re
 import logging
+import re
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -41,7 +41,11 @@ from opensiddur.exporter.condition_eval import (
     parse_condition_element,
 )
 from opensiddur.exporter.conditional_markers import check_pairing, mark_silent_scopes
-from opensiddur.exporter.conditional_settings import J_CONDITIONAL, J_END_CONDITIONAL, XML_ID
+from opensiddur.exporter.conditional_settings import (
+    J_CONDITIONAL,
+    J_END_CONDITIONAL,
+    XML_ID,
+)
 from opensiddur.exporter.constants import (
     JLPTEI_NAMESPACE,
     PROCESSING_NAMESPACE,

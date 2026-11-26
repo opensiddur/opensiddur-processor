@@ -1,7 +1,8 @@
 """Saturday-night omissions based on the six coming working days."""
 import hdate
 from pyluach.dates import HebrewDate
-from .compute import SettingSnapshot, FS_HEBREW_DATE
+
+from .compute import FS_HEBREW_DATE, SettingSnapshot
 
 FS_MOTZAEI_SHABBAT = 'opensiddur:motzaei-shabbat'
 

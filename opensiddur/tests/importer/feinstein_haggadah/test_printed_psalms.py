@@ -12,7 +12,10 @@ import re
 import unittest
 from pathlib import Path
 
-from opensiddur.importer.feinstein_haggadah.page_breaks import load_page_breaks, pb_markup
+from opensiddur.importer.feinstein_haggadah.page_breaks import (
+    load_page_breaks,
+    pb_markup,
+)
 from opensiddur.importer.feinstein_haggadah.tei_builder import printed_verse_body
 from opensiddur.importer.feinstein_haggadah.versify import (
     BIBLICAL_SECTIONS,

@@ -45,10 +45,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
-from opensiddur.importer.opensiddur_org import match
-from opensiddur.importer.opensiddur_org.match import PROPOSALS_PATH
 from opensiddur.exporter.urn import split_project, split_range
-from opensiddur.importer.opensiddur_org.convert import CANDIDATES_PATH, ConvertRun, convert_posts, print_run
+from opensiddur.importer.opensiddur_org import match
+from opensiddur.importer.opensiddur_org.convert import (
+    CANDIDATES_PATH,
+    ConvertRun,
+    convert_posts,
+    print_run,
+)
 from opensiddur.importer.opensiddur_org.download import (
     DEFAULT_REF,
     UPSTREAM_ENV,
@@ -59,10 +63,18 @@ from opensiddur.importer.opensiddur_org.download import (
     load_manifest,
     post_paths,
 )
-from opensiddur.importer.opensiddur_org.licences import LicenceDecisions, lapsed, load_decisions
+from opensiddur.importer.opensiddur_org.licences import (
+    LicenceDecisions,
+    lapsed,
+    load_decisions,
+)
+from opensiddur.importer.opensiddur_org.match import PROPOSALS_PATH
 from opensiddur.importer.opensiddur_org.naming import imported_projects
 from opensiddur.importer.opensiddur_org.parse_post import Post, load_post, parse_post
-from opensiddur.importer.opensiddur_org.post_decisions import PostDecisions, default_post_decisions
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    PostDecisions,
+    default_post_decisions,
+)
 from opensiddur.importer.opensiddur_org.scope import table_views
 from opensiddur.importer.opensiddur_org.urns import load_post_urns
 from opensiddur.importer.util.pages import opensiddur_org_data_directory
@@ -165,7 +177,7 @@ class ReferenceIndex:
     refers: dict[str, set[tuple[str, str | None]]]
 
     @classmethod
-    def build(cls, project_directory: Path) -> "ReferenceIndex":
+    def build(cls, project_directory: Path) -> ReferenceIndex:
         holds: dict[str, set[str]] = {}
         refers: dict[str, set[tuple[str, str | None]]] = {}
         for project in sorted(Path(project_directory).iterdir()):

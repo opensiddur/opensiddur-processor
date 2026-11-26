@@ -1,8 +1,10 @@
-from argparse import ArgumentParser
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
+
 from saxonche import PySaxonProcessor
+
 
 def _to_xdm_value(proc: PySaxonProcessor, value: Any) -> Any:
     if isinstance(value, str):
@@ -21,7 +23,7 @@ def xslt_transform_string(
     xslt_file: Path,
     input_xml: str,
     multiple_results: bool = False,
-    xslt_params: Optional[dict[str, Any]] = None,
+    xslt_params: dict[str, Any] | None = None,
     ) -> str | dict[str, str]:
     
     try:
@@ -65,13 +67,13 @@ def xslt_transform_string(
 def xslt_transform(
     xslt_file: Path,
     input_file: Path,
-    output_file: Optional[Path] = None,
+    output_file: Path | None = None,
     *,
-    xslt_params: Optional[dict[str, Any]] = None,
+    xslt_params: dict[str, Any] | None = None,
 ):
     try:
         # Read the input XML
-        with open(input_file, 'r', encoding='utf-8') as input_fd:
+        with open(input_file, encoding='utf-8') as input_fd:
             input_xml = input_fd.read()
 
         result = xslt_transform_string(

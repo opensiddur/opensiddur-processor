@@ -144,8 +144,9 @@ def _interpretations(root, unit, rules):
 
 
 def apply_source_encoding(root, unit, lang):
-    from . import build as b
     from opensiddur.importer.scan.authoring import printed_text
+
+    from . import build as b
     config = unit.get('source_encoding', {}).get(lang, {})
     _keys(config, {'interpretations', 'reference_terminators_outside_container',
                   'remove_prayer_footnote_marker', 'commentary_pages',

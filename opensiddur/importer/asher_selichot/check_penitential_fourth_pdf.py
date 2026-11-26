@@ -1,9 +1,12 @@
 """Check fourth penitential day stanza alignment, apparatus, and fulfilled reference boundaries."""
 import copy
+
 from lxml import etree
-from .check_pdf import MAX_BASELINE_DIFFERENCE, plain, load_glyphs, strip_line_numbers
-from .check_first_day_pdf import latin_note_runs
+
 from opensiddur.importer.scan.pdf_direction import base
+
+from .check_first_day_pdf import latin_note_runs
+from .check_pdf import MAX_BASELINE_DIFFERENCE, load_glyphs, plain, strip_line_numbers
 
 ANCHORS = [('יושבבסתרעליון','Thou who dwellest in the secret place'),
            ('צדקהעשהלעמך','Deal generously with thy people'),
@@ -112,7 +115,9 @@ def controls(tree,expanded):
 
 
 def main():
-    import argparse, subprocess, tempfile
+    import argparse
+    import subprocess
+    import tempfile
     from pathlib import Path
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('pdf',type=Path);parser.add_argument('--expanded',action='store_true');parser.add_argument('--control',action='store_true')

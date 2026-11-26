@@ -1,9 +1,10 @@
 """Printed commentary and source citations for the conclusion of Shabbat."""
 import re
 from html import escape
-from .motzaei_shabbat import ROOT, LEVANAH, POEMS
-from .common import PRAYER, POEM
+
+from .common import POEM, PRAYER
 from .motzaei_data import READINGS
+from .motzaei_shabbat import LEVANAH, POEMS, ROOT
 
 
 def xml(value):

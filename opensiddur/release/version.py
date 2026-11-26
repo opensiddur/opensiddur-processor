@@ -15,7 +15,7 @@ the development it was.
 import functools
 import re
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Literal
 
 BumpLevel = Literal["major", "minor", "patch"]
 
@@ -33,7 +33,7 @@ class Version:
     minor: int
     patch: int
     #: The N of X.Y.Z.devN: the development of X.Y.Z, which comes before it.
-    dev: Optional[int] = None
+    dev: int | None = None
 
     def __str__(self) -> str:
         release = f"{self.major}.{self.minor}.{self.patch}"

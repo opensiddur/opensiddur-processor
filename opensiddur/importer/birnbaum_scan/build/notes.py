@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Birnbaum's own footnotes, as a standoff apparatus.
 
 The print carries two apparatuses, and they are different things:
@@ -46,8 +45,8 @@ assumption that a note is a paragraph of inline prose is contradicted by that on
 #: keyed to URNs by matching against the authored text -- see
 #: `specs/birnbaum_scan/extract_notes.py`. They were written out by hand here while there
 #: was one of them; there are eighty-four.
-from .notes_data import AMIDAH_NOTES, BIRCHOT_NOTES, YELADIM_NOTES   # noqa: F401
 from .common import AGG, SERVICE, feature
+from .notes_data import AMIDAH_NOTES, BIRCHOT_NOTES, YELADIM_NOTES  # noqa: F401
 
 # This essay concerns the nineteen-blessing weekday Amidah. Its opening is
 # shared by the Sabbath, festival and Rosh Hodesh Musaf Amidahs too.

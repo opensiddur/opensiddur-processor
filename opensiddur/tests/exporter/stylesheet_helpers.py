@@ -8,17 +8,14 @@ defaults unless a test supplies settings of its own.
 
 from __future__ import annotations
 
-from typing import Optional, Union
-
 from lxml import etree
 
 from opensiddur.common.xslt import xslt_transform_string
-from opensiddur.exporter.tex.latex import XSLT_FILE, typography_parameters
 from opensiddur.exporter.settings import DistributionSettings
+from opensiddur.exporter.tex.latex import XSLT_FILE, typography_parameters
 from opensiddur.exporter.typography import TypographyConfig
 
-
-Settings = Optional[Union[TypographyConfig, dict]]
+Settings = TypographyConfig | dict | None
 
 #: For a test whose pages are counted: no distribution notice and no back page.
 NO_NOTICES = DistributionSettings(notice="none", back_notice="none")

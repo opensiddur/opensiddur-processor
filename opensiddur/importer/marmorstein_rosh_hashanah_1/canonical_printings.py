@@ -1,6 +1,6 @@
 """Verified pagination at a caller's boundaries inside one shared text."""
-from copy import deepcopy
 import re
+from copy import deepcopy
 
 from lxml import etree
 
@@ -12,8 +12,12 @@ FIELDS = {'id', 'host', 'lang', 'identity', 'caller', 'fragment', 'scan',
 
 def bindings(readings):
     """Fail closed unless every multi-page caller boundary is source-attested."""
-    from .realizations import (PLAIN_FRAGMENT_KEYS, canonical_text,
-                               join_source_fragments, _range_segments)
+    from .realizations import (
+        PLAIN_FRAGMENT_KEYS,
+        _range_segments,
+        canonical_text,
+        join_source_fragments,
+    )
     entries = readings.get('canonical_printings', [])
     if not isinstance(entries, list):
         raise ValueError('Canonical printings must be a list')
@@ -86,8 +90,9 @@ def bindings(readings):
 
 def apply(documents, readings):
     """Place only explicitly sigiled breaks, including inside a selected wording."""
-    from . import PROJECTS, IDENTIFIER
     from opensiddur.importer.util.internet_archive import page_image_url
+
+    from . import IDENTIFIER, PROJECTS
     for item in bindings(readings):
         roots = [root for path,root in documents
                  if path.stem == item['file'] and path.parent.name == PROJECTS[item['lang']]]
@@ -130,8 +135,9 @@ def apply(documents, readings):
 
 
 def permitted_breaks(readings, stem, lang):
-    from . import IDENTIFIER
     from opensiddur.importer.util.internet_archive import page_image_url
+
+    from . import IDENTIFIER
     return {('printing_'+v['id'],'1965 '+v['context'],v['printed_page'],
              page_image_url(IDENTIFIER,int(v['scan'][1:])-1,size=''))
             for v in bindings(readings) if v['file']==stem and v['lang']==lang}

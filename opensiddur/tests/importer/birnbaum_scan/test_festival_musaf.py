@@ -1,8 +1,11 @@
 """Festival Musaf choices and scan-specific variants."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import festival_musaf as f
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestFestivalMusaf(unittest.TestCase):
     def test_tal_only_first_day_repetition_with_minyan(self):
@@ -20,7 +23,8 @@ class TestFestivalMusaf(unittest.TestCase):
         self.assertEqual(evaluate(f.DUCHEN,values),TriState.FALSE)
     def test_shared_passages_match_both_readings(self):
         import unicodedata
-        from opensiddur.importer.birnbaum_scan.build import build_he,build_en
+
+        from opensiddur.importer.birnbaum_scan.build import build_en, build_he
         def norm(v):return ' '.join(unicodedata.normalize('NFC',v).split())
         for lang,build in [('he',build_he),('en',build_en)]:
             index={p['urn']:p for p in build.PRAYERS}

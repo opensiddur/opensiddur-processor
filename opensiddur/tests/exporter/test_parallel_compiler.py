@@ -3,7 +3,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from lxml import etree
 
@@ -14,18 +14,14 @@ from opensiddur.exporter.compiler import (
     _ProcessingContext,
 )
 from opensiddur.exporter.external_compiler import (
-    STRUCTURAL_BLOCKS,
     TEI_NS,
     ExternalCompilerProcessor,
     _shared_split_points,
 )
 from opensiddur.exporter.linear import (
-    LinearData,
-    ParallelColumnOrder,
     get_linear_data,
     reset_linear_data,
 )
-from opensiddur.exporter.urn import ResolvedUrn, ResolvedUrnRange
 
 P_NS = PROCESSING_NAMESPACE
 J_NS = JLPTEI_NAMESPACE

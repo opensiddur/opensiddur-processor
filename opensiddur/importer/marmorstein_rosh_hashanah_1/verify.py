@@ -6,8 +6,14 @@ from pathlib import Path
 from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.importer.scan.review import review_is_current
 from opensiddur.importer.util.internet_archive import write_if_changed
+
 from . import BOOK
-from .build import unit_review_text, front_text, instruction_review_text, rubric_source_pages
+from .build import (
+    front_text,
+    instruction_review_text,
+    rubric_source_pages,
+    unit_review_text,
+)
 from .realizations import review_payloads, validate_occurrences
 
 

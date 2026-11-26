@@ -1,16 +1,24 @@
 """Shared corrections require exact literal attestations and unchanged source words."""
+import unittest
 from copy import deepcopy
 from pathlib import Path
-import unittest
 from unittest.mock import patch
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import PROJECTS
-from opensiddur.importer.marmorstein_rosh_hashanah_1.build import unit_document, document, transclude_unit
-from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
-    prepare_documents, prepare_unit, review_payloads, validate_generated,
+from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+    document,
+    transclude_unit,
+    unit_document,
 )
 from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_corrections import (
-    bind_corrections, apply_bound_corrections,
+    apply_bound_corrections,
+    bind_corrections,
+)
+from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+    prepare_documents,
+    prepare_unit,
+    review_payloads,
+    validate_generated,
 )
 from opensiddur.importer.scan.authoring import apply_corrections
 
@@ -124,7 +132,6 @@ class CanonicalCorrectionTest(unittest.TestCase):
                 with self.assertRaises(ValueError):validate_generated(docs,r)
 
     def test_literal_context_page_positions_are_checked_against_raw_fragments(self):
-        from lxml import etree
         r,_=fixture();host=r['units'][0];old=deepcopy(host['languages']['en'][0]['fragments'][0])
         host['languages']['en'][0]['fragments']=[dict(old,text='prefix'),dict(old,scan='s3',printed_page='2')]
         host['canonical_home']['context']='literal'
@@ -172,7 +179,8 @@ class CanonicalCorrectionTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'one generated home'):validate_generated(docs,r)
 
     def test_payload_source_literal_and_corrected_hashes_bind_the_actual_wordings(self):
-        import hashlib,json
+        import hashlib
+        import json
         r,c=fixture();payloads={key:json.loads(value)for key,value,_ in review_payloads(r,c)}
         for key in ['realization/old/en','realization/new/en']:
             fidelity=payloads[key]['source_fidelity'][0]
@@ -188,7 +196,6 @@ class CanonicalCorrectionTest(unittest.TestCase):
             apply_bound_corrections(docs,r,c)
 
     def test_corrected_spine_references_name_an_attester_and_bind_both_orders(self):
-        import json
         r,c=fixture();before={k:v for k,v,_ in review_payloads(r,c)}
         r['expanded_order']=[{'reference':{'target':P+'/part'}}]
         with self.assertRaisesRegex(ValueError,'source witness'):bind_corrections(r,c)

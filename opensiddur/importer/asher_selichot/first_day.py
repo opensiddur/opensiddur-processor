@@ -1,15 +1,21 @@
 """Encode the complete first day from scan-first documentary readings."""
 
-from opensiddur.importer.scan.authoring import append_words, mixed_words, words_with_notes, conditional_scope
-from opensiddur.importer.scan.authoring import poetic_lines as _poetic_lines
-
 import json
 import re
 import unicodedata
+
 from lxml import etree
-from pathlib import Path
-from .build import TEI, XML, PRAYER, POEM, document, element, pb
-from .identities import TEXTS, text_urn, project_name
+
+from opensiddur.importer.scan.authoring import (
+    append_words,
+    conditional_scope,
+    mixed_words,
+    words_with_notes,
+)
+from opensiddur.importer.scan.authoring import poetic_lines as _poetic_lines
+
+from .build import POEM, PRAYER, TEI, XML, document, element, pb
+from .identities import TEXTS, project_name, text_urn
 
 FIRST_DAY = 'urn:x-opensiddur:text:siddur:selichot/first_day'
 OBSOLETE_ASSEMBLIES = ('first_day_opening', 'first_day_preface',

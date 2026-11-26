@@ -19,7 +19,6 @@ PESUKEI_NOTES = [
              "of Amram Gaon."))]),
 ]
 
-from .common import SIDDUR
 from .pesukei_passages import BIBLE, ROOT
 
 PESUKEI_NOTES += [

@@ -3,13 +3,17 @@
 Only structural containers are expanded. A unit that owns prayer words remains
 one transclusion, so no Hebrew or translation is copied into the new project.
 """
+import unicodedata
 from copy import deepcopy
 from itertools import count
 from pathlib import Path
-import unicodedata
+
 from lxml import etree as E
+
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN, PROJECT_HE
-from .xml import T, J, NS, XID, TEXT, feature, parse_fragment, transclude, serialize
+
+from .xml import NS, TEXT, XID, J, T, feature, parse_fragment, serialize, transclude
+
 
 def unpinned(urn):
     """`urn` without an `@project` suffix naming the edition it must come from."""

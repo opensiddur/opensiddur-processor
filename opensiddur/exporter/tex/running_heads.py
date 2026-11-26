@@ -21,13 +21,11 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from opensiddur.common.bidi import strip_bidi_formatting
 from opensiddur.exporter.tex.escape import escape_tex
-
 
 # ---------------------------------------------------------------------------
 # The closed code list
@@ -257,7 +255,7 @@ def expand_template(template: str) -> str:
     )
 
 
-def is_hebrew_language(language: Optional[str]) -> bool:
+def is_hebrew_language(language: str | None) -> bool:
     """Whether a declared language is written in the Hebrew script.
 
     The rule of ``f:is-hebrew-lang`` in ``tex/common.xsl``: a script subtag decides
@@ -292,14 +290,14 @@ class RunningHeadPosition(BaseModel):
     # Direction and font are chosen from this. Defaults to the document's own
     # language when unset. A BCP 47 tag, as in xml:lang: a misspelt one would
     # quietly set the slot left to right.
-    language: Optional[str] = Field(
+    language: str | None = Field(
         default=None, pattern=r"^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*$"
     )
     # When set, the slot renders only if this template expands to something
     # non-empty. Literal text in `text` is suppressed along with the codes, so
     # "Chapter {chapter-number}" leaves no orphaned "Chapter" on a page before
     # the first chapter.
-    if_: Optional[str] = Field(default=None, alias="if")
+    if_: str | None = Field(default=None, alias="if")
 
     @model_validator(mode="before")
     @classmethod
@@ -310,7 +308,7 @@ class RunningHeadPosition(BaseModel):
 
     @field_validator("text", "if_")
     @classmethod
-    def validate_template(cls, v: Optional[str]) -> Optional[str]:
+    def validate_template(cls, v: str | None) -> str | None:
         if v:
             parse_template(v)
         return v
@@ -347,12 +345,12 @@ class RunningHeadConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    all: Optional[RunningHeadSide] = None
-    odd: Optional[RunningHeadSide] = None
-    even: Optional[RunningHeadSide] = None
+    all: RunningHeadSide | None = None
+    odd: RunningHeadSide | None = None
+    even: RunningHeadSide | None = None
 
     @model_validator(mode="after")
-    def validate_all_is_exclusive(self) -> "RunningHeadConfig":
+    def validate_all_is_exclusive(self) -> RunningHeadConfig:
         if self.all is not None and (self.odd is not None or self.even is not None):
             raise ValueError(
                 "`all` cannot be combined with `odd` or `even`: "
@@ -429,7 +427,7 @@ _SILENCE_AUTOMATIC_MARKS = "\\makeatletter\n\\let\\@mkboth\\@gobbletwo\n\\makeat
 
 def render_position(
     position: RunningHeadPosition,
-    default_language: Optional[str] = None,
+    default_language: str | None = None,
 ) -> str:
     """Render one slot as TeX.
 
@@ -461,7 +459,7 @@ def _render_side(
     command: str,
     suffix: str,
     side: RunningHeadSide,
-    default_language: Optional[str],
+    default_language: str | None,
 ) -> list[str]:
     lines = []
     for attribute, letter in _SLOT_LETTERS:
@@ -472,9 +470,9 @@ def _render_side(
 
 
 def build_page_style_tex(
-    page_header: Optional[RunningHeadConfig] = None,
-    page_footer: Optional[RunningHeadConfig] = None,
-    default_language: Optional[str] = None,
+    page_header: RunningHeadConfig | None = None,
+    page_footer: RunningHeadConfig | None = None,
+    default_language: str | None = None,
 ) -> str:
     """Build the fancyhdr preamble block for the configured headers and footers.
 

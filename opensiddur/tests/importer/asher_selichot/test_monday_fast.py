@@ -1,9 +1,12 @@
 """Monday fast is a weekday occasion, with asymmetric printed refrain cues."""
 import unittest
 from unittest.mock import patch
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import penitential_days as service
 from opensiddur.importer.asher_selichot.build import TEI, XML
+
 
 class MondayFastTests(unittest.TestCase):
     def test_thursday_uses_weekday_five(self):
@@ -42,7 +45,7 @@ class MondayFastTests(unittest.TestCase):
         manifest={'heading':{'he':'לשני','en':'Monday'}}
         with patch.object(service,'readings',return_value=(manifest,[reading])):
             authored=list(service.documents(None,'last-monday-fast'))
-        for project,name,root in authored:
+        for project,_name,root in authored:
             milestones=root.findall('.//{'+TEI+'}milestone[@corresp]')
             self.assertEqual([n.get('corresp')for n in milestones],['urn:x-opensiddur:text:siddur:selichot/last_monday_fast/verses_after_haazinah/expanded'])
             self.assertEqual(len(root.findall('.//{'+service.J+'}transclude')),1 if project.endswith('-he') else 0)

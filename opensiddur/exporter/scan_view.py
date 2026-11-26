@@ -10,7 +10,7 @@ a link it does not recognise keeps opening in a new tab.
 
 import hashlib
 import re
-from typing import Literal, Optional
+from typing import Literal
 from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 ScanKind = Literal["image", "pdf"]
@@ -26,7 +26,7 @@ _ARCHIVE_PAGE = re.compile(r"^(/download/[^/]+/page/n\d+)(?:_[a-z]+)?\.jpg$")
 _WIKISOURCE_PAGE = re.compile(r"^/wiki/Page:(.+)/(\d+)$")
 
 
-def scan_view(facs: str) -> Optional[tuple[ScanKind, str]]:
+def scan_view(facs: str) -> tuple[ScanKind, str] | None:
     """The kind of thing the viewer shows for a link to a scan, and its address; or None."""
     if facs.startswith("data:image/"):
         return "image", facs

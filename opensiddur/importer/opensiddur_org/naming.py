@@ -29,9 +29,9 @@ from __future__ import annotations
 import logging
 import re
 import unicodedata
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping
 
 from lxml import etree
 
@@ -183,7 +183,7 @@ def title_words(post: Post, *, prefixes_joined: bool = False) -> list[str]:
         words = []
     if not words:
         # The site's slug is already romanized; its attribution starts at "by".
-        slug = re.split(r"-by-", post.slug, 1)[0]
+        slug = re.split(r"-by-", post.slug, maxsplit=1)[0]
         words = fold(slug.replace("-", " ")) or ["post"]
     return words
 

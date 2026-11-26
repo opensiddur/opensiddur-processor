@@ -3,11 +3,13 @@ import tempfile
 import unicodedata
 import unittest
 from pathlib import Path
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.first_day import opening
+
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
+from opensiddur.importer.asher_selichot.first_day import opening
 
 
 class HalfKaddishTests(unittest.TestCase):

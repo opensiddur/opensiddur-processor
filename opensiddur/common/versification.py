@@ -26,9 +26,10 @@ in a translation -- can be resolved to canonical.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass
-from functools import lru_cache
-from typing import Iterator, NamedTuple
+from functools import cache
+from typing import NamedTuple
 
 # Verse numbering conventions, and the project that follows each.
 NUMBERING_MASORAH = "masorah"       # Miqra al pi ha-Masorah
@@ -157,7 +158,7 @@ def divergent_chapters(numbering: str | None = None) -> set[tuple[str, int]]:
     }
 
 
-@lru_cache(maxsize=None)
+@cache
 def _spans(numbering: str, book: str, chapter: int) -> tuple[tuple[VerseRef, VerseRef], ...]:
     """The canonical span of every verse of ``chapter`` in ``numbering``, in edition order.
 

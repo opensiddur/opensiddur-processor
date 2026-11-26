@@ -1,16 +1,17 @@
 """Omitting optional words or verses must not leave typographic gaps."""
 import re
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
+
 from lxml import etree
 
 from opensiddur.exporter.compiler import CompilerProcessor, close_up_whitespace
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
+from opensiddur.exporter.html.markers import prepare
 from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.exporter.refdb import ReferenceDatabase
-from opensiddur.exporter.html.markers import prepare
 from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 T = "http://www.tei-c.org/ns/1.0"

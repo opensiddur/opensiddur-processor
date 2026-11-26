@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The English of the korbanot, printed pages 28 to 42.
 
 The citations are centred italic lines on this side as they are on the Hebrew side, and
@@ -15,8 +14,8 @@ and checked page by page with `reverse`.
 """
 import functools
 
-from .common import PRAYER, POEM
 from . import common
+from .common import POEM, PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

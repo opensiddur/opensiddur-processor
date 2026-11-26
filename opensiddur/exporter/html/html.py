@@ -22,8 +22,8 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
-import io
 import html
+import io
 import json
 import logging
 import re
@@ -40,6 +40,8 @@ from pydantic import ValidationError
 from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.common.version import processor_version
 from opensiddur.common.xslt import xslt_transform_string
+from opensiddur.exporter import notices
+from opensiddur.exporter.calendar.compute import FS_HOLIDAY, FS_PURIM_OBSERVANCE
 from opensiddur.exporter.cli_common import (
     SettingsError,
     add_settings_arguments,
@@ -47,19 +49,27 @@ from opensiddur.exporter.cli_common import (
     prepare_compiled_tree,
     scan_links_wanted,
 )
-from opensiddur.exporter.calendar.compute import FS_HOLIDAY, FS_PURIM_OBSERVANCE
 from opensiddur.exporter.client_settings import is_reader_supplied, resolve
-from opensiddur.exporter.condition_eval import TriState, condition_features, condition_from_json, value_to_json
+from opensiddur.exporter.condition_eval import (
+    TriState,
+    condition_features,
+    condition_from_json,
+    value_to_json,
+)
 from opensiddur.exporter.constants import PROCESSING_NAMESPACE, TEI_NS
 from opensiddur.exporter.derived_settings import STATIC_DEFAULTS
 from opensiddur.exporter.html.css import css_length, typography_css, xslt_parameters
 from opensiddur.exporter.html.markers import BookConditions, prepare
 from opensiddur.exporter.html.psalms import normalize as normalize_psalm_titles
-from opensiddur.exporter.metadata import ISBN_TYPES, Colophon, SourceRecord, build_colophon
+from opensiddur.exporter.metadata import (
+    ISBN_TYPES,
+    Colophon,
+    SourceRecord,
+    build_colophon,
+)
+from opensiddur.exporter.notices import RunKind
 from opensiddur.exporter.scan_links import SCAN_LINK
 from opensiddur.exporter.scan_view import scan_view
-from opensiddur.exporter import notices
-from opensiddur.exporter.notices import RunKind
 from opensiddur.exporter.settings import (
     DistributionNotice,
     DistributionSettings,

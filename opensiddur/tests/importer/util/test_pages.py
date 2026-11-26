@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch, mock_open, MagicMock
 from pathlib import Path
+from unittest.mock import mock_open, patch
 
+from opensiddur.importer.util.constants import Page
 from opensiddur.importer.util.pages import (
     birnbaum_siddur_correspondence_path,
     birnbaum_siddur_en_credits_directory,
@@ -12,14 +13,12 @@ from opensiddur.importer.util.pages import (
     birnbaum_siddur_ia_regions_directory,
     birnbaum_siddur_source_text_directory,
     feinstein_haggadah_data_directory,
-    get_page,
     get_credits,
+    get_page,
     heidenheim_haggadah_data_directory,
-    jps1917_text_directory,
     relative_path_to_title,
     title_to_relative_path,
 )
-from opensiddur.importer.util.constants import Page
 
 
 class TestGetPage(unittest.TestCase):

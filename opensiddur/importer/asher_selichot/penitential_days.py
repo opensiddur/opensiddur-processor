@@ -1,17 +1,38 @@
 """Manifest-driven authoring and reverse verification of later selichot services."""
-from opensiddur.importer.scan.authoring import printed_text
 import copy
 import hashlib
 import json
 import re
 import unicodedata
 from collections import defaultdict
+
 from lxml import etree
-from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spelled_name, spelled_urn
-from .first_day import poetic_lines, words_with_notes, mixed_words, expansion_scope, append_words, verify_half_kaddish
-from .erev_rosh_hashanah import printed as ordinary_printed, targets
-from .penitential_second_day import wrap_hebrew
+
+from opensiddur.importer.scan.authoring import printed_text
+
+from .build import (
+    PRAYER,
+    TEI,
+    XML,
+    choice,
+    document,
+    element,
+    marker,
+    pb,
+    spelled_name,
+    spelled_urn,
+)
+from .erev_rosh_hashanah import printed as ordinary_printed
+from .erev_rosh_hashanah import targets
+from .first_day import (
+    append_words,
+    expansion_scope,
+    poetic_lines,
+    verify_half_kaddish,
+    words_with_notes,
+)
 from .identities import project_name
+from .penitential_second_day import wrap_hebrew
 from .printings import is_declaration, printing, text_urn
 
 SERVICE_PREFIX = 'urn:x-opensiddur:text:siddur:selichot/penitential_'
@@ -88,7 +109,7 @@ def pizmon(parent, reading, lang, context):
                 data=fragment[lang]
                 if index:pb(block,data['scan'],data['printed_page'])
                 pieces=re.split('('+pattern+')',data['text'])
-                for piece_index,piece in enumerate(pieces):
+                for _piece_index,piece in enumerate(pieces):
                     if not piece:continue
                     if re.fullmatch(pattern,piece):
                         choice(element(block,'seg',type='refrain'),piece,opening if piece==opening_cue else reading.get('refrain_expansions',{}).get(lang,{}).get(piece,reading['refrain'][lang]))
@@ -240,7 +261,7 @@ def verify_evidence(source,units,day):
 
 def verify_readings(source,project_directory,day):
     context_urn=service_urn(day)
-    from opensiddur.importer.scan.reverse import streams,check
+    from opensiddur.importer.scan.reverse import check, streams
     normalize=lambda s:' '.join(unicodedata.normalize('NFKD',s).split())
     manifest,units=readings(source,day);verify_evidence(source,units,day)
     for lang in ['he','en']:

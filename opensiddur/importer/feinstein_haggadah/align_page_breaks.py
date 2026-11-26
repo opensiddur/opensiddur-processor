@@ -26,15 +26,15 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-from opensiddur.importer.feinstein_haggadah.parse_compilation import (
-    build_section_contents,
-    load_compilation_json,
-    parse_rows,
-)
 from opensiddur.importer.feinstein_haggadah.page_breaks import (
     FACSIMILE_FIRST_PAGE,
     FACSIMILE_LAST_PAGE,
     folio_at_facsimile_page,
+)
+from opensiddur.importer.feinstein_haggadah.parse_compilation import (
+    build_section_contents,
+    load_compilation_json,
+    parse_rows,
 )
 from opensiddur.importer.feinstein_haggadah.sections import (
     MAGID_SUBSECTION_PREFIXES,

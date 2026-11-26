@@ -1,7 +1,6 @@
 import unittest
 
 from opensiddur.importer.opensiddur_org.parse_post import (
-    safe_uri,
     FootnoteRef,
     Span,
     Text,
@@ -10,9 +9,13 @@ from opensiddur.importer.opensiddur_org.parse_post import (
     parse_coauthor,
     parse_post,
     post_id_from_path,
+    safe_uri,
     split_title,
 )
-from opensiddur.importer.opensiddur_org.post_decisions import NO_DECISIONS, PostDecisions
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    NO_DECISIONS,
+    PostDecisions,
+)
 from opensiddur.tests.importer.opensiddur_org.support import (
     HEBREW_EN_ROWS,
     cell,

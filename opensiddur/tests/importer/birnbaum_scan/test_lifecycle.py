@@ -1,12 +1,15 @@
 """Calendar scope, reusable content and reference boundaries for life events."""
-import unittest
 import re
 import unicodedata
+import unittest
+
 from lxml import etree
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import lifecycle as r
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN
-from .test_tachanun_conditions import evaluate, fragment, settings, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment, settings
 
 
 class TestLifecycle(unittest.TestCase):
@@ -74,8 +77,8 @@ class TestLifecycle(unittest.TestCase):
             self.assertNotIn('Amen' if lang=='en' else 'אָמֵן',''.join(node.xpath('.//tei:seg',namespaces=NS)[-1].itertext()))
 
     def test_both_languages_preserve_every_reading_and_reused_text(self):
-        from opensiddur.importer.birnbaum_scan.build.build_he import PRAYERS as HE
         from opensiddur.importer.birnbaum_scan.build.build_en import PRAYERS as EN
+        from opensiddur.importer.birnbaum_scan.build.build_he import PRAYERS as HE
         def norm(text):
             return re.sub(r'\s+','',unicodedata.normalize('NFC',re.sub(r'\{pb:\d+\}','',text)))
         for lang,prayers in [('he',HE),('en',EN)]:

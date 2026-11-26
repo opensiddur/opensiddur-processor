@@ -1,11 +1,14 @@
 import json
+import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
 from unittest.mock import Mock
+
 from lxml import etree
-from opensiddur.importer.scan import pages, reverse, compare
+
+from opensiddur.importer.scan import compare, pages, reverse
 from opensiddur.importer.scan.metadata import derive_pages
+
 
 class ToolsTest(unittest.TestCase):
     def setUp(self):
@@ -49,10 +52,15 @@ class ToolsTest(unittest.TestCase):
         with self.assertRaises(ValueError):reverse.check({},actual)
 
     def test_expansion_instructions_follow_supplied_text_independently(self):
-        from opensiddur.importer.scan.authoring import conditional_scope, element, TEI, J
         from opensiddur.exporter.compiler import CompilerProcessor
         from opensiddur.exporter.linear import LinearData
         from opensiddur.exporter.settings import load_settings
+        from opensiddur.importer.scan.authoring import (
+            TEI,
+            J,
+            conditional_scope,
+            element,
+        )
         project = self.root/'pilot'
         project.mkdir()
         root = etree.Element(f'{{{TEI}}}text', nsmap={'tei':TEI, 'j':J})

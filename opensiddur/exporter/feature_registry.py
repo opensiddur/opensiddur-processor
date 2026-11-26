@@ -16,9 +16,9 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import yaml
 from lxml.etree import ElementBase
@@ -56,11 +56,11 @@ class ValueKind:
     """The kind of value a feature takes, and the constraints on it."""
 
     kind: str
-    minimum: Optional[float] = None
-    maximum: Optional[float] = None
+    minimum: float | None = None
+    maximum: float | None = None
     integer: bool = True
-    values: Optional[frozenset[str]] = None
-    pattern: Optional[re.Pattern] = None
+    values: frozenset[str] | None = None
+    pattern: re.Pattern | None = None
 
     def describe(self) -> str:
         if self.kind == "numeric":
@@ -74,7 +74,7 @@ class ValueKind:
             return f"a string matching {self.pattern.pattern}"
         return {"binary": "binary", "symbol": "a symbol", "string": "a string"}[self.kind]
 
-    def number_problem(self, number: float) -> Optional[str]:
+    def number_problem(self, number: float) -> str | None:
         """Why ``number`` is not a value of this numeric kind, or None if it is."""
         if not math.isfinite(number):
             return f"{number} is not a finite number"
@@ -95,10 +95,10 @@ class FeatureType:
     common: bool
     supplied: str
     features: dict[str, ValueKind]
-    open_name: Optional[re.Pattern] = None
-    open_value: Optional[ValueKind] = None
+    open_name: re.Pattern | None = None
+    open_value: ValueKind | None = None
 
-    def feature(self, name: str) -> Optional[ValueKind]:
+    def feature(self, name: str) -> ValueKind | None:
         if name in self.features:
             return self.features[name]
         if self.open_name is not None and self.open_name.fullmatch(name):
@@ -166,7 +166,7 @@ def _feature_type(name: str, spec: dict[str, Any]) -> FeatureType:
     )
 
 
-@lru_cache(maxsize=None)
+@cache
 def load_registry(path: Path = REGISTRY_FILE) -> dict[str, FeatureType]:
     """Every registered type, by name."""
     with open(path, encoding="utf-8") as registry_file:
@@ -180,7 +180,7 @@ def is_governed(fs_type: str) -> bool:
 
 
 def _lookup(fs_type: str, feature: str,
-            registry: dict[str, FeatureType]) -> tuple[Optional[ValueKind], Optional[str]]:
+            registry: dict[str, FeatureType]) -> tuple[ValueKind | None, str | None]:
     """A feature's kind, or why there is none."""
     registered = registry.get(fs_type)
     if registered is None:
@@ -195,7 +195,7 @@ def _lookup(fs_type: str, feature: str,
 
 
 def check_yaml_value(fs_type: str, feature: str, value: Any,
-                     registry: Optional[dict[str, FeatureType]] = None) -> list[str]:
+                     registry: dict[str, FeatureType] | None = None) -> list[str]:
     """What is wrong with declaring ``value`` for a feature in a settings file, if anything."""
     if not is_governed(fs_type):
         return []
@@ -231,7 +231,7 @@ def _text_problems(where: str, kind: ValueKind, text: str) -> list[str]:
 
 
 def check_fs_element(fs_element: ElementBase, *, in_condition: bool,
-                     registry: Optional[dict[str, FeatureType]] = None) -> list[str]:
+                     registry: dict[str, FeatureType] | None = None) -> list[str]:
     """What is wrong with a declared or tested ``tei:fs``, if anything.
 
     Only the registry's own questions: the type, the feature names and the kinds of their

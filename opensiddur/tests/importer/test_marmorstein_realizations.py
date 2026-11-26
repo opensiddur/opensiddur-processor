@@ -1,14 +1,21 @@
 """Source evidence stays immutable while canonical mappings get their own review."""
+import unittest
 from copy import deepcopy
 from pathlib import Path
-import unittest
 
 from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
-    unit_document, unit_review_text, transclude_unit, document,
+    document,
+    transclude_unit,
+    unit_document,
+    unit_review_text,
 )
 from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
-    prepare_unit, prepare_documents, validate_occurrences, review_payloads, selection,
+    prepare_documents,
+    prepare_unit,
+    review_payloads,
+    selection,
     validate_generated,
+    validate_occurrences,
 )
 
 P = 'urn:x-opensiddur:text:prayer:example'
@@ -355,13 +362,18 @@ class RealizationTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'one host'):validate_occurrences(r)
 
     def test_join_respects_punctuation_and_split_words(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import join_source_fragments
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            join_source_fragments,
+        )
         self.assertEqual(join_source_fragments([{'text':'Israel'},{'text':', O God.'}]),'Israel, O God.')
         self.assertEqual(join_source_fragments([{'text':'fore','join_next':True},{'text':'ver'}]),'forever')
 
     def test_generated_canonical_collision_and_direct_caller_defaults(self):
         from pathlib import Path
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import validate_generated
+
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            validate_generated,
+        )
         r=fixture();root=unit_document(prepare_unit(r['units'][0],r),'en',True)
         caller,body=document('en','example','Example',P+'/caller')
         from lxml import etree
@@ -374,8 +386,12 @@ class RealizationTest(unittest.TestCase):
 
     def test_range_caller_selects_overlay_after_an_unvaried_start(self):
         from pathlib import Path
+
         from lxml import etree
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import validate_generated
+
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            validate_generated,
+        )
         r=fixture();u=r['units'][0];u['languages']['en'].insert(0,dict(paragraph=1,corresp=P+'/before',fragments=[dict(scan='s2',printed_page='1',text='Beginning',page_start=True)]))
         root=unit_document(prepare_unit(u,r),'en',True);caller,body=document('en','example','Example',P+'/caller')
         etree.SubElement(body,'{'+NS['j']+'}transclude',target=P+'/before',targetEnd=P+'/part',type='inline')
@@ -390,9 +406,13 @@ class RealizationTest(unittest.TestCase):
 
     def test_generated_pure_library_rejects_controls_roots_and_ranges(self):
         from pathlib import Path
+
         from lxml import etree
+
         from opensiddur.importer.marmorstein_rosh_hashanah_1 import PROJECTS
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import validate_generated
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            validate_generated,
+        )
         T='{'+NS['tei']+'}';J='{'+NS['j']+'}'
         def setup():
             r=fixture();host,caller=r['units'];host['canonical_parts']=True
@@ -428,9 +448,8 @@ class RealizationTest(unittest.TestCase):
 
     def test_redirected_old_qedushah_keeps_its_own_speakers_and_scope(self):
         import json
-        from opensiddur.common.constants import SOURCETEXTS_ROOT
-        from opensiddur.importer.marmorstein_rosh_hashanah_1 import BOOK
         from pathlib import Path
+
         old=json.loads((Path(__file__).parent/'fixtures/marmorstein_qedushah_before_reuse.json').read_text())['unit']
         original=deepcopy(old);parts=[P.replace('prayer:example','prayer:amidah/qedushah')+'/'+s for s in ['qadosh','barukh_kevod','uvedivrei','ledor_vador']]
         library=dict(stem='library',urn='urn:x-opensiddur:text:siddur:shared/qedushah_parts',title={'he':'חלקי קדושה'},canonical_parts=True,languages={'he':[]})
@@ -597,7 +616,9 @@ class ControlledOccurrenceTest(unittest.TestCase):
                         validate_occurrences(r)
 
     def test_unidentified_host_spans_do_not_bind_unrelated_units(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import attesting_controls
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            attesting_controls,
+        )
         r = fixture()
         host, caller = r['units']
         host['languages']['en'].append(dict(paragraph=1, fragments=[dict(scan='s2', text='unidentified')]))
@@ -673,7 +694,9 @@ class ControlledOccurrenceTest(unittest.TestCase):
             self.assertNotEqual(before['realization/'+other['stem']+'/en'], after['realization/'+other['stem']+'/en'])
 
     def test_nonpure_range_attester_binds_controls_to_part_caller(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import attesting_controls
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.realizations import (
+            attesting_controls,
+        )
         r = fixture();r['wording_variants'] = []
         host, caller = r['units'];caller['wording_selection'] = []
         host['languages']['en'].append(dict(corresp=P+'/second', paragraph=1,

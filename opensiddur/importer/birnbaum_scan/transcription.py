@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Resolve the Hebrew Wikisource foundation text to the reading *this* book prints.
 
 The Wikisource edition is not a reproduction of the 1949 print: it renders Birnbaum's

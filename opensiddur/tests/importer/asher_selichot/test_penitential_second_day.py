@@ -1,7 +1,9 @@
 """Unequal printed refrain positions and the penitential service context."""
 import copy
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import penitential_second_day as day
 from opensiddur.importer.asher_selichot.build import TEI, XML
 from opensiddur.importer.scan.reverse import streams

@@ -1,21 +1,33 @@
 """Verify encoded days, the contents page and the bookmark hierarchy."""
 
-from opensiddur.importer.scan import pdf as measurements
-from opensiddur.importer.scan.pdf import outline_rows
-
 import argparse
 import copy
 import json
 import re
-from collections import Counter
-from opensiddur.common.constants import SOURCETEXTS_ROOT
 import subprocess
 import tempfile
+from collections import Counter
 from pathlib import Path
+
 from lxml import etree
 from pypdf import PdfReader
-from .check_pdf import MAX_BASELINE_DIFFERENCE, check as check_poem, controls as poem_controls, corrected, hebrew_rows, plain, load_glyphs
-from .check_first_day_pdf import check as check_first, controls as first_controls, latin_note_runs
+
+from opensiddur.common.constants import SOURCETEXTS_ROOT
+from opensiddur.importer.scan import pdf as measurements
+from opensiddur.importer.scan.pdf import outline_rows
+
+from .check_first_day_pdf import check as check_first
+from .check_first_day_pdf import controls as first_controls
+from .check_first_day_pdf import latin_note_runs
+from .check_pdf import (
+    MAX_BASELINE_DIFFERENCE,
+    corrected,
+    hebrew_rows,
+    load_glyphs,
+    plain,
+)
+from .check_pdf import check as check_poem
+from .check_pdf import controls as poem_controls
 
 
 def day_bookmarks(rows, captions=("FIRST DAY", "SECOND DAY")):
@@ -237,25 +249,31 @@ def main(argv=None):
                 except ValueError:pass
                 else:raise AssertionError('Shifted numbered-day stanza escaped detection')
         if len(days)>7:
-            from .check_erev_pdf import check as erev_check, controls as erev_controls
+            from .check_erev_pdf import check as erev_check
+            from .check_erev_pdf import controls as erev_controls
             erev_portion=slice_day(tree,days[7],days[8] if len(days)>8 else None)
             erev_check(erev_portion,args.expanded)
             if args.control:erev_controls(erev_portion,args.expanded)
         if len(days)>8:
-            from .check_gedaliah_pdf import check as gedaliah_check, controls as gedaliah_controls
+            from .check_gedaliah_pdf import check as gedaliah_check
+            from .check_gedaliah_pdf import controls as gedaliah_controls
             gedaliah_portion=slice_day(tree,days[8],days[9] if len(days)>9 else None,
                                        trailing_note_texts=('עשרה הרוגי מלכות',))
             gedaliah_check(gedaliah_portion,args.expanded)
             if args.control:gedaliah_controls(gedaliah_portion,args.expanded)
         if len(days)>9:
-            from .check_penitential_pdf import check as penitential_check, controls as penitential_controls
+            from .check_penitential_pdf import check as penitential_check
+            from .check_penitential_pdf import controls as penitential_controls
             portion=slice_day(tree,days[9],days[10] if len(days)>10 else None,
                               trailing_note_texts=('With reference to Ps. xlii. 9.',),
                               prior_note_texts=('עשרה הרוגי מלכות',))
             penitential_check(portion,args.expanded)
             if args.control:penitential_controls(portion,args.expanded)
         if len(days)>10:
-            from .check_penitential_third_pdf import check as third_penitential_check, controls as third_penitential_controls
+            from .check_penitential_third_pdf import check as third_penitential_check
+            from .check_penitential_third_pdf import (
+                controls as third_penitential_controls,
+            )
             third_last_notes=('Joseph. (Deut. xxxiii. 17.)', 'Ezek. xxxiv. 31.',
                               'Exod. xix. 4.', 'Names of angels.')
             portion=slice_day(tree,days[10],days[11] if len(days)>11 else None,
@@ -264,47 +282,59 @@ def main(argv=None):
             third_penitential_check(portion,args.expanded)
             if args.control:third_penitential_controls(portion,args.expanded)
         if len(days)>11:
-            from .check_penitential_fourth_pdf import check as fourth_penitential_check, controls as fourth_penitential_controls
+            from .check_penitential_fourth_pdf import check as fourth_penitential_check
+            from .check_penitential_fourth_pdf import (
+                controls as fourth_penitential_controls,
+            )
             portion=slice_day(tree,days[11],days[12] if len(days)>12 else None,
                               prior_note_texts=third_last_notes)
             fourth_penitential_check(portion,args.expanded)
             if args.control:fourth_penitential_controls(portion,args.expanded)
         if len(days)>12:
-            from .check_penitential_fifth_pdf import check as fifth_penitential_check, controls as fifth_penitential_controls
+            from .check_penitential_fifth_pdf import check as fifth_penitential_check
+            from .check_penitential_fifth_pdf import (
+                controls as fifth_penitential_controls,
+            )
             portion=slice_day(tree,days[12],days[13] if len(days)>13 else None)
             fifth_penitential_check(portion,args.expanded)
             if args.control:fifth_penitential_controls(portion,args.expanded)
         if len(days)>13:
-            from .check_erev_yom_kippur_pdf import check as yk_check, controls as yk_controls
+            from .check_erev_yom_kippur_pdf import check as yk_check
+            from .check_erev_yom_kippur_pdf import controls as yk_controls
             portion=slice_day(tree,days[13],days[14] if len(days)>14 else None, trailing_note_texts=('Ezek. xxxvi. 25.',))
             yk_check(portion,args.expanded)
             if args.control:yk_controls(portion,args.expanded)
         if len(days)>14:
-            from .check_monday_fast_pdf import check as monday_check, controls as monday_controls
+            from .check_monday_fast_pdf import check as monday_check
+            from .check_monday_fast_pdf import controls as monday_controls
             portion=slice_day(tree,days[14],days[15] if len(days)>15 else None,
                               prior_note_texts=('Ezek. xxxvi. 25.',), trailing_note_texts=('Ezek. xxxvi. 25.',))
             monday_check(portion,args.expanded)
             if args.control:monday_controls(portion,args.expanded)
         if len(days)>15:
-            from .check_fast_pdf import check as fast_check, controls as fast_controls
+            from .check_fast_pdf import check as fast_check
+            from .check_fast_pdf import controls as fast_controls
             portion=slice_day(tree,days[15],days[16] if len(days)>16 else None,
                               prior_note_texts=('Ezek. xxxvi. 25.',),
                               trailing_note_texts=('Viz., Ishmael. See Gen. xxviii. 9.',))
             fast_check(portion,'thursday-fast',args.source_root,args.expanded)
             if args.control:fast_controls(portion,'thursday-fast',args.source_root,args.expanded)
         if len(days)>16:
-            from .check_fast_pdf import check as fast_check, controls as fast_controls
+            from .check_fast_pdf import check as fast_check
+            from .check_fast_pdf import controls as fast_controls
             portion=slice_day(tree,days[16],days[17] if len(days)>17 else None,
                               prior_note_texts=('Viz., Ishmael. See Gen. xxviii. 9.',))
             fast_check(portion,'last-monday-fast',args.source_root,args.expanded)
             if args.control:fast_controls(portion,'last-monday-fast',args.source_root,args.expanded)
         if len(days)>17:
-            from .check_fast_pdf import check as fast_check, controls as fast_controls
+            from .check_fast_pdf import check as fast_check
+            from .check_fast_pdf import controls as fast_controls
             portion=slice_day(tree,days[17],days[18] if len(days)>18 else None)
             fast_check(portion,'tenth-tevet',args.source_root,args.expanded)
             if args.control:fast_controls(portion,'tenth-tevet',args.source_root,args.expanded)
         if len(days)>18:
-            from .check_fast_pdf import check as fast_check, controls as fast_controls
+            from .check_fast_pdf import check as fast_check
+            from .check_fast_pdf import controls as fast_controls
             portion=slice_day(tree,days[18],days[19] if len(days)>19 else None)
             fast_check(portion,'esther-fast',args.source_root,args.expanded)
             if args.control:fast_controls(portion,'esther-fast',args.source_root,args.expanded)
@@ -313,12 +343,14 @@ def main(argv=None):
             fast_check(portion,'tammuz-fast',args.source_root,args.expanded)
             if args.control:fast_controls(portion,'tammuz-fast',args.source_root,args.expanded)
         if len(days)>20:
-            from .check_yom_kippur_katan_pdf import check as monthly_check,controls as monthly_controls
+            from .check_yom_kippur_katan_pdf import check as monthly_check
+            from .check_yom_kippur_katan_pdf import controls as monthly_controls
             portion=slice_day(tree,days[20],days[21] if len(days)>21 else None)
             monthly_check(portion,args.source_root,args.expanded)
             if args.control:monthly_controls(portion,args.source_root,args.expanded)
         if len(days)>21:
-            from .check_circumcision_pdf import check as final_check, controls as final_controls
+            from .check_circumcision_pdf import check as final_check
+            from .check_circumcision_pdf import controls as final_controls
             portion=slice_day(tree,days[21])
             final_check(portion,args.expanded)
             if args.control:final_controls(portion,args.expanded)

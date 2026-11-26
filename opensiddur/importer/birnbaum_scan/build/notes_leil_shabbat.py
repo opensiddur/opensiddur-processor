@@ -1,6 +1,6 @@
 """Commentary and source notes read from printed 283–298."""
-from .notes_minchah import note
 from .leil_shabbat import ROOT, URNS
+from .notes_minchah import note
 
 NOTES = [
 note(URNS['shalom_aleikhem'], 'was introduced by the Kabbalists some three hundred years ago. This song of peace is based on the talmudic passage concerning a good angel and an evil angel accompanying every man home from the synagogue on Friday evening. If they find the house in good order, the good angel says: “May the next Sabbath be as this one.” If, on the other hand, they find the house neglected, the evil angel says: “May the next Sabbath be as this one.” The reading <tei:foreign xml:lang="he">מֶלֶךְ</tei:foreign>, instead of <tei:foreign xml:lang="he">מִמֶּלֶךְ</tei:foreign>, is preferred by Rabbi Jacob Emden and others.', lemma='שלום עליכם'),

@@ -11,7 +11,7 @@ from opensiddur.exporter.compiler import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE
 from opensiddur.exporter.conditional_markers import check_pairing
 from opensiddur.exporter.external_compiler import TEI_NS, ExternalCompilerProcessor
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
-from opensiddur.exporter.urn import ResolvedUrn, ResolvedUrnRange, UrnResolver
+from opensiddur.exporter.urn import ResolvedUrn, UrnResolver
 
 P_NS = PROCESSING_NAMESPACE
 J_NS = JLPTEI_NAMESPACE

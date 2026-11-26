@@ -2,6 +2,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+
 from lxml import etree
 
 from opensiddur.importer.birnbaum_scan.build.shared_passages import split_paragraph
@@ -43,7 +44,9 @@ class TestSharedParagraph(unittest.TestCase):
 
 class TestDetachedDivision(unittest.TestCase):
     def test_occurrence_condition_stays_with_caller(self):
-        from opensiddur.importer.birnbaum_scan.build.shared_passages import detach_division
+        from opensiddur.importer.birnbaum_scan.build.shared_passages import (
+            detach_division,
+        )
         leaf = f'<tei:div corresp="{URN}"><tei:p>Shared words.</tei:p></tei:div>'
         prayer = dict(name='caller',urn=URN+'/caller',title='Caller',first=1,last=3,
             body='<j:conditional xml:id="occasion"/>'+leaf+'<j:endConditional target="#occasion"/>')

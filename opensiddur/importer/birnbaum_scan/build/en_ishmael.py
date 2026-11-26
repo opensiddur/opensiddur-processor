@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The English of Rabbi Ishmael's rules and Kaddish d'Rabbanan, printed 42 to 48.
 
 **This side carries a heading the Hebrew side does not** -- `TALMUDIC EXPOSITION OF THE
@@ -13,8 +12,8 @@ and checked page by page with `reverse`.
 """
 import functools
 
-from .common import PRAYER, POEM
 from . import common
+from .common import POEM, PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

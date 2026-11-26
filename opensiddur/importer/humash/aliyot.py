@@ -36,14 +36,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from opensiddur.importer.miqra_al_pi_hamasorah.convert import load_source
-from opensiddur.importer.miqra_al_pi_hamasorah.miqra_plus import (
-    DOCUMENTATION_NOTE,
-    VERSE_LABEL,
-    PlusFormatError,
-    check_aliyah,
-    template_params,
-)
+from opensiddur.common.versification import NUMBERING_MASORAH
 from opensiddur.importer.humash.names import (
     PAIR_MEMBERS,
     slug_for_combined_hebrew,
@@ -59,13 +52,20 @@ from opensiddur.importer.humash.refs import (
     UNIT_PARSHA_COMBINED,
     UNIT_WEEKDAY,
     UNIT_WEEKDAY_COMBINED,
-    NUMBERING_MASORAH,
     ReadingSpan,
     VerseRef,
     canonical_ref,
     chapters_in_book,
     previous_verse,
     verses_in_chapter,
+)
+from opensiddur.importer.miqra_al_pi_hamasorah.convert import load_source
+from opensiddur.importer.miqra_al_pi_hamasorah.miqra_plus import (
+    DOCUMENTATION_NOTE,
+    VERSE_LABEL,
+    PlusFormatError,
+    check_aliyah,
+    template_params,
 )
 
 logger = logging.getLogger(__name__)

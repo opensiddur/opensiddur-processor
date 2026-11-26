@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of the Torah blessings and Birkhoth ha-Shaḥar, printed pages 13 to 19.
 
 The blessings over the Torah; the Priestly Blessing; Elu Devarim; Elohai Neshamah; the
@@ -21,8 +20,8 @@ keeps both columns with the rubrics naming who each is for, which is what the pa
 """
 import functools
 
-from .common import PRAYER, PERSON, feature, cond, endcond
 from . import common
+from .common import PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

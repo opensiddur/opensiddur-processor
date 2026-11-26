@@ -6,12 +6,12 @@ from unittest.mock import MagicMock, patch
 
 from opensiddur.importer.birnbaum_siddur import wikisource
 from opensiddur.importer.birnbaum_siddur.wikisource import download_book, main
+from opensiddur.importer.util import wikisource_book
 from opensiddur.importer.util.pages import (
     birnbaum_siddur_credits_directory,
     birnbaum_siddur_data_directory,
     birnbaum_siddur_text_directory,
 )
-from opensiddur.importer.util import wikisource_book
 from opensiddur.importer.util.wikisource import RevisionInfo, WikisourceError
 
 # Page numbers chosen so the zero-padding width is the real one (three digits).

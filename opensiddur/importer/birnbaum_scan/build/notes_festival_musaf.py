@@ -1,8 +1,10 @@
 """Printed commentary and source notes, pages609–636, with split notes rejoined."""
 import re
+
 from .festival_musaf import URNS
 from .festival_musaf_data import PAGES
 from .notes_motzaei_shabbat import xml
+
 
 def note(key,kind,text):
     return dict(target=URNS[key],kind=kind,lemma='',n='',paras=[dict(text=xml(text))])

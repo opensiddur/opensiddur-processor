@@ -9,10 +9,10 @@ from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from opensiddur.exporter.cache import XMLCache
+
 # Literal values allowed in exporter settings YAML ``declarations`` (null → Undefined).
 DeclarationFeatureValue: TypeAlias = int | float | bool | str | None
-
-from opensiddur.exporter.cache import XMLCache
 
 
 class UndefinedType:

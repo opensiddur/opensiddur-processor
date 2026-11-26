@@ -13,6 +13,7 @@ from pydantic import ValidationError
 
 from opensiddur.common.xslt import xslt_transform_string
 from opensiddur.exporter.settings import TypographyConfig
+from opensiddur.exporter.tex.escape import escape_tex
 from opensiddur.exporter.tex.running_heads import (
     RUNNING_HEAD_CODES,
     RunningHeadConfig,
@@ -20,15 +21,13 @@ from opensiddur.exporter.tex.running_heads import (
     RunningHeadSide,
     build_page_style_tex,
     default_page_header,
-    expand_template,
-    parse_template,
     escape_with_hebrew_runs,
+    expand_template,
     hebrew_runs,
+    parse_template,
     render_position,
 )
-from opensiddur.exporter.tex.escape import escape_tex
 from opensiddur.tests.exporter.stylesheet_helpers import stylesheet_parameters
-
 
 LTR = r"{\textdir TLT\foreignlanguage{english}{"
 

@@ -12,10 +12,10 @@ from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.exporter.compiler import CompilerProcessor, main
-from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS
 from opensiddur.exporter.client_settings import is_reader_supplied, resolve
+from opensiddur.exporter.compiler import CompilerProcessor, main
 from opensiddur.exporter.condition_eval import parse_condition_element
+from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS
 from opensiddur.exporter.linear import Undefined, get_linear_data, reset_linear_data
 from opensiddur.exporter.settings import load_settings
 from opensiddur.tests.exporter.registry_helpers import unchecked_registry

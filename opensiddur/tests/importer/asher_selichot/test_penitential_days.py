@@ -1,7 +1,9 @@
 """Later penitential days retain language-specific cues and seasonal scopes."""
 import copy
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import penitential_days as day
 from opensiddur.importer.asher_selichot.build import TEI, XML
 from opensiddur.importer.scan.reverse import streams
@@ -33,7 +35,7 @@ class LaterPenitentialDaysTests(unittest.TestCase):
         self.assertEqual([e.text for e in expansions],[r['refrain']['en'],f['en']['text']])
 
     def test_enter_not_target_excludes_preceding_mercy_verse(self):
-        from opensiddur.importer.asher_selichot.erev_rosh_hashanah import printed, EXTRA
+        from opensiddur.importer.asher_selichot.erev_rosh_hashanah import EXTRA, printed
         r={'id':'adonai_boqer_tishma_qoli','kind':'prose','fragments':[
             {'en':{'scan':'s107','printed_page':'52','text':'Morning. Thy mercy is great. Enter not into judgment with us.'},'notes':{'en':[]}}]}
         root=etree.Element('{'+TEI+'}body');printed(root,r,'en','urn:example')
@@ -82,7 +84,8 @@ class LaterPenitentialDaysTests(unittest.TestCase):
         with self.assertRaises(ValueError):day.service_urn('sixth')
 
     def test_duplicated_printed_invocation_is_rejected(self):
-        import json,tempfile
+        import json
+        import tempfile
         from pathlib import Path
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)

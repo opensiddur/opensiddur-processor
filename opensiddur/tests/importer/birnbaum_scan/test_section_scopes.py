@@ -4,12 +4,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from lxml import etree
-
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
-from opensiddur.importer.birnbaum_scan.build.scopes import scope_section_headings, J, TEI
+from opensiddur.importer.birnbaum_scan.build.scopes import (
+    TEI,
+    J,
+    scope_section_headings,
+)
 
 
 class TestSectionScopes(unittest.TestCase):

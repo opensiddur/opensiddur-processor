@@ -24,10 +24,10 @@ import html
 import json
 import re
 import unicodedata
-from urllib.parse import quote
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal, Union
+from typing import Any, Literal
+from urllib.parse import quote
 
 import lxml.html
 from lxml.html import HtmlElement
@@ -37,10 +37,10 @@ from opensiddur.importer.opensiddur_org.languages import (
     NOT_TEXT_ROLES,
     UNKNOWN_LANGUAGE,
     language_from_header,
-    site_lang,
     language_from_lang_attribute,
     resolve_disagreement,
     same_language,
+    site_lang,
 )
 from opensiddur.importer.opensiddur_org.post_decisions import (
     NO_DECISIONS,
@@ -89,7 +89,7 @@ class Span:
     :data:`FORMATTING_TAGS`."""
 
     kind: str
-    children: tuple["Node", ...]
+    children: tuple[Node, ...]
 
 
 @dataclass(frozen=True)
@@ -97,10 +97,10 @@ class FootnoteRef:
     """A footnote marker. ``number`` counts footnotes through the whole post, in order."""
 
     number: int
-    note: tuple["Node", ...]
+    note: tuple[Node, ...]
 
 
-Node = Union[Text, Span, FootnoteRef]
+Node = Text | Span | FootnoteRef
 Line = tuple[Node, ...]
 
 #: A line of the post's own words that is a transclusion of the URN after this prefix: a text

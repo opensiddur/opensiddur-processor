@@ -1,13 +1,14 @@
 """Saturday-night additions and Birkat Halevanah, printed535–566."""
-from html import escape
 import re
-from .common import SIDDUR, PRAYER, POEM, PROJECT_HE, AGG, feature, pb
-from .conclusion import BIBLE, MINYAN, instruction, transclude, text_xml
+from html import escape
+
+from .common import AGG, POEM, PRAYER, PROJECT_HE, SIDDUR, feature, pb
+from .conclusion import BIBLE, MINYAN, instruction, text_xml, transclude
 from .milestones import marked
+from .motzaei_data import READINGS
 from .shabbat_minchah import conditional, kaddish
 from .shacharit_end import editorial_head
 from .tachanun_conditions import holiday
-from .motzaei_data import READINGS
 
 ROOT = SIDDUR+'shabbat/conclusion'
 LEVANAH = SIDDUR+'berakhot/birkat_halevanah'
@@ -124,21 +125,21 @@ def units(project,by_name):
     value=reading(537+side,'veattah_qadosh')+' {pb:'+str(539+side)+'} '
     if side:value+=' '.join(t for k,t in READINGS['540']['text'])
     else:value+=reading(539,'veattah_qadosh_cont')
-    from .motzaei_refs import split
-    from .conclusion_data import PASSAGES
     from .conclusion import URNS as CONCLUSION
+    from .conclusion_data import PASSAGES
+    from .motzaei_refs import split
     bounds=[]
-    for key,ref,he,en in PASSAGES['uva_letziyyon']['rows'][2:]:
+    for key,_ref,he,en in PASSAGES['uva_letziyyon']['rows'][2:]:
         he=re.sub(r'\{[^}]+\}', '', he);en=re.sub(r'\{[^}]+\}', '', en)
         he=' '.join(he.split()[:2]);en=' '.join(en.split()[:4])
         if key=='lemaan':en='May my soul sing'
         if key=='targum_qadosh':he='וּמְקַבְּלִין'
         bounds.append((key,he,en))
     body=''
-    for (key,value),(_,ref,_,_) in zip(split(value,bounds,lang),PASSAGES['uva_letziyyon']['rows'][2:]):
+    for (key,segment),(_,ref,_,_) in zip(split(value,bounds,lang),PASSAGES['uva_letziyyon']['rows'][2:]):
         source=(BIBLE+ref) if ref and not key.startswith('targum') else CONCLUSION['uva_letziyyon']+'/'+key
-        value=value.replace('*','')
-        encoded=xml(value)
+        segment=segment.replace('*','')
+        encoded=xml(segment)
         if key.startswith('targum'):
             encoded=('<tei:hi rend="italic">'+encoded+'</tei:hi>') if side else '<tei:foreign xml:lang="arc-Hebr">'+encoded+'</tei:foreign>'
         body+='<tei:p>'+marked(ROOT+'/veattah_qadosh/'+key,'<tei:seg source="'+source+'">'+encoded+'</tei:seg>',unit='verse' if ref and not key.startswith('targum') else 'prayer-part')+'</tei:p>'
@@ -168,13 +169,13 @@ def units(project,by_name):
         value+=' '.join(text for key,text in READINGS[str(page)]['text']
                         if not key.startswith('kaddish') and key!='psalm128')+' '
     body=''
-    for source,value in split(value,VEYITTEN,lang):
+    for source,segment in split(value,VEYITTEN,lang):
         if ':talmud:' in source:
             from .motzaei_refs import megillah_quotes
-            value=megillah_quotes(value,lang)
+            segment=megillah_quotes(segment,lang)
             body+=f'<tei:note type="instruction" xml:lang="{lang}">'+('Talmud Megillah 31a' if side else 'מסכת מגילה לא, א')+'</tei:note>'
         urn=source if source not in seen else ROOT+'/veyitten_lekha/'+source.split(':')[-1]
-        body+=paragraph(urn,value,source=source if urn!=source else None,
+        body+=paragraph(urn,segment,source=source if urn!=source else None,
                         unit='verse' if ':bible:' in source else 'prayer-part')
         seen.add(urn)
     body+=transclude(ROOT+'/psalm128')

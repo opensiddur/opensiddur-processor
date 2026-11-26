@@ -1,16 +1,15 @@
 """Tests for the CompilerProcessor class."""
 
 import re
-from typing import Optional
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, patch
+
 from lxml import etree
-from opensiddur.exporter.compiler import CompilerProcessor, JLPTEI_NAMESPACE
-from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
-from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
-from opensiddur.exporter.linear import LinearData, reset_linear_data, get_linear_data
+
+from opensiddur.exporter.compiler import JLPTEI_NAMESPACE, CompilerProcessor
+from opensiddur.exporter.linear import LinearData, get_linear_data, reset_linear_data
 from opensiddur.exporter.refdb import Reference, ReferenceDatabase, UrnMapping
 from opensiddur.exporter.urn import ResolvedUrn, ResolvedUrnRange, split_range
 
@@ -241,7 +240,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
     <tei:div xml:lang="zh">
         <tei:p>中文 Chinese text</tei:p>
     </tei:div>
-</root>'''.encode('utf-8')
+</root>'''.encode()
         
         project, file_name = self._create_test_file("unicode.xml", xml_content)
         
@@ -276,7 +275,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_internal_transclusion_calls_inline_processor(self):
         """Test that CompilerProcessor calls InlineCompilerProcessor for inline transclusions."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" 
                                xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2">
@@ -304,7 +303,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
             MockInlineProcessor.return_value = mock_instance
             
             # Mock UrnResolver methods to return resolved URNs
-            from opensiddur.exporter.urn import ResolvedUrn, ResolvedUrnRange
+            from opensiddur.exporter.urn import ResolvedUrn
             
             def mock_resolve_range(urn):
                 return [ResolvedUrn(urn=urn, project=project, file_name=file_name, element_path="/TEI/div[1]")]
@@ -335,7 +334,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_external_transclusion_calls_external_processor(self):
         """Test that CompilerProcessor calls ExternalCompilerProcessor for external transclusions."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" 
                                xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2">
@@ -396,7 +395,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_external_transclusion_defaults_type_to_external_when_missing(self):
         """Regression: j:transclude without @type must behave as external, not crash setting type=None."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
 
         xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0"
                                xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2">
@@ -443,7 +442,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_transclusion_with_urn_resolves_correctly(self):
         """Test that CompilerProcessor correctly resolves URNs and passes them to processors."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" 
                                xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2">
@@ -502,7 +501,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_inline_transclusion_with_metadata(self):
         """Test CompilerProcessor with inline transclusion that includes teiHeader metadata."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import patch
         
         # Main file
         main_xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" 
@@ -622,7 +621,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_external_transclusion_with_metadata(self):
         """Test CompilerProcessor with external transclusion that includes teiHeader metadata."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import patch
         
         # Main file
         main_xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" 
@@ -753,7 +752,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_metadata_extraction_preserves_structure(self):
         """Test that metadata extraction preserves the full fileDesc structure including nested elements."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         # Main file
         main_xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" 
@@ -871,7 +870,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_language_handling_in_transclusions(self):
         """Test that language differences are correctly handled in transclusions."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         # Main file with English as default
         main_xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">
@@ -955,7 +954,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_language_handling_in_instructional_annotations(self):
         """Test that language differences are correctly handled in instructional annotations."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         # Main file with English as default
         main_xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">
@@ -1073,7 +1072,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
 
     def test_language_handling_in_editorial_annotations(self):
         """Test that language differences are correctly handled in editorial annotations."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         
         # Main file with English as default
         main_xml_content = b'''<root xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:jlp="http://jewishliturgy.org/ns/jlptei/2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">
@@ -1119,8 +1118,8 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
         refdb = MagicMock(spec=ReferenceDatabase)
         
         # Mock get_references_to to return the editorial note reference
+
         from opensiddur.exporter.refdb import Reference
-        import xml.etree.ElementTree as ET
         # Get the note element from the parsed XML to get its path
         note_elem = editorial_tree_root.xpath('//tei:note[@type="editorial"]', namespaces={'tei': 'http://www.tei-c.org/ns/1.0'})[0]
         note_path = note_elem.getroottree().getpath(note_elem)
@@ -1668,9 +1667,9 @@ class TestCompilerProcessorAnnotations(unittest.TestCase):
 
     def _create_instructional_note_file(self, project: str, 
         file_name: str, title: str, 
-        urn: Optional[str], 
+        urn: str | None, 
         content: str,
-        xml_id: Optional[str]) -> tuple[str, str]:
+        xml_id: str | None) -> tuple[str, str]:
         """Create a test file with an instructional note."""
         corresp = f"corresp='{urn}'" if urn else f"xml:id='{xml_id}'" if xml_id else ""
         xml_content = f'''<TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">
@@ -1694,7 +1693,7 @@ class TestCompilerProcessorAnnotations(unittest.TestCase):
             </tei:div>
         </tei:body>
     </tei:text>
-</TEI>'''.encode('utf-8')
+</TEI>'''.encode()
         return self._create_test_file(project, file_name, xml_content)
 
     def _create_editorial_note_file(self, project: str, file_name: str, title: str, urn: str, content: str) -> tuple[str, str]:
@@ -1712,13 +1711,13 @@ class TestCompilerProcessorAnnotations(unittest.TestCase):
             {content}
         </tei:note>
     </tei:standOff>
-</TEI>'''.encode('utf-8')
+</TEI>'''.encode()
         return self._create_test_file(project, file_name, xml_content)
 
     def _create_targeted_note_file(self, project: str, 
         file_name: str, title: str, 
-        urn: Optional[str],
-        xml_id: Optional[str],
+        urn: str | None,
+        xml_id: str | None,
         internal_note: str = "") -> tuple[str, str]:
         """Create a test file with a target for a note."""
         corresp = f"corresp='{urn}'" if urn else f"xml:id='{xml_id}'" if xml_id else ""
@@ -1744,7 +1743,7 @@ class TestCompilerProcessorAnnotations(unittest.TestCase):
     <tei:standOff>
         {internal_note}
     </tei:standOff>
-</TEI>'''.encode('utf-8')
+</TEI>'''.encode()
         return self._create_test_file(project, file_name, xml_content)
 
     def test_instructional_note_with_urn_not_found_in_database(self):

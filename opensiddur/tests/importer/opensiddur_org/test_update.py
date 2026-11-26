@@ -15,7 +15,10 @@ from opensiddur.importer.opensiddur_org.download import (
     Upstream,
 )
 from opensiddur.importer.opensiddur_org.licences import LicenceDecisions
-from opensiddur.importer.opensiddur_org.post_decisions import NO_DECISIONS, PostDecisions
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    NO_DECISIONS,
+    PostDecisions,
+)
 from opensiddur.importer.opensiddur_org.update import (
     CHANGED,
     DELETED,

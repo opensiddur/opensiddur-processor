@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the queue of unsettled differences.
 
 Every fixture is synthetic. Nothing here reads the sourcetexts submodule: CI does not
@@ -11,8 +10,8 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from opensiddur.importer.scan import compare as cmp
 from opensiddur.importer.birnbaum_scan import open_questions as oq
+from opensiddur.importer.scan import compare as cmp
 
 
 class _Reading:

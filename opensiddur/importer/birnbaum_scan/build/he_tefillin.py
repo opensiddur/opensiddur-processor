@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of Seder Hanachath Tefillin, read off printed pages 5, 7, 9 and 11.
 
 Four printed pages and three page turns, every one of them mid-sentence: the meditation
@@ -20,8 +19,8 @@ unconditional and the fact stays in the apparatus, where he put it.
 """
 import functools
 
-from .common import PRAYER
 from . import common
+from .common import PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

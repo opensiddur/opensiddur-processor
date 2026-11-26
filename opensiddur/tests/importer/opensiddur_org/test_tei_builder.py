@@ -6,7 +6,10 @@ from lxml import etree
 from opensiddur.importer.opensiddur_org.contributors import Contributors, post_credits
 from opensiddur.importer.opensiddur_org.licences import LICENCES, LicenceDecision
 from opensiddur.importer.opensiddur_org.parse_post import node_text, parse_post
-from opensiddur.importer.opensiddur_org.post_decisions import NO_DECISIONS, PostDecisions
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    NO_DECISIONS,
+    PostDecisions,
+)
 from opensiddur.importer.opensiddur_org.scope import project_columns
 from opensiddur.importer.opensiddur_org.tei_builder import (
     build_project,

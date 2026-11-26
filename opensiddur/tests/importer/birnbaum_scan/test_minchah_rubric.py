@@ -10,7 +10,7 @@ from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.importer.birnbaum_scan.build import minchah
-from opensiddur.importer.birnbaum_scan.build.common import PROJECT_HE, PROJECT_EN
+from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN, PROJECT_HE
 
 NS = {'tei': 'http://www.tei-c.org/ns/1.0', 'j': 'http://jewishliturgy.org/ns/jlptei/2'}
 

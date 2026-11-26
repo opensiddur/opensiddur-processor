@@ -215,7 +215,10 @@ class TestConditionalSegmentation(unittest.TestCase):
 
 class TestTeiBuilder(unittest.TestCase):
     def test_index_body_includes_head_and_transcludes(self) -> None:
-        from opensiddur.importer.feinstein_haggadah.sections import SectionContent, TextBlock
+        from opensiddur.importer.feinstein_haggadah.sections import (
+            SectionContent,
+            TextBlock,
+        )
         from opensiddur.importer.feinstein_haggadah.tei_builder import index_body
 
         section = SectionContent(
@@ -228,7 +231,10 @@ class TestTeiBuilder(unittest.TestCase):
         self.assertNotIn("<tei:p>נִרְצָה</tei:p>", body)
 
     def test_content_body_emits_milestone_urns(self) -> None:
-        from opensiddur.importer.feinstein_haggadah.sections import SectionContent, TextBlock
+        from opensiddur.importer.feinstein_haggadah.sections import (
+            SectionContent,
+            TextBlock,
+        )
         from opensiddur.importer.feinstein_haggadah.tei_builder import content_body
 
         section = SectionContent(
@@ -247,7 +253,10 @@ class TestTeiBuilder(unittest.TestCase):
         self.assertIn("<tei:head>קַדֵּשׁ</tei:head>", body)
 
     def test_content_body_emits_instruction_notes(self) -> None:
-        from opensiddur.importer.feinstein_haggadah.sections import SectionContent, TextBlock
+        from opensiddur.importer.feinstein_haggadah.sections import (
+            SectionContent,
+            TextBlock,
+        )
         from opensiddur.importer.feinstein_haggadah.tei_builder import content_body
 
         section = SectionContent(

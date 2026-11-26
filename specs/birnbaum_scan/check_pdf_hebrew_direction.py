@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Is every Hebrew run in a built PDF actually set right to left?
 
 A missing direction wrapper does not fail the build, does not fail validation and does not

@@ -1,17 +1,37 @@
 """Weekday Minchah: occurrence wrappers around shared prayers and distinct readings."""
 from html import escape
 
-from .common import (PRAYER, SIDDUR, AGG, RECITATION, QUORUM, PROJECT_HE,
-                     cond, endcond, feature, pb)
-from .conclusion import transclude, instruction, URNS as CONCLUSION
-from .tachanun import URNS as TACHANUN, NEFILAH, CLOSING
-from .tachanun_conditions import date, holiday, TISHREI
 from .avinu_malkenu import TEN_DAYS
-from .minchah_data import (NACHEM_HE, NACHEM_EN, NACHEM_VERSE_HE, NACHEM_VERSE_EN,
-                          NACHEM_SEAL_HE, NACHEM_SEAL_EN, SHALOM_RAV,
-                          TACHANUN_RUBRIC, TORAH_RUBRIC)
+from .common import (
+    AGG,
+    PRAYER,
+    PROJECT_HE,
+    QUORUM,
+    RECITATION,
+    SIDDUR,
+    cond,
+    endcond,
+    feature,
+    pb,
+)
+from .conclusion import URNS as CONCLUSION
+from .conclusion import instruction, transclude
 from .milestones import marked
-from .shared_passages import split_paragraph, detach_division
+from .minchah_data import (
+    NACHEM_EN,
+    NACHEM_HE,
+    NACHEM_SEAL_EN,
+    NACHEM_SEAL_HE,
+    NACHEM_VERSE_EN,
+    NACHEM_VERSE_HE,
+    SHALOM_RAV,
+    TACHANUN_RUBRIC,
+    TORAH_RUBRIC,
+)
+from .shared_passages import detach_division, split_paragraph
+from .tachanun import CLOSING, NEFILAH
+from .tachanun import URNS as TACHANUN
+from .tachanun_conditions import TISHREI, date, holiday
 
 ROOT = SIDDUR + 'chol/minchah'
 BIBLE = 'urn:x-opensiddur:text:bible:'

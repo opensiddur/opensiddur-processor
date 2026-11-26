@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Birnbaum's English of Adon Olam and Yigdal, read off printed pages 12 and 14.
 
 Both poems are set in two columns on the Hebrew page and as two stacked lines
@@ -14,8 +13,8 @@ they are `@n` on the line rather than words in it, and only on this side.
 """
 import functools
 
-from .common import POEM
 from . import common
+from .common import POEM
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

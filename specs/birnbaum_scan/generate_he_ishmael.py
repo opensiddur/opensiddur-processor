@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Emit `build/he_ishmael.py`, lifting its text from the readings rather than retyping it.
 
 Same reason and same use as `generate_he_korbanot.py`: see its docstring. Run from the

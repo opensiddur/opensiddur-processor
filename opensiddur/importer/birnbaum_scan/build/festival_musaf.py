@@ -1,14 +1,15 @@
 """Festival Musaf, priestly blessing, morning Kiddush and Tal, IA n633–660."""
 import re
-from .common import SIDDUR, PRAYER, PROJECT_HE, SERVICE, AGG, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
-from .festival import conditional, HOLIDAYS, IN_SUKKAH
-from .shabbat_arvit import SHABBAT, REGALIM
-from .shabbat_amidah import READER
-from .tachanun_conditions import holiday, ISRAEL, DIASPORA
-from .shacharit_end import editorial_head
+
+from .common import AGG, PRAYER, PROJECT_HE, SERVICE, SIDDUR, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .festival import HOLIDAYS, IN_SUKKAH, conditional
+from .festival_musaf_data import ROWS
 from .milestones import marked
-from .festival_musaf_data import ROWS, PAGES
+from .shabbat_amidah import READER
+from .shabbat_arvit import REGALIM, SHABBAT
+from .shacharit_end import editorial_head
+from .tachanun_conditions import DIASPORA, ISRAEL, holiday
 
 ROOT = SIDDUR+'regalim/musaf'
 AMIDAH = ROOT+'/amidah'

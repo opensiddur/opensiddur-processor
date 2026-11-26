@@ -36,8 +36,8 @@ import unittest
 from pathlib import Path
 
 from opensiddur.exporter.tex.latex import transform_xml_to_tex
-from opensiddur.tests.exporter.stylesheet_helpers import NO_NOTICES
 from opensiddur.exporter.typography import TypographyConfig
+from opensiddur.tests.exporter.stylesheet_helpers import NO_NOTICES
 
 _SECTIONS = 30
 # Words in a section's first paragraph; the second has twice as many and five more.

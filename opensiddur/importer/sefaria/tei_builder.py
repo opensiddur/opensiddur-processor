@@ -33,20 +33,33 @@ from __future__ import annotations
 
 import html
 import re
-
-from lxml import etree
 from collections.abc import Collection, Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
+from lxml import etree
+
 from opensiddur.importer.sefaria.align import Pair
-from opensiddur.importer.sefaria.blocks import Heading, Item, Rubric, TextBlock, is_heading, is_phrase
+from opensiddur.importer.sefaria.blocks import (
+    Heading,
+    Item,
+    Rubric,
+    TextBlock,
+    is_heading,
+    is_phrase,
+)
+from opensiddur.importer.sefaria.conditions import (
+    Conditions,
+    LeafGate,
+    condition_xml,
+    negated_xml,
+)
 from opensiddur.importer.sefaria.markup import (
     Break,
     Correction,
     EnglishKind,
-    HebrewKind,
     Footnote,
+    HebrewKind,
     Node,
     Styled,
     Text,
@@ -54,7 +67,6 @@ from opensiddur.importer.sefaria.markup import (
     leading_label,
     plain_text,
 )
-from opensiddur.importer.sefaria.conditions import Conditions, LeafGate, condition_xml, negated_xml
 from opensiddur.importer.sefaria.phrases import phrase_urn
 from opensiddur.importer.sefaria.works import Work
 from opensiddur.importer.util.hebrew import to_nfkd
@@ -414,9 +426,8 @@ class _TextWriter:
     def _unreplaced_at_end(self, xml: str) -> tuple[str, Any] | None:
         """The inline alternative the phrase ends with, when it replaces words and none beside it
         were: the next phrase may open with them."""
-        last = None
-        for last in _INLINE.finditer(xml):
-            pass
+        matches = list(_INLINE.finditer(xml))
+        last = matches[-1] if matches else None
         if last is None or re.sub(r"<[^>]*>|[\s,.:;]", "", xml[last.end():]):
             return None
         if re.search(r'</j:none></j:conditional>[^<]*<j:endConditional target="#inline_\d+"/>\s*$',

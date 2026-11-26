@@ -1,6 +1,6 @@
 """New occurrence commentary, printed 337–340; other notes are shared."""
 from .notes_minchah import note
-from .shabbat_shema import YOTZER,EL_ADON,LAEL
+from .shabbat_shema import EL_ADON, LAEL, YOTZER
 
 NOTES = [
 note(YOTZER+'/festival/el_barukh','is an alphabetic acrostic ending with <tei:foreign xml:lang="he">תמיד</tei:foreign>.',lemma='אל ברוך גדול דעה'),

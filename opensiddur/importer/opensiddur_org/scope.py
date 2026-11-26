@@ -17,9 +17,15 @@ import html
 from dataclasses import dataclass
 from typing import Any
 
-from opensiddur.importer.opensiddur_org.languages import NOT_TEXT_ROLES, UNKNOWN_LANGUAGE
+from opensiddur.importer.opensiddur_org.languages import (
+    NOT_TEXT_ROLES,
+    UNKNOWN_LANGUAGE,
+)
 from opensiddur.importer.opensiddur_org.parse_post import Cell, Column, Post
-from opensiddur.importer.opensiddur_org.post_decisions import PostDecisions, default_post_decisions
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    PostDecisions,
+    default_post_decisions,
+)
 
 PRAYERS_CATEGORY = 1132
 
@@ -152,7 +158,7 @@ def irregularities(post: Post) -> list[str]:
     if post.undecided_colours:
         reasons.append("colour-coded text: " + ", ".join(sorted(post.undecided_colours)))
     for view in table_views(post):
-        for index, column in imported_columns(view):
+        for _index, column in imported_columns(view):
             if not column.role:
                 reasons.append(f"column {column.header!r}: unknown role")
             if column.lang == UNKNOWN_LANGUAGE:

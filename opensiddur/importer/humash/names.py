@@ -10,8 +10,11 @@ week's aliyot can be scoped to the pair rather than to either member.
 
 from __future__ import annotations
 
+from opensiddur.importer.util.hebrew import normalize_hebrew
 from opensiddur.importer.util.parshiyot import (
     COMBINED_PARSHIYOT as _COMBINED_HEBCAL,
+)
+from opensiddur.importer.util.parshiyot import (
     HEBCAL_TO_SLUG,
     PARSHA_NAMES,
     SLUG_TO_HEBREW,
@@ -19,7 +22,6 @@ from opensiddur.importer.util.parshiyot import (
     slug_for_hebrew,
     slugify_reading_name,
 )
-from opensiddur.importer.util.hebrew import normalize_hebrew
 
 __all__ = [
     "COMBINED_PARSHIYOT",

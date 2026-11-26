@@ -1,7 +1,8 @@
 """A public passage's inherited quorum tests must not split the prayer."""
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
+
 from lxml import etree as E
 
 from opensiddur.exporter.compiler import CompilerProcessor
@@ -9,7 +10,15 @@ from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.importer.birnbaum_scan.build import build_he, common
 from opensiddur.importer.siddur_expanded.compose import Composer
-from opensiddur.importer.siddur_expanded.xml import Author, T, J, NS, feature, parse_fragment, serialize
+from opensiddur.importer.siddur_expanded.xml import (
+    NS,
+    Author,
+    J,
+    T,
+    feature,
+    parse_fragment,
+    serialize,
+)
 
 
 class SyntheticPrayers(dict):

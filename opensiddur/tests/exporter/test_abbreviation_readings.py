@@ -1,13 +1,16 @@
 import tempfile
-from pathlib import Path
 import unittest
+from pathlib import Path
+
 from lxml import etree
-from opensiddur.exporter.linear import LinearData
+
 from opensiddur.exporter.compiler import CompilerProcessor
-from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
+from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
+from opensiddur.exporter.linear import LinearData
 from opensiddur.exporter.settings import SettingsYaml
 from opensiddur.tests.exporter.stylesheet_helpers import transform
+
 TEI='http://www.tei-c.org/ns/1.0'
 class AbbreviationTest(unittest.TestCase):
     def setUp(self):

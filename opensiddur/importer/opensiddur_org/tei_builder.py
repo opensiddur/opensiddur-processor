@@ -43,7 +43,11 @@ from opensiddur.importer.opensiddur_org.scope import (
     table_views,
 )
 from opensiddur.importer.opensiddur_org.urns import PostUrns
-from opensiddur.importer.util.tei_project import PROJECT_SOURCE_BIBL_ID, tei_document, xml_id_ref
+from opensiddur.importer.util.tei_project import (
+    PROJECT_SOURCE_BIBL_ID,
+    tei_document,
+    xml_id_ref,
+)
 
 SITE_URL = "https://opensiddur.org"
 SITE_NAME = "Open Siddur Project"

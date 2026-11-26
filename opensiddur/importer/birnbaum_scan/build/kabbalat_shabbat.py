@@ -1,12 +1,25 @@
 """Kabbalat Shabbat, printed 237–256; occasion gates belong to callers."""
 import re
-from .common import PRAYER, POEM, SIDDUR, PROJECT_HE, AGG, cond, endcond, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml, MINYAN
-from .milestones import Correspondences, milestone, marked
-from .shacharit_end import editorial_head
+
 from .arvit import AFTER_FESTIVAL
-from .kabbalat_shabbat_data import (HE, EN, EN_JOIN, PAGES, READER, REFRAIN,
-    DODI_HE, DODI_EN, CONDOLENCE, CONDOLENCE_RUBRIC, STANZAS_RUBRIC, RISE_RUBRIC)
+from .common import AGG, POEM, PRAYER, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, MINYAN, instruction, text_xml, transclude
+from .kabbalat_shabbat_data import (
+    CONDOLENCE,
+    CONDOLENCE_RUBRIC,
+    DODI_EN,
+    DODI_HE,
+    EN,
+    EN_JOIN,
+    HE,
+    PAGES,
+    READER,
+    REFRAIN,
+    RISE_RUBRIC,
+    STANZAS_RUBRIC,
+)
+from .milestones import Correspondences, marked, milestone
+from .shacharit_end import editorial_head
 
 ROOT = SIDDUR+'shabbat/qabbalat_shabbat'
 SIGIL = '1949 shabbat/qabbalat_shabbat'

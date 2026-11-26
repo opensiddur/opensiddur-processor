@@ -1,8 +1,12 @@
 """Small XML authoring helpers, independent of source data."""
 from html import escape
 from itertools import count
+
 from lxml import etree as E
-from opensiddur.importer.birnbaum_scan.build.common import PROJECT_HE as BIRNBAUM_PROJECT
+
+from opensiddur.importer.birnbaum_scan.build.common import (
+    PROJECT_HE as BIRNBAUM_PROJECT,
+)
 from opensiddur.importer.humash.build import PROJECT as HUMASH_PROJECT
 
 T = 'http://www.tei-c.org/ns/1.0'

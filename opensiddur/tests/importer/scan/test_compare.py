@@ -1,10 +1,11 @@
 """Reading comparisons classify differences without knowing either book."""
-from contextlib import redirect_stdout
 import io
 import json
+import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
+
 from opensiddur.importer.scan import compare as c
 
 

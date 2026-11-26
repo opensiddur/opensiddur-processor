@@ -1,13 +1,12 @@
 """Rosh Hodesh Musaf Amidah, scan leaves n599–n608 (printed575–584)."""
-import re
-from .common import PRAYER,SIDDUR,PROJECT_HE,SERVICE,AGG,feature,cond,endcond,pb
-from .conclusion import BIBLE,instruction,transclude,text_xml
+from .common import AGG, PRAYER, PROJECT_HE, SERVICE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .milestones import marked
+from .rosh_hodesh_musaf_data import PAGES, ROWS
 from .shabbat_amidah import READER
 from .shabbat_musaf import LEAP
-from .tachanun_conditions import holiday
 from .shacharit_end import editorial_head
-from .milestones import marked
-from .rosh_hodesh_musaf_data import ROWS,PAGES
+from .tachanun_conditions import holiday
 
 ROOT=SIDDUR+'rosh_chodesh/musaf'
 AMIDAH=ROOT+'/amidah'

@@ -14,11 +14,11 @@ from unittest.mock import patch
 
 from opensiddur.importer.feinstein_haggadah.conditionals import (
     ALTERNATES,
-    Alternate,
     CONDITIONALS,
     CONDITIONS,
     RUBRIC_CONDITIONS,
     VARIANT_RUBRIC_SECTIONS,
+    Alternate,
     Conditional,
     ConditionalError,
     Inline,

@@ -1,14 +1,14 @@
 import unittest
-from unittest.mock import patch, call
 from pathlib import Path
+from unittest.mock import call, patch
 
 from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.common.versification import WLC_PROJECT
 from opensiddur.importer.wlc.wlc import (
-    make_project_directory,
     get_source_directory,
     get_xslt_directory,
     main,
+    make_project_directory,
 )
 
 

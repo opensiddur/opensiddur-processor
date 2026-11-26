@@ -52,8 +52,9 @@ import os
 import random
 import re
 import time
+from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Iterator, Sequence
+from typing import Any
 
 import requests
 from pydantic import BaseModel, Field

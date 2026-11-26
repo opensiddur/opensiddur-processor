@@ -6,10 +6,21 @@ repeated verses retain source spans rather than duplicate canonical corresponden
 import re
 from html import escape
 
-from .common import PRAYER, SIDDUR, PROJECT_EN, PROJECT_HE, QUORUM, AGG, cond, endcond, feature, pb
+from .common import (
+    AGG,
+    PRAYER,
+    PROJECT_EN,
+    PROJECT_HE,
+    QUORUM,
+    SIDDUR,
+    cond,
+    endcond,
+    feature,
+    pb,
+)
 from .conclusion_data import PASSAGES
 from .milestones import Correspondences
-from .tachanun_conditions import date, holiday, DIASPORA
+from .tachanun_conditions import DIASPORA, date, holiday
 
 BIBLE = 'urn:x-opensiddur:text:bible:'
 ROOT = SIDDUR + 'chol/shacharit/conclusion'

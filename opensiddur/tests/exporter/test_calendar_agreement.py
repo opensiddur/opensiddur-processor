@@ -13,8 +13,8 @@ import json
 import logging
 import os
 import unittest
-from unittest.mock import patch
 from datetime import date, datetime, time, timedelta
+from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
 import hdate
@@ -22,11 +22,12 @@ import tzfpy
 from pyluach import dates as pyluach_dates
 from pyluach import parshios
 
+from opensiddur.exporter import derived_settings
 from opensiddur.exporter.calendar.compute import (
+    _ISRAEL_ZONES,
     ALWAYS_YOM_TOV,
     HOLIDAY_FEATURES,
     TORAH_FEATURES,
-    _ISRAEL_ZONES,
 )
 from opensiddur.exporter.client_settings import is_reader_supplied
 from opensiddur.exporter.condition_eval import value_from_json, value_to_json
@@ -35,7 +36,6 @@ from opensiddur.exporter.derivation_graph import (
     READ_FEATURES,
     topological_derivation_order,
 )
-from opensiddur.exporter import derived_settings
 from opensiddur.exporter.derived_settings import (
     STATIC_DEFAULTS,
     SettingChangeTrigger,

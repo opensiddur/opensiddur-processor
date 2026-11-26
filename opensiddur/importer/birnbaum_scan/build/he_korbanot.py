@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of the korbanot, printed pages 27 to 41.
 
 The laver, the Tamid and the ketoreth with their Yehi Ratzon passages; Pittum ha-Ketoreth
@@ -29,8 +28,8 @@ of this one against the reading, word for word.
 """
 import functools
 
-from .common import PRAYER, POEM, cond, endcond, feature
 from . import common
+from .common import POEM, PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

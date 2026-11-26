@@ -79,14 +79,12 @@ from itertools import groupby
 from pathlib import Path
 
 from opensiddur.common.versification import MIQRA_PROJECT
-from opensiddur.importer.util.tei_project import validate_and_write
 from opensiddur.importer.humash import model
 from opensiddur.importer.humash.aliyot import CombinedParsha, Parsha, parse_readings
 from opensiddur.importer.humash.festival_names import hebrew_name
 from opensiddur.importer.humash.names import (
     PAIR_FOR_MEMBER,
     PAIR_MEMBERS,
-    SLUG_TO_HEBREW,
     slugify_reading_name,
     vocalized_name,
 )
@@ -120,6 +118,7 @@ from opensiddur.importer.humash.refs import (
     next_verse,
     verses_in_chapter,
 )
+from opensiddur.importer.util.tei_project import validate_and_write
 
 logger = logging.getLogger(__name__)
 

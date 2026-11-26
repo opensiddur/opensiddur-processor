@@ -71,14 +71,29 @@ target-version = "py312"
 extend-exclude = ["sourcetexts", "opensiddur-projects"]
 
 [tool.ruff.lint]
-# Listed explicitly: ruff's default rule set changes between releases. This first set is
-# the checks that find bugs: syntax errors, pyflakes, closures over loop variables and
-# pylint's errors.
-select = ["E9", "F", "B023", "PLE"]
-# Unused imports are removed together with import sorting.
-ignore = ["F401"]
+# Listed explicitly: ruff's default rule set changes between releases.
+# E4/E7/E9: pycodestyle's import, statement and syntax errors; F: pyflakes; B: bugbear;
+# I: import sorting; UP: newer syntax for the target Python; PLE: pylint's errors.
+select = ["E4", "E7", "E9", "F", "B", "I", "UP", "PLE"]
+ignore = [
+    # Several statements on one line. `ruff format` splits them; checked once the code
+    # is formatted.
+    "E701",
+    "E702",
+    # Style, not bugs: assigning a lambda, and the variable names l, O and I.
+    "E731",
+    "E741",
+    # zip() without strict=: each of ~100 calls needs its own decision.
+    "B905",
+    # %-formatting: not fixed automatically.
+    "UP031",
+    # `type X = ...` makes a TypeAliasType, which pydantic and get_args() see differently.
+    "UP040",
+]
 
 [tool.ruff.lint.per-file-ignores]
 # These build on everything siddur_expanded.xml defines.
 "opensiddur/importer/siddur_expanded/build.py" = ["F403", "F405"]
 "opensiddur/importer/siddur_expanded/readings.py" = ["F403", "F405"]
+# The Birnbaum builders import each section next to the code that uses it.
+"opensiddur/importer/birnbaum_scan/build/*" = ["E402"]

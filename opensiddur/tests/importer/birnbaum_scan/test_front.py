@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for how the front matter of the 1949 print is assembled into an index.
 
 The words are not checked here. They are a reading committed to `sourcetexts`, and
