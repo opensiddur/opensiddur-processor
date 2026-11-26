@@ -287,3 +287,15 @@ do not prove attachment. When the default interlinear placement drifts, test
 the existing `typography.notes.anchor: superscript` setting and independently
 review the rebuilt configured outputs before accepting them. Record the chosen
 book setting and preserve the rejected-output evidence.
+
+### Dedicated readers before human pointing questions
+
+For each unresolved pointing question, give its own dedicated agent reader the
+preflighted enlarged source snippet and a neutral question. Do not supply the
+proposed answer or other readers' conclusions. Record the reader identity,
+image hash, answer, confidence and visible evidence for that occurrence.
+Resolve confident image-supported answers without asking the user; return only
+cases the dedicated reader cannot confidently settle, with the question before
+its enlarged image. Offer an open reading when candidate choices may be wrong.
+This question-level adjudication does not replace full-page independent reading,
+guideline/alignment/order review or the remaining acceptance gates.
