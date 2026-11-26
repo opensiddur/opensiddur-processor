@@ -30,6 +30,17 @@ For round-trip command examples, see `scripts/tei-to-pdf.sh` — the same
 `-s <settings-file>` flag drives both the compiler and the PDF stage, so any
 typography settings in the YAML are forwarded to the LuaLaTeX preamble.
 
+PDF page destinations use an independent shipout counter
+(`hyperref`'s `hypertexnames=false`), so title leaves and restarted folios cannot
+create duplicate page anchors. Printed page numbers and PDF page labels keep
+their normal numbering. Contents entries, bookmarks and generated page references
+link through their labels rather than reconstructing a destination from a folio.
+The exporter does not generate alphabetical indexes using `\hyperpage`, which
+requires the default folio-based destination names.
+Generated destination names are internal to each PDF build; external links to old
+named destinations need updating after regeneration. Viewer links using `#page=N`
+continue to select physical PDF page N.
+
 ## Electronic books
 
 An electronic book is one HTML file with its styles, scripts and data inline, so it opens
