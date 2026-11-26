@@ -701,7 +701,7 @@ class TestDayMaftirCondition(unittest.TestCase):
             {1: [], 2: [1], 3: [2], 4: [3], 5: [4], 6: [5], 7: []},
         )
 
-    def test_with_a_date_but_no_place_each_places_maftir_is_kept(self):
+    def test_with_the_day_known_but_not_the_place_each_places_maftir_is_kept(self):
         self.assertEqual(self._kept(None, 2), [1])
         self.assertEqual(self._kept(None, 4), [2, 3])
         self.assertEqual(self._kept(None, 7), [5])
@@ -709,6 +709,31 @@ class TestDayMaftirCondition(unittest.TestCase):
     def test_outside_sukkot_no_maftir_is_kept(self):
         self.assertEqual(self._kept(False, 0), [])
         self.assertEqual(self._kept(True, 0), [])
+
+    def _kept_on(self, year: int, month: int, day: int, place: tuple | None) -> list[int]:
+        """The maftirs kept for a declared date and place, through the calendar derivation."""
+        from opensiddur.exporter.calendar.compute import (
+            FS_GREGORIAN, FS_LOCATION, SettingSnapshot, compute_holiday, compute_israel,
+        )
+
+        declared = {(FS_GREGORIAN, "year"): year, (FS_GREGORIAN, "month"): month,
+                    (FS_GREGORIAN, "day"): day}
+        if place is not None:
+            declared[(FS_LOCATION, "latitude")], declared[(FS_LOCATION, "longitude")] = place
+        snapshot = SettingSnapshot(get_setting=lambda fs, f: declared.get((fs, f)))
+        sukkot = (compute_holiday(snapshot) or {}).get("sukkot")
+        israel = (compute_israel(snapshot) or {}).get("is-israel")
+        return self._kept(israel, sukkot)
+
+    def test_a_declared_date_and_place_keep_that_shabbats_maftir(self):
+        # Shabbat 11 October 2025 is 19 Tishrei 5786, the fifth day of Sukkot: the third day of
+        # Chol HaMoed in the Diaspora, the fourth in Israel.
+        self.assertEqual(self._kept_on(2025, 10, 11, (40.71, -74.01)), [3])
+        self.assertEqual(self._kept_on(2025, 10, 11, (31.78, 35.22)), [4])
+
+    def test_a_declared_date_without_a_place_keeps_every_maftir(self):
+        # The day of a festival is derived only where there is a place to derive it for.
+        self.assertEqual(self._kept_on(2025, 10, 11, None), [1, 2, 3, 4, 5])
 
     def test_each_maftir_is_printed_inside_its_condition(self):
         spans = [

@@ -33,9 +33,11 @@ volume narrows them.
     hebcal gives five, ``maftir_day1`` to ``maftir_day5``, numbered by the day of Chol HaMoed,
     which counts from 17 Tishrei in the Diaspora and from 16 Tishrei in Israel. Each is printed
     with its own citation under a condition on that day of Sukkot. **Alternatives, not
-    additions**: a date selects one. A volume that declares no date leaves the day undefined
-    and prints all five, each headed with its day; one that declares a date but no locale
-    prints the two that the Diaspora and Israel would read.
+    additions**: a date and a place select one. The day of Sukkot is derived only from a date
+    with a location, so a volume that declares no date, or a date but no location, leaves it
+    undefined and prints all five, each headed with its day. Where the day is known but not
+    whether the place is in Israel (``opensiddur:holiday`` declared directly), the two that
+    the Diaspora and Israel would read are printed.
 
 ``opensiddur:reading-cycle`` (binary, `_cycle_condition`)
     ``annual`` and ``triennial-year-{1,2,3}``, guarding haftarot. **Alternatives, not
@@ -516,9 +518,9 @@ DAY_MAFTIR_SUKKOT_DAY = {False: 2, True: 1}
 def _day_maftir_condition(day: int) -> str:
     """The test that `maftir_day<day>` is the maftir of this Shabbat.
 
-    With no date, the day of Sukkot is undefined and so is the test, which keeps every maftir.
-    With a date but no locale, `opensiddur:israel` is undefined: the maftir each locale would
-    read is kept, and the others are not.
+    Without a date and a location, the day of Sukkot is undefined and so is the test, which
+    keeps every maftir. With the day known but `opensiddur:israel` undefined, the maftir each
+    locale would read is kept, and the others are not.
     """
     alternatives = "".join(
         "<j:all>"

@@ -45,9 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   citation under a condition on the day of Sukkot (`opensiddur:holiday` `sukkot`) and on
   `opensiddur:israel`, following hebcal's numbering of the days of Chol HaMoed: the first
   maftir is read on the third day of Sukkot in the Diaspora and on the second in Israel. A
-  volume that declares a date prints only that Shabbat's maftir; one that declares a date but
-  no place prints the two that Israel and the Diaspora would read; one that declares no date
-  still prints all five, each headed with its day.
+  volume that declares a date and a location prints only that Shabbat's maftir. One that
+  declares no location, with or without a date, still prints all five, each headed with its
+  day, since the day of a festival is derived only for a place.
 - **A scan viewer in the electronic book.** With `electronic.scan_viewer`
   (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
   book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
