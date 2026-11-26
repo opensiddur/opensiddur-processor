@@ -210,6 +210,25 @@ class TestStructure(unittest.TestCase):
         self.assertEqual(_classes(primary), ["col", "col-primary"])
         self.assertEqual(_classes(parallel), ["col", "col-parallel", "col-empty"])
 
+    def test_empty_parallel_carriers_do_not_make_blank_grids(self):
+        main = _render('<p:parallel column-order="primary_first" p:row="2">'
+                       '<p:parallelItem role="primary" xml:lang="he" p:project="one-he" p:file_name="a.xml"/>'
+                       '<p:parallelItem role="parallel" xml:lang="en" p:project="two-en" p:file_name="b.xml"/>'
+                       '</p:parallel>')
+        self.assertEqual(main.xpath("//h:div[contains(concat(' ', @class, ' '), ' par ')]", namespaces=NS), [])
+
+    def test_empty_looking_parallel_with_a_target_or_scope_is_preserved(self):
+        for attributes in ['xml:id="keep-target"', 'p:scopes="7"']:
+            with self.subTest(attributes=attributes):
+                main = _render('<p:parallel '+attributes+'><p:parallelItem role="primary"/>'
+                               '<p:parallelItem role="parallel"/></p:parallel>')
+                self.assertEqual(len(main.xpath("//h:div[contains(concat(' ', @class, ' '), ' par ')]", namespaces=NS)), 1)
+
+    def test_empty_looking_parallel_with_child_target_is_preserved(self):
+        main = _render('<p:parallel><p:parallelItem role="primary" corresp="urn:x:test:child-target"/>'
+                       '<p:parallelItem role="parallel"/></p:parallel>')
+        self.assertEqual(len(main.xpath("//*[@id='urn:x:test:child-target']")), 1)
+
     def test_notes_open_from_numbered_marks(self):
         main = _render('<tei:p>a<tei:note type="commentary">first</tei:note> b'
                        '<tei:note>second</tei:note></tei:p>')
