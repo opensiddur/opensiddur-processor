@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Distinct source-page links on the same output line remain separately clickable in
+  PDF and HTML margins. PDF symbols use nearby free positions within the page; HTML
+  symbols clear earlier margin links. Narrow-screen links remain inline.
 - The expanded siddur no longer pins prayers to Birnbaum. Birnbaum pins some of its own
   transclusions to itself (the Kaddish's parts among them), and the expanded siddur copied
   them with the rest of Birnbaum's structure, so a volume could not take those prayers from
