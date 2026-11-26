@@ -4280,10 +4280,10 @@ end
                 <!-- A shared bilingual rubric follows the actual column order,
                      rather than putting each language above the opposite column. -->
                 <xsl:text>\OSBilingualRubric{</xsl:text>
-                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $secondary else $primary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
+                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $secondary else $primary)/@xml:lang))) then '\pardir TRT\textdir TRT\raggedright ' else '\pardir TLT\textdir TLT\raggedright '"/>
                 <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $secondary else $primary" mode="emit"/>
                 <xsl:text>}{</xsl:text>
-                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $primary else $secondary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
+                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $primary else $secondary)/@xml:lang))) then '\pardir TRT\textdir TRT\raggedright ' else '\pardir TLT\textdir TLT\raggedright '"/>
                 <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $primary else $secondary" mode="emit"/>
                 <xsl:text>}</xsl:text>
             </xsl:when>
