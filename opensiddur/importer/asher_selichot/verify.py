@@ -319,7 +319,7 @@ def verify_continuation(source, project_directory):
             if reading['id'] in TEXTS and TEXTS[reading['id']][0] in PRINTED_IN_FULL:
                 # A text printed in full elsewhere (Vayaavor, pp. 11-12) and transcluded here: this
                 # printing is that text, word for word, whatever its pages and punctuation.
-                words_of=lambda streams:re.sub(r'[^\w\s]','',' '.join(v for (_,l),v in sorted(streams.items()) if l==lang)).split()
+                words_of=lambda streams,lang=lang:re.sub(r'[^\w\s]','',' '.join(v for (_,l),v in sorted(streams.items()) if l==lang)).split()
                 if words_of(actual)!=words_of(expected):
                     raise ValueError(f'{reading["id"]}: not the words of the text printed in full')
                 count+=1

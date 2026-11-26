@@ -29,7 +29,7 @@ def shared(lang,prayers):
     pattern=r'<tei:milestone unit="verse" corresp="('+re.escape(BIBLE)+r'psalms/(?:113|114|115|116|117|118)/\d+)"/>(.*?)(?=<tei:milestone unit="verse")'
     for original in prayers:
         p=dict(original)
-        def quote(match):
+        def quote(match, p=p):
             source,value=match.groups()
             local=p['urn']+'/quoted_'+source.split('psalms/')[1].replace('/','_')
             return marked(local,f'<tei:seg source="{source}">{value}</tei:seg>',unit='verse')

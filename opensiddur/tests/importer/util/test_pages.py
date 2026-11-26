@@ -36,7 +36,6 @@ class TestGetPage(unittest.TestCase):
         self.assertEqual(result.content, 'Page content here')
         
         # Should open the correct file
-        expected_path = jps1917_text_directory() / "0025.txt"
         mock_file.assert_called_once()
         # Check that the path used ends with the expected filename
         actual_call = str(mock_file.call_args[0][0])

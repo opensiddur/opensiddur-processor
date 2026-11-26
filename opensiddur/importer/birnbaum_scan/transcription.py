@@ -59,7 +59,7 @@ def _templates(text: str):
         start = text.find(TEMPLATE_OPEN, i)
 
 #: A value is a reading if it is short and made of Hebrew letters, points and separators.
-READING = re.compile(r"^[֐-׿‏\s/\[\]|,.;׳״־-]+$")
+READING = re.compile(r"^[֐-׿\u200f\s/\[\]|,.;׳״־-]+$")
 MAX_READING_WORDS = 4
 
 
@@ -344,7 +344,7 @@ def _cli(argv: list[str] | None = None) -> int:
     for printed in args.pages:
         page_file = book / "text" / f"{printed + args.scan_offset:03d}.txt"
         sliced = page_slice(page_file.read_text(encoding="utf-8"), load)
-        def report(message: str) -> None:
+        def report(message: str, printed=printed) -> None:
             print(f"{printed}: {message}", file=sys.stderr)
 
         for comment in sliced.comments:

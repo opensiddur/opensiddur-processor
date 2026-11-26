@@ -173,14 +173,14 @@ class TestExpandedBuild(unittest.TestCase):
         self.assertNotIn('siddur:shabbat/musaf/amidah', prayers)
 
     def test_services_are_selected_before_local_context_is_entered(self):
-        for module, service, amidah, count in [
+        for module, service, amidah, expected_count in [
             ('afternoon', 'minha', 'siddur:chol/minchah/amidah', 2),
             ('evening', 'maariv', 'siddur:chol/arvit/amidah', 1),
             ('musaf', 'musaf', 'siddur:shabbat/musaf/amidah', 2),
         ]:
             with self.subTest(module=module):
                 prayers = self.compile_service(module, service=service, major=module == 'musaf')
-                self.assertEqual(prayers.count(amidah), count)
+                self.assertEqual(prayers.count(amidah), expected_count)
                 wrong = self.compile_service(module, service='shaharit', major=True)
                 self.assertNotIn(amidah, wrong)
 

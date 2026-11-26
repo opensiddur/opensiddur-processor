@@ -149,7 +149,13 @@ The opening page's complete collection has the structural identity
 `urn:x-opensiddur:text:siddur:rosh_hashanah/entering_synagogue`; its component
 prayers and verses retain their existing identities. Documentary transclusions
 select the edition explicitly, while expanded prayer transclusions remain
-edition-independent. Hebrew dependencies precede English projects in source
+edition-independent. The build drops the edition from an expanded reference
+that names one, except the two in `EXPANDED_EDITION_PINS` (the pins stay in
+`readings.json`, whose expanded-order hash every realization review binds): the Half Kaddish of the
+preparatory weekday Minchah and the Mourner's Kaddish of Kabbalat Shabbat
+outside the Ten Days. Both are said outside the Ten Days, where Heidenheim's
+Ten Days Kaddish, first in the volume's priorities, would be wrong; they keep
+Birnbaum's calendar-responsive wording. Hebrew dependencies precede English projects in source
 priority, with translations selected separately as parallel witnesses.
 
 Following the comparison with Birnbaum, the reusable Kedushah is conditioned
@@ -355,8 +361,10 @@ are reused. Pure Bible excerpts remain free of occurrence conditions. Shabbat
 and minyan guards belong to service order; the printed fixed Ten Days Kaddish
 witness carries its own calendar scope. Preparatory Elul 29 Kaddish remains
 bound to the compatible Birnbaum Hebrew dependency, whose component references
-are now self-qualified. This prevents festival English from filling an absent
-preparatory translation and retains Birnbaum’s calendar-responsive wording.
+are now self-qualified. This retains Birnbaum’s calendar-responsive wording.
+(The pin decides only the Hebrew: the parallel English is looked up by the URN
+alone, and none is set there because the festival English Half Kaddish carries
+its own Ten Days scope.)
 
 The literal חזן label lies before the first prayer-part milestone. Instructions
 use semantic types without rend attributes. Partial chapter context does not

@@ -32,3 +32,4 @@ dist/
 
 # Generated db
 database/
+.ruff_cache/

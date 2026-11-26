@@ -480,10 +480,10 @@ class TestDerivedSettingsIntegration(unittest.TestCase):
                     f'<tei:f name="{holiday}"><tei:numeric value="1"/></tei:f></tei:fs>'
                     f'</j:conditional><tei:p>{text}</tei:p><j:endConditional target="#{text}"/>')
 
-        body = (f'<j:declare xml:id="h"><tei:fs type="opensiddur:hebrew-date">'
-                f'<tei:f name="year"><tei:numeric value="5786"/></tei:f>'
-                f'<tei:f name="month"><tei:numeric value="7"/></tei:f>'
-                f'<tei:f name="day"><tei:numeric value="1"/></tei:f></tei:fs></j:declare>'
+        body = ('<j:declare xml:id="h"><tei:fs type="opensiddur:hebrew-date">'
+                '<tei:f name="year"><tei:numeric value="5786"/></tei:f>'
+                '<tei:f name="month"><tei:numeric value="7"/></tei:f>'
+                '<tei:f name="day"><tei:numeric value="1"/></tei:f></tei:fs></j:declare>'
                 + on("rosh-hashana", "inside_rh") + on("pesah", "inside_pesah")
                 + '<j:endDeclare target="#h"/>' + on("pesah", "after_pesah"))
         fn = self._write("d.xml", _declare_xml(body).decode())
