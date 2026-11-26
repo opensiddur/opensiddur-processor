@@ -65,7 +65,7 @@ def dynamic_instructions(text, project):
                 result.append(part)
                 continue
 
-            def replace(m):
+            def replace(m, part=part):
                 number = int(m[2]) - side
                 if m[3] and m[2] == '11':
                     # The preliminary service runs from Adon Olam to Rabbi Ishmael.

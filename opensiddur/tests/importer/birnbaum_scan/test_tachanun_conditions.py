@@ -87,5 +87,5 @@ class TestTachanunCalendar(unittest.TestCase):
             processor = Mock()
             values = settings(month=1, **{'house-of-mourning': True})
             values['opensiddur:quorum', 'minyan'] = has_minyan
-            processor.get_active_setting.side_effect = lambda fs, f: values.get((fs, f))
+            processor.get_active_setting.side_effect = lambda fs, f, values=values: values.get((fs, f))
             self.assertEqual(evaluate_condition(node, processor), expected)

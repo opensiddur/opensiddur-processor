@@ -94,6 +94,11 @@ uv run pytest
 uv run pytest opensiddur/tests/exporter/test_compiler.py
 ```
 
+**Lint** (CI runs this; the rules are in `pyproject.toml`):
+```bash
+uv run ruff check .
+```
+
 **Run with coverage:**
 ```bash
 uv run coverage run -m unittest discover -s opensiddur/tests -v

@@ -943,6 +943,32 @@ def transclude_unit(parent, unit, readings, *, project=None, documentary=False):
         element(parent, 'j:endDeclare', target='#'+identifier)
 
 
+# The expanded mahzor leaves the edition of each prayer to the volume's transclusion priorities.
+# These two are the exceptions: both are said outside the Ten Days of Repentance (the weekday
+# Minchah before the festival, and Kabbalat Shabbat's Mourner's Kaddish outside the Ten Days),
+# and the edition the volume prefers, Heidenheim, prints only the Ten Days Kaddish: its Half
+# Kaddish is gated to the Ten Days and its Mourner's Kaddish has their wording. Pinned, they take
+# Birnbaum's calendar-responsive wording. (A pin decides only the Hebrew: the parallel English is
+# looked up by the URN alone.)
+EXPANDED_EDITION_PINS = frozenset({
+    'urn:x-opensiddur:text:prayer:kaddish/chatzi@hasiddur_hashalem-birnbaum-1949-he',
+    'urn:x-opensiddur:text:prayer:kaddish/yatom@hasiddur_hashalem-birnbaum-1949-he',
+})
+
+
+def expanded_reference(reference):
+    """The attributes of a transclusion in the expanded order, naming no edition.
+
+    A reference in readings.json that names one (`urn@project`) loses it, unless it is one of
+    EXPANDED_EDITION_PINS. The pin is dropped here rather than in readings.json because every
+    realization review binds the expanded order's hash, and editing it would make them stale.
+    """
+    return {attribute: value.partition('@')[0]
+            if attribute in ('target', 'targetEnd') and value not in EXPANDED_EDITION_PINS
+            else value
+            for attribute, value in reference.items()}
+
+
 def expanded_order(parent, order, readings, by_stem):
     """Keep service choices local while sharing one sequence across languages."""
     for occurrence in order:
@@ -1013,7 +1039,8 @@ def expanded_order(parent, order, readings, by_stem):
                     clause['target'] = clause['target'].format(project=PROJECTS['he'])
             append_instruction(parent, clauses, expanded=True)
         elif 'reference' in occurrence:
-            element(parent, 'j:transclude', type='external', **occurrence['reference'])
+            element(parent, 'j:transclude', type='external',
+                    **expanded_reference(occurrence['reference']))
         else:
             transclude_unit(parent, by_stem[occurrence['unit']], readings)
 

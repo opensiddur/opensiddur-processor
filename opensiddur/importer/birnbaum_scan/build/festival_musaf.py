@@ -93,7 +93,7 @@ def prayers(lang):
         value=text_xml(raw,SIGIL).replace("\n","<tei:lb/>")
         if key in ('vattitten','miqra','musaf_intro','vehasi'):
             n=iter(range(20))
-            value=re.sub(r'\(([^()]*)\)',lambda m:c(key+str(next(n)),'On the Sabbath:',SHABBAT,m[1]),value)
+            value=re.sub(r'\(([^()]*)\)',lambda m,key=key,n=n:c(key+str(next(n)),'On the Sabbath:',SHABBAT,m[1]),value)
         if key in ('gevurot','attah_vechartanu'):
             source=PRAYER+('amidah/gevurot/attah_gibbor' if key=='gevurot' else 'amidah/attah_vechartanu_mikol')
             value=f'<tei:seg source="{source}">'+value+'</tei:seg>'

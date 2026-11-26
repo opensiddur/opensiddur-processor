@@ -170,7 +170,7 @@ def shared(lang,prayers):
    pages.add(785+side)
    incipits=('adon_olam','leet_naasah','veacharei','vehu_hayah','vehu_echad','beli_reshit','vehu_eli','vehu_nissi','beyado','veim_ruchi')
    lines=iter(incipits)
-   p['body']=re.sub(r'<tei:l>(.*?)</tei:l>',lambda m:'<tei:l>'+marked(POEM+'adon_olam/'+next(lines),m[1],unit='stanza')+'</tei:l>',p['body'],flags=re.S)
+   p['body']=re.sub(r'<tei:l>(.*?)</tei:l>',lambda m,lines=lines:'<tei:l>'+marked(POEM+'adon_olam/'+next(lines),m[1],unit='stanza')+'</tei:l>',p['body'],flags=re.S)
   if pages:p['printings']=(*p.get('printings',()),*((p,p) for p in sorted(pages)))
  return result
 

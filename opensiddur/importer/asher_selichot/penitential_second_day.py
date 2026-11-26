@@ -76,7 +76,7 @@ def pizmon(parent, reading, lang, context):
         if lang=='he':
             # One call retains an unfinished verse across the printed page break.
             prepared=copy.deepcopy(fragments);cues=[]
-            def cue_token(match):
+            def cue_token(match, cues=cues):
                 cues.append(match.group(0))
                 return '__CUE_'+str(len(cues)-1)+'__|'
             for fragment in prepared:

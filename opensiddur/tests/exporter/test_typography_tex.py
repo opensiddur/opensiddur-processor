@@ -770,6 +770,7 @@ class TestScanLinks(unittest.TestCase):
         tex = self._scan("margin")
         self.assertIn(r"\usepackage{zref-savepos}", tex)
         self.assertIn(r"\zsavepos{\OSScanLink@label}", tex)
+        self.assertIn(r"\OSScanLink@top-\textheight-\maxdepth\relax", tex)
         self.assertIn(r"\hbox dir TLT to \z@{\kern\dimexpr\OSScanLink@edge"
                       r"-\zposx{\OSScanLink@label}sp\relax", tex)
 

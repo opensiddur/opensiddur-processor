@@ -236,7 +236,9 @@ def _scan_link_css(scan_links) -> list[str]:
     column, the left of an English one: in a parallel row of a Hebrew book, where the
     Hebrew column is on the right, each is that column's outer edge. A row lays out only its own box (``content-visibility`` in reader.css), so the
     margin is kept inside the row. A narrow screen has no margin to spare: the symbol
-    stands in the line.
+    stands in the line. Zero-width floats keep distinct markers in reading order
+    without consuming text width; clearing the preceding float prevents collisions
+    when two source pages begin on the same display line.
     """
     if scan_links.placement is ScanLinkPlacement.NONE:
         return []
@@ -247,12 +249,13 @@ def _scan_link_css(scan_links) -> list[str]:
     ]
     if scan_links.placement is ScanLinkPlacement.MARGIN:
         rules.append(
-            "@media (min-width: 40.001rem) { "
-            f".os-book {{ position: relative; padding-inline-start: {SCAN_LINK_GUTTER}; "
-            "--scan-link-offset: 0; } "
+            "@media (min-width: 40.001rem) { @supports (float: inline-start) { "
+            f".os-book {{ display: flow-root; padding-inline-start: {SCAN_LINK_GUTTER}; "
+            f"--scan-link-offset: -{SCAN_LINK_GUTTER}; }} "
             f".par {{ padding-inline: {SCAN_LINK_GUTTER}; }} "
             f".col {{ position: relative; --scan-link-offset: -{SCAN_LINK_GUTTER}; }} "
-            ".scan-link-margin { position: absolute; "
-            "inset-inline-start: var(--scan-link-offset); } }"
+            ".scan-link-margin { float: inline-start; clear: inline-start; width: 1em; "
+            "margin-inline-start: var(--scan-link-offset); "
+            "margin-inline-end: calc(-1em - var(--scan-link-offset)); } } }"
         )
     return rules

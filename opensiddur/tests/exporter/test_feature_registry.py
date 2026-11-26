@@ -395,7 +395,7 @@ class TestRegistryAgreesWithTheCode(unittest.TestCase):
                     if hour is not None:
                         values[(FS_TIME, "hour")] = hour
                         values[(FS_TIME, "minute")] = 0
-                    snapshot = SettingSnapshot(get_setting=lambda t, f: values.get((t, f)))
+                    snapshot = SettingSnapshot(get_setting=lambda t, f, values=values: values.get((t, f)))
                     for spec in topological_derivation_order():
                         for feature, value in (spec.compute(snapshot) or {}).items():
                             values[(spec.fs_type, feature)] = value

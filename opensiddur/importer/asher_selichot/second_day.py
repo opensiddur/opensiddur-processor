@@ -195,7 +195,7 @@ def verify_numbered_readings(source, project_directory, day_name):
                     children=list(unit)
                     for n in children[children.index(start):children.index(end)+1]:unit.remove(n)
             expected = {}
-            def append(page, language, words):
+            def append(page, language, words, expected=expected):
                 key=(page,language);expected[key]=normalize(expected.get(key,'')+' '+words)
             parts = reading.get('stanzas', [reading])
             expected_notes=[]

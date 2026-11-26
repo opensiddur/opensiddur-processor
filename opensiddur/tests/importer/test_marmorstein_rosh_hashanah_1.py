@@ -1307,7 +1307,7 @@ class EditionWiringTest(unittest.TestCase):
                 settings = {('opensiddur:recitation', 'repetition'): repetition,
                             ('opensiddur:quorum', 'minyan'): minyan}
                 processor = Mock()
-                processor.get_active_setting.side_effect = lambda kind, feature: settings.get((kind, feature))
+                processor.get_active_setting.side_effect = lambda kind, feature, settings=settings: settings.get((kind, feature))
                 self.assertEqual(evaluate_condition(condition, processor), expected)
 
     def test_person_gender_uses_registered_symbol_and_selects_one_alternative(self):
@@ -1976,3 +1976,40 @@ class EditionWiringTest(unittest.TestCase):
         result = report(self.source)
         self.assertIn('realization/first/en', result['pending_unit_reviews'])
         self.assertNotIn('realization/first/he', result['pending_unit_reviews'])
+
+
+class ExpandedEditionPinTest(unittest.TestCase):
+    """The expanded order names no edition, except the two Kaddishes said outside the Ten Days."""
+
+    def test_an_unpinned_reference_is_unchanged(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import expanded_reference
+        reference = {'target': 'urn:x-opensiddur:text:prayer:kaddish/shalem'}
+        self.assertEqual(expanded_reference(reference), reference)
+
+    def test_a_pinned_reference_loses_its_pin(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import expanded_reference
+        self.assertEqual(
+            expanded_reference({'target': 'urn:x-opensiddur:text:prayer:hamotzi@hasiddur_hashalem-birnbaum-1949-he'}),
+            {'target': 'urn:x-opensiddur:text:prayer:hamotzi'})
+        self.assertEqual(
+            expanded_reference({'target': 'urn:x-opensiddur:text:bible:psalms/1/1@some-edition-he',
+                                'targetEnd': 'urn:x-opensiddur:text:bible:psalms/1/3@some-edition-he'}),
+            {'target': 'urn:x-opensiddur:text:bible:psalms/1/1',
+             'targetEnd': 'urn:x-opensiddur:text:bible:psalms/1/3'})
+
+    def test_the_documented_exceptions_keep_their_pin(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import (
+            EXPANDED_EDITION_PINS, expanded_reference,
+        )
+        self.assertEqual(len(EXPANDED_EDITION_PINS), 2)
+        for target in EXPANDED_EDITION_PINS:
+            self.assertEqual(expanded_reference({'target': target}), {'target': target})
+
+    def test_the_expanded_order_writes_references_without_a_pin(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.build import expanded_order
+        parent = etree.Element('{http://www.tei-c.org/ns/1.0}div')
+        expanded_order(parent, [
+            {'reference': {'target': 'urn:x-opensiddur:text:prayer:hamotzi@hasiddur_hashalem-birnbaum-1949-he'}},
+        ], {}, {})
+        targets = [e.get('target') for e in parent.iter('{http://jewishliturgy.org/ns/jlptei/2}transclude')]
+        self.assertEqual(targets, ['urn:x-opensiddur:text:prayer:hamotzi'])
