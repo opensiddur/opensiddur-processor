@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Parallel two-column PDFs keep their columns in order and their line numbers in the outer
+  margins under TeX Live 2024 (Debian trixie). There the right column's language switch did
+  not take, so the row and the right column's lines were built right to left: the columns
+  swapped places and the numbers were printed over the text (#338).
+- A Hebrew title with parentheses or quotation marks is set as one Hebrew run in running
+  heads, table-of-contents entries and the bibliography, so its punctuation is mirrored and
+  stays on the right side. Invisible bidi marks no longer print as a missing-glyph box, and
+  the opensiddur.org importer no longer stores them (#338).
 - Distinct source-page links on the same output line remain separately clickable in
   PDF and HTML margins. PDF symbols use nearby free positions within the page; HTML
   symbols clear earlier margin links. Narrow-screen links remain inline.

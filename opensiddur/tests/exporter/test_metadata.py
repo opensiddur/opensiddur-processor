@@ -250,9 +250,17 @@ class TestSerialisers(unittest.TestCase):
                          "Folio 2_40.")
 
     def test_a_hebrew_phrase_is_one_run_across_its_punctuation(self):
-        """Set as three runs, the words of the phrase would be laid out left to right."""
+        """Set as three runs, the words of the phrase would be laid out left to right. The
+        closing parenthesis is part of the phrase that opened it (#338)."""
         source = SourceRecord(key="k", entry_type="misc", title='ספר "החינוך" (ה׳)')
-        self.assertIn('  title = {\\texthebrew{ספר "החינוך" (ה׳}' + ")},\n", source_to_bibtex(source))
+        self.assertIn('  title = {\\texthebrew{ספר "החינוך" (ה׳)}},\n', source_to_bibtex(source))
+
+    def test_a_right_to_left_mark_does_not_reach_the_bibliography(self):
+        """The mark printed as a box in the Latin font, and kept the closing parenthesis
+        out of the Hebrew run (#338)."""
+        source = SourceRecord(key="k", entry_type="misc", title="לכה דודי (נוסח אחר)\u200f")
+        self.assertIn("  title = {\\texthebrew{לכה דודי (נוסח אחר)}},\n",
+                      source_to_bibtex(source))
 
     def test_bibliography_specials_are_escaped_inside_a_hebrew_run(self):
         source = SourceRecord(key="k", entry_type="misc", title="ספר & טוב")

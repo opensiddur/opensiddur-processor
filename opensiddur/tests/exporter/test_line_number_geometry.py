@@ -131,6 +131,10 @@ class TestLineNumberGeometry(unittest.TestCase):
                 (work / "t.pdf").exists(),
                 f"lualatex produced no PDF:\n{done.stdout[-2000:]}",
             )
+            # A \patchcmd that finds nothing to patch only reports it, and a PDF is made
+            # regardless: an exporter patch or a simulation here could fail unnoticed.
+            log = (work / "t.log").read_text(errors="replace")
+            self.assertNotIn("! Package", log, "a package error while typesetting")
             boxes = subprocess.run(
                 ["pdftotext", "-bbox", "t.pdf", "-"],
                 cwd=work, capture_output=True, text=True,
@@ -219,3 +223,70 @@ class TestLineNumberGeometry(unittest.TestCase):
         reproduction of the pre-fix state rather than an invented one."""
         with self.assertRaises(AssertionError):
             self.assertNumbersResetEachPage(self._typeset(macros=r"\lineationR{section}"))
+
+    # -- polyglossia 2.4 (TeX Live 2024): the direction reledpar's language switch leaves ---
+
+    def assertHebrewInTheLeftColumn(self, pages: list[Page]) -> None:
+        """``\\begin{Leftside}`` is the physical left column, whatever language it holds:
+        on every page with both texts, all the Hebrew lies left of all the English."""
+        for n, page in enumerate(pages, 1):
+            words = page.text["left"] + page.text["right"]
+            hebrew = [b for b in words if _HEBREW_LETTER.search(b.text)]
+            # pdftotext splits pointed Hebrew into fragments, some of them only points, so
+            # English is recognized by its own words rather than by having no Hebrew letter.
+            english = [b for b in words if _ENGLISH_WORD.fullmatch(b.text)]
+            if not hebrew or not english:
+                continue
+            self.assertLess(
+                max(b.x1 for b in hebrew), min(b.x0 for b in english),
+                f"page {n}: the Hebrew Leftside is not the left column",
+            )
+
+    def test_numbers_and_columns_survive_a_right_to_left_language_switch(self):
+        """Under polyglossia 2.4 (TeX Live 2024) reledpar's switch to the English column's
+        language around each row does not take, so ``\\textdir`` is still right to left
+        when the row box and the English column's line box are built: the columns swapped
+        places and every margin number landed over its first word (#338).
+        Simulated here by selecting Hebrew again just before those boxes are built."""
+        pages = self._typeset(macros=_LEAVE_RIGHT_TO_LEFT)
+        self.assertHebrewInTheLeftColumn(pages)
+        self.assertNumbersOutsideTheirColumn(pages)
+        self.assertNoNumberTouchesText(pages)
+
+    def test_the_simulation_breaks_the_unpatched_boxes(self):
+        """Without the explicit directions, the simulation must reproduce the defect, or
+        the test above proves nothing."""
+        pages = self._typeset(macros=_LEAVE_RIGHT_TO_LEFT + _UNDO_DIRECTION_PATCHES)
+        with self.assertRaises(AssertionError):
+            self.assertHebrewInTheLeftColumn(pages)
+        with self.assertRaises(AssertionError):
+            self.assertNumbersOutsideTheirColumn(pages)
+
+
+_HEBREW_LETTER = re.compile("[א-ת]")
+_ENGLISH_WORD = re.compile(r"word\d+")
+
+# The state polyglossia 2.4 leaves behind, measured under TeX Live 2024: reledpar's switch
+# to the English column's language does not take, so Hebrew is still the language in force,
+# right to left, when the row box and the English column's line box are built. Setting
+# \textdir or \pardir alone does not reproduce the swapped columns; selecting Hebrew does.
+# The row's language is selected just before its box, at the \OS@rowbound test the
+# exporter puts there.
+_LEAVE_RIGHT_TO_LEFT = (
+    r"\makeatletter"
+    r"\patchcmd{\OSreledparColumnsOrig}{\ifnum\OS@rowbound}{\selectlanguage{hebrew}\ifnum\OS@rowbound}{}"
+    r"{\PackageError{test}{could not select Hebrew before the row}{}}"
+    r"\pretocmd{\print@lineR}{\selectlanguage{hebrew}}{}"
+    r"{\PackageError{test}{could not select Hebrew before print@lineR}{}}"
+    r"\makeatother" "\n"
+)
+
+# The exporter's two direction patches, taken back out.
+_UNDO_DIRECTION_PATCHES = (
+    r"\makeatletter"
+    r"\patchcmd{\OSreledparColumnsOrig}{\hbox dir TLT to\hsize}{\hb@xt@ \hsize}{}"
+    r"{\PackageError{test}{could not undo the row patch}{}}"
+    r"\patchcmd{\print@lineR}{\hbox dir TLT to\Rcolwidth}{\hb@xt@ \Rcolwidth}{}"
+    r"{\PackageError{test}{could not undo the print@lineR patch}{}}"
+    r"\makeatother" "\n"
+)

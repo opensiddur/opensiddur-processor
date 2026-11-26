@@ -6,6 +6,8 @@ section separators, conditional markers — into the emitted document.
 
 import re
 
+from opensiddur.common.bidi import strip_bidi_formatting
+
 
 # Stands in for a literal backslash while the other specials are escaped, so
 # that the braces of its own replacement text are not escaped in turn. U+0000
@@ -17,8 +19,10 @@ def escape_tex(s: str) -> str:
     """Escape characters that have special meaning in LaTeX.
 
     Covers the same characters, the same way, as ``f:escape-tex`` in ``tex/common.xsl``.
+    Bidi formatting characters are dropped: ``\\textdir`` ignores them, and a font without
+    a glyph for them prints a box (see ``opensiddur.common.bidi``).
     """
-    t = s.replace("\\", _BACKSLASH_SENTINEL)
+    t = strip_bidi_formatting(s).replace("\\", _BACKSLASH_SENTINEL)
     t = re.sub(r"([&%$#_{}])", r"\\\1", t)
     t = t.replace("~", r"\textasciitilde{}")
     t = t.replace("^", r"\textasciicircum{}")
