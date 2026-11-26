@@ -209,10 +209,10 @@ class TestSectionOrder(unittest.TestCase):
         self.assertEqual(
             psalms, ["psalm_115", "psalm_116", "psalm_117", "psalm_118", "psalm_136"]
         )
-        # Yehalelukha sits between Psalms 118 and 136, which is why Hallel had to become an
+        # Yehallelukha sits between Psalms 118 and 136, which is why Hallel had to become an
         # index node rather than keeping the non-psalms inline.
-        self.assertLess(order.index("psalm_118"), order.index("yehalalukha"))
-        self.assertLess(order.index("yehalalukha"), order.index("psalm_136"))
+        self.assertLess(order.index("psalm_118"), order.index("yehallelukha"))
+        self.assertLess(order.index("yehallelukha"), order.index("psalm_136"))
 
     def test_second_cup_blessings_close_magid(self) -> None:
         self.assertEqual(

@@ -618,7 +618,7 @@ shared section or paragraph is named by its own URN (`feinstein_haggadah/section
 | Section | URN |
 |---|---|
 | `maggid/psalm_113`, `/psalm_114`; `hallel/psalm_115` … `/psalm_118` | `prayer:hallel/psalm_113` … `/psalm_118` (+ `bible:psalms/*` milestones) |
-| `hallel/yehalalukha` | `prayer:hallel/yehalelukha` |
+| `hallel/yehallelukha` | `prayer:hallel/yehallelukha` |
 | `hallel/psalm_136` | `prayer:hallel_hagadol` |
 | `hallel/nishmat`, `/shokhen_ad`, `/hael_betaatzumot`, `/uvemaqhalot`, `/befi_yesharim`, `/yishtabbach` | `prayer:nishmat`, `prayer:shokhen_ad`, `prayer:hael_betaatzumot`, `prayer:uvemaqhalot`, `prayer:befi_yesharim`, `prayer:yishtabbach` |
 | `barekh` paragraphs 1–28 | `prayer:birkat_hamazon/*`, by their opening words (`zimmun/hav_lan` … `yiru_et_adonai`), and `prayer:yaaleh_veyavo` |

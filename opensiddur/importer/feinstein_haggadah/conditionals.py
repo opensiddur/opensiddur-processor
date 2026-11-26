@@ -490,9 +490,9 @@ CONDITIONALS: tuple[Conditional, ...] = (
         scope_en=Inline("a sandwich of", "the Passover sacrifice,", "the Passover sacrifice,", "the matzah"),
     ),
     Conditional(
-        slug="yehalalukha",
-        cond_id="yehalalukha_al",
-        condition=variant_condition("yehalalukha", "al"),
+        slug="yehallelukha",
+        cond_id="yehallelukha_al",
+        condition=variant_condition("yehallelukha", "al"),
         scope_he=Inline("אֱלֹהֵֽינוּ", "עַל", "עַל", "כָּל מַעֲשֶֽׂיךָ"),
     ),
     Conditional(
