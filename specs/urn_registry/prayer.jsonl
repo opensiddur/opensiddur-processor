@@ -364,7 +364,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:hallel/psalm_116", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/psalm_117", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/psalm_118", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
-{"urn": "urn:x-opensiddur:text:prayer:hallel/yehalelukha", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
+{"urn": "urn:x-opensiddur:text:prayer:hallel/yehallelukha", "status": "canonical", "parent": "urn:x-opensiddur:text:prayer:hallel"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel_hagadol", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:hamotzi", "status": "canonical"}
 {"urn": "urn:x-opensiddur:text:prayer:hareini_mezammen", "status": "canonical", "label_he": "הֲרֵינִי מְזַמֵּן", "label_en": "Preparation for the verses of praise"}

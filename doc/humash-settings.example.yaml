@@ -58,6 +58,12 @@ declarations:
   # that read the pair apart: in Behar–Bechukotai the year-א׳ fourth aliyah is
   # [א׳ רביעי (נפרדות א׳ וג׳)] at 25:11 and [א׳ רביעי (נפרדות א׳)] at 25:14.
   #
+  # A date with a location also picks the maftir of Shabbat Chol HaMoed Sukkot, which depends
+  # on the day of Sukkot the Shabbat falls on and on whether the place is in Israel
+  # (opensiddur:israel). The day of a festival is derived only where there is a location to
+  # derive it for, so without one, date or no date, all five are printed, each headed with
+  # its day.
+  #
   # An unsuffixed marker beside its מחוברות counterpart is a different thing and is left alone:
   # there the separate and the combined readings simply begin at the same verse. See
   # importer/humash/build.py for every conditional the humash emits and how each behaves.

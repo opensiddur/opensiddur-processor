@@ -9,6 +9,10 @@ reads, an aliyah out of its place and an instruction where nothing is read again
 Each citation is checked too: it names the verses printed under it, and the first citation of
 a book's passage names, in order, the stretches that the citations after it open.
 
+A maftir that depends on the day of Chol HaMoed is printed under a condition on that day. Each
+one's citation, marker, instruction and verses must stand inside a condition of its own, and
+nothing else inside any.
+
 The checks run over hebcal's readings where the sourcetexts submodule is initialised, and over
 every arrangement of a few synthetic aliyot everywhere, so that they also run without the data.
 """
@@ -36,6 +40,7 @@ from opensiddur.importer.util.pages import hebcal_leyning_data_directory
 
 TEI = "{http://www.tei-c.org/ns/1.0}"
 J = "{http://jewishliturgy.org/ns/jlptei/2}"
+XML = "{http://www.w3.org/XML/1998/namespace}"
 TARGET = re.compile(r"urn:x-opensiddur:text:bible:([a-z_0-9]+)/(\d+)/(\d+)-(\d+)/(\d+)")
 # One clause of a citation: "<book> 28:1–28:15", or "7:42–7:47" after the first clause.
 CLAUSE = re.compile(
@@ -59,7 +64,7 @@ def _verses(start: VerseRef, end: VerseRef, root: Path | None) -> list[tuple]:
 
 def _read_back(document: str, root: Path | None) -> list[tuple]:
     """The Torah reading of a festival file, in document order: citations, markers,
-    instructions and verses."""
+    instructions, verses, and where a condition opens and closes."""
     division = etree.fromstring(document.encode("utf-8")).find(f"{TEI}text/{TEI}body/{TEI}div")
     stream: list[tuple] = []
     for element in division:
@@ -72,6 +77,10 @@ def _read_back(document: str, root: Path | None) -> list[tuple]:
         elif element.tag == f"{TEI}milestone":
             unit, label = element.get("corresp").rsplit("/", 2)[-2:]
             stream.append(("marker", unit, label))
+        elif element.tag == f"{J}conditional":
+            stream.append(("conditional", element.get(f"{XML}id")))
+        elif element.tag == f"{J}endConditional":
+            stream.append(("endConditional", element.get("target").removeprefix("#")))
         elif element.tag == f"{TEI}note" and element.get("type") == "instruction":
             stream.append(("instruction",))
         elif element.tag == f"{J}transclude":
@@ -91,7 +100,37 @@ def _read_back(document: str, root: Path | None) -> list[tuple]:
 
 
 def _without_citations(stream: list[tuple]) -> list[tuple]:
-    return [event for event in stream if event[0] != "citation"]
+    """The reading itself: markers, instructions and verses."""
+    return [
+        event for event in stream
+        if event[0] not in ("citation", "conditional", "endConditional")
+    ]
+
+
+def _conditions_hold_the_day_maftirs(test: unittest.TestCase, stream: list[tuple]) -> None:
+    """Each maftir that depends on the day, and its citation, stands in a condition of its own:
+    the condition opens just before its citation and closes after its last verse."""
+    open_condition = None
+    held: list[tuple] = []
+    for event in stream:
+        if event[0] == "conditional":
+            test.assertIsNone(open_condition, "a condition opens inside another")
+            open_condition, held = event[1], []
+        elif event[0] == "endConditional":
+            test.assertEqual(event[1], open_condition, "a condition closes that is not open")
+            test.assertEqual(held[0][0], "citation", "a condition does not open with a citation")
+            markers = [e for e in held if e[0] == "marker"]
+            test.assertEqual(len(markers), 1, f"a condition holds {len(markers)} markers")
+            test.assertTrue(markers[0][2].startswith("maftir_day"),
+                            f"a condition holds {markers[0]}")
+            test.assertTrue(any(e[0] == "verse" for e in held), "a condition holds no verse")
+            open_condition = None
+        elif open_condition is not None:
+            held.append(event)
+        elif event[0] == "marker":
+            test.assertFalse(event[2].startswith("maftir_day"),
+                             f"{event} is printed outside a condition")
+    test.assertIsNone(open_condition, "a condition is never closed")
 
 
 def _cited_ranges(citation: str) -> list[tuple]:
@@ -184,6 +223,7 @@ class TestHebcalReadings(unittest.TestCase):
                 stream = _read_back(document, None)
                 self.assertEqual(_without_citations(stream), _as_read(spans, None))
                 _citations_name_their_verses(self, stream)
+                _conditions_hold_the_day_maftirs(self, stream)
 
 
 # Aliyot that between them continue, overlap, skip ahead, step back and change book.
@@ -234,6 +274,7 @@ class TestEveryArrangement(unittest.TestCase):
             stream = _read_back(document, self.root)
             self.assertEqual(_without_citations(stream), _as_read(spans, self.root))
             _citations_name_their_verses(self, stream)
+            _conditions_hold_the_day_maftirs(self, stream)
 
     def test_aliyot_in_every_order_read_as_they_are_listed(self):
         for length in (1, 2, 3):

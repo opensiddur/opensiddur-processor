@@ -76,3 +76,59 @@ class TestReadingSlots(unittest.TestCase):
             expected += [TEXT+'bible:genesis/6/1-7/5'] if three else [TEXT+'bible:genesis/6/1-6/5',TEXT+'bible:genesis/7/1-7/5']
             self.assertEqual(readings,expected)
             self.assertEqual(len(targets),4*len(expected))
+
+
+class TestSukkotShabbatMaftir(unittest.TestCase):
+    """Which day's maftir Shabbat Chol HaMoed Sukkot reads, in the Diaspora and in Israel.
+
+    hebcal numbers the five maftirs by the day of Chol HaMoed, which begins on the third day of
+    Sukkot in the Diaspora and on the second in Israel. The dates are the three days of Sukkot
+    a Shabbat of Chol HaMoed can fall on, derived through the calendar as a volume would be.
+    """
+
+    PLACES = {'diaspora': (40.71, -74.01), 'israel': (31.78, 35.22)}
+
+    def _read(self, year, month, day, place):
+        from lxml import etree
+        from opensiddur.exporter.calendar.compute import (
+            FS_GREGORIAN, FS_LOCATION, SettingSnapshot, compute_holiday, compute_israel,
+        )
+        from opensiddur.exporter.condition_eval import (
+            TriState, evaluate_condition, parse_condition_element,
+        )
+        from opensiddur.importer.siddur_expanded.readings import day_maftir_condition
+
+        declared = {(FS_GREGORIAN, 'year'): year, (FS_GREGORIAN, 'month'): month,
+                    (FS_GREGORIAN, 'day'): day}
+        if place is not None:
+            declared[(FS_LOCATION, 'latitude')], declared[(FS_LOCATION, 'longitude')] = place
+        snapshot = SettingSnapshot(get_setting=lambda fs, f: declared.get((fs, f)))
+        active = {('opensiddur:holiday', 'sukkot'): (compute_holiday(snapshot) or {}).get('sukkot'),
+                  ('opensiddur:israel', 'is-israel'): (compute_israel(snapshot) or {}).get('is-israel')}
+
+        class Lookup:
+            def get_active_setting(self, fs, f):
+                return active.get((fs, f))
+
+        read = []
+        for offset in range(1, 6):
+            conditional = etree.fromstring(
+                f'<j:conditional xmlns:j="{NS["j"]}" xmlns:tei="{NS["tei"]}">'
+                f'{day_maftir_condition(offset)}</j:conditional>')
+            if evaluate_condition(parse_condition_element(conditional), Lookup()) != TriState.FALSE:
+                read.append(offset)
+        return read
+
+    def test_each_place_reads_its_own_days_maftir(self):
+        shabbatot = {
+            (2024, 10, 19): {'diaspora': [1], 'israel': [2]},  # 17 Tishrei 5785, day 3
+            (2025, 10, 11): {'diaspora': [3], 'israel': [4]},  # 19 Tishrei 5786, day 5
+            (2019, 10, 19): {'diaspora': [4], 'israel': [5]},  # 20 Tishrei 5780, day 6
+        }
+        for date, expected in shabbatot.items():
+            for place, coordinates in self.PLACES.items():
+                with self.subTest(date=date, place=place):
+                    self.assertEqual(self._read(*date, coordinates), expected[place])
+
+    def test_without_a_place_every_maftir_is_kept(self):
+        self.assertEqual(self._read(2025, 10, 11, None), [1, 2, 3, 4, 5])

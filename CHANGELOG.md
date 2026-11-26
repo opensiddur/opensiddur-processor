@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- The expanded siddur no longer pins prayers to Birnbaum. Birnbaum pins some of its own
+  transclusions to itself (the Kaddish's parts among them), and the expanded siddur copied
+  them with the rest of Birnbaum's structure, so a volume could not take those prayers from
+  another edition by its priorities. The pins are now dropped, and a pinned structural unit
+  is expanded like any other.
+- The expanded siddur reads the right maftir on Shabbat Chol HaMoed Sukkot in Israel. It
+  chose the day's maftir by the Diaspora's count alone, so in Israel, where Chol HaMoed begins
+  a day earlier, it read the maftir of the day before: the first instead of the second when
+  that Shabbat is the third day of Sukkot, the third instead of the fourth on the fifth, the
+  fourth instead of the fifth on the sixth. It now follows hebcal's count in each place, as
+  the humash does.
 - Source-scan links no longer repeat at each paragraph or transcluded module while the
   same column remains on the same source page. Returning to a different page keeps its
   link; optional passages and instructions cannot hide a required later link.
@@ -25,8 +36,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   does. The tests no longer assume POSIX paths, a UTF-8 locale, or that Saxon can open a
   temporary file that is still open. On Windows the suite now fails only the tests that need
   jing and the compiled schema.
+- The last verse of a book no longer runs on into the notes after the text. The passes that
+  place the `half-verse` and `verse-part` milestones ended a verse only at the next verse or
+  chapter milestone, so a book's last verse ran on past the end of `tei:text` into the notes
+  of its `tei:standOff`. In Miqra al pi ha-Masorah, Lamentations 5:22, Ruth 4:22 and Song of
+  Songs 8:14, which have no etnachta, were divided at an etnachta in a note, so that their
+  second half began inside the note; they are no longer divided. Proverbs 31:31 was not
+  divided, because the half-verse pass leaves undivided a verse of Psalms, Proverbs or Job
+  that has an ole, and a note has one; it is now divided at its etnachta. The WLC's books are
+  unchanged. A part that `VERSE_PARTS` declares for a book's last verse is no longer looked
+  for in the notes: one whose incipit only a note has is now reported as unplaceable, where
+  before it was placed inside the note. No part declared today is in a book's last verse. A
+  document that ends inside `tei:text` now raises `ValueError` instead of being read to its
+  end.
 
 ### Added
+- **The maftir of Shabbat Chol HaMoed Sukkot by the day.** The humash printed all five of
+  hebcal's maftirs for that Shabbat whatever a volume declared. Each is now printed with its own
+  citation under a condition on the day of Sukkot (`opensiddur:holiday` `sukkot`) and on
+  `opensiddur:israel`, following hebcal's numbering of the days of Chol HaMoed: the first
+  maftir is read on the third day of Sukkot in the Diaspora and on the second in Israel. A
+  volume that declares a date and a location prints only that Shabbat's maftir. One that
+  declares no location, with or without a date, still prints all five, each headed with its
+  day, since the day of a festival is derived only for a place.
 - **A scan viewer in the electronic book.** With `electronic.scan_viewer`
   (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
   book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
