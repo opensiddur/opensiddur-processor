@@ -987,7 +987,7 @@ def _scan_links_section(config: TypographyConfig, uses_reledpar: bool) -> list[s
         # The number of the page a place is on, as the output routine reads it to choose
         # the odd or even margins (and reledmac, inner from outer): the page counter at
         # shipout, not the absolute page, since a title page restarts the counter.
-        r"\zref@newprop{OSScanLinkPage}[1]{\number\c@page}",
+        r"\zref@newprop*{OSScanLinkPage}[1]{\number\c@page}",
         r"\zref@addprop{savepos}{OSScanLinkPage}",
         r"\zref@addprop{savepos}{abspage}",
         r"\newbox\OSScanLink@measure",
