@@ -34,3 +34,18 @@ and English projects. Each entry point contains the volume-two bibliography. It 
 first-day projects or supplies absent English from the first volume.
 The four accepted source readings remain unchanged; project separation requires
 an independently reviewed equivalence record and refreshed presentation evidence.
+
+Confirmed excerpts can be generated separately while the larger batch remains in
+adjudication:
+
+```bash
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers \
+  --draft --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project
+```
+
+The versioned `batches/maariv_s5_s24/draft_units.json` recipe binds its source
+inputs by hash. This command writes only named excerpt modules, never index.xml;
+it removes a previously generated counterpart if its recipe now records an absent
+translation, after all current documents validate. These draft modules do not
+accept a complete scan or add words to the documentary/expanded service.
