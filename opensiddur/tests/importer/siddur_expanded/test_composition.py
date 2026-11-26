@@ -160,8 +160,8 @@ class TestBirnbaumPinsAreDropped(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         root=Path(self.temp.name)
-        pin='@hasiddur_hashalem-birnbaum-1949-he'
         for lang in ['he','en']:
+            pin=f'@hasiddur_hashalem-birnbaum-1949-{lang}'
             p=root/f'hasiddur_hashalem-birnbaum-1949-{lang}';p.mkdir()
             p.joinpath('index.xml').write_text(f'''<tei:TEI xmlns:tei="{T}" xmlns:j="{J}"><tei:text><tei:body>
             <tei:div corresp="{TEXT}service"><j:transclude target="{TEXT}prayer:kaddish/yitgaddal{pin}"/>
@@ -185,3 +185,19 @@ class TestBirnbaumPinsAreDropped(unittest.TestCase):
             './/j:transclude/@target',namespaces=NS)
         self.assertFalse([t for t in targets if t.startswith(TEXT+'structure')])
         self.assertIn(TEXT+'prayer:kaddish/yehe_shemeh',targets)
+
+    def test_omit_and_replace_match_a_pinned_transclusion(self):
+        omitted=parse_fragment(self.composer.source(
+            TEXT+'service',omit={TEXT+'prayer:kaddish/yitgaddal'})).xpath(
+            './/j:transclude/@target',namespaces=NS)
+        self.assertNotIn(TEXT+'prayer:kaddish/yitgaddal',omitted)
+        replaced=self.composer.source(
+            TEXT+'service',replace={TEXT+'prayer:kaddish/yitgaddal':'<tei:p>Replacement</tei:p>'})
+        self.assertIn('Replacement',replaced)
+        self.assertNotIn('yitgaddal',replaced)
+
+    def test_only_a_project_suffix_is_removed(self):
+        from opensiddur.importer.siddur_expanded.compose import unpinned
+        self.assertEqual(unpinned(TEXT+'prayer:x@some-project-he'),TEXT+'prayer:x')
+        self.assertEqual(unpinned(TEXT+'prayer:x'),TEXT+'prayer:x')
+        self.assertEqual(unpinned('#local_id'),'#local_id')
