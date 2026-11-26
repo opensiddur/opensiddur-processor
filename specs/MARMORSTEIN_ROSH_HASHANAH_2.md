@@ -71,12 +71,14 @@ outside the minyan/mourner gate. The existing user723 holam-supply convention fo
 the literal Tetragrammaton applies here too: record supplied marks separately from
 the unchanged scan readings and leave the two-yod abbreviation as printed.
 
-The shared expanded index excludes its original first-volume sequence on the
-second day; it must retain the original Erev Rosh ha-Shanah services, so do not
-restrict that entire sequence to holiday day1. The second-night entry has its own
-day2/ Maariv selection. Compatible unprinted Hebrew dependencies keep explicit
-first-day bibliography and licences; they introduce no first-day English notes
-or translations into the new documentary projects.
+The second-night entry has its own day2/Maariv selection and output profile in
+the existing expanded project. Preserve the first-day index and its shipped
+profile unchanged, including Erev Rosh ha-Shanah. One global source-priority list
+cannot prefer two different editions for the same canonical prayers when an
+undated combined index displays both days, so each per-day profile selects its
+own shared bilingual sequence. Compatible unprinted Hebrew dependencies keep
+explicit first-day bibliography and licences; they introduce no first-day English
+notes or translations into the new documentary projects.
 
 Day-two Yitbarakh ends before its untranslated Psalm113:2 tail, which the new
 spine transcludes once separately. The older first-day Hebrew Yitbarakh range

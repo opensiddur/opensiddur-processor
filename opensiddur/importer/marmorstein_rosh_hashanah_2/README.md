@@ -112,3 +112,7 @@ records their first-day bibliography. A hash-bound, exact Titqabbal source span
 is exposed in the expanded project without editing the accepted first-day file.
 The three settings files select documentary Hebrew, documentary parallel and
 expanded second-night output. Generation alone does not accept the batch.
+The expanded first-day index/profile remain unchanged; the second-night profile
+selects its own entry in that project. Documentary `maariv_service.xml` is a shared
+structural boundary after the untranslated entrance, keeping facing headings and
+speaker descriptions beside their proper section.

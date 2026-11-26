@@ -3,7 +3,7 @@ import unittest
 from lxml import etree
 
 from opensiddur.importer.marmorstein_rosh_hashanah_2.evening import (
-    documentary_documents, integrate_expanded_index, render_sequence, settings,
+    documentary_documents, render_sequence, settings,
 )
 
 NS = {'t': 'http://www.tei-c.org/ns/1.0', 'j': 'http://jewishliturgy.org/ns/jlptei/2'}
@@ -101,20 +101,3 @@ class EveningSequenceTests(unittest.TestCase):
         self.assertTrue(self.root[0].get('corresp').endswith('/reader_and_congregation'))
         self.assertEqual(self.root.xpath('string(//t:abbr)', namespaces=NS), 'קו״ח')
 
-    def test_index_integration_is_idempotent_and_preserves_existing_sections(self):
-        root = etree.fromstring(b'''<TEI xmlns="http://www.tei-c.org/ns/1.0"
-          xmlns:j="http://jewishliturgy.org/ns/jlptei/2">
-          <teiHeader><fileDesc><editionStmt><edition>Old</edition></editionStmt>
-          <sourceDesc/></fileDesc></teiHeader><text><front/><body>
-          <div><div xml:id="existing"><p>First-day words.</p></div></div>
-          </body></text></TEI>''')
-        old = root.xpath('//*[@xml:id="existing"]')[0]
-        before = etree.tostring(old)
-        recipe = {'selection': [{'type': 'opensiddur:holiday',
-                                 'feature': 'rosh-hashana', 'value': 2}]}
-        integrate_expanded_index(root, recipe)
-        once = etree.tostring(root)
-        integrate_expanded_index(root, recipe)
-        self.assertEqual(etree.tostring(root), once)
-        self.assertEqual(etree.tostring(old), before)
-        self.assertEqual(len(root.xpath('//*[@xml:id="section_second_night_maariv"]')), 1)

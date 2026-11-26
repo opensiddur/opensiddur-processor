@@ -131,7 +131,7 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
                 continue
             div = element(parent, 'div')
             div.set(XML+'id', item['id'])
-            page = item.get('source_pages', {}).get(lang)
+            page = item.get('source_pages', {}).get(lang) if not expanded else None
             if page:
                 element(div, 'pb', ed='1965', n=page['printed_page'],
                         facs=page_image_url(IDENTIFIER, page['scan_page']-1))
@@ -245,59 +245,6 @@ def documentary_documents(recipe, units, lang):
     return root, service
 
 
-def integrate_expanded_index(root, recipe):
-    """Retain first-day children and select the new running order at its entry."""
-    body = root.find(f'{{{TEI}}}text/{{{TEI}}}body/{{{TEI}}}div')
-    holders = body.xpath('./*[@xml:id="section_second_night_maariv"]')
-    if len(holders) > 1:
-        raise ValueError('Duplicate expanded second-night section')
-    for holder in holders:
-        body.remove(holder)
-    old_gates = body.xpath('./j:conditional[@xml:id="expanded_first_day_selection"]',
-                          namespaces={'j': J})
-    if not old_gates:
-        gate = etree.Element(f'{{{J}}}conditional')
-        gate.set(XML+'id', 'expanded_first_day_selection')
-        body.insert(0, gate)
-        element(body, 'j:endConditional', target='#expanded_first_day_selection')
-    else:
-        gate = old_gates[0]
-        for child in list(gate):
-            gate.remove(child)
-    # Keep the original Erev RH services and appendices available. Exclude only
-    # day two, whose own entrance/order must replace the first-volume sequence.
-    settings(element(gate, 'j:none'), [{'type': 'opensiddur:holiday',
-                                      'feature': 'rosh-hashana', 'value': 2}])
-    holder = element(body, 'div')
-    holder.set(XML+'id', 'section_second_night_maariv')
-    gate = element(holder, 'j:conditional')
-    gate.set(XML+'id', 'index_second_night_selection')
-    settings(element(gate, 'j:all'), recipe['selection'])
-    element(holder, 'j:transclude', type='external', target=EXPANDED_URN)
-    element(holder, 'j:endConditional', target='#index_second_night_selection')
-    desc = root.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc')
-    desc.find(f'{{{TEI}}}editionStmt/{{{TEI}}}edition').text = (
-        'Expanded first-day maḥzor and second-night evening sequence. '
-        'Independent evidence is recorded in both Marmorstein source projects; '
-        'later second-day material is not yet included.')
-    source = desc.find(f'{{{TEI}}}sourceDesc')
-    if not source.xpath('./tei:bibl[@xml:id="expanded_second_day_sources"]',
-                        namespaces={'tei': TEI}):
-        bibl = element(source, 'bibl')
-        bibl.set(XML+'id', 'expanded_second_day_sources')
-        for project in PROJECTS.values():
-            element(bibl, 'ptr', target=f'/{project}/index#day_two_source_bibl')
-        element(bibl, 'note', 'Second-day evening witnesses; missing English remains absent. '
-                'Compatible first-day Hebrew Kaddish ending parts and Yigdal retain their source credits.')
-    for note in source.xpath('.//tei:note[@type="encoding"]', namespaces={'tei': TEI}):
-        if note.text and 'this does not claim coverage of other volumes' in note.text:
-            note.text = note.text.replace('this does not claim coverage of other volumes',
-                                          'the second-night evening sequence now begins the second-day volume')
-    for paragraph in root.xpath('./tei:text/tei:front//tei:p', namespaces={'tei': TEI}):
-        if paragraph.text == 'First day of Rosh ha-Shanah':
-            paragraph.text = 'Rosh ha-Shanah: first day and second-night evening service'
-
-
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-root', type=Path, default=SOURCETEXTS_ROOT)
@@ -348,8 +295,6 @@ def main(argv=None):
     targets.append((expanded_path.parent/'second_night.xml', root))
     targets.append((expanded_path.parent/'kaddish_titqabbal.xml',
                     titqabbal_document(args.project_directory, recipe['titqabbal_source_sha256'])))
-    integrate_expanded_index(expanded_index, recipe)
-    targets.append((expanded_path, expanded_index))
     for target in write_documents(targets, validator=validate):
         print(target)
     return 0
