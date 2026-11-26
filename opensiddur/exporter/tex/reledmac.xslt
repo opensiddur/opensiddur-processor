@@ -70,6 +70,7 @@
          facing pages or in columns; interleaved sets it in one reledmac stream, each
          block followed by its translation. -->
     <xsl:param name="layout" as="xs:string" required="yes"/>
+    <xsl:variable name="first-parallel" select="(//p:parallel)[1]"/>
     <xsl:variable name="interleaved" as="xs:boolean" select="$layout = 'interleaved'"/>
     <xsl:variable name="facing-pages" as="xs:boolean" select="$layout = 'pages'"/>
     <!-- footnote | endnote | none — where the text of an editorial note goes.
@@ -4288,7 +4289,7 @@ end
          inline; only top-level runs in block instructions are separated. -->
     <xsl:template name="note-direction-runs">
         <xsl:param name="separate" as="xs:boolean"/>
-        <xsl:variable name="pair" select="(following::p:parallel[1], preceding::p:parallel[1])[1]"/>
+        <xsl:variable name="pair" select="(following::p:parallel[1], preceding::p:parallel[1], $first-parallel)[1]"/>
         <xsl:variable name="primary-lang" select="string($pair/p:parallelItem[@role='primary']/@xml:lang)"/>
         <xsl:variable name="primary" select="tei:foreign[@xml:lang=$primary-lang]"/>
         <xsl:variable name="secondary" select="tei:foreign[@xml:lang ne $primary-lang]"/>
@@ -4301,7 +4302,7 @@ end
                             and count($primary)=1 and count($secondary)=1">
                 <!-- A shared bilingual rubric follows the actual column order,
                      rather than putting each language above the opposite column. -->
-                <xsl:text>\hbox dir TLT to \linewidth{\parbox[t]{\Lcolwidth}{</xsl:text>
+                <xsl:text>\leavevmode\hbox dir TLT to \linewidth{\parbox[t]{\Lcolwidth}{</xsl:text>
                 <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $secondary else $primary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
                 <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $secondary else $primary" mode="emit"/>
                 <xsl:text>}\hfil\parbox[t]{\Rcolwidth}{</xsl:text>
