@@ -182,6 +182,10 @@ to other editions; apply the edition-specific decisions below only to this book.
   synthetic regressions for reusable changes. Cover repeated page labels,
   missing/partial counterparts, conditional destinations, repeated transclusions
   and mixed ritual/navigation clauses. Test shared algorithms with invented data.
+- After creating or renaming projects, refresh the reference database before
+  exporting. Assert actual counterpart discovery and parallel output mode; a
+  warning about fallback to per-transclusion parallels can hide missing English
+  while a front-matter-only preview still looks correct.
 - Inspect documentary Hebrew, documentary parallel and expanded PDF/HTML.
   Verify actual links, direction, columns, notes, bookmarks and conditional
   alternatives. Record visual sampling separately from mechanical all-page QA.
