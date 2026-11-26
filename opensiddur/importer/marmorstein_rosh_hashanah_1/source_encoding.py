@@ -143,7 +143,7 @@ def _interpretations(root, unit, rules):
             b.element(choice, 'corr', '(')
 
 
-def apply_source_encoding(root, unit, lang):
+def apply_source_encoding(root, unit, lang, *, identifier=None):
     from opensiddur.importer.scan.authoring import printed_text
 
     from . import build as b
@@ -242,7 +242,8 @@ def apply_source_encoding(root, unit, lang):
         paragraph.text = None
         for fragment in item['fragments']:
             marker = b.element(paragraph, 'pb', ed='1965', n=fragment['printed_page'],
-                               facs=b.page_image_url(b.IDENTIFIER, int(fragment['scan'][1:])-1, size=''))
+                               facs=b.page_image_url(b.IDENTIFIER if identifier is None else identifier,
+                                                     int(fragment['scan'][1:])-1, size=''))
             marker.tail = fragment['text']
         if ''.join(paragraph.itertext()) != expected:
             raise ValueError('Source commentary pagination changed its words')

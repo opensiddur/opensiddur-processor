@@ -280,9 +280,15 @@ def unit_instructions(unit, lang):
             if lang in note.get('witnesses', [lang])]
 
 
-def unit_document(unit, lang, draft):
-    project = PROJECTS[lang]
-    root, body = document(lang, project, unit['title'][lang], unit_urn(unit), draft=draft)
+def unit_document(unit, lang, draft, *, projects=None, identifier=IDENTIFIER,
+                  document_factory=document):
+    """Render a witness with an explicit edition's projects, scan and header.
+
+    Defaults preserve the first-day importer. Other volumes supply their own
+    header factory and source identity without changing module globals.
+    """
+    project = (PROJECTS if projects is None else projects)[lang]
+    root, body = document_factory(lang, project, unit['title'][lang], unit_urn(unit), draft=draft)
     if unit.get('omit_publication_urn'):
         idno = root.find(f'.//{{{TEI}}}publicationStmt/{{{TEI}}}idno')
         idno.getparent().remove(idno)
@@ -295,7 +301,7 @@ def unit_document(unit, lang, draft):
     reuse = unit.get('reuse', {}).get(lang)
     div = element(body, 'div', **({'corresp': unit['urn']} if not reuse and unit.get('map_root', not biblical_root) else {}))
     opening = unit['languages'][lang][0]['fragments'][0]
-    div.set('facs', page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
+    div.set('facs', page_image_url(identifier, int(opening['scan'][1:])-1, size=''))
     last = unit['languages'][lang][-1]['fragments'][-1]
     if opening.get('printed_page') is not None and last.get('printed_page') is not None:
         element(root.find(f'.//{{{TEI}}}sourceDesc/{{{TEI}}}bibl'), 'biblScope',
@@ -331,13 +337,13 @@ def unit_document(unit, lang, draft):
     current_page = None
     if unit.get('opening_page', {}).get(lang):
         element(div, 'pb', ed='1965', n=opening['printed_page'],
-                facs=page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
+                facs=page_image_url(identifier, int(opening['scan'][1:])-1, size=''))
         current_page = opening['scan']
     if unit.get('head', {}).get(lang):
         opening = unit['languages'][lang][0]['fragments'][0]
         if current_page != opening['scan'] and opening.get('page_start', True):
             element(div, 'pb', ed='1965', n=opening['printed_page'],
-                    facs=page_image_url(IDENTIFIER, int(opening['scan'][1:])-1, size=''))
+                    facs=page_image_url(identifier, int(opening['scan'][1:])-1, size=''))
         current_page = opening['scan']
         element(div, 'head', unit['head'][lang]).set(XML+'lang', lang)
     for instruction in unit_instructions(unit, lang):
@@ -410,7 +416,7 @@ def unit_document(unit, lang, draft):
             close_references()
             first = segment['fragments'][0]
             if first.get('page_start', True):
-                attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(first['scan'][1:])-1, size='')}
+                attributes = {'ed': '1965', 'facs': page_image_url(identifier, int(first['scan'][1:])-1, size='')}
                 if first.get('printed_page') is not None:
                     attributes['n'] = first['printed_page']
                 element(div, 'pb', **attributes)
@@ -471,7 +477,7 @@ def unit_document(unit, lang, draft):
             if not valid_transition:
                 raise ValueError('Deferred page boundary requires the first continuation after a marked clause containing the matching page transition')
             attributes = {'ed': '1965', 'facs': page_image_url(
-                IDENTIFIER, int(current_page[1:])-1, size='')}
+                identifier, int(current_page[1:])-1, size='')}
             if opening_fragment.get('printed_page') is not None:
                 attributes['n'] = opening_fragment['printed_page']
             element(paragraph, 'pb', **attributes)
@@ -480,7 +486,7 @@ def unit_document(unit, lang, draft):
             # A continuation rubric belongs to the new source page too.
             # Emit its boundary before the conditional's own note.
             attributes = {'ed': '1965', 'facs': page_image_url(
-                IDENTIFIER, int(opening_fragment['scan'][1:])-1, size='')}
+                identifier, int(opening_fragment['scan'][1:])-1, size='')}
             if opening_fragment.get('printed_page') is not None:
                 attributes['n'] = opening_fragment['printed_page']
             element(paragraph, 'pb', **attributes)
@@ -537,7 +543,7 @@ def unit_document(unit, lang, draft):
                         paragraph.set(XML+'lang', text_language)
                     current_paragraph = fragment['line']
             if fragment['scan'] != current_page:
-                attributes = {'ed': '1965', 'facs': page_image_url(IDENTIFIER, int(fragment['scan'][1:])-1, size='')}
+                attributes = {'ed': '1965', 'facs': page_image_url(identifier, int(fragment['scan'][1:])-1, size='')}
                 if fragment.get('printed_page') is not None:
                     attributes['n'] = fragment['printed_page']
                 if index and fragments[index-1].get('join_next'):
@@ -843,7 +849,7 @@ def unit_document(unit, lang, draft):
             page.set('ed', '1965 '+context)
     if unit.get('source_encoding', {}).get(lang):
         from .source_encoding import apply_source_encoding
-        root = apply_source_encoding(root, unit, lang)
+        root = apply_source_encoding(root, unit, lang, identifier=identifier)
     return root
 
 
