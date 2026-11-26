@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Distinct source-page links on the same output line remain separately clickable in
+  PDF and HTML margins. PDF symbols use nearby free positions within the page; HTML
+  symbols clear earlier margin links. Narrow-screen links remain inline.
 - The expanded maḥzor no longer pins the Complete Kaddish and ha-Motzi to Birnbaum, so a
   volume's priorities choose their edition, as for its other prayers. The Half Kaddish of the
   preparatory weekday Minchah and Kabbalat Shabbat's Mourner's Kaddish outside the Ten Days
