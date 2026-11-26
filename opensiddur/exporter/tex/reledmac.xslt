@@ -4288,7 +4288,27 @@ end
          inline; only top-level runs in block instructions are separated. -->
     <xsl:template name="note-direction-runs">
         <xsl:param name="separate" as="xs:boolean"/>
+        <xsl:variable name="pair" select="(following::p:parallel[1], preceding::p:parallel[1])[1]"/>
+        <xsl:variable name="primary-lang" select="string($pair/p:parallelItem[@role='primary']/@xml:lang)"/>
+        <xsl:variable name="primary" select="tei:foreign[@xml:lang=$primary-lang]"/>
+        <xsl:variable name="secondary" select="tei:foreign[@xml:lang ne $primary-lang]"/>
         <xsl:choose>
+            <xsl:when test="$separate and $layout='pairs' and exists($pair)
+                            and not(ancestor::p:parallelItem)
+                            and empty(text()[normalize-space()])
+                            and count(tei:foreign)=2
+                            and empty(*[not(self::tei:foreign)])
+                            and count($primary)=1 and count($secondary)=1">
+                <!-- A shared bilingual rubric follows the actual column order,
+                     rather than putting each language above the opposite column. -->
+                <xsl:text>\hbox dir TLT to \linewidth{\parbox[t]{\Lcolwidth}{</xsl:text>
+                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $secondary else $primary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
+                <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $secondary else $primary" mode="emit"/>
+                <xsl:text>}\hfil\parbox[t]{\Rcolwidth}{</xsl:text>
+                <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $primary else $secondary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
+                <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $primary else $secondary" mode="emit"/>
+                <xsl:text>}}</xsl:text>
+            </xsl:when>
             <xsl:when test="$separate and empty(text()[normalize-space()])
                             and exists(tei:foreign[@xml:lang])
                             and empty(*[not(self::tei:foreign[@xml:lang])])">

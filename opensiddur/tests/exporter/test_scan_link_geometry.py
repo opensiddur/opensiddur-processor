@@ -68,7 +68,7 @@ class Box:
                      "requires a real lualatex installation and pdftotext")
 class TestScanLinkGeometry(unittest.TestCase):
 
-    def _typeset(self, xml: str, typography: dict):
+    def _typeset(self, xml: str, typography: dict, *, all_pages=False):
         """The first page's links (as boxes in pdftotext's coordinates, top down), its
         words, and the run's log."""
         root = etree.fromstring(xml)
@@ -84,20 +84,39 @@ class TestScanLinkGeometry(unittest.TestCase):
             self.assertTrue((work / "t.pdf").exists(),
                             f"lualatex produced no PDF:\n{done.stdout[-2000:]}")
             log = (work / "t.log").read_text(encoding="utf-8", errors="replace")
-            page = PdfReader(work / "t.pdf").pages[0]
-            height = float(page.mediabox.height)
-            links = []
-            for annotation in page.get("/Annots") or []:
-                annotation = annotation.get_object()
-                uri = annotation.get("/A", {}).get("/URI")
-                if uri:
-                    x0, y0, x1, y1 = (float(v) for v in annotation["/Rect"])
-                    links.append(Box(x0, height - y1, x1, height - y0, uri))
-            bbox = subprocess.run(["pdftotext", "-f", "1", "-l", "1", "-bbox", "t.pdf", "-"],
-                                  cwd=work, capture_output=True, text=True).stdout
-        words = [Box(*(float(m.group(i)) for i in range(1, 5)), m.group(5))
-                 for m in _WORD.finditer(bbox) if m.group(5).strip()]
-        return links, words, log
+            results = []
+            for number, page in enumerate(PdfReader(work / "t.pdf").pages, 1):
+                height = float(page.mediabox.height)
+                links = []
+                for annotation in page.get("/Annots") or []:
+                    annotation = annotation.get_object()
+                    uri = annotation.get("/A", {}).get("/URI")
+                    if uri:
+                        x0, y0, x1, y1 = (float(v) for v in annotation["/Rect"])
+                        links.append(Box(x0, height - y1, x1, height - y0, uri))
+                bbox = subprocess.run(
+                    ["pdftotext", "-f", str(number), "-l", str(number),
+                     "-bbox", "t.pdf", "-"], cwd=work, capture_output=True, text=True).stdout
+                words = [Box(*(float(m.group(i)) for i in range(1, 5)), m.group(5))
+                         for m in _WORD.finditer(bbox) if m.group(5).strip()]
+                results.append((links, words, log))
+                if not all_pages:
+                    break
+        return results if all_pages else results[0]
+
+    def test_buffered_paragraphs_use_the_margin_of_their_shipped_page(self):
+        # reledmac prepares paragraphs before the page they eventually occupy.
+        # Wide alternating margins expose a page counter captured too early.
+        xml = _document("".join(
+            f"<tei:p>{_pb(n)}{_HEBREW}</tei:p>" for n in range(1, 41)))
+        pages = self._typeset(xml, {
+            "markers": {"scan_links": {"placement": "margin"}},
+            "line_numbers": {"enabled": False},
+        }, all_pages=True)
+        self.assertGreaterEqual(len(pages), 3)
+        self.assertEqual(sum(len(links) for links, _, _ in pages), 40)
+        for links, words, _ in pages:
+            self.assertOutsideTheText(links, words)
 
     @staticmethod
     def _text(words):
