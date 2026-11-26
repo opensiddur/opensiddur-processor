@@ -143,7 +143,7 @@ def excerpt_document(unit, lang, witness):
         element(element(note, 'p'), 'ref', witness['citation'], target=verses[0]['verse_urn'])
     text = root.find(f'{{{TEI}}}text')
     text.clear()
-    attributes = {} if is_range else {'corresp': unit['urn']}
+    attributes = {} if is_range or unit['urn'] == verses[0]['verse_urn'] else {'corresp': unit['urn']}
     div = element(element(text, 'body'), 'div', **attributes)
     element(div, 'pb', ed='1965', n=witness['printed_page'],
             facs=page_image_url(IDENTIFIER, witness['scan_page']-1))
@@ -162,18 +162,17 @@ def excerpt_document(unit, lang, witness):
         element(paragraph, 'milestone', unit='verse', n=verse['verse'],
                 corresp=verse['verse_urn'])
         attributes = {'source': verse['verse_urn']}
-        if is_range:
-            # A verse selected without its preceding page marker must retain
-            # its own starting source, including after an earlier verse's break.
-            start_page = current_page
-            for part in verse['content']:
-                if isinstance(part, str) and not part.strip():
-                    continue
-                if isinstance(part, dict) and set(part) == {'page_break'}:
-                    start_page = part['page_break']['scan_page']
-                    continue
-                break
-            attributes['facs'] = page_image_url(IDENTIFIER, start_page-1)
+        # A verse selected without its preceding page marker must retain
+        # its own starting source, including after an earlier verse's break.
+        start_page = current_page
+        for part in verse['content']:
+            if isinstance(part, str) and not part.strip():
+                continue
+            if isinstance(part, dict) and set(part) == {'page_break'}:
+                start_page = part['page_break']['scan_page']
+                continue
+            break
+        attributes['facs'] = page_image_url(IDENTIFIER, start_page-1)
         quotation = element(paragraph, 'seg', **attributes)
         last_page = append_content(quotation, verse['content'])
         if last_page is not None:

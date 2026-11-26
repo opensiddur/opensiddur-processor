@@ -109,3 +109,26 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
       recitation, and accurate licences/credits and documented critical uncertainty.
 - [ ] Finish linked PRs and CI; merge processor dependencies first, rerun dependent
       project checks, merge and close out managed worktrees preserving needed outputs.
+
+## Batch B checkpoint — 2026-11-26
+
+- [x] Resolve questions931–976 with dedicated readers, returning only the
+      unresolved973 host letter to the user; record the gimel adjudication.
+- [x] Complete independent whole-source verification of scans12–13, including
+      source extent, Jerusalem marks and printed paratext. Source approval
+      is recorded separately from complete-scan acceptance.
+- [x] Encode Emet veEmunah in both languages with six existing canonical parts,
+      source paragraphs and three bounded scriptural quotations.
+- [x] Close independent Emet source/encoding/code and configured PDF/HTML
+      presentation review; preserve the rejected Divine Name markup finding
+      and its corrected evidence. Integrate merged exporter PR341 from main.
+- [x] Pass branch lint and 42 focused tests (19 subtests).
+- [x] Close independent encoding review of the three scan12–13 scripture modules,
+      including single-verse identity/provenance and earlier Shema provenance equivalence.
+- [ ] Inspect and independently review the three scripture modules’ exports.
+- [ ] Encode and review Hashkivenu and half Kaddish, with role/variant context
+      in the service spine, then complete the remaining scans5–24 batch gates.
+
+Complete accepted scans remain **4/385**. Excerpt approval and complete source
+readings do not change that count while service, encoding or presentation gates
+for a complete scan remain open.

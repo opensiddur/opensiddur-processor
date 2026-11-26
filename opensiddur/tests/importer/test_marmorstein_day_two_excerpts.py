@@ -104,6 +104,17 @@ class ExcerptTests(unittest.TestCase):
                     self.run_builder()
                 self.assertFalse((self.base/'projects'/PROJECTS['he']/'invented_prayer.xml').exists())
 
+    def test_single_verse_keeps_one_canonical_identity_and_own_provenance(self):
+        unit = self.recipe['units'][0]
+        unit['urn'] = unit['verse_urn']
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        root = etree.parse(str(self.base/'projects'/PROJECTS['he']/'invented_prayer.xml'))
+        self.assertEqual(root.xpath('count(//*[@corresp=$urn])', urn=unit['urn']), 1)
+        self.assertEqual(root.xpath('//t:body/t:div/@corresp', namespaces=NS), [])
+        self.assertIn('/page/n22', root.xpath('string(//t:seg/@facs)', namespaces=NS))
+
     def test_exact_scope_semantics_and_absent_translation_cleanup(self):
         stale = self.base/'projects'/PROJECTS['en']/'invented_prayer.xml'
         stale.write_text('Previously generated counterpart', encoding='utf-8')
