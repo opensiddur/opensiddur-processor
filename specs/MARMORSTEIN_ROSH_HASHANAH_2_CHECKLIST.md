@@ -91,8 +91,14 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
 
 ## Next and final work
 
-- [ ] Batch B begins with תפלה on scan5 and second-night Maariv on scan6; determine
-      a coherent endpoint and include each facing translation/continuation.
+- [x] Batch B scope: scans5–24, תפלה and full second-night Maariv through Aleinu;
+      scan25 begins morning material. Twenty images and overlapping bands cached.
+- [ ] Finish primary reading/comparison of batch B. Direct primary drafts5–12 saved;
+      full blind Claude Opus5.5 medium response5–24 preserved;13–24 remains unread
+      until its primary drafts are recorded. No prayer scan is accepted.
+- [ ] Close the independently reviewed project-separation equivalence record for
+      the user-approved volume-two project pair. Historical four-scan source
+      acceptance remains; migrated presentation approval is pending.
 - [ ] Repeat all twelve acceptance gates for each subsequent batch through scan385.
 - [ ] Review cross-batch joins, duplicate/repeated units, reference destinations and
       full second-day recitation order; retain first-day paths and settings.

@@ -199,9 +199,12 @@ to other editions; apply the edition-specific decisions below only to this book.
 These decisions describe this edition, not every Ashkenaz maḥzor. The book
 specification and source records retain their detailed evidence and exceptions.
 
-- Keep the projects' shared title `prayerbook_for_the_new_year`, with edition
+- Keep the first-day projects' shared title `prayerbook_for_the_new_year`, with edition
   fields `heidenheim-1965-he` and `marmorstein-1965-en`. Use the actual book title
-  in presentation, never a historical “pilot installment” label.
+  in presentation, never a historical “pilot installment” label. Volume two uses
+  `prayerbook_for_the_new_year_second_day` for both languages, by user decision.
+  Separate physical-volume projects keep scan provenance and missing translations
+  distinct while reusing canonical prayer identities.
 - The expanded project is `machzor_expanded-opensiddur-he`; its structural root
   is `urn:x-opensiddur:text:siddur:machzor_expanded`.
 - Numeric-only biblical citations such as Ashrei's קמה refer to Psalms.

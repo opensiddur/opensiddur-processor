@@ -41,13 +41,14 @@ Keep source data in `sources/marmorstein_rosh_hashanah_2/` and cache images unde
 and scan utilities. The initial download entry point reuses the existing
 book-profile-based metadata/OCR downloader; no day-one assembly is invoked.
 
-The Hebrew and English volumes share the existing edition projects:
+User decision (2026-11-25): volume two has its own project pair. Hebrew and
+English share a title field; the first-day project names remain unchanged:
 
-- `prayerbook_for_the_new_year-heidenheim-1965-he`
-- `prayerbook_for_the_new_year-marmorstein-1965-en`
+- `prayerbook_for_the_new_year_second_day-heidenheim-1965-he`
+- `prayerbook_for_the_new_year_second_day-marmorstein-1965-en`
 
-Add a distinct second-day entry point `day_two.xml` and separate source bibliography
-for volume two; preserve day-one files, settings, targets and accepted evidence.
+Use `index.xml` as the documentary project entry point with its own volume-two
+source bibliography; preserve day-one files, settings, targets and accepted evidence.
 Use `urn:x-opensiddur:text:siddur:rosh_hashanah/day_two` for this volume's structural
 entry point, registering structural identities before publishing them. Prayer
 identities remain canonical and edition-independent. Reuse existing modules only
@@ -149,3 +150,12 @@ scans6/8/10. Consequently this is not a completed independent pointing review.
 Do not count it as final approval or use its words as an independent primary
 transcription. Finish primary reading and targeted image review, adjudicate the
 emblem/signature, then complete encoding, order and presentation review.
+
+## Project separation after front-matter acceptance
+
+The original shared-project startup is superseded by the user-approved separate
+volume-two projects. Preserve its four accepted source readings and historical
+artifacts unchanged. Bind the renamed publication URNs, bibliography pointers and
+new index entry points through an independent equivalence review before claiming
+that the migrated presentation is accepted. The scans5–24 batch covers תפלה and
+the complete second-night evening service through Aleinu.

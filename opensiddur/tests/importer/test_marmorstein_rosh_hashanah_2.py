@@ -57,9 +57,8 @@ class OpeningBuildTests(unittest.TestCase):
         self.assertEqual(validator.call_count, 2)
         for lang, project in PROJECTS.items():
             root = self.base/'projects'/project
-            self.assertEqual((root/'index.xml').read_text(encoding='utf-8'), 'existing index')
             self.assertEqual((root/'shared_prayer.xml').read_text(encoding='utf-8'), 'existing witness')
-            document = etree.parse(str(root/'day_two.xml'))
+            document = etree.parse(str(root/'index.xml'))
             self.assertEqual(document.xpath('string(/tei:TEI/@xml:lang)', namespaces=NS), lang)
             front = document.find('tei:text/tei:front', NS)
             self.assertEqual(len(front), 16)
@@ -84,24 +83,18 @@ class OpeningBuildTests(unittest.TestCase):
             stream.write(' ')
         with self.assertRaisesRegex(ValueError, 'Stale front-matter adjudication'):
             self.run_builder()
-        self.assertFalse(any((self.base/'projects').glob('*/day_two.xml')))
+        for project in PROJECTS.values():
+            self.assertEqual((self.base/'projects'/project/'index.xml').read_text(encoding='utf-8'), 'existing index')
 
-    def test_explicit_bibliography_update_preserves_all_existing_index_content(self):
-        original = ('<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"><tei:teiHeader>'
-                    '<tei:fileDesc><tei:sourceDesc><tei:bibl xml:id="original">Original book</tei:bibl>'
-                    '</tei:sourceDesc></tei:fileDesc></tei:teiHeader><tei:text><tei:body>'
-                    '<tei:p>Retained prayer</tei:p></tei:body></tei:text></tei:TEI>')
-        for project in PROJECTS.values():
-            (self.base/'projects'/project/'index.xml').write_text(original, encoding='utf-8')
+    def test_day_one_projects_are_never_written(self):
+        for lang, project in PROJECTS.items():
+            old = project.replace('_second_day', '')
+            directory = self.base/'projects'/old
+            directory.mkdir()
+            (directory/'index.xml').write_text('Unrelated accepted volume', encoding='utf-8')
         with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.build.validate',
-                   return_value=(True, [])) as validator:
-            self.assertEqual(self.run_builder('--update-bibliography'), 0)
-        self.assertEqual(validator.call_count, 4)
-        parser = etree.XMLParser(remove_blank_text=True)
+                   return_value=(True, [])):
+            self.run_builder()
         for project in PROJECTS.values():
-            after = etree.parse(str(self.base/'projects'/project/'index.xml'), parser).getroot()
-            added = after.xpath('//tei:bibl[@xml:id="day_two_source_bibl"]', namespaces=NS)
-            self.assertEqual(len(added), 1)
-            added[0].getparent().remove(added[0])
-            self.assertEqual(etree.tostring(after, method='c14n'),
-                             etree.tostring(etree.fromstring(original, parser), method='c14n'))
+            old = self.base/'projects'/project.replace('_second_day', '')/'index.xml'
+            self.assertEqual(old.read_text(encoding='utf-8'), 'Unrelated accepted volume')

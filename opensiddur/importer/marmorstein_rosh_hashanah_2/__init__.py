@@ -7,9 +7,9 @@ from opensiddur.importer.scan.pages import BookProfile
 BOOK = 'marmorstein_rosh_hashanah_2'
 IDENTIFIER = 'mahzor-lyom-sheni-shel-rosh-hashanah-day-two-jenny-marmorstein-1965'
 SOURCE_RECORD = 'https://opensiddur.org/?p=69124'
-TITLE = 'prayerbook_for_the_new_year'
-# Both volumes belong to the same edition projects. Day-two files must not
-# overwrite day one's index, modules, settings or acceptance evidence.
+TITLE = 'prayerbook_for_the_new_year_second_day'
+# Physical volumes have separate witnesses and scan provenance. Canonical prayer
+# identities remain shared, while publication URNs select this volume's projects.
 PROJECTS = {'he': f'{TITLE}-heidenheim-1965-he', 'en': f'{TITLE}-marmorstein-1965-en'}
 ROOT_URN = 'urn:x-opensiddur:text:siddur:rosh_hashanah/day_two'
 EXPANDED = 'machzor_expanded-opensiddur-he'

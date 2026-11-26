@@ -28,11 +28,9 @@ The downloader requires the configured reachable contact address and agent model
 It reuses the existing book-profile-based downloader and shared scan/client
 operations. OCR and machine labels never become accepted readings automatically.
 
-The builder requires current hash-bound adjudication and explicit title layouts, and validates both documents before writing `day_two.xml` in the existing
-Hebrew and English edition projects. It does not write `index.xml`, day-one
-modules, settings or the expanded maḥzor. Add those integrations only after
-reading and reviewing the corresponding new material. The synthetic startup test
-checks that the accepted index/shared modules survive and each language receives
-the complete multilingual paratext with correct language tags and per-page paratext gates.
-
-Use `--update-bibliography` explicitly to add/update only the volume-two bibliography in the edition indexes. The default build leaves indexes unchanged; the explicit update preserves all existing index content.
+The builder requires current hash-bound adjudication and explicit title layouts.
+It validates both documents before writing `index.xml` in the separate `prayerbook_for_the_new_year_second_day` Hebrew
+and English projects. Each entry point contains the volume-two bibliography. It never writes
+first-day projects or supplies absent English from the first volume.
+The four accepted source readings remain unchanged; project separation requires
+an independently reviewed equivalence record and refreshed presentation evidence.

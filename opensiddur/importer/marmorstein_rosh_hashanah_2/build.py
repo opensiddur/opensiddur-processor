@@ -1,12 +1,11 @@
 """Build only the opening documentary witnesses, explicitly as unaccepted drafts.
 
-This startup builder writes day_two.xml and never replaces day one's index.xml
-or reusable prayer witnesses. Full service assembly follows image adjudication.
+This builder writes a volume-specific index.xml. It never writes
+day-one projects. Full service assembly follows image adjudication.
 """
 import argparse
 import json
 import hashlib
-from copy import deepcopy
 from pathlib import Path
 
 from lxml import etree
@@ -60,7 +59,6 @@ def opening_document(lang, pages, layouts):
     element(bibl, 'note', 'Digital imaging and document preparation: Aharon N. Varady.')
     element(bibl, 'note', 'WH transcribes the cover monogram; the adjacent Hebrew text is its legend. '
             'The website preface from volume one is not part of this source transcription.', type='encoding')
-    element(bibl, 'ptr', target=f'/{project}/index#day_two_source_bibl')
     front = element(element(root, 'text'), 'front')
     for page in pages:
         # Paratext belongs to the physical volume, including its other-language
@@ -114,8 +112,6 @@ def main(argv=None):
     parser.add_argument('--project-directory', type=Path, default=PROJECT_DIRECTORY)
     parser.add_argument('--draft', action='store_true', required=True,
                         help='Required: opening witnesses have not been accepted.')
-    parser.add_argument('--update-bibliography', action='store_true',
-                        help='Update only volume two bibliography in the existing edition indexes.')
     args = parser.parse_args(argv)
     source = args.source_root/BOOK
     reading_path = source/'front_resolved.json'
@@ -125,23 +121,8 @@ def main(argv=None):
         raise ValueError('Stale front-matter adjudication hash')
     layouts = json.loads((source/'front_layout.json').read_text(encoding='utf-8'))
     documents = {lang: opening_document(lang, reading['pages'], layouts) for lang in PROJECTS}
-    targets = [(args.project_directory/PROJECTS[lang]/'day_two.xml', root)
+    targets = [(args.project_directory/PROJECTS[lang]/'index.xml', root)
                for lang, root in documents.items()]
-    if args.update_bibliography:
-        for lang, root in documents.items():
-            index_path = args.project_directory/PROJECTS[lang]/'index.xml'
-            index = etree.parse(str(index_path)).getroot()
-            source_desc = index.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc/{{{TEI}}}sourceDesc')
-            entry = deepcopy(root.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc/{{{TEI}}}sourceDesc/{{{TEI}}}bibl'))
-            for ptr in entry.findall(f'{{{TEI}}}ptr'):
-                entry.remove(ptr)
-            existing = source_desc.find(f"{{{TEI}}}bibl[@{{{XML[1:-1]}}}id='day_two_source_bibl']")
-            if existing is None:
-                source_desc.append(entry)
-            else:
-                entry.tail = existing.tail
-                source_desc.replace(existing, entry)
-            targets.append((index_path, index))
     for path in write_documents(targets, validator=validate):
         print(path)
     return 0
