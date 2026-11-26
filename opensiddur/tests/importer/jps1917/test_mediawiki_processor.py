@@ -1,9 +1,10 @@
 import unittest
+
 from opensiddur.importer.jps1917.mediawiki_processor import (
+    ConversionResult,
     MediaWikiProcessor,
     create_processor,
     process_page,
-    ConversionResult
 )
 
 

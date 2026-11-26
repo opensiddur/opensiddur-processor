@@ -1,13 +1,21 @@
 """Synthetic reference-boundary and occasion checks for the closing study."""
 import unittest
+
 from lxml import etree
-from .test_tachanun_conditions import evaluate, fragment, NS
-from .test_kabbalat_shabbat import date_values
+
 from opensiddur.exporter.condition_eval import TriState
-from opensiddur.importer.birnbaum_scan.build.common import AGG, PROJECT_HE
 from opensiddur.importer.birnbaum_scan.build.bameh_madlikin import (
-    chapter_body, units, shared, MISHNAH, TALMUD, ROOT,
+    MISHNAH,
+    ROOT,
+    TALMUD,
+    chapter_body,
+    shared,
+    units,
 )
+from opensiddur.importer.birnbaum_scan.build.common import AGG, PROJECT_HE
+
+from .test_kabbalat_shabbat import date_values
+from .test_tachanun_conditions import NS, evaluate, fragment
 
 
 class TestBamehMadlikin(unittest.TestCase):

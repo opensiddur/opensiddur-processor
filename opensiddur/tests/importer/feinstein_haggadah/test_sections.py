@@ -1,7 +1,11 @@
 """A section's URN: under `haggadah:`, or a shared text's own."""
 import unittest
 
-from opensiddur.importer.feinstein_haggadah.sections import SHARED_PARAGRAPHS, SHARED_TEXTS, urn_for_section
+from opensiddur.importer.feinstein_haggadah.sections import (
+    SHARED_PARAGRAPHS,
+    SHARED_TEXTS,
+    urn_for_section,
+)
 
 
 class UrnForSectionTestCase(unittest.TestCase):

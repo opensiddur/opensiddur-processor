@@ -1,10 +1,13 @@
 """Monthly service preserves interleaved rubrics and non-seasonal Kaddish."""
 import unittest
 from unittest.mock import patch
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import penitential_days as service
-from opensiddur.importer.asher_selichot.build import TEI,XML,PRAYER
+from opensiddur.importer.asher_selichot.build import PRAYER, TEI, XML
 from opensiddur.importer.asher_selichot.first_day import entry
+
 
 class YomKippurKatanTests(unittest.TestCase):
     def test_occasion_is_the_eve_of_the_new_moon(self):

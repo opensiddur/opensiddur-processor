@@ -6,7 +6,13 @@ from datetime import date
 
 from opensiddur.exporter.html import kinds_of_day
 from opensiddur.exporter.html.kinds_of_day import (
-    EXCLUDED, ISRAEL, OUTPUT, Kind, _derive, certain, generate,
+    EXCLUDED,
+    ISRAEL,
+    OUTPUT,
+    Kind,
+    _derive,
+    certain,
+    generate,
 )
 
 H = "opensiddur:holiday"

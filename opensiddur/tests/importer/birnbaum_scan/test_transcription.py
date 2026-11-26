@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for resolving the Wikisource foundation text to what the 1949 print reads.
 
 Every fixture here is synthetic. Asserting on the committed transcription would test the
@@ -213,10 +212,10 @@ class TestPageSlice(unittest.TestCase):
 
 class TestMissingSpanCli(unittest.TestCase):
     def test_missing_page_does_not_corrupt_foundation_path_for_next_page(self):
-        from tempfile import TemporaryDirectory
-        from pathlib import Path
         from contextlib import redirect_stderr
         from io import StringIO
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
         with TemporaryDirectory() as d:
             root=Path(d);book=root/'sources/birnbaum_siddur'
             foundation=book/'source/text/אשכנז/דפי יסוד';foundation.mkdir(parents=True)

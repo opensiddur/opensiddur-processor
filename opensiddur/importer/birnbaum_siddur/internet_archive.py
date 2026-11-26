@@ -35,7 +35,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -53,7 +53,6 @@ from opensiddur.importer.util.internet_archive import (
     load_pageindex,
     read_maybe_gzip,
     resolve_agent_model,
-    sha256_file,
     slice_searchtext,
     write_if_changed,
 )
@@ -376,7 +375,7 @@ def download_ia(
     manifest = {
         "source": "archive.org",
         "identifier": IA_IDENTIFIER,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "leaf_offset": LEAF_OFFSET,
         "derivatives": records,
         "ocr": ocr,

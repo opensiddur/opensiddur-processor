@@ -1,11 +1,15 @@
 """The printed recitation choices and independent Hashmonaim reference units."""
-import unittest
 import unicodedata
+import unittest
+
 from lxml import etree
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import hanukkah_purim as r
 from opensiddur.importer.birnbaum_scan.build.festival_data import ROWS as FESTIVAL
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestHanukkahPurim(unittest.TestCase):
     def test_first_night_only_and_unspecified(self):

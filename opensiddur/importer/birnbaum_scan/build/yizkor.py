@@ -1,11 +1,11 @@
 """Memorial service, IA n625–n632; occasion gates belong to callers."""
-from .common import SIDDUR, PRAYER, PROJECT_HE, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
+from .common import PRAYER, PROJECT_HE, SIDDUR, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
 from .festival import conditional
-from .tachanun_conditions import ISRAEL, DIASPORA
 from .milestones import marked
 from .shacharit_end import editorial_head
-from .yizkor_data import ROWS, PAGES, AV_ROWS
+from .tachanun_conditions import DIASPORA, ISRAEL
+from .yizkor_data import AV_ROWS, PAGES, ROWS
 
 ROOT = SIDDUR+'yizkor'
 SERVICE = PRAYER+'yizkor'

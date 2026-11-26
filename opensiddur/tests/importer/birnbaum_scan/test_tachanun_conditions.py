@@ -1,11 +1,16 @@
 """Calendar boundaries and independence of the three post-Amidah sections."""
 import unittest
 from unittest.mock import Mock
+
 from lxml import etree
 
-from opensiddur.exporter.condition_eval import parse_condition_element, evaluate_condition, TriState
+from opensiddur.exporter.condition_eval import (
+    TriState,
+    evaluate_condition,
+    parse_condition_element,
+)
 from opensiddur.importer.birnbaum_scan.build import tachanun_conditions as rules
-from opensiddur.importer.birnbaum_scan.build.common import cond, PROJECT_HE
+from opensiddur.importer.birnbaum_scan.build.common import PROJECT_HE, cond
 from opensiddur.importer.birnbaum_scan.build.tachanun import kaddish_body
 
 NS = {'tei': 'http://www.tei-c.org/ns/1.0', 'j': 'http://jewishliturgy.org/ns/jlptei/2'}

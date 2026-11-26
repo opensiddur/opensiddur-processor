@@ -1,5 +1,6 @@
 """Add addressable boundaries to a shared paragraph without changing its text."""
 import re
+
 from .milestones import marked
 
 

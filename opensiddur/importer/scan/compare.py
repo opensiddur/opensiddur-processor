@@ -15,7 +15,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from opensiddur.importer.util.hebrew import normalize_hebrew, to_nfkd
+from opensiddur.importer.util.hebrew import to_nfkd
 
 #: Buckets. Every difference is in exactly one.
 WHITESPACE = "whitespace"

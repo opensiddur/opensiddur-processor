@@ -38,11 +38,23 @@ import yaml
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings
-from opensiddur.importer.sefaria.align import Alignment, Pair, align_work, join_chapters, load_decisions
-from opensiddur.importer.sefaria.corrections import apply_corrections, load_corrections
-from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, is_phrase
-from opensiddur.importer.sefaria.download import load_manifest
+from opensiddur.importer.sefaria.align import (
+    Alignment,
+    Pair,
+    align_work,
+    join_chapters,
+    load_decisions,
+)
+from opensiddur.importer.sefaria.blocks import (
+    Item,
+    Rubric,
+    TextBlock,
+    divide,
+    is_phrase,
+)
 from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
+from opensiddur.importer.sefaria.corrections import apply_corrections, load_corrections
+from opensiddur.importer.sefaria.download import load_manifest
 from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
 from opensiddur.importer.sefaria.markup import HebrewKind, plain_text
 from opensiddur.importer.sefaria.match import (
@@ -57,8 +69,17 @@ from opensiddur.importer.sefaria.match import (
     scripture_verses,
     verse_length,
 )
-from opensiddur.importer.sefaria.phrases import clashing_paths, recorded_phrases, skeleton, text_path
-from opensiddur.importer.sefaria.source import PATH_SEPARATOR, WorkSource, load_work_source
+from opensiddur.importer.sefaria.phrases import (
+    clashing_paths,
+    recorded_phrases,
+    skeleton,
+    text_path,
+)
+from opensiddur.importer.sefaria.source import (
+    PATH_SEPARATOR,
+    WorkSource,
+    load_work_source,
+)
 from opensiddur.importer.sefaria.tei_builder import (
     Notes,
     SourceInfo,
@@ -76,7 +97,11 @@ from opensiddur.importer.sefaria.tei_builder import (
     variant_urn,
 )
 from opensiddur.importer.sefaria.works import LANGUAGES, Work, load_works, select_works
-from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index
+from opensiddur.importer.util.incipit import (
+    TEXT_PREFIX,
+    IncipitIndex,
+    load_incipit_index,
+)
 from opensiddur.importer.util.tei_project import prune_stale_files, validate_and_write
 
 logger = logging.getLogger(__name__)

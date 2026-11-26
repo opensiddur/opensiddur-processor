@@ -11,9 +11,14 @@ from pathlib import Path
 
 import yaml
 
-from opensiddur.exporter.html.css import STYLE_SELECTORS, style_css, typography_css, xslt_parameters
+from opensiddur.exporter.html.css import (
+    STYLE_SELECTORS,
+    style_css,
+    typography_css,
+    xslt_parameters,
+)
 from opensiddur.exporter.html.html import build_book
-from opensiddur.exporter.typography import TypographyConfig, Styles
+from opensiddur.exporter.typography import Styles, TypographyConfig
 from opensiddur.tests.exporter.test_html_book import INDEX, _compiled, _render
 
 CHROME = shutil.which("google-chrome") or shutil.which("chromium")

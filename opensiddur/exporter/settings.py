@@ -1,10 +1,28 @@
 """ Exporter settings management utilities. """
 
 from pathlib import Path
-from typing import Literal, Optional, Union
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
-import yaml
+from typing import Literal
 
+import yaml
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
+
+from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.common.version import parse_requirement, processor_version, satisfies
+from opensiddur.exporter import feature_registry
+from opensiddur.exporter.client_settings import is_reader_supplied
+from opensiddur.exporter.compiler import CompilerProcessor
+from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
+from opensiddur.exporter.derived_settings import (
+    SettingChangeTrigger,
+    recalculate_derived_settings,
+)
 from opensiddur.exporter.linear import (
     AbbreviationReading,
     DeclarationFeatureValue,
@@ -14,20 +32,12 @@ from opensiddur.exporter.linear import (
     Undefined,
     get_linear_data,
 )
-from opensiddur.exporter.compiler import CompilerProcessor
-from opensiddur.exporter.client_settings import is_reader_supplied
-from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
-from opensiddur.exporter import feature_registry
-from opensiddur.exporter.derived_settings import SettingChangeTrigger, recalculate_derived_settings
 from opensiddur.exporter.typography import (
     RESOLVE_FONTS,
     NonNegativeLength,
     ScanLinkPlacement,
     TypographyConfig,
 )
-from opensiddur.common.constants import PROJECT_DIRECTORY
-from opensiddur.common.version import parse_requirement, processor_version, satisfies
-
 
 #: Validation context key: False skips checking that the projects and files a settings file
 #: names exist here — for an output stage, which reads a compiled file, not the projects.
@@ -45,7 +55,7 @@ def _checks_projects(info: ValidationInfo) -> bool:
 
 def _validate_project_list(
     project_list: list[str],
-    project_directory: Optional[Path] = None,
+    project_directory: Path | None = None,
 ) -> list[str]:
     """Validate a list of projects."""
     if project_directory is None:
@@ -124,7 +134,7 @@ class BookTarget(BaseModel):
 
     project: str
     file_name: str
-    title: Optional[str] = None
+    title: str | None = None
 
     @field_validator("project")
     @classmethod
@@ -293,10 +303,10 @@ class DistributionSettings(BaseModel):
     """
 
     model_config = ConfigDict(extra="forbid")
-    notice: Union[DistributionNotice, Literal["none"]] = Field(
+    notice: DistributionNotice | Literal["none"] = Field(
         default_factory=DistributionNotice
     )
-    back_notice: Union[BackNotice, Literal["none"]] = Field(default_factory=BackNotice)
+    back_notice: BackNotice | Literal["none"] = Field(default_factory=BackNotice)
 
 
 class SettingsYaml(BaseModel):
@@ -311,18 +321,18 @@ class SettingsYaml(BaseModel):
 
     # What this settings file makes and how it differs from the book's other settings files
     # (e.g. annual vs. triennial readings for the same humash). Free text, for people.
-    description: Optional[str] = None
+    description: str | None = None
     # The processor versions that build this book as it should be, as PEP 440 writes them
     # (`>=0.7.0`). An older processor refuses the file rather than build a broken book: the
     # settings and the processor that reads them are released separately, and a release
     # can pair a book with a processor that predates a fix it depends on.
-    requires_processor: Optional[str] = None
-    book: Optional[BookTarget] = None
+    requires_processor: str | None = None
+    book: BookTarget | None = None
     # Empty, the compiler gives priority to the project of the file it compiles.
     priority: Prioritizations = Field(default_factory=Prioritizations)
     annotations: list[str] = Field(default_factory=list)
     print_once: PrintOnceSettings = Field(default_factory=PrintOnceSettings)
-    parallel: Optional[ParallelConfig] = None
+    parallel: ParallelConfig | None = None
     readings: ReadingSettings = Field(default_factory=ReadingSettings)
     typography: TypographyConfig = Field(default_factory=TypographyConfig)
     declarations: dict[str, dict[str, DeclarationFeatureValue]] = Field(default_factory=dict)
@@ -334,7 +344,7 @@ class SettingsYaml(BaseModel):
 
     @field_validator("requires_processor")
     @classmethod
-    def validate_requires_processor(cls, v: Optional[str]) -> Optional[str]:
+    def validate_requires_processor(cls, v: str | None) -> str | None:
         if v is None:
             return v
         parse_requirement(v)
@@ -394,19 +404,19 @@ class SettingsYaml(BaseModel):
 
 def read_settings(
     settings_file: Path,
-    project_directory: Optional[Path] = None,
+    project_directory: Path | None = None,
     resolve_fonts: bool = True,
     check_projects: bool = True,
 ) -> SettingsYaml:
     """ Read and validate a settings file, without loading it into linear data. """
-    with open(settings_file, 'r', encoding="utf-8") as f:
+    with open(settings_file, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return validate_settings(data, project_directory, resolve_fonts, check_projects)
 
 
 def validate_settings(
     data: object,
-    project_directory: Optional[Path] = None,
+    project_directory: Path | None = None,
     resolve_fonts: bool = True,
     check_projects: bool = True,
 ) -> SettingsYaml:
@@ -429,8 +439,8 @@ def validate_settings(
 
 def load_settings(
     settings_file: Path,
-    linear_data: Optional[LinearData] = None,
-    project_directory: Optional[Path] = None,
+    linear_data: LinearData | None = None,
+    project_directory: Path | None = None,
 ) -> LinearData:
     """ Load settings into linear data from a YAML file. """
     project_directory = Path(project_directory or PROJECT_DIRECTORY).resolve()
@@ -471,8 +481,8 @@ def load_settings(
 def load_default_settings(
     project: str,
     file_name: str,
-    linear_data: Optional[LinearData] = None,
-    project_directory: Optional[Path] = None,
+    linear_data: LinearData | None = None,
+    project_directory: Path | None = None,
 ) -> LinearData:
     """ Load default settings into linear data. """
     project_directory = Path(project_directory or PROJECT_DIRECTORY).resolve()

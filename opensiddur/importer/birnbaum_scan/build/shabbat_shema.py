@@ -1,11 +1,12 @@
 """Sabbath/festival Shema and blessings, printed 335–350, before the Amidah."""
 import re
-from .common import PRAYER, POEM, SIDDUR, PROJECT_HE, AGG, cond, endcond, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml, MINYAN
+
+from . import shabbat_shema_data as data
+from .common import AGG, POEM, PRAYER, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, MINYAN, instruction, text_xml, transclude
 from .milestones import marked
 from .shacharit_end import editorial_head
 from .shema_data import ROWS
-from . import shabbat_shema_data as data
 
 SERVICE = SIDDUR+'shabbat/shacharit'
 ROOT = SERVICE+'/shema'

@@ -1,6 +1,8 @@
 """Editorial mapping of Birnbaum's navigational instructions."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.birnbaum_scan.build.page_references import dynamic_instructions
 
 

@@ -1,6 +1,7 @@
 """A heading-only Hebrew block must stay with the paired verse it introduces."""
 import shutil
 import unittest
+
 from .test_keep_together_geometry import _typeset
 
 

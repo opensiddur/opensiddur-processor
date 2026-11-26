@@ -1,8 +1,11 @@
 """Distinct short refrains must select their own printed full verses."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import penitential_days as service
 from opensiddur.importer.asher_selichot.build import TEI
+
 
 class CircumcisionTests(unittest.TestCase):
     def test_each_refrain_has_its_own_expansion(self):
@@ -24,6 +27,7 @@ class CircumcisionTests(unittest.TestCase):
 
     def test_final_book_order_places_circumcision_after_monthly_service(self):
         from unittest.mock import patch
+
         from opensiddur.importer.asher_selichot.first_day import entry
         with patch('opensiddur.importer.asher_selichot.first_day.titles'):
             root=entry('he','example',{},book=True,remaining_services=tuple(d for d in service.SERVICES if d in service.FAST_SERVICES or d=='circumcision'))

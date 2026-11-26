@@ -3,7 +3,9 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock
+
 from lxml import etree
+
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
 from opensiddur.exporter.inline_compiler import InlineCompilerProcessor

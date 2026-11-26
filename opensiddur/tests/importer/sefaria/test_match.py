@@ -6,13 +6,13 @@ from opensiddur.common.validate_names import Spellings
 from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.match import (
-    later_text,
-    verse_run,
     TextRecord,
     decide_work,
+    later_text,
     load_records,
     mint,
     save_records,
+    verse_run,
 )
 from opensiddur.importer.sefaria.phrases import skeleton
 from opensiddur.importer.sefaria.source import Leaf
@@ -616,7 +616,12 @@ class TestStageTwo(unittest.TestCase):
         self.assertEqual([r.kind for r in outcome.decided], ["new", "variant"])
 
     def test_curated_choices_and_joins(self):
-        from opensiddur.importer.sefaria.equivalents import Choice, Equivalents, Join, apply_joins
+        from opensiddur.importer.sefaria.equivalents import (
+            Choice,
+            Equivalents,
+            Join,
+            apply_joins,
+        )
 
         table = Equivalents(texts=(Choice(tuple(words("זֶה טֶקְסְט")), T + "prayer:chosen_name"),),
                             joins=(Join(tuple(words("וְעוֹד דָּבָר"))),))

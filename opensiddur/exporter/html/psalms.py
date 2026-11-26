@@ -1,8 +1,10 @@
 """Present liturgical psalms consistently in the expanded electronic siddur."""
 import re
 import unicodedata
+
 from lxml import etree
-from opensiddur.exporter.constants import TEI_NS, PROCESSING_NAMESPACE, JLPTEI_NAMESPACE
+
+from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS
 
 T='{'+TEI_NS+'}'; P='{'+PROCESSING_NAMESPACE+'}'; J='{'+JLPTEI_NAMESPACE+'}'
 LANG='{http://www.w3.org/XML/1998/namespace}lang'

@@ -1,14 +1,15 @@
 """Marriage, meals, blessings, bedtime and Israel, IA n777–n814."""
 import re
 import unicodedata
-from .common import PRAYER, POEM, SIDDUR, PROJECT_HE, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
+
+from .common import POEM, PRAYER, PROJECT_HE, SIDDUR, feature, pb
+from .concluding_prayers_data import ROWS, RUBRICS
+from .conclusion import BIBLE, text_xml, transclude
 from .festival import conditional
-from .tachanun_conditions import holiday
-from .shacharit_end import editorial_head
 from .milestones import marked
 from .notes_motzaei_shabbat import xml as note_xml
-from .concluding_prayers_data import ROWS, RUBRICS
+from .shacharit_end import editorial_head
+from .tachanun_conditions import holiday
 
 ROOT = SIDDUR+'concluding_prayers'
 MARRIAGE = SIDDUR+'marriage'

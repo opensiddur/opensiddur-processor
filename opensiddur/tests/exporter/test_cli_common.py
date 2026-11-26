@@ -12,9 +12,9 @@ from pydantic import ValidationError
 from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.exporter import typography as typography_module
 from opensiddur.exporter.cli_common import (
+    COLOPHON_BACK,
     SettingsError,
     add_settings_arguments,
-    COLOPHON_BACK,
     load_output_settings,
     prepare_compiled_tree,
     relocate_colophons,

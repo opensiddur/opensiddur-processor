@@ -1,11 +1,22 @@
 """Avot schedule boundaries and independent explicit selection."""
 import unittest
+
 from pyluach.dates import HebrewDate
-from opensiddur.exporter.calendar.avot import chapters_on,compute_avot,FS_AVOT
-from opensiddur.exporter.calendar.compute import SettingSnapshot,FS_HEBREW_DATE,FS_ISRAEL
+
+from opensiddur.exporter.calendar.avot import FS_AVOT, chapters_on, compute_avot
+from opensiddur.exporter.calendar.compute import (
+    FS_HEBREW_DATE,
+    FS_ISRAEL,
+    SettingSnapshot,
+)
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
-from opensiddur.exporter.derived_settings import recalculate_derived_settings,SettingChangeTrigger,get_active_setting_entry
-from opensiddur.exporter.linear import reset_linear_data,get_linear_data
+from opensiddur.exporter.derived_settings import (
+    SettingChangeTrigger,
+    get_active_setting_entry,
+    recalculate_derived_settings,
+)
+from opensiddur.exporter.linear import get_linear_data, reset_linear_data
+
 
 class TestAvot(unittest.TestCase):
     def test_israel_diaspora_festival_boundaries(self):
@@ -52,8 +63,13 @@ class TestAvotInstructionModes(unittest.TestCase):
         """The rubric says when a chapter is read; once that is known it is not printed."""
         import tempfile
         from pathlib import Path
+
         from opensiddur.exporter.compiler import CompilerProcessor
-        from opensiddur.importer.birnbaum_scan.build.common import cond, endcond, feature
+        from opensiddur.importer.birnbaum_scan.build.common import (
+            cond,
+            endcond,
+            feature,
+        )
 
         for selected, expected_text, expected_instruction in [
             (True, True, False),
@@ -82,8 +98,13 @@ class TestAvotInstructionModes(unittest.TestCase):
     def test_siddur_caller_requires_season_and_a_selected_chapter(self):
         import tempfile
         from pathlib import Path
+
         from opensiddur.exporter.compiler import CompilerProcessor
-        from opensiddur.importer.birnbaum_scan.build.avot import caller, ROOT, transclude
+        from opensiddur.importer.birnbaum_scan.build.avot import (
+            ROOT,
+            caller,
+            transclude,
+        )
 
         # The seasonal rubric says when Avot is read, so a season known to hold prints Avot
         # without it, and only an undecided one keeps it.

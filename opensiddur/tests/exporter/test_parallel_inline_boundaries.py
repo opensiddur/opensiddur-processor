@@ -1,6 +1,8 @@
 """Inline references remain within their containing bilingual paragraph."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
 from opensiddur.exporter.marker_reconstruct import reconstruct_markered_document
 
@@ -53,6 +55,7 @@ class TestARubricOpeningARow(unittest.TestCase):
 
     def test_an_annotation_between_opener_and_description_moves_with_them(self):
         from lxml import etree
+
         from opensiddur.exporter.external_compiler import _alignment_boundaries
         tei, j = "http://www.tei-c.org/ns/1.0", "http://jewishliturgy.org/ns/jlptei/2"
         root = etree.fromstring(

@@ -27,17 +27,24 @@ import collections
 import logging
 import re
 import sys
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator
 
 import yaml
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY, REPO_ROOT, SETTINGS_DIRECTORY
 from opensiddur.common.urn_registry import (
-    COMPONENT_RE, ERROR, REGISTRY_DIRECTORY, SCHEME, STATUS_ALIAS, WARNING, Problem,
-    RegistryError, load_registry,
+    COMPONENT_RE,
+    ERROR,
+    REGISTRY_DIRECTORY,
+    SCHEME,
+    STATUS_ALIAS,
+    WARNING,
+    Problem,
+    RegistryError,
+    load_registry,
 )
 
 logger = logging.getLogger(__name__)

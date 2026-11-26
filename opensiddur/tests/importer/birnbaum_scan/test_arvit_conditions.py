@@ -3,8 +3,12 @@ import unittest
 
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build.arvit import (
-    AFTER_FESTIVAL, AFTER_MINCHA, HAVDALAH, SATURDAY_NIGHT,
+    AFTER_FESTIVAL,
+    AFTER_MINCHA,
+    HAVDALAH,
+    SATURDAY_NIGHT,
 )
+
 from .test_tachanun_conditions import evaluate, settings
 
 

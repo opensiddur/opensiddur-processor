@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # The sourcetexts and opensiddur-projects repositories are git submodules of this one,

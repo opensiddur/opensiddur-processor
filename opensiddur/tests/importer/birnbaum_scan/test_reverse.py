@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for checking the authored text against the reading.
 
 Every fixture is synthetic. Asserting on the committed reading would test the data rather

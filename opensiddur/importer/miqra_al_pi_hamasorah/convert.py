@@ -5,14 +5,33 @@ import json
 import logging
 import re
 import sys
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Optional
+from typing import Any
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
-from opensiddur.common.versification import MIQRA_PROJECT
 from opensiddur.common.subverse import add_subverse_milestones
+from opensiddur.common.versification import MIQRA_PROJECT
 from opensiddur.common.xslt import xslt_transform_string
+from opensiddur.importer.miqra_al_pi_hamasorah.canonical_verses import (
+    annotate_canonical_verses,
+)
+from opensiddur.importer.miqra_al_pi_hamasorah.download import (
+    _FULL_SHA,
+    LICENSE_NAME,
+    MANIFEST_NAME,
+    file_sha256,
+)
+from opensiddur.importer.miqra_al_pi_hamasorah.miqra_plus import (
+    _NUMBER,
+    MIQRA_NS,
+    MW_NS,
+    PlusFormatError,
+    PlusToIntermediate,
+    _xml_escape,
+    check_plus_file,
+)
 from opensiddur.importer.util.pages import (
     default_sourcetexts_root,
     miqra_al_pi_hamasorah_data_directory,
@@ -20,22 +39,6 @@ from opensiddur.importer.util.pages import (
 )
 from opensiddur.importer.util.prettify import prettify_xml
 from opensiddur.importer.util.validation import validate
-from opensiddur.importer.miqra_al_pi_hamasorah.canonical_verses import annotate_canonical_verses
-from opensiddur.importer.miqra_al_pi_hamasorah.download import (
-    LICENSE_NAME,
-    MANIFEST_NAME,
-    _FULL_SHA,
-    file_sha256,
-)
-from opensiddur.importer.miqra_al_pi_hamasorah.miqra_plus import (
-    MIQRA_NS,
-    MW_NS,
-    PlusFormatError,
-    PlusToIntermediate,
-    _NUMBER,
-    _xml_escape,
-    check_plus_file,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -66,11 +69,11 @@ class Book:
 @dataclass(frozen=True)
 class Index:
     index_title_en: str
-    index_title_he: Optional[str]
-    index_sub_en: Optional[str]
-    index_sub_he: Optional[str]
+    index_title_he: str | None
+    index_sub_en: str | None
+    index_sub_he: str | None
     file_name: str
-    transclusions: list[Book | "Index"]
+    transclusions: list[Book | Index]
 
 
 TANAKH_INDEX: list[Index] = [
@@ -173,7 +176,7 @@ def _flatten_books(indices: Iterable[Index]) -> list[Book]:
 
 
 def header(
-    title_he: Optional[str],
+    title_he: str | None,
     title_en: str,
     *,
     source_note: str,
@@ -512,7 +515,7 @@ def convert_books(source: MamSource) -> dict[str, str]:
     return intermediates
 
 
-def intermediate_to_tei(intermediate_xml: str, *, xslt_params: Optional[dict[str, Any]] = None) -> dict[str, str]:
+def intermediate_to_tei(intermediate_xml: str, *, xslt_params: dict[str, Any] | None = None) -> dict[str, str]:
     outputs = xslt_transform_string(
         MIQRA_TO_TEI_XSLT,
         intermediate_xml,

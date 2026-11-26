@@ -3,8 +3,15 @@
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
-from opensiddur.exporter.urn import UrnResolver, ResolvedUrn, ResolvedUrnRange, coarsen, split_range
+
 from opensiddur.exporter.refdb import UrnMapping
+from opensiddur.exporter.urn import (
+    ResolvedUrn,
+    ResolvedUrnRange,
+    UrnResolver,
+    coarsen,
+    split_range,
+)
 
 
 def make_urn_mapping(

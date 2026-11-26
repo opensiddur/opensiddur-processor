@@ -15,7 +15,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 from opensiddur.common import versification
-from opensiddur.common.versification import NUMBERING_COMMON, NUMBERING_MASORAH
+from opensiddur.common.versification import NUMBERING_COMMON
 from opensiddur.importer.util.pages import hebcal_leyning_data_directory
 
 # Unit-spaces. These become tei:milestone/@unit, and refdb.UNIT_CONTAINED_BY decides which of
@@ -218,20 +218,20 @@ class VerseRef:
     def _sort_key(self) -> tuple:
         return (self.book, self.chapter, self.verse, {"a": 0, None: 1, "b": 2}[self.half])
 
-    def __lt__(self, other: "VerseRef") -> bool:
+    def __lt__(self, other: VerseRef) -> bool:
         return self._sort_key < other._sort_key
 
-    def __le__(self, other: "VerseRef") -> bool:
+    def __le__(self, other: VerseRef) -> bool:
         return self._sort_key <= other._sort_key
 
-    def __gt__(self, other: "VerseRef") -> bool:
+    def __gt__(self, other: VerseRef) -> bool:
         return self._sort_key > other._sort_key
 
-    def __ge__(self, other: "VerseRef") -> bool:
+    def __ge__(self, other: VerseRef) -> bool:
         return self._sort_key >= other._sort_key
 
     @property
-    def whole_verse(self) -> "VerseRef":
+    def whole_verse(self) -> VerseRef:
         """This reference with any half dropped — the verse that contains it."""
         return replace(self, half=None) if self.half else self
 
@@ -246,7 +246,7 @@ class VerseRef:
         """The URN's path components below the book, which the absolute range form takes."""
         return self.urn.partition("/")[2]
 
-    def range_urn(self, end: "VerseRef") -> str:
+    def range_urn(self, end: VerseRef) -> str:
         """A ranged transclusion target from this reference to `end`.
 
         A relative range end replaces the trailing components of the start and so always

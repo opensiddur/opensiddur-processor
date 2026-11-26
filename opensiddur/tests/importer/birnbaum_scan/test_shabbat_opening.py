@@ -1,10 +1,15 @@
 """Synthetic checks for recipient selection and biblical paragraph boundaries."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build.shabbat_opening import (
-    recipient_condition, RECIPIENT, SONG, song_body,
+    RECIPIENT,
+    SONG,
+    recipient_condition,
+    song_body,
 )
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
 
 
 class TestParentalBlessing(unittest.TestCase):

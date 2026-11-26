@@ -9,20 +9,32 @@ import re
 from copy import deepcopy
 from pathlib import Path
 
-from lxml import etree
 import yaml
+from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
 from opensiddur.common.urn_registry import load_registry, parse_urn
 from opensiddur.importer.scan.authoring import (
-    TEI, J, XML, element, mixed_words, append_words, write_documents,
+    TEI,
+    XML,
+    J,
+    append_words,
+    element,
+    mixed_words,
+    write_documents,
 )
 from opensiddur.importer.scan.navigation import append_instruction
 from opensiddur.importer.scan.review import review_is_current
 from opensiddur.importer.util.internet_archive import page_image_url, write_if_changed
 from opensiddur.importer.util.validation import validate
-from . import BOOK, IDENTIFIER, PROJECTS, EXPANDED, ROOT_URN, EXPANDED_URN
-from .realizations import prepare_documents, selection, review_payloads, validate_occurrences
+
+from . import BOOK, EXPANDED, EXPANDED_URN, IDENTIFIER, PROJECTS, ROOT_URN
+from .realizations import (
+    prepare_documents,
+    review_payloads,
+    selection,
+    validate_occurrences,
+)
 
 FRONT_KINDS = ('cover', 'title', 'copyright', 'preface')
 ROLE_LABELS = {'reader': 'חזן', 'congregation': 'קהל',

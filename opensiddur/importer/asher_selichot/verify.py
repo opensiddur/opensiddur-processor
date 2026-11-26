@@ -1,17 +1,17 @@
 """Verify the edition against independent documentary streams and its expansion policy."""
-from opensiddur.importer.scan.authoring import printed_text
-
-from opensiddur.importer.scan.authoring import check_poetry
-
 import argparse
 import json
 import unicodedata
 from pathlib import Path
+
 from lxml import etree
-from opensiddur.common.constants import SOURCETEXTS_ROOT, PROJECT_DIRECTORY
-from opensiddur.importer.scan.reverse import streams, check
+
+from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
+from opensiddur.importer.scan.authoring import check_poetry, printed_text
+from opensiddur.importer.scan.reverse import check, streams
 from opensiddur.importer.util.validation import validate
-from .build import TEI, J, POEM, PRAYER, spelled_name, spelled_urn
+
+from .build import POEM, PRAYER, TEI, J, spelled_name, spelled_urn
 from .identities import project_name
 
 
@@ -74,7 +74,7 @@ def verify(source_root, project_directory):
         if (source/'penitential-second-day.json').exists():
             from .penitential_second_day import PENITENTIAL_SECOND_DAY
             targets.append(PENITENTIAL_SECOND_DAY)
-        from .penitential_days import SERVICES,manifest_name,service_urn
+        from .penitential_days import SERVICES, manifest_name, service_urn
         targets.extend(service_urn(d) for d in SERVICES if (source/(manifest_name(d)+'.json')).exists())
         for name in ['index.xml', 'expanded.xml']:
             entry=etree.parse(str(project/name))
@@ -100,7 +100,8 @@ def verify(source_root, project_directory):
     if (source/'penitential-second-day.json').exists():
         from .penitential_second_day import verify_readings as verify_penitential
         verify_penitential(source,Path(project_directory))
-    from .penitential_days import SERVICES, manifest_name, verify_readings as verify_later_penitential
+    from .penitential_days import SERVICES, manifest_name
+    from .penitential_days import verify_readings as verify_later_penitential
     for day in SERVICES:
         if (source/(manifest_name(day)+'.json')).exists():
             verify_later_penitential(source,Path(project_directory),day)
@@ -241,6 +242,7 @@ def verify_continuation(source, project_directory):
     """Compare authored units to source readings and printed footnote evidence."""
     import re
     import unicodedata
+
     from .first_day import EXPANSION_TARGETS, PRINTED_IN_FULL
     from .identities import TEXTS
     groups=json.loads((source/'first-day-continuation.json').read_text(encoding="utf-8"))['sections']

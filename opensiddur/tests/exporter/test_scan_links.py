@@ -599,8 +599,9 @@ class TestPageChanges(unittest.TestCase):
     def test_electronic_compile_keeps_conditional_pair_through_transclusion(self):
         import tempfile
         from pathlib import Path
-        from opensiddur.exporter.linear import LinearData
+
         from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
+        from opensiddur.exporter.linear import LinearData
         from opensiddur.exporter.refdb import ReferenceDatabase
         j = 'http://jewishliturgy.org/ns/jlptei/2'
         with tempfile.TemporaryDirectory() as temp:

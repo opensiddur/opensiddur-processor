@@ -24,9 +24,10 @@ import json
 import logging
 import re
 import sys
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable, Iterator
+from typing import Any
 
 from opensiddur.common.constants import REPO_ROOT
 
@@ -109,13 +110,13 @@ class Urn:
         return self.namespace in GOVERNED_NAMESPACES or self.type in GOVERNED_TYPES
 
     @property
-    def parent(self) -> "Urn | None":
+    def parent(self) -> Urn | None:
         """The URN one component shallower, or None at the root of a namespace."""
         if len(self.path) <= 1:
             return None
         return Urn(self.type, self.namespace, self.path[:-1])
 
-    def without_numeric_tail(self) -> "Urn":
+    def without_numeric_tail(self) -> Urn:
         """Drop trailing numeric components.
 
         This is a fallback for edition-specific subdivisions. Check the exact URN

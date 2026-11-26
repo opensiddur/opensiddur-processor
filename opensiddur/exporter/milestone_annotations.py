@@ -1,5 +1,4 @@
 """Place apparatus at the end of its milestone scope before parallel alignment."""
-from lxml import etree
 
 from opensiddur.exporter.constants import RUBRIC_NOTE_TYPES, TEI_NS
 from opensiddur.exporter.refdb import milestone_terminates

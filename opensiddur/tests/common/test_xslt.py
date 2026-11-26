@@ -1,12 +1,12 @@
-import unittest
 import tempfile
-import sys
+import unittest
 from io import StringIO
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from opensiddur.common.xslt import xslt_transform_string, xslt_transform, _to_xdm_value
-from saxonche import PySaxonProcessor, PyXdmAtomicValue
+from saxonche import PySaxonApiError, PySaxonProcessor, PyXdmAtomicValue
+
+from opensiddur.common.xslt import _to_xdm_value, xslt_transform, xslt_transform_string
 
 
 class TestXSLTTransformString(unittest.TestCase):
@@ -60,7 +60,7 @@ class TestXSLTTransformString(unittest.TestCase):
             f.flush()
             xslt_file = Path(f.name)
             
-            with self.assertRaises(Exception):
+            with self.assertRaises(PySaxonApiError):
                 xslt_transform_string(xslt_file, input_xml)
     
     def test_transformation_with_parameters(self):
@@ -206,7 +206,7 @@ class TestXSLTTransformString(unittest.TestCase):
             f.flush()
             xslt_file = Path(f.name)
             
-            with self.assertRaises(Exception):
+            with self.assertRaises(PySaxonApiError):
                 xslt_transform_string(xslt_file, input_xml)
     
     def test_compile_stylesheet_none_raises_value_error(self):
@@ -298,7 +298,7 @@ class TestXSLTTransform(unittest.TestCase):
                 xslt_transform(Path(xslt_f.name), Path(input_f.name), output_path)
                 
                 # Read and verify output
-                with open(output_path, 'r') as f:
+                with open(output_path) as f:
                     result = f.read()
                 
                 self.assertIn('<output>', result)
@@ -387,7 +387,7 @@ class TestXSLTTransform(unittest.TestCase):
             input_f.write(input_xml)
             input_f.flush()
             
-            with self.assertRaises(Exception):
+            with self.assertRaises(PySaxonApiError):
                 xslt_transform(Path(xslt_f.name), Path(input_f.name), None)
     
     def test_transform_with_invalid_xml_input(self):
@@ -416,7 +416,7 @@ class TestXSLTTransform(unittest.TestCase):
             input_f.write(input_xml)
             input_f.flush()
             
-            with self.assertRaises(Exception):
+            with self.assertRaises(PySaxonApiError):
                 xslt_transform(Path(xslt_f.name), Path(input_f.name), None)
     
     def test_transform_preserves_encoding(self):
@@ -457,7 +457,7 @@ class TestXSLTTransform(unittest.TestCase):
                 xslt_transform(Path(xslt_f.name), Path(input_f.name), output_path)
                 
                 # Read and verify output preserves Hebrew
-                with open(output_path, 'r', encoding='utf-8') as f:
+                with open(output_path, encoding='utf-8') as f:
                     result = f.read()
                 
                 self.assertIn('שלום עולם', result)

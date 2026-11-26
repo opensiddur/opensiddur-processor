@@ -1,15 +1,28 @@
 """Sabbath Musaf and its conclusion, printed 391–424 (before Kiddush)."""
 import re
-from .common import PRAYER, SIDDUR, POEM, PROJECT_HE, SERVICE, AGG, feature, cond, endcond, pb
-from .conclusion import instruction, transclude, text_xml, MINYAN, BIBLE, ELUL_SEASON
-from .shacharit_end import editorial_head
-from .milestones import marked, Correspondences
+
+from . import shabbat_musaf_data as data
+from .avinu_malkenu import TEN_DAYS
+from .bameh_madlikin import TALMUD as ELAZAR
+from .bameh_madlikin import citation
+from .common import (
+    AGG,
+    POEM,
+    PRAYER,
+    PROJECT_HE,
+    SERVICE,
+    SIDDUR,
+    cond,
+    endcond,
+    feature,
+    pb,
+)
+from .conclusion import BIBLE, ELUL_SEASON, MINYAN, instruction, text_xml, transclude
+from .milestones import Correspondences, marked
 from .shabbat_amidah import READER
 from .shabbat_arvit import URNS as ARVIT
+from .shacharit_end import editorial_head
 from .tachanun_conditions import holiday
-from .avinu_malkenu import TEN_DAYS
-from .bameh_madlikin import TALMUD as ELAZAR, citation
-from . import shabbat_musaf_data as data
 
 ROOT = SIDDUR+'shabbat/musaf'
 SIGIL = '1949 shabbat/musaf'

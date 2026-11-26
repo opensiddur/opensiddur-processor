@@ -3,10 +3,11 @@
 Unlike a regex over markup, this does not concatenate editorial expansions or
 mistake a transcluded passage for text printed at the referring location.
 """
-from collections import defaultdict
 import argparse
 import difflib
+from collections import defaultdict
 from pathlib import Path
+
 from lxml import etree
 
 TEI = '{http://www.tei-c.org/ns/1.0}'

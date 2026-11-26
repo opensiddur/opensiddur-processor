@@ -21,7 +21,6 @@ from opensiddur.exporter.metadata import Colophon
 from opensiddur.exporter.notices import RunKind
 from opensiddur.exporter.settings import (
     DistributionNotice,
-    DistributionSettings,
     SettingsYaml,
     validate_settings,
 )

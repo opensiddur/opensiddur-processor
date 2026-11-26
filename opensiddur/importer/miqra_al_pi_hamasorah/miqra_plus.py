@@ -25,7 +25,8 @@ parameters before the template's own.
 from __future__ import annotations
 
 import re
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 from urllib.parse import quote
 
 MIQRA_NS = "urn:x-opensiddur:miqra:intermediate"
@@ -129,7 +130,7 @@ def _escape_outside_tags(fragment: str) -> str:
         close = f"</{ns}:{local}>"
         depth = 1
         search = m.end()
-        closed_at: Optional[int] = None
+        closed_at: int | None = None
         while depth > 0 and search <= len(fragment):
             next_close = fragment.find(close, search)
             if next_close == -1:

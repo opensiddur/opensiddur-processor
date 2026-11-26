@@ -1,6 +1,6 @@
 """Commentary and source footnotes read from printed 251–256."""
-from .notes_minchah import note
 from .bameh_madlikin import MISHNAH, TALMUD
+from .notes_minchah import note
 
 NOTES = [
  note(MISHNAH, 'was inserted during the geonic period. Various reasons are given for the recital of this chapter from the Mishnah, which deals with the oils and wicks appropriate for the Sabbath lights. Rashi in his <tei:hi rend="italic">Siddur</tei:hi> (page 243) says that this chapter is recited <tei:hi rend="italic">after</tei:hi> the Sabbath eve service so as to enable the late-comers to complete their prayers and leave the synagogue together with the rest of the congregation. Accordingly, this chapter is omitted on festival occasions when late-coming is not likely to happen. Rabbi Isaiah Horowitz and Rabbi Jacob Emden, in their respective editions of the <tei:hi rend="italic">Siddur</tei:hi>, are of the opinion that <tei:hi rend="italic">Bammeh Madlikin</tei:hi> is to be recited before <tei:hi rend="italic">Kabbalath Shabbath</tei:hi>.', lemma='במה מדליקין'),

@@ -1,12 +1,12 @@
 """Sabbath morning Kiddush and table hymns, printed 423–436."""
-from .common import cond, endcond, feature, AGG, SIDDUR, POEM, PROJECT_HE, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
-from .milestones import marked
-from .shacharit_end import editorial_head
-from .shabbat_arvit import URNS as ARVIT
-from .leil_shabbat import URNS as LEIL
 from . import leil_shabbat_data as old
 from . import shabbat_day_meal_data as data
+from .common import AGG, POEM, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .leil_shabbat import URNS as LEIL
+from .milestones import marked
+from .shabbat_arvit import URNS as ARVIT
+from .shacharit_end import editorial_head
 
 ROOT = SIDDUR+'shabbat/day_meal'
 SIGIL = '1949 shabbat/day_meal'

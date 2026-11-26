@@ -5,8 +5,9 @@ import unittest
 from pathlib import Path
 
 from opensiddur.common.versification import WLC_PROJECT
-from opensiddur.importer.feinstein_haggadah.convert import EN_PROJECT, HE_PROJECT
 from opensiddur.importer.feinstein_haggadah.convert import (
+    EN_PROJECT,
+    HE_PROJECT,
     convert_all,
     document_header,
     index_header,

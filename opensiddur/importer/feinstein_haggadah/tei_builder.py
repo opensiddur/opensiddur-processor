@@ -16,8 +16,8 @@ from opensiddur.importer.feinstein_haggadah.conditionals import (
     Inline,
     Paragraphs,
     Transclusion,
-    condition_for_rubric,
     alternate_for,
+    condition_for_rubric,
     condition_markup,
     conditionals_for,
 )
@@ -42,6 +42,7 @@ from opensiddur.importer.util.tei_project import (  # noqa: F401  (re-exported)
     xml_id_ref,
 )
 from opensiddur.importer.util.validation import validate
+
 
 def _xml_escape(text: str) -> str:
     return html.escape(text, quote=False)

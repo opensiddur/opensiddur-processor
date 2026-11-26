@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Birnbaum's English for Shaḥarith li-Yladim, read off printed page 2.
 
 Emits the SAME URNs as :mod:`he_yeladim`, which is what aligns the two columns.
@@ -24,9 +23,9 @@ leave the rest to the typography.
 """
 import functools
 
-from .milestones import marked
-from .common import PRAYER
 from . import common
+from .common import PRAYER
+from .milestones import marked
 
 #: Every page break in this module belongs to the children's printing.
 pb = functools.partial(common.pb, sigil=common.SIGIL_YELADIM)

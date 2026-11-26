@@ -30,7 +30,10 @@ from copy import deepcopy
 
 from lxml import etree
 
-from opensiddur.exporter.condition_eval import condition_features, parse_condition_element
+from opensiddur.exporter.condition_eval import (
+    condition_features,
+    parse_condition_element,
+)
 from opensiddur.exporter.conditional_settings import (
     J_ALL,
     J_CONDITIONAL,

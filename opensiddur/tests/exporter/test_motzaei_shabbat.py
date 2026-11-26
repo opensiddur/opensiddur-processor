@@ -1,8 +1,17 @@
 """Upcoming-week conditions for Birnbaum's Saturday-night additions."""
 import unittest
+
 from pyluach.dates import HebrewDate
-from opensiddur.exporter.calendar.motzaei_shabbat import omit_vihi_noam, compute_motzaei_shabbat
-from opensiddur.exporter.calendar.compute import SettingSnapshot, FS_HEBREW_DATE, FS_ISRAEL
+
+from opensiddur.exporter.calendar.compute import (
+    FS_HEBREW_DATE,
+    FS_ISRAEL,
+    SettingSnapshot,
+)
+from opensiddur.exporter.calendar.motzaei_shabbat import (
+    compute_motzaei_shabbat,
+    omit_vihi_noam,
+)
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN, PROJECT_HE
 
 
@@ -62,8 +71,11 @@ class TestMotzaeiShabbat(unittest.TestCase):
         from opensiddur.exporter.calendar.motzaei_shabbat import FS_MOTZAEI_SHABBAT
         from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
         from opensiddur.exporter.derived_settings import (
-            recalculate_derived_settings, SettingChangeTrigger, get_active_setting_entry)
-        from opensiddur.exporter.linear import reset_linear_data, get_linear_data
+            SettingChangeTrigger,
+            get_active_setting_entry,
+            recalculate_derived_settings,
+        )
+        from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 
         for year, month, day, israel, expected in (
             (5782, 1, 9, True, False),
@@ -90,7 +102,7 @@ class TestMotzaeiEncoding(unittest.TestCase):
     def test_prayer_and_unit_output_names_do_not_collide(self):
         # The Hamavdil blessing and hymn are distinct texts; a collision silently
         # overwrites one during regeneration and leaves its URN unresolved.
-        from opensiddur.importer.birnbaum_scan.build import build_he, build_en
+        from opensiddur.importer.birnbaum_scan.build import build_en, build_he
         for module in (build_he, build_en):
             language = 'he' if module is build_he else 'en'
             project = {'he': PROJECT_HE, 'en': PROJECT_EN}[language]
@@ -101,8 +113,9 @@ class TestMotzaeiEncoding(unittest.TestCase):
 
     def test_printed_kaddish_retains_its_own_titkabal(self):
         from lxml import etree
-        from opensiddur.importer.birnbaum_scan.build import build_he, build_en
-        from opensiddur.importer.birnbaum_scan.build.motzaei_shabbat import units, ROOT
+
+        from opensiddur.importer.birnbaum_scan.build import build_en, build_he
+        from opensiddur.importer.birnbaum_scan.build.motzaei_shabbat import ROOT, units
         ns = {'tei': 'http://www.tei-c.org/ns/1.0'}
         for language, module, expected in (
             ('he', build_he, 'תִּתְקַבַּל'),

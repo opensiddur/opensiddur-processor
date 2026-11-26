@@ -459,7 +459,15 @@
                      (typography.parallel), in the typography preamble. -->
                 <!-- Polyglossia Hebrew uses TRT; if \pardir stays RTL when \Columns runs,
                      LuaTeX lays out the two-column \hbox right-to-left and Leftside (Hebrew)
-                     lands in the physical right column.  Force LTR for assembly only. -->
+                     lands in the physical right column.  Force LTR for assembly only.
+
+                     This group is not enough by itself. reledpar assembles each row after
+                     re-selecting both columns' languages (\l@duselanguage), and whether
+                     \textdir is left-to-right again by then depends on the polyglossia
+                     version: 2.9 resets it for the English column, 2.4 (TeX Live 2024, as on
+                     Debian trixie) leaves it right-to-left after the Hebrew one. The row box
+                     itself is therefore built with an explicit direction, where reledpar's
+                     \Columns is patched below (\OS@rowbound); see also \print@lineR. -->
                 <xsl:text>\let\OSreledparColumnsOrig\Columns&#10;</xsl:text>
                 <xsl:text>\renewcommand{\Columns}{\begingroup\pardir TLT\relax\textdir TLT\relax\OSreledparColumnsOrig\endgroup}&#10;</xsl:text>
             </xsl:if>
@@ -514,8 +522,8 @@
              mean the same margin for a Hebrew line as for an English one, which is what
              lets the interleaved layout number both texts in one margin.
 
-             reledpar sets its columns and pages with \print@lineL and \print@lineR,
-             which this does not touch. -->
+             reledpar sets its columns and pages with \print@lineL and \print@lineR;
+             only the paired layout's \print@lineR needs the same, below. -->
         <xsl:text>\patchcmd{\print@line}{\hb@xt@ \linewidth}{\hbox dir TLT to\linewidth}{}{\PackageError{opensiddur}{could not patch reledmac's print@line}{}}&#10;</xsl:text>
         <!-- An unnumbered line (\numberlinefalse) still advances the absolute line count
              and runs the actions queued for it, but reledmac writes its \@nl record to the
@@ -526,6 +534,22 @@
              number, and the line list stays in step with the lines. -->
         <xsl:text>\patchcmd{\new@line}{\ifnumberline}{\iftrue}{}{\PackageError{opensiddur}{could not patch reledmac's new@line}{}}&#10;</xsl:text>
         <xsl:if test="$uses-reledpar">
+            <!-- In a paired layout, reledpar's \print@lineR hangs the right column's laps on
+                 a column-wide box that, like \print@line's, takes the prevailing direction.
+                 reledpar selects each column's language before its line, and under
+                 polyglossia 2.4 (TeX Live 2024) the switch to the right column's language
+                 does not take: its line box is still built right to left after the Hebrew
+                 column, and the right lap lands at the left edge of the column, over the
+                 first word of every line. Fix the box's direction; the line inside keeps
+                 the direction reledpar records for it (\l@luatextextdir@R).
+
+                 \print@lineL needs nothing: its left lap is set before the box, not inside
+                 it. And facing pages (\Pages) are left alone, their rows already turned by
+                 \ledstrutL/R: a fixed direction there sets a Hebrew verso's numbers over
+                 its text. -->
+            <xsl:if test="$layout = 'pairs'">
+                <xsl:text>\patchcmd{\print@lineR}{\hb@xt@ \Rcolwidth}{\hbox dir TLT to\Rcolwidth}{}{\PackageError{opensiddur}{could not patch reledpar's print@lineR}{}}&#10;</xsl:text>
+            </xsl:if>
             <xsl:text>\renewcommand*{\leftlinenumR}{\hbox dir TLT to \z@{\hss\l@dlinenumR\kern\linenumsep}}&#10;</xsl:text>
             <xsl:text>\renewcommand*{\rightlinenumR}{\hbox dir TLT to \z@{\kern\linenumsep\l@dlinenumR\hss}}&#10;</xsl:text>
             <!-- \setRlineflag is reledpar-only; it does not exist when reledpar is not
@@ -1718,7 +1742,7 @@ end
                 <xsl:text>\newcount\OS@rowbound&#10;</xsl:text>
                 <xsl:text>\renewcommand{\OSKeepRow}{\global\OS@rowbound\@ne}&#10;</xsl:text>
                 <xsl:text>\apptocmd{\checkpb@columns}{\global\OS@rowbound\z@\ifnum\OS@rowkeep>\z@\global\OS@rowkeep\z@\global\advance\OS@keeprun\@ne\ifnum\OS@keeprun&lt;10 \ifaraw@text\global\OS@rowbound\@ne\else\OSKeepNext\fi\else\global\OS@keeprun\z@\fi\else\global\OS@keeprun\z@\fi}{}{\PackageError{opensiddur}{could not patch reledpar's checkpb@columns}{}}&#10;</xsl:text>
-                <xsl:text>\patchcmd{\OSreledparColumnsOrig}{\hb@xt@ \hsize}{\ifnum\OS@rowbound>\z@\nobreak\fi\hb@xt@ \hsize}{}{\PackageError{opensiddur}{could not patch reledpar's Columns}{}}&#10;</xsl:text>
+                <xsl:text>\patchcmd{\OSreledparColumnsOrig}{\hb@xt@ \hsize}{\ifnum\OS@rowbound>\z@\nobreak\fi\hbox dir TLT to\hsize}{}{\PackageError{opensiddur}{could not patch reledpar's Columns}{}}&#10;</xsl:text>
                 <xsl:text>\pretocmd{\OSreledparColumnsOrig}{\global\OS@rowbound\z@\global\OS@keeprun\z@}{}{\PackageError{opensiddur}{could not patch reledpar's Columns}{}}&#10;</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
@@ -4753,29 +4777,95 @@ end
          f:format-section-title calls this too. -->
     <xsl:function name="f:emit-bidi-mark" as="xs:string">
         <xsl:param name="s" as="xs:string"/>
-        <xsl:variable name="parts" as="xs:string*">
-            <!-- Hebrew segments joined by whitespace or connecting punctuation are
-                 one run. A paired parsha name is written with an en-dash —
-                 תַזְרִיעַ–מְצֹרָע — which is outside the Hebrew block, so splitting on it
-                 would make the dash its own LTR embedding and let a neighbouring
-                 chapter number reorder into the middle of the name. (The maqaf of
-                 לֶךְ־לְךָ is inside the block and was never at risk.) -->
-            <xsl:analyze-string select="$s"
-                                regex="[&#x0590;-&#x05FF;&#xFB1D;-&#xFB4F;]+([\s&#x2010;-&#x2015;/,.:;-]*[&#x0590;-&#x05FF;&#xFB1D;-&#xFB4F;]+)*">
+        <xsl:variable name="pieces" as="element()*">
+            <!-- One run is Hebrew segments joined by whitespace and punctuation of any kind,
+                 the rule of running_heads.hebrew_runs. A paired parsha name is written with
+                 an en dash — תַזְרִיעַ–מְצֹרָע — and a title with parentheses — לכה דודי (נוסח אחר);
+                 split at either, the punctuation became its own LTR embedding, laid out on
+                 the wrong side and never mirrored. Digits and Latin letters still end a run.
+
+                 The groups around the run are the brackets and straight quotation mark
+                 next to it, which it takes when it opened them (f:bidi-run-parts). Bidi
+                 formatting characters go first: an RLM between the Hebrew and its closing
+                 parenthesis would otherwise keep them apart. -->
+            <xsl:analyze-string select="f:strip-bidi($s)"
+                                regex="(&quot;?)(\p{{Ps}}*)([&#x0590;-&#x05FF;&#xFB1D;-&#xFB4F;]+(?:[\s\p{{Z}}\p{{P}}]*[&#x0590;-&#x05FF;&#xFB1D;-&#xFB4F;]+)*)(\p{{Pe}}*)(&quot;?)">
                 <xsl:matching-substring>
-                    <xsl:sequence select="concat('\texthebrew{', f:escape-tex(.), '}')"/>
+                    <xsl:variable name="run" select="f:bidi-run-parts(regex-group(1), regex-group(2),
+                                                     regex-group(3), regex-group(4), regex-group(5))"/>
+                    <f:ltr><xsl:value-of select="$run[1]"/></f:ltr>
+                    <f:hebrew><xsl:value-of select="$run[2]"/></f:hebrew>
+                    <f:ltr><xsl:value-of select="$run[3]"/></f:ltr>
                 </xsl:matching-substring>
                 <xsl:non-matching-substring>
-                    <!-- Whitespace separating two runs carries no direction of
-                         its own; wrapping it would only add empty groups. -->
-                    <xsl:if test="normalize-space(.)">
-                        <xsl:sequence select="concat('{\textdir TLT\foreignlanguage{english}{',
-                                                     f:escape-tex(.), '}}')"/>
-                    </xsl:if>
+                    <f:ltr><xsl:value-of select="."/></f:ltr>
                 </xsl:non-matching-substring>
             </xsl:analyze-string>
         </xsl:variable>
+        <!-- What a run leaves of the brackets around it joins the text beside it in one LTR
+             wrap: two LTR groups side by side in an RTL slot are laid out right to left, so
+             "said" would come out before the quotation mark it follows. -->
+        <xsl:variable name="parts" as="xs:string*">
+            <xsl:for-each-group select="$pieces" group-adjacent="local-name()">
+                <xsl:sequence select="if (self::f:hebrew)
+                                      then concat('\texthebrew{', f:escape-tex(string(.)), '}')
+                                      else f:emit-ltr(string-join(current-group(), ''))"/>
+            </xsl:for-each-group>
+        </xsl:variable>
         <xsl:sequence select="string-join($parts, '')"/>
+    </xsl:function>
+
+    <!-- Text outside a Hebrew run, wrapped LTR. Whitespace (\s or a Unicode separator, as
+         running_heads._is_space) carries no direction of its own and is set bare; wrapping
+         it would only add empty groups. -->
+    <xsl:function name="f:emit-ltr" as="xs:string">
+        <xsl:param name="s" as="xs:string"/>
+        <xsl:sequence select="if (matches($s, '^[\s\p{Z}]*$'))
+                              then f:escape-tex($s)
+                              else concat('{\textdir TLT\foreignlanguage{english}{', f:escape-tex($s), '}}')"/>
+    </xsl:function>
+
+    <!-- Split a matched Hebrew run and the punctuation around it into (before, run, after).
+         The run takes as many of the closing brackets after it as it has unclosed opening
+         brackets, or as many of the opening brackets before it as it has unopened closing
+         ones; then, if it holds an odd number of straight quotation marks, the one beside
+         it, after it first. So לכה דודי (נוסח אחר) keeps its parenthesis while in
+         "(RUTH רות)" the parenthesis stays with the English that opened it. -->
+    <xsl:function name="f:bidi-run-parts" as="xs:string+">
+        <xsl:param name="pre-quote" as="xs:string"/>
+        <xsl:param name="opens" as="xs:string"/>
+        <xsl:param name="core" as="xs:string"/>
+        <xsl:param name="closes" as="xs:string"/>
+        <xsl:param name="post-quote" as="xs:string"/>
+        <xsl:variable name="unclosed"
+                      select="string-length(replace($core, '\P{Ps}', ''))
+                              - string-length(replace($core, '\P{Pe}', ''))"/>
+        <xsl:variable name="take-close" select="max((0, min(($unclosed, string-length($closes)))))"/>
+        <xsl:variable name="take-open" select="max((0, min((-$unclosed, string-length($opens)))))"/>
+        <xsl:variable name="kept-opens"
+                      select="substring($opens, string-length($opens) - $take-open + 1)"/>
+        <xsl:variable name="bracketed"
+                      select="concat($kept-opens, $core, substring($closes, 1, $take-close))"/>
+        <!-- A quotation mark between two Hebrew characters is a gershayim (רש"י) and is
+             not counted. -->
+        <xsl:variable name="odd-quotes"
+                      select="string-length(replace(
+                                  replace($bracketed, '([&#x0590;-&#x05FF;&#xFB1D;-&#xFB4F;])&quot;([&#x0590;-&#x05FF;&#xFB1D;-&#xFB4F;])', '$1$2'),
+                                  '[^&quot;]', '')) mod 2 = 1"/>
+        <!-- A quotation mark is beside the run only when every bracket between them went
+             into it. -->
+        <xsl:variable name="quote-after"
+                      select="$odd-quotes and $post-quote and $take-close = string-length($closes)"/>
+        <xsl:variable name="quote-before"
+                      select="$odd-quotes and not($quote-after) and $pre-quote
+                              and $take-open = string-length($opens)"/>
+        <xsl:sequence select="(
+            concat(if ($quote-before) then '' else $pre-quote,
+                   substring($opens, 1, string-length($opens) - $take-open)),
+            concat(if ($quote-before) then $pre-quote else '', $bracketed,
+                   if ($quote-after) then $post-quote else ''),
+            concat(substring($closes, $take-close + 1),
+                   if ($quote-after) then '' else $post-quote))"/>
     </xsl:function>
 
     <xsl:function name="f:escape-url" as="xs:string">

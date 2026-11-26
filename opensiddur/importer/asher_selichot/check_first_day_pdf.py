@@ -1,16 +1,18 @@
 """Check the first-day PDF, including the Latin citation direction."""
 
-from opensiddur.importer.scan.pdf import latin_note_runs as _latin_note_runs
-
 import argparse
 import copy
 import re
 import subprocess
 import tempfile
 from pathlib import Path
+
 from lxml import etree
-from .check_pdf import MAX_BASELINE_DIFFERENCE, hebrew_rows, plain, load_glyphs
+
+from opensiddur.importer.scan.pdf import latin_note_runs as _latin_note_runs
 from opensiddur.importer.scan.pdf_direction import base
+
+from .check_pdf import MAX_BASELINE_DIFFERENCE, hebrew_rows, load_glyphs, plain
 
 ANCHORS = [('אשרייושביביתך', 'Happy are they who dwell'),
            ('תהלתיי', 'My mouth shall utter'),

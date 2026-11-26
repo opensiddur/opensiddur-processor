@@ -1,28 +1,44 @@
-# -*- coding: utf-8 -*-
 """Write the English project. Same URNs as the Hebrew, which is what aligns them."""
 import argparse
 import sys
-from .common import set_project_directory
-from .common import PROJECT_EN, PRAYER, SIDDUR, FRONT, NOTES, document, standoff_document, write, cond, endcond, feature, SERVICE, AGG
-from .front import SECTIONS, front_block, section_body
-from .index import index
+
+from .common import (
+    FRONT,
+    NOTES,
+    PRAYER,
+    PROJECT_EN,
+    SIDDUR,
+    cond,
+    document,
+    endcond,
+    feature,
+    set_project_directory,
+    standoff_document,
+    write,
+)
+from .en_akedah import PRAYERS as AKEDAH_PRAYERS
+from .en_berakhot import PRAYERS as BERAKHOT_PRAYERS
+from .en_ishmael import PRAYERS as ISHMAEL_PRAYERS
+from .en_korbanot import PRAYERS as KORBANOT_PRAYERS
+from .en_pesukei import PRAYERS as PESUKEI_PRAYERS
+from .en_poems import PRAYERS as POEM_PRAYERS
 from .en_prayers import PRAYERS as AMIDAH_PRAYERS
-from .en_yeladim import PRAYERS as YELADIM_PRAYERS
 from .en_tallith import PRAYERS as TALLITH_PRAYERS
 from .en_tefillin import PRAYERS as TEFILLIN_PRAYERS
-from .en_poems import PRAYERS as POEM_PRAYERS
-from .en_berakhot import PRAYERS as BERAKHOT_PRAYERS
-from .en_akedah import PRAYERS as AKEDAH_PRAYERS
-from .en_korbanot import PRAYERS as KORBANOT_PRAYERS
-from .en_ishmael import PRAYERS as ISHMAEL_PRAYERS
-from .en_pesukei import PRAYERS as PESUKEI_PRAYERS
+from .en_yeladim import PRAYERS as YELADIM_PRAYERS
+from .front import SECTIONS, front_block, section_body
+from .index import index
 from .shema import prayers as shema_prayers
+
 SHEMA_PRAYERS = shema_prayers("en")
 from .avinu_malkenu import prayers as avinu_prayers
+
 AVINU_PRAYERS = avinu_prayers("en")
 from .tachanun import prayers as tachanun_prayers
+
 TACHANUN_PRAYERS = tachanun_prayers("en")
 from .torah import prayers as torah_prayers
+
 TORAH_PRAYERS = torah_prayers("en")
 from . import build_he
 from . import notes as apparatus
@@ -34,79 +50,130 @@ PRAYERS = (AMIDAH_PRAYERS + YELADIM_PRAYERS + TALLITH_PRAYERS
            + TEFILLIN_PRAYERS + POEM_PRAYERS + BERAKHOT_PRAYERS
            + AKEDAH_PRAYERS + KORBANOT_PRAYERS + ISHMAEL_PRAYERS + PESUKEI_PRAYERS + SHEMA_PRAYERS + AVINU_PRAYERS + TACHANUN_PRAYERS + TORAH_PRAYERS)
 from .conclusion import prayers as conclusion_prayers
+
 PRAYERS += conclusion_prayers("en", PRAYERS)
 from .shacharit_end import prayers as final_prayers
+
 PRAYERS += final_prayers("en")
-from .minchah import shared as minchah_shared, prayers as minchah_prayers
+from .minchah import prayers as minchah_prayers
+from .minchah import shared as minchah_shared
+
 PRAYERS = minchah_shared("en", PRAYERS) + minchah_prayers("en")
-from .arvit import shared as arvit_shared, prayers as arvit_prayers
+from .arvit import prayers as arvit_prayers
+from .arvit import shared as arvit_shared
+
 PRAYERS = arvit_shared("en", PRAYERS)
 PRAYERS += arvit_prayers("en", PRAYERS)
-from .shabbat_opening import shared as shabbat_shared, prayers as shabbat_prayers
+from .shabbat_opening import prayers as shabbat_prayers
+from .shabbat_opening import shared as shabbat_shared
+
 PRAYERS = shabbat_shared("en", PRAYERS) + shabbat_prayers("en")
-from .kabbalat_shabbat import shared as kabbalat_shared, prayers as kabbalat_prayers
+from .kabbalat_shabbat import prayers as kabbalat_prayers
+from .kabbalat_shabbat import shared as kabbalat_shared
+
 PRAYERS = kabbalat_shared("en", PRAYERS) + kabbalat_prayers("en")
-from .bameh_madlikin import shared as bameh_shared, prayers as bameh_prayers
+from .bameh_madlikin import prayers as bameh_prayers
+from .bameh_madlikin import shared as bameh_shared
+
 PRAYERS = bameh_shared("en", PRAYERS) + bameh_prayers("en")
-from .shabbat_arvit import shared as shabbat_arvit_shared, prayers as shabbat_arvit_prayers
+from .shabbat_arvit import prayers as shabbat_arvit_prayers
+from .shabbat_arvit import shared as shabbat_arvit_shared
+
 PRAYERS = shabbat_arvit_shared("en", PRAYERS)
 PRAYERS += shabbat_arvit_prayers("en", PRAYERS)
-from .leil_shabbat import shared as leil_shabbat_shared, prayers as leil_shabbat_prayers
+from .leil_shabbat import prayers as leil_shabbat_prayers
+from .leil_shabbat import shared as leil_shabbat_shared
+
 PRAYERS = leil_shabbat_shared("en", PRAYERS)
 PRAYERS += leil_shabbat_prayers("en", PRAYERS)
-from .shabbat_pesukei import shared as shabbat_pesukei_shared, prayers as shabbat_pesukei_prayers
+from .shabbat_pesukei import prayers as shabbat_pesukei_prayers
+from .shabbat_pesukei import shared as shabbat_pesukei_shared
+
 PRAYERS = shabbat_pesukei_shared("en", PRAYERS)
 PRAYERS += shabbat_pesukei_prayers("en")
-from .shabbat_shema import shared as shabbat_shema_shared, prayers as shabbat_shema_prayers
+from .shabbat_shema import prayers as shabbat_shema_prayers
+from .shabbat_shema import shared as shabbat_shema_shared
+
 PRAYERS = shabbat_shema_shared("en", PRAYERS)
 PRAYERS += shabbat_shema_prayers("en")
-from .shabbat_amidah import shared as shabbat_amidah_shared, prayers as shabbat_amidah_prayers
+from .shabbat_amidah import prayers as shabbat_amidah_prayers
+from .shabbat_amidah import shared as shabbat_amidah_shared
+
 PRAYERS = shabbat_amidah_shared("en", PRAYERS)
 PRAYERS += shabbat_amidah_prayers("en", PRAYERS)
-from .shabbat_torah import shared as shabbat_torah_shared, prayers as shabbat_torah_prayers
+from .shabbat_torah import prayers as shabbat_torah_prayers
+from .shabbat_torah import shared as shabbat_torah_shared
+
 PRAYERS = shabbat_torah_shared("en", PRAYERS)
 PRAYERS += shabbat_torah_prayers("en", PRAYERS)
-from .shabbat_musaf import shared as musaf_shared, prayers as musaf_prayers
+from .shabbat_musaf import prayers as musaf_prayers
+from .shabbat_musaf import shared as musaf_shared
+
 PRAYERS = musaf_shared("en", PRAYERS)
 PRAYERS += musaf_prayers("en", PRAYERS)
-from .shabbat_day_meal import shared as day_meal_shared, prayers as day_meal_prayers
+from .shabbat_day_meal import prayers as day_meal_prayers
+from .shabbat_day_meal import shared as day_meal_shared
+
 PRAYERS = day_meal_shared("en", PRAYERS)
 PRAYERS += day_meal_prayers("en", PRAYERS)
-from .shabbat_minchah import shared as shabbat_minchah_shared, prayers as shabbat_minchah_prayers
+from .shabbat_minchah import prayers as shabbat_minchah_prayers
+from .shabbat_minchah import shared as shabbat_minchah_shared
+
 PRAYERS = shabbat_minchah_shared("en", PRAYERS)
 PRAYERS += shabbat_minchah_prayers("en", PRAYERS)
 from .avot import prayers as avot_prayers
+
 PRAYERS += avot_prayers("en")
-from .motzaei_shabbat import prayers as motzaei_prayers, shared as motzaei_shared
+from .motzaei_shabbat import prayers as motzaei_prayers
+from .motzaei_shabbat import shared as motzaei_shared
+
 PRAYERS = motzaei_shared("en", PRAYERS)
 PRAYERS += motzaei_prayers("en", PRAYERS)
-from .hallel import shared as hallel_shared, prayers as hallel_prayers
+from .hallel import prayers as hallel_prayers
+from .hallel import shared as hallel_shared
+
 PRAYERS = hallel_shared("en", PRAYERS)
 PRAYERS += hallel_prayers("en")
-from .rosh_hodesh_musaf import prayers as rc_musaf_prayers, shared as rc_musaf_shared
+from .rosh_hodesh_musaf import prayers as rc_musaf_prayers
+from .rosh_hodesh_musaf import shared as rc_musaf_shared
+
 PRAYERS = rc_musaf_shared("en", PRAYERS)
 PRAYERS += rc_musaf_prayers("en")
-from .festival import prayers as festival_prayers, shared as festival_shared
+from .festival import prayers as festival_prayers
+from .festival import shared as festival_shared
+
 PRAYERS = festival_shared("en", PRAYERS)
 PRAYERS += festival_prayers("en")
 from .yizkor import prayers as yizkor_prayers
+
 PRAYERS += yizkor_prayers("en")
-from .festival_musaf import prayers as festival_musaf_prayers, shared as festival_musaf_shared
+from .festival_musaf import prayers as festival_musaf_prayers
+from .festival_musaf import shared as festival_musaf_shared
+
 PRAYERS = festival_musaf_shared("en", PRAYERS)
 PRAYERS += festival_musaf_prayers("en")
 from .omer_akdamut import prayers as omer_akdamut_prayers
+
 PRAYERS += omer_akdamut_prayers("en")
 from .rosh_hashanah import prayers as rosh_hashanah_prayers
+
 PRAYERS += rosh_hashanah_prayers("en")
 from .sukkot_rites import prayers as sukkot_rites_prayers
+
 PRAYERS += sukkot_rites_prayers("en")
-from .hanukkah_purim import prayers as hanukkah_purim_prayers, shared as hanukkah_purim_shared
+from .hanukkah_purim import prayers as hanukkah_purim_prayers
+from .hanukkah_purim import shared as hanukkah_purim_shared
+
 PRAYERS = hanukkah_purim_shared("en", PRAYERS)
 PRAYERS += hanukkah_purim_prayers("en")
-from .lifecycle import prayers as lifecycle_prayers, shared as lifecycle_shared
+from .lifecycle import prayers as lifecycle_prayers
+from .lifecycle import shared as lifecycle_shared
+
 PRAYERS = lifecycle_shared("en", PRAYERS)
 PRAYERS += lifecycle_prayers("en")
-from .concluding_prayers import prayers as concluding_prayers, shared as concluding_shared
+from .concluding_prayers import prayers as concluding_prayers
+from .concluding_prayers import shared as concluding_shared
+
 PRAYERS = concluding_shared("en", PRAYERS)
 PRAYERS += concluding_prayers("en")
 
@@ -124,64 +191,41 @@ EN_UNIT_PAGES = {"yeladim": (2, 2), "birkhot": (4, 48), "opening": (50, 52), "pe
 #: are the pages the notes were read from, which for the commentary are the *Hebrew*
 #: pages -- that is where the print sets it.
 from .avinu_malkenu import NOTES as AVINU_NOTES
-
+from .conclusion import ANCHORS
+from .notes_conclusion import make_notes
 from .notes_tachanun import NOTES as TACHANUN_NOTES
-
 from .notes_torah import NOTES as TORAH_NOTES
 
-from .notes_conclusion import make_notes
-from .conclusion import ANCHORS
 CONCLUSION_NOTES = make_notes(ANCHORS)
 
-from .shacharit_end import NOTES as FINAL_NOTES
-
-from .notes_minchah import NOTES as MINCHAH_NOTES
-
 from .notes_arvit import NOTES as ARVIT_NOTES
-
-from .notes_shabbat_opening import NOTES as SHABBAT_OPENING_NOTES
-
-from .notes_kabbalat_shabbat import NOTES as KABBALAT_NOTES
-
-from .notes_bameh_madlikin import NOTES as BAMEH_NOTES
-
-from .notes_shabbat_arvit import NOTES as SHABBAT_ARVIT_NOTES
-
-from .notes_leil_shabbat import NOTES as LEIL_SHABBAT_NOTES
-
-from .notes_shabbat_pesukei import NOTES as SHABBAT_PESUKEI_NOTES
-
-from .notes_shabbat_shema import NOTES as SHABBAT_SHEMA_NOTES
-
-from .notes_shabbat_amidah import NOTES as SHABBAT_AMIDAH_NOTES
-
-from .notes_shabbat_torah import NOTES as SHABBAT_TORAH_NOTES
-
-from .notes_shabbat_musaf import NOTES as MUSAF_NOTES
-
-from .notes_shabbat_day_meal import NOTES as DAY_MEAL_NOTES
-
-from .notes_shabbat_minchah import NOTES as SHABBAT_MINCHAH_NOTES
-
 from .notes_avot import NOTES as AVOT_NOTES
-
-from .notes_motzaei_shabbat import NOTES as MOTZAEI_NOTES
-
-from .notes_hallel import NOTES as HALLEL_NOTES
-
-from .notes_rosh_hodesh_musaf import NOTES as RC_MUSAF_NOTES
-from .notes_festival import NOTES as FESTIVAL_NOTES
-
-from .notes_yizkor import NOTES as YIZKOR_NOTES
-from .notes_sukkot_rites import NOTES as SUKKOT_RITES_NOTES
-from .notes_rosh_hashanah import NOTES as ROSH_HASHANAH_NOTES
-from .notes_omer_akdamut import NOTES as OMER_AKDAMUT_NOTES
-from .notes_festival_musaf import NOTES as FESTIVAL_MUSAF_NOTES
-
-from .notes_hanukkah_purim import NOTES as HANUKKAH_PURIM_NOTES
-
-from .notes_lifecycle import NOTES as LIFECYCLE_NOTES
+from .notes_bameh_madlikin import NOTES as BAMEH_NOTES
 from .notes_concluding_prayers import NOTES as CONCLUDING_NOTES
+from .notes_festival import NOTES as FESTIVAL_NOTES
+from .notes_festival_musaf import NOTES as FESTIVAL_MUSAF_NOTES
+from .notes_hallel import NOTES as HALLEL_NOTES
+from .notes_hanukkah_purim import NOTES as HANUKKAH_PURIM_NOTES
+from .notes_kabbalat_shabbat import NOTES as KABBALAT_NOTES
+from .notes_leil_shabbat import NOTES as LEIL_SHABBAT_NOTES
+from .notes_lifecycle import NOTES as LIFECYCLE_NOTES
+from .notes_minchah import NOTES as MINCHAH_NOTES
+from .notes_motzaei_shabbat import NOTES as MOTZAEI_NOTES
+from .notes_omer_akdamut import NOTES as OMER_AKDAMUT_NOTES
+from .notes_rosh_hashanah import NOTES as ROSH_HASHANAH_NOTES
+from .notes_rosh_hodesh_musaf import NOTES as RC_MUSAF_NOTES
+from .notes_shabbat_amidah import NOTES as SHABBAT_AMIDAH_NOTES
+from .notes_shabbat_arvit import NOTES as SHABBAT_ARVIT_NOTES
+from .notes_shabbat_day_meal import NOTES as DAY_MEAL_NOTES
+from .notes_shabbat_minchah import NOTES as SHABBAT_MINCHAH_NOTES
+from .notes_shabbat_musaf import NOTES as MUSAF_NOTES
+from .notes_shabbat_opening import NOTES as SHABBAT_OPENING_NOTES
+from .notes_shabbat_pesukei import NOTES as SHABBAT_PESUKEI_NOTES
+from .notes_shabbat_shema import NOTES as SHABBAT_SHEMA_NOTES
+from .notes_shabbat_torah import NOTES as SHABBAT_TORAH_NOTES
+from .notes_sukkot_rites import NOTES as SUKKOT_RITES_NOTES
+from .notes_yizkor import NOTES as YIZKOR_NOTES
+from .shacharit_end import NOTES as FINAL_NOTES
 
 APPARATUS = {
     "notes_concluding_prayers": dict(entries=CONCLUDING_NOTES, slug="birnbaum_1949/concluding_prayers", title="Notes on marriage, meals, blessings, bedtime and Israel", first=753, last=790),

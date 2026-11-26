@@ -5,8 +5,8 @@ import sys
 from pathlib import Path
 
 from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
-from opensiddur.common.versification import WLC_PROJECT
 from opensiddur.common.subverse import add_subverse_milestones_to_file
+from opensiddur.common.versification import WLC_PROJECT
 from opensiddur.common.xslt import xslt_transform
 from opensiddur.importer.util.validation import validate
 

@@ -51,18 +51,18 @@ class PostUrns:
     urn: str
     rows: dict[int, str | None] = field(default_factory=dict)
     #: Table number -> its own decision, for a post with more than one table.
-    tables: dict[int, "PostUrns"] = field(default_factory=dict)
+    tables: dict[int, PostUrns] = field(default_factory=dict)
     #: For an ``existing`` post, each unmapped row -> the span of the original it stands in
     #: for, a range like ``…:bible:psalms/29/3-6``, or "" for material the version adds.
     spans: dict[int, str] = field(default_factory=dict)
 
-    def table(self, number: int, count: int) -> "PostUrns":
+    def table(self, number: int, count: int) -> PostUrns:
         """The URNs of the post's table ``number`` (from 1) of ``count``."""
         if count == 1:
             return self
         return self.tables.get(number) or PostUrns(self.post_id, "new", f"{self.urn}/{number}")
 
-    def quoted(self) -> "PostUrns":
+    def quoted(self) -> PostUrns:
         """For an essay, whose own URN is the essay's: the text of the passages it quotes."""
         return PostUrns(self.post_id, "new", f"{self.urn}/quoted")
 
@@ -85,11 +85,11 @@ class PostUrns:
         return json.dumps(data, ensure_ascii=False)
 
     @classmethod
-    def from_json(cls, line: str) -> "PostUrns":
+    def from_json(cls, line: str) -> PostUrns:
         return cls.from_data(json.loads(line))
 
     @classmethod
-    def from_data(cls, data: dict, post_id: int | None = None) -> "PostUrns":
+    def from_data(cls, data: dict, post_id: int | None = None) -> PostUrns:
         post_id = int(data["post_id"]) if post_id is None else post_id
         rows = {int(n): urn for n, urn in (data.get("rows") or {}).items()}
         tables = {int(n): cls.from_data(t, post_id) for n, t in (data.get("tables") or {}).items()}
@@ -117,7 +117,7 @@ def is_poem(tags: list[str]) -> bool:
     return any(tag in lowered for tag in POEM_TAGS)
 
 
-def mint(post: "Post", taken: set[str], variants: Mapping[str, str] | None = None) -> PostUrns:
+def mint(post: Post, taken: set[str], variants: Mapping[str, str] | None = None) -> PostUrns:
     """A new URN for a post that matches nothing in the collection.
 
     The name is the post's title, by ``specs/NAMING_SCHEME.md``: its Latin part up to the

@@ -22,7 +22,6 @@ from pathlib import Path
 from opensiddur.importer.humash.aliyot import parse_parshiyot
 from opensiddur.importer.humash.names import HEBCAL_TO_SLUG
 from opensiddur.importer.humash.refs import (
-    HEBCAL_BOOK_TO_SLUG,
     UNIT_ALIYAH,
     UNIT_MAFTIR,
     UNIT_WEEKDAY,

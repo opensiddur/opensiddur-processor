@@ -1,7 +1,6 @@
 import unittest
 
 from opensiddur.importer.opensiddur_org.parse_post import (
-    safe_uri,
     FootnoteRef,
     Span,
     Text,
@@ -10,9 +9,13 @@ from opensiddur.importer.opensiddur_org.parse_post import (
     parse_coauthor,
     parse_post,
     post_id_from_path,
+    safe_uri,
     split_title,
 )
-from opensiddur.importer.opensiddur_org.post_decisions import NO_DECISIONS, PostDecisions
+from opensiddur.importer.opensiddur_org.post_decisions import (
+    NO_DECISIONS,
+    PostDecisions,
+)
 from opensiddur.tests.importer.opensiddur_org.support import (
     HEBREW_EN_ROWS,
     cell,
@@ -52,6 +55,24 @@ class TestMetadata(unittest.TestCase):
     def test_source_dates(self) -> None:
         post = parse_post(make_post(date_src=("1440-00-00", "1500-00-00")))
         self.assertEqual((post.date_src_start, post.date_src_end), ("1440-00-00", "1500-00-00"))
+
+    def test_title_parts_drop_bidi_formatting_characters(self) -> None:
+        """The site ends Hebrew titles with a right-to-left mark for the browser; stored text
+        carries its language on xml:lang, and the mark printed as a box in a PDF (#338)."""
+        self.assertEqual(split_title("\u202bשִׁירָה (שנייה)\u200f\u202c | A Song\u200e"),
+                         ["שִׁירָה (שנייה)", "A Song"])
+
+    def test_body_text_drops_bidi_formatting_characters(self) -> None:
+        rows = [[cell("heb-Hebr", "liturgy", "שִׁירָה (שנייה)\u200f<br />\nלְךָ\u2067א\u2069"),
+                 cell("eng-Latn", "english", "A song\u200e<br />\nto You")]]
+        content = "\n".join(["<p>An introduction.</p>", "<hr />",
+                              table(["Source (Hebrew)", "Translation (English)"], rows)])
+        post = parse_post(make_post(content=content))
+        lines = [node_text(line) for row in post.rows for c in row.cells
+                 for block in c.blocks for line in block.lines]
+        self.assertEqual(4, len(lines), lines)
+        for line in lines:
+            self.assertNotRegex(line, "[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]")
 
 
 class TestTable(unittest.TestCase):

@@ -1,9 +1,13 @@
 """Festival gates, service return points, and diplomatic-text structure."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import festival as f
-from .test_tachanun_conditions import evaluate,fragment,NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestFestival(unittest.TestCase):
     def test_candle_shehecheyanu_boundaries(self):
@@ -50,7 +54,7 @@ class TestFestival(unittest.TestCase):
         self.assertNotIn('j:conditional',texts['festival_miqra_text'])
 
     def test_shared_passages_do_not_inherit_weekday_rubrics(self):
-        from opensiddur.importer.birnbaum_scan.build import build_he,build_en
+        from opensiddur.importer.birnbaum_scan.build import build_en, build_he
         for module in (build_he,build_en):
             for urn in dict.fromkeys(f.REUSE.values()):
                 owners=[p for p in module.PRAYERS if 'corresp="'+urn+'"' in p['body']]

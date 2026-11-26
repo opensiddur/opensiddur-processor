@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of Rabbi Ishmael's thirteen rules and Kaddish d'Rabbanan, printed 41 to 47.
 
 **The rules are a numbered list and the numerals are text.** They are set `א)` with a
@@ -19,8 +18,8 @@ the tail of Zevaḥim to the citation. That asymmetry is in the unit body, not h
 """
 import functools
 
-from .common import PRAYER, endcond, ten_days_addition
 from . import common
+from .common import PRAYER, endcond, ten_days_addition
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

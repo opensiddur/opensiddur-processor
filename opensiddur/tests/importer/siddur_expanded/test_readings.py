@@ -1,8 +1,21 @@
 """Synthetic reading spans verify blessing boundaries and scroll precedence."""
 import unittest
-from opensiddur.importer.siddur_expanded.readings import Entry, slots, SHABBAT
-from opensiddur.importer.siddur_expanded.xml import Author, TEXT, NS, parse_fragment, transclude
-from opensiddur.importer.humash.refs import ReadingSpan, VerseRef, UNIT_ALIYAH, UNIT_MAFTIR
+
+from opensiddur.importer.humash.refs import (
+    UNIT_ALIYAH,
+    UNIT_MAFTIR,
+    ReadingSpan,
+    VerseRef,
+)
+from opensiddur.importer.siddur_expanded.readings import SHABBAT, Entry, slots
+from opensiddur.importer.siddur_expanded.xml import (
+    NS,
+    TEXT,
+    Author,
+    parse_fragment,
+    transclude,
+)
+
 
 class Source:
     def source(self,urn):return transclude(TEXT+urn)
@@ -39,8 +52,12 @@ class TestReadingSlots(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Missing weekly haftarah'):
             weekly_haftarah_slug('unavailable',available)
     def test_machar_chodesh_does_not_displace_consolation_in_av(self):
+        from opensiddur.exporter.condition_eval import (
+            TriState,
+            evaluate_condition,
+            parse_condition_element,
+        )
         from opensiddur.importer.siddur_expanded.readings import festival_cases
-        from opensiddur.exporter.condition_eval import parse_condition_element, evaluate_condition, TriState
         condition=parse_condition_element(parse_fragment('<j:conditional>'+festival_cases()['Shabbat Machar Chodesh']+'</j:conditional>')[0])
         class Lookup:
             month=5
@@ -54,7 +71,11 @@ class TestReadingSlots(unittest.TestCase):
         lookup.month=8
         self.assertEqual(evaluate_condition(condition,lookup),TriState.TRUE)
     def test_scroll_arrangements_have_complete_aliyot_and_blessings(self):
-        from opensiddur.exporter.condition_eval import parse_condition_element, evaluate_condition, TriState
+        from opensiddur.exporter.condition_eval import (
+            TriState,
+            evaluate_condition,
+            parse_condition_element,
+        )
         spans=[ReadingSpan(UNIT_ALIYAH,str(i),VerseRef('genesis',i,1),VerseRef('genesis',i,5)) for i in range(1,8)]
         entry=Entry('weekly_synthetic','Synthetic weekly reading',SHABBAT,kind='weekly',torah=spans,haftarah=TEXT+'bible:haftarah/synthetic')
         root=parse_fragment(slots([entry],Author(),Source(),'morning')['torah'])
@@ -90,11 +111,18 @@ class TestSukkotShabbatMaftir(unittest.TestCase):
 
     def _read(self, year, month, day, place):
         from lxml import etree
+
         from opensiddur.exporter.calendar.compute import (
-            FS_GREGORIAN, FS_LOCATION, SettingSnapshot, compute_holiday, compute_israel,
+            FS_GREGORIAN,
+            FS_LOCATION,
+            SettingSnapshot,
+            compute_holiday,
+            compute_israel,
         )
         from opensiddur.exporter.condition_eval import (
-            TriState, evaluate_condition, parse_condition_element,
+            TriState,
+            evaluate_condition,
+            parse_condition_element,
         )
         from opensiddur.importer.siddur_expanded.readings import day_maftir_condition
 

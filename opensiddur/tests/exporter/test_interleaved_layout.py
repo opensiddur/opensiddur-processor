@@ -9,9 +9,9 @@ counted — is measured in ``test_interleaved_geometry``.
 import re
 import unittest
 
-from opensiddur.tests.exporter.stylesheet_helpers import transform
 from opensiddur.exporter.tex.typography_tex import _NAMED_SIZE_COMMANDS
 from opensiddur.exporter.typography import InterleavedConfig, InterleavedLineNumbers
+from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 _TEI = """<?xml version="1.0" encoding="UTF-8"?>
 <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"

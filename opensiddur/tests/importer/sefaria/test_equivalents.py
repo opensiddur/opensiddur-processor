@@ -3,8 +3,18 @@ import unittest
 from pathlib import Path
 
 from opensiddur.importer.sefaria.align import align_leaf
-from opensiddur.importer.sefaria.blocks import Heading, Rubric, TextBlock, divide, is_heading
-from opensiddur.importer.sefaria.equivalents import EquivalentsError, apply_joins, load_equivalents
+from opensiddur.importer.sefaria.blocks import (
+    Heading,
+    Rubric,
+    TextBlock,
+    divide,
+    is_heading,
+)
+from opensiddur.importer.sefaria.equivalents import (
+    EquivalentsError,
+    apply_joins,
+    load_equivalents,
+)
 from opensiddur.importer.sefaria.source import Leaf
 from opensiddur.importer.util.incipit import words
 

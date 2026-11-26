@@ -6,7 +6,11 @@ from pathlib import Path
 
 import yaml
 
-from opensiddur.exporter.linear import LinearData, ParallelColumnOrder, reset_linear_data
+from opensiddur.exporter.linear import (
+    LinearData,
+    ParallelColumnOrder,
+    reset_linear_data,
+)
 from opensiddur.exporter.settings import load_default_settings, load_settings
 
 

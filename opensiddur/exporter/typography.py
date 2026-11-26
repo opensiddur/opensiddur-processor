@@ -29,7 +29,7 @@ import shutil
 import subprocess
 from enum import StrEnum
 from functools import lru_cache
-from typing import Annotated, Optional, Union
+from typing import Annotated
 
 from pydantic import (
     BaseModel,
@@ -43,7 +43,6 @@ from pydantic import (
 )
 
 from opensiddur.exporter.tex.running_heads import RunningHeadConfig, default_page_header
-
 
 # ---------------------------------------------------------------------------
 # Value types
@@ -125,7 +124,7 @@ class NamedSize(StrEnum):
     XXXX_LARGE = "xxxx-large"
 
 
-FontSize = Union[NamedSize, AbsoluteLength]
+FontSize = NamedSize | AbsoluteLength
 
 
 class FontWeight(StrEnum):
@@ -361,7 +360,7 @@ class FontFace(ForbidExtra):
     # The name goes into \setmainfont{…} and \newfontfamily as written, so it may not hold a
     # character TeX gives a meaning to.
     name: str = Field(min_length=1, pattern=r"^[^{}\\%#&$^_~]+$")
-    normal_size: Optional[float] = Field(default=None, gt=0, allow_inf_nan=False, strict=True)
+    normal_size: float | None = Field(default=None, gt=0, allow_inf_nan=False, strict=True)
 
     @model_validator(mode="before")
     @classmethod
@@ -406,7 +405,7 @@ _DEFAULT_FONTS = {
 
 
 @lru_cache(maxsize=1)
-def _installed_font_families() -> Optional[frozenset[str]]:
+def _installed_font_families() -> frozenset[str] | None:
     """ Every font family fontconfig knows about, or None if it cannot be asked.
 
     Cached: a settings file declares a handful of chains and each would
@@ -437,7 +436,7 @@ def _installed_font_families() -> Optional[frozenset[str]]:
     return frozenset(families)
 
 
-def resolve_font(names: list[str]) -> Optional[str]:
+def resolve_font(names: list[str]) -> str | None:
     """ The first installed name in a chain.
 
     Returns None when fontconfig is unavailable, which means "undecidable here";
@@ -471,14 +470,14 @@ class TextStyle(ForbidExtra):
     :class:`Styles` spell out the appearance the exporter has always produced.
     """
 
-    font: Optional[str] = Field(
+    font: str | None = Field(
         default=None,
         description=(
             "A family declared in `typography.fonts`. Omit to let the text keep "
             "the font its script selects (`hebrew` for Hebrew, `latin` otherwise)."
         ),
     )
-    size: Optional[FontSize] = Field(
+    size: FontSize | None = Field(
         default=None,
         description=(
             "A named size (xxx-small ... xxxx-large), which follows "
@@ -486,23 +485,23 @@ class TextStyle(ForbidExtra):
             "or an absolute length such as `9pt`."
         ),
     )
-    weight: Optional[FontWeight] = Field(default=None, description="normal | bold")
-    style: Optional[FontStyle] = Field(default=None, description="normal | italic")
-    variant: Optional[FontVariant] = Field(
+    weight: FontWeight | None = Field(default=None, description="normal | bold")
+    style: FontStyle | None = Field(default=None, description="normal | italic")
+    variant: FontVariant | None = Field(
         default=None, description="normal | small-caps"
     )
-    align: Optional[Alignment] = Field(
+    align: Alignment | None = Field(
         default=None,
         description=(
             "left | right | center | justify. Only on headings, citations, list "
             "labels, the title page and the section separator; an error elsewhere."
         ),
     )
-    space_before: Optional[Length] = Field(
+    space_before: Length | None = Field(
         default=None,
         description="Vertical space above. Title-page roles and the section separator only.",
     )
-    space_after: Optional[Length] = Field(
+    space_after: Length | None = Field(
         default=None,
         description="Vertical space below. Title-page roles and the section separator only.",
     )
@@ -780,7 +779,7 @@ class Styles(ForbidExtra):
     )
 
     @model_validator(mode="after")
-    def validate_block_properties(self) -> "Styles":
+    def validate_block_properties(self) -> Styles:
         """ Refuse an alignment or vertical space on a role that cannot honour it.
 
         Most roles are set in the middle of a line — a verse number, a note — where
@@ -855,19 +854,19 @@ class Margins(ForbidExtra):
     and outer is right, and the renderer maps them.
     """
 
-    top: Optional[NonNegativeLength] = Field(default=None, description="Space above the text block.")
-    bottom: Optional[NonNegativeLength] = Field(
+    top: NonNegativeLength | None = Field(default=None, description="Space above the text block.")
+    bottom: NonNegativeLength | None = Field(
         default=None, description="Space below the text block."
     )
-    inner: Optional[NonNegativeLength] = Field(
+    inner: NonNegativeLength | None = Field(
         default=None,
         description="Margin at the binding edge (the left margin when `sides: one`).",
     )
-    outer: Optional[NonNegativeLength] = Field(
+    outer: NonNegativeLength | None = Field(
         default=None,
         description="Margin at the fore edge (the right margin when `sides: one`).",
     )
-    binding_offset: Optional[NonNegativeLength] = Field(
+    binding_offset: NonNegativeLength | None = Field(
         default=None,
         description=(
             "Extra space added at the binding edge and taken off the fore edge, "
@@ -889,10 +888,10 @@ class PageConfig(ForbidExtra):
             "executivepaper | custom. `custom` requires `width` and `height`."
         ),
     )
-    width: Optional[NonNegativeLength] = Field(
+    width: NonNegativeLength | None = Field(
         default=None, description="Sheet width. Only with `paper: custom`."
     )
-    height: Optional[NonNegativeLength] = Field(
+    height: NonNegativeLength | None = Field(
         default=None, description="Sheet height. Only with `paper: custom`."
     )
     orientation: Orientation = Field(
@@ -932,7 +931,7 @@ class PageConfig(ForbidExtra):
     )
 
     @model_validator(mode="after")
-    def validate_custom_paper(self) -> "PageConfig":
+    def validate_custom_paper(self) -> PageConfig:
         if self.paper is PaperType.CUSTOM:
             missing = [
                 name
@@ -1215,7 +1214,7 @@ class ParallelTypographyConfig(ForbidExtra):
     )
 
     @model_validator(mode="after")
-    def validate_column_settings(self) -> "ParallelTypographyConfig":
+    def validate_column_settings(self) -> ParallelTypographyConfig:
         # Column geometry exists only where there are two columns on one page. Under
         # any other layout it would be accepted and do nothing, so a settings file
         # asking for it would look as though it had worked.
@@ -1477,7 +1476,7 @@ class TypographyConfig(ForbidExtra):
         return fonts
 
     @model_validator(mode="after")
-    def apply_font_defaults(self, info: ValidationInfo) -> "TypographyConfig":
+    def apply_font_defaults(self, info: ValidationInfo) -> TypographyConfig:
         """ Fill in `latin` and `hebrew` and check every chain resolves.
 
         A user-declared `latin` or `hebrew` replaces the default outright rather
@@ -1508,7 +1507,7 @@ class TypographyConfig(ForbidExtra):
         return self
 
     @model_validator(mode="after")
-    def bind_default_page_header(self) -> "TypographyConfig":
+    def bind_default_page_header(self) -> TypographyConfig:
         """ The default running head follows the binding.
 
         Its slots are physical positions, so a right-bound book needs them mirrored to
@@ -1522,7 +1521,7 @@ class TypographyConfig(ForbidExtra):
         return self
 
     @model_validator(mode="after")
-    def validate_style_font_references(self) -> "TypographyConfig":
+    def validate_style_font_references(self) -> TypographyConfig:
         for role, style in self.styles.__dict__.items():
             if style.font is not None and style.font not in self.fonts:
                 known = ", ".join(sorted(self.fonts))
@@ -1533,7 +1532,7 @@ class TypographyConfig(ForbidExtra):
         return self
 
     @model_validator(mode="after")
-    def validate_notes_are_not_styled_away(self) -> "TypographyConfig":
+    def validate_notes_are_not_styled_away(self) -> TypographyConfig:
         """ Styling notes that are switched off is a contradiction, not a no-op.
 
         Someone who sets a note style and `placement: none` in the same file has

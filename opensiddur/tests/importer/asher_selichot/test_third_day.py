@@ -3,11 +3,16 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot.build import TEI, XML, J, poem
-from opensiddur.importer.asher_selichot.second_day import numbered_documents, printed_unit
-from opensiddur.tests.importer.asher_selichot import test_second_day as fixtures
+from opensiddur.importer.asher_selichot.second_day import (
+    numbered_documents,
+    printed_unit,
+)
 from opensiddur.importer.scan.reverse import streams
+from opensiddur.tests.importer.asher_selichot import test_second_day as fixtures
 
 
 class ThirdDayTest(unittest.TestCase):
@@ -19,7 +24,7 @@ class ThirdDayTest(unittest.TestCase):
             (source/'third-day.json').write_text(json.dumps({'heading':{'he':'סליחות ליום שלישי','en':'THIRD DAY'},'units':readings}))
             docs=list(numbered_documents(source,'third'))
         self.assertEqual(['third_day.xml']*2,[d[1] for d in docs])
-        for project,name,root in docs:
+        for project,_name,root in docs:
             self.assertEqual('urn:x-opensiddur:text:siddur:selichot/third_day',root.find(f'.//{{{TEI}}}body/{{{TEI}}}div').get('corresp'))
             ids=[n.get(XML+'id') for n in root.findall(f'.//{{{J}}}conditional')]
             self.assertEqual(['third_opening_instruction_printed','third_opening_instruction_expanded'],ids)

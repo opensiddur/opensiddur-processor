@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew text of the weekday shacharit Amidah, read off printed pages 81-97.
 
 One entry per prayer file. Each is (file name, title, urn slug, first page, last page,
@@ -9,8 +8,17 @@ too and name nothing, which is a level to see through; see the skill's note on d
 """
 import functools
 
-from .common import PRAYER, cond, endcond, feature, AGG, HOL, SERVICE, RECITATION, QUORUM
 from . import common
+from .common import (
+    AGG,
+    HOL,
+    PRAYER,
+    QUORUM,
+    RECITATION,
+    cond,
+    endcond,
+    feature,
+)
 
 #: Every page break in this module belongs to the Amidah's printing. Bound once here
 #: because common.pb takes no default sigil -- see common.SIGIL_AMIDAH.

@@ -1,10 +1,11 @@
 """Candle lighting, parental blessing and Song of Songs, printed 221–236."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, cond, endcond, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
-from .milestones import Correspondences, milestone, marked
+
+from .common import PRAYER, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .milestones import Correspondences, marked, milestone
 from .shacharit_end import editorial_head
-from .song_of_songs_data import HE, EN, EN_PARAGRAPHS
+from .song_of_songs_data import EN, EN_PARAGRAPHS, HE
 
 ROOT = SIDDUR + 'shabbat/preparations'
 CANDLES = PRAYER + 'hadlaqat_ner_shabbat'

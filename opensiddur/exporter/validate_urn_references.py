@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import argparse
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
 
 from lxml import etree
 
@@ -27,7 +27,10 @@ from opensiddur.common.urn_registry import (
 )
 from opensiddur.exporter.refdb import INDEX_DB_FILE, ReferenceDatabase
 from opensiddur.exporter.urn import ResolvedUrnRange, UrnResolver, coarsen
-from opensiddur.exporter.xml_id_ref import parse_file_fragment_ref, resolve_file_fragment_ref
+from opensiddur.exporter.xml_id_ref import (
+    parse_file_fragment_ref,
+    resolve_file_fragment_ref,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +42,7 @@ class UnresolvableUrnReference:
     element_path: str
     attribute_name: str
     urn: str
-    reason: Optional[str] = None
+    reason: str | None = None
 
 
 def _iter_project_xml_files(project_path: Path) -> Iterable[Path]:
@@ -50,7 +53,7 @@ def _resolvable(
     value: str,
     *,
     check_urns: bool,
-    resolver: Optional[UrnResolver],
+    resolver: UrnResolver | None,
     project_directory: Path,
 ) -> bool:
     """A single, non-range target/targetEnd value: True if it resolves or is out of scope.
@@ -138,7 +141,7 @@ def validate_project_urn_references(
             for el in root.xpath("//*[@target or @targetEnd]"):
                 target = el.get("target")
                 target_end = el.get("targetEnd")
-                start_project: Optional[str] = None
+                start_project: str | None = None
 
                 if target:
                     if check_urns and target.startswith("urn:x-opensiddur:"):
@@ -242,7 +245,7 @@ def validate_project_contributor_references(
     project: str,
     *,
     project_directory: Path = PROJECT_DIRECTORY,
-    registry_directory: Optional[Path] = None,
+    registry_directory: Path | None = None,
 ) -> list[InvalidContributorReference]:
     """Validate the contributor URNs a project credits.
 
@@ -393,7 +396,7 @@ def _format_coarsened(c: CoarsenedUrnReference) -> str:
     )
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Validate that compilation-relevant URN references are resolvable using refdb (post-conversion)."
     )

@@ -1,8 +1,10 @@
 """Synthetic calendar and personal-setting cases for the Torah service."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import torah
-from opensiddur.importer.birnbaum_scan.build.common import feature, PERSON
+from opensiddur.importer.birnbaum_scan.build.common import PERSON, feature
+
 from .test_tachanun_conditions import evaluate, settings
 
 

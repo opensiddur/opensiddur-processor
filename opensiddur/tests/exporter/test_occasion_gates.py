@@ -11,13 +11,13 @@ from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.tests.exporter.stylesheet_helpers import transform
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_markers import mark_silent_scopes
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.importer.util.occasion import aggregate, gated, none_of
+from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 SHABBAT = aggregate("shabbat")
 WEEKDAY = none_of(SHABBAT, aggregate("yom-tov"))
@@ -95,6 +95,7 @@ class TestARubricTheScopeOpensWith(unittest.TestCase):
 
     def _scope(self, opening: str):
         from lxml import etree
+
         from opensiddur.exporter.conditional_markers import is_silent
         root = etree.fromstring(
             '<r xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2">'

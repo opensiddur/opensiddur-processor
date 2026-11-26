@@ -1,4 +1,5 @@
 import unittest
+
 from lxml import etree
 
 from opensiddur.importer.util.prettify import prettify_xml

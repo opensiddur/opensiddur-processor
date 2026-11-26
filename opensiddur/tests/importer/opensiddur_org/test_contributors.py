@@ -2,8 +2,8 @@ import json
 import unittest
 
 from opensiddur.importer.opensiddur_org.contributors import (
-    Credit,
     Contributors,
+    Credit,
     candidate_line,
     post_credits,
     registered_contributors,

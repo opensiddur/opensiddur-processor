@@ -14,13 +14,17 @@ import yaml
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
-from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS, XML_NS
 from opensiddur.exporter.conditional_markers import mark_silent_scopes
+from opensiddur.exporter.constants import (
+    JLPTEI_NAMESPACE,
+    PROCESSING_NAMESPACE,
+    TEI_NS,
+    XML_NS,
+)
 from opensiddur.exporter.page_references import resolve_page_references
 from opensiddur.exporter.scan_links import mark_scan_links
 from opensiddur.exporter.settings import SettingsYaml, validate_settings
 from opensiddur.exporter.typography import ScanLinkPlacement, TypographyConfig
-
 
 #: The settings file's help for a stage that typesets, with the fonts this machine has.
 TYPOGRAPHY_SETTINGS_HELP = (

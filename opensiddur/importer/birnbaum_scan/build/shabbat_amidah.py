@@ -1,13 +1,15 @@
 """Sabbath morning Amidah and its separate common Kaddish, printed 349–362."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, RECITATION, feature, cond, endcond, pb
-from .conclusion import instruction, transclude, text_xml, MINYAN
+
+from . import shabbat_amidah_data as data
+from .avinu_malkenu import TEN_DAYS
+from .common import PRAYER, PROJECT_HE, RECITATION, SIDDUR, cond, endcond, feature, pb
+from .conclusion import MINYAN, instruction, text_xml, transclude
+from .shabbat_arvit import SHABBAT_AMIDAH
+from .shabbat_arvit import URNS as ARVIT
 from .shacharit_end import editorial_head
 from .shared_passages import detach_division
-from .shabbat_arvit import SHABBAT_AMIDAH, URNS as ARVIT
-from .avinu_malkenu import TEN_DAYS
 from .tachanun_conditions import holiday
-from . import shabbat_amidah_data as data
 
 SERVICE = SIDDUR+'shabbat/shacharit'
 ROOT = SERVICE+'/amidah'

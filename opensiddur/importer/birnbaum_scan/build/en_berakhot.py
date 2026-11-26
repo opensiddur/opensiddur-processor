@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Birnbaum's English for the Torah blessings and Birkhoth ha-Shaḥar, pages 14 to 20.
 
 Same URNs as the Hebrew, which is what aligns them.
@@ -16,8 +15,8 @@ it and the parting is named on both, so the columns pair instead of drifting.
 """
 import functools
 
-from .common import PRAYER
 from . import common
+from .common import PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

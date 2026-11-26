@@ -12,7 +12,12 @@ import yaml
 
 from opensiddur.importer.sefaria.align import AlignmentError, LeafDecision
 from opensiddur.importer.sefaria.corrections import CorrectionError, SegmentCorrection
-from opensiddur.importer.sefaria.update import classify, committed_manifest, main, update
+from opensiddur.importer.sefaria.update import (
+    classify,
+    committed_manifest,
+    main,
+    update,
+)
 
 from .support import WORK, write_work_dir
 

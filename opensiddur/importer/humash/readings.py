@@ -23,15 +23,15 @@ from opensiddur.importer.humash.names import (
 from opensiddur.importer.humash.refs import (
     BOOK_NUMBER_TO_SLUG,
     HEBCAL_BOOK_TO_SLUG,
+    NUMBERING_COMMON,
     UNIT_ALIYAH,
     UNIT_MAFTIR,
     VARIATION_COMBINED,
-    triennial_unit,
     ReadingSpan,
     VerseRef,
-    NUMBERING_COMMON,
     canonical_ref,
     parse_hebcal_ref,
+    triennial_unit,
 )
 from opensiddur.importer.util.pages import hebcal_leyning_data_directory
 

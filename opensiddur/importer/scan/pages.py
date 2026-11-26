@@ -4,13 +4,20 @@ A printed label is not a primary key: bilingual books may repeat it on both side
 Images are cached outside repositories, by scan identity, independently of labels.
 """
 from __future__ import annotations
+
 import argparse
-from dataclasses import dataclass
 import json
 import os
+from dataclasses import dataclass
 from pathlib import Path
+
 from opensiddur.common.constants import OUTPUT_DIRECTORY, SOURCETEXTS_ROOT
-from opensiddur.importer.util.internet_archive import connect, http_get, page_image_url, resolve_agent_model
+from opensiddur.importer.util.internet_archive import (
+    connect,
+    http_get,
+    page_image_url,
+    resolve_agent_model,
+)
 
 
 class ScanError(ValueError):

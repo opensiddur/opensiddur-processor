@@ -1,13 +1,14 @@
 """Inline compiler processor for processing text content between start and end markers."""
 
-from typing import Optional
+
+from lxml import etree
 from lxml.etree import ElementBase
 
 from opensiddur.exporter.compiler import (
     CompilerProcessor,
+    _AnnotationCommand,
     _ProcessingCommand,
     _ProcessingContext,
-    _AnnotationCommand,
 )
 from opensiddur.exporter.conditional_settings import CONDITIONAL_CONTROL_TAGS
 from opensiddur.exporter.constants import (
@@ -19,8 +20,6 @@ from opensiddur.exporter.constants import (
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
 from opensiddur.exporter.linear import LinearData
 from opensiddur.exporter.refdb import ReferenceDatabase
-from lxml import etree
-
 
 TEI_CHOICE = f"{{{TEI_NS}}}choice"
 J_READ = f"{{{JLPTEI_NAMESPACE}}}read"
@@ -74,8 +73,8 @@ class InlineCompilerProcessor(CompilerProcessor):
         from_start: str,
         to_end: str,
         include_tail_after_end: bool = False,
-        linear_data: Optional[LinearData] = None,
-        reference_database: Optional[ReferenceDatabase] = None):
+        linear_data: LinearData | None = None,
+        reference_database: ReferenceDatabase | None = None):
         """ Process the given file/project.
         Only start from the given start and end, inclusive.
         Start and end must be in the same file
@@ -149,7 +148,7 @@ class InlineCompilerProcessor(CompilerProcessor):
 
         return context
 
-    def _process_element(self, element: ElementBase, root: Optional[ElementBase] = None) -> ElementBase:
+    def _process_element(self, element: ElementBase, root: ElementBase | None = None) -> ElementBase:
         """Process the given element, putting the markers of the scopes still open around
         the range's start in front of the start's text."""
         result = self._process_element_contents(element, root)
@@ -169,7 +168,7 @@ class InlineCompilerProcessor(CompilerProcessor):
                 result.insert(0, marker)
         return result
 
-    def _process_element_contents(self, element: ElementBase, root: Optional[ElementBase] = None) -> ElementBase:
+    def _process_element_contents(self, element: ElementBase, root: ElementBase | None = None) -> ElementBase:
         """
         Process the given element and return the text content.
         """
@@ -335,7 +334,7 @@ class InlineCompilerProcessor(CompilerProcessor):
             return name
         return text_element
 
-    def process(self, root: Optional[ElementBase] = None) -> ElementBase:
+    def process(self, root: ElementBase | None = None) -> ElementBase:
         if root is None:
             root = self.root_tree
         self._gather_file_credits()

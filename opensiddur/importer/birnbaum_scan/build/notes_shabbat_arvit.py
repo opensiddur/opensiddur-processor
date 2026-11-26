@@ -1,7 +1,7 @@
 """Commentary and source notes printed 263–280 (before the home service)."""
+from .common import PRAYER
 from .notes_minchah import note
 from .shabbat_arvit import ROOT, URNS
-from .common import PRAYER
 
 NOTES = [
  note(URNS['hashkivenu'], ', instead of the weekday ending <tei:foreign xml:lang="he">שומר עמו ישראל</tei:foreign>, is used to express the idea of peace which fills the Jewish home on Friday evening.',lemma='הפורש סכת שלום'),

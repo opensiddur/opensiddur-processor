@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Callable, Iterable, Iterator, TypeVar
+from collections.abc import Callable, Iterable, Iterator
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -29,7 +30,7 @@ def format_duration(seconds: float) -> str:
     return f"{hours}h{minutes:02d}m"
 
 
-def progress(
+def progress[T](
     items: Iterable[T],
     what: str,
     *,

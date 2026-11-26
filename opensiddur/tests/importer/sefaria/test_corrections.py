@@ -9,7 +9,13 @@ from opensiddur.importer.sefaria.corrections import (
     apply_corrections,
     load_corrections,
 )
-from opensiddur.importer.sefaria.markup import Correction, Styled, Text, parse_segment, plain_text
+from opensiddur.importer.sefaria.markup import (
+    Correction,
+    Styled,
+    Text,
+    parse_segment,
+    plain_text,
+)
 from opensiddur.importer.sefaria.source import Leaf
 from opensiddur.importer.sefaria.tei_builder import render
 

@@ -8,7 +8,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from opensiddur.common.versification import JPS_PROJECT as JPS, MIQRA_PROJECT as MIQRA, WLC_PROJECT as WLC
+from opensiddur.common.versification import JPS_PROJECT as JPS
+from opensiddur.common.versification import MIQRA_PROJECT as MIQRA
+from opensiddur.common.versification import WLC_PROJECT as WLC
 from opensiddur.exporter.validate_versification import (
     collect_verse_urns,
     validate_versification,

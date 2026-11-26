@@ -1,11 +1,10 @@
 """
 XML prettification utilities for formatting XML strings with proper indentation.
 """
-import sys
 import argparse
+import sys
 
 from lxml import etree as lxml_etree
-
 
 
 def prettify_xml(xml_string: str,
@@ -89,7 +88,7 @@ def main(): # pragma: no cover
     
     try:
         # Read input file
-        with open(args.input_file, 'r', encoding=args.encoding) as f:
+        with open(args.input_file, encoding=args.encoding) as f:
             xml_content = f.read()
         
         # Prettify the XML

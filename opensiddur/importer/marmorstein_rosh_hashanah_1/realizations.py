@@ -1,8 +1,7 @@
 """Reviewed canonical realizations without replacing the literal image evidence."""
-from copy import deepcopy
-import json
 import hashlib
-
+import json
+from copy import deepcopy
 
 PLAIN_FRAGMENT_KEYS = {'scan','printed_page','text','page_start','join_next'}
 PLAIN_SEGMENT_KEYS = {'paragraph','fragments','corresp','source','source_reference',
@@ -611,6 +610,7 @@ def prepare_documents(unit, readings):
 def validate_generated(documents, readings):
     """Check actual range uniqueness and give every direct caller local defaults."""
     from lxml import etree
+
     from . import EXPANDED
     T = '{http://www.tei-c.org/ns/1.0}'
     J = '{http://jewishliturgy.org/ns/jlptei/2}'
@@ -659,6 +659,7 @@ def validate_generated(documents, readings):
                     raise ValueError('Canonical context duplicates the home identity')
                 if config.get('context') == 'literal':
                     from opensiddur.importer.util.internet_archive import page_image_url
+
                     from . import IDENTIFIER
                     lang = root.get(X+'lang')
                     fragments, expected_pbs, previous_scan = [], [], None

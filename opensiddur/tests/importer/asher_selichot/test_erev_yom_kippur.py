@@ -1,8 +1,11 @@
 """Erev Yom Kippur keeps its own bounds, full refrains and Reader role."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import penitential_days as service
 from opensiddur.importer.asher_selichot.build import TEI, XML
+
 
 class ErevYomKippurTests(unittest.TestCase):
     def test_service_identity_is_independent_of_penitential_ordinals(self):
@@ -32,6 +35,7 @@ class ErevYomKippurTests(unittest.TestCase):
 
     def test_index_gate_uses_ninth_of_tishrei_without_printed_instruction(self):
         from unittest.mock import patch
+
         from opensiddur.importer.asher_selichot.first_day import entry
         with patch('opensiddur.importer.asher_selichot.first_day.titles'):
             root=entry('he','example',{},book=True,include_erev_yom_kippur=True)

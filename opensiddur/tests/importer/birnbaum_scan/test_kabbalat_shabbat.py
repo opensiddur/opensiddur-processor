@@ -1,12 +1,22 @@
 """Synthetic checks for festival boundaries and reusable correspondence ranges."""
 import unittest
+
 from lxml import etree
-from .test_tachanun_conditions import evaluate, fragment, NS
+
 from opensiddur.exporter.condition_eval import TriState
-from opensiddur.importer.birnbaum_scan.build.common import AGG, PROJECT_HE
+from opensiddur.importer.birnbaum_scan.build.common import PROJECT_HE
 from opensiddur.importer.birnbaum_scan.build.kabbalat_shabbat import (
-    FULL, FESTIVAL, PRESENT_MOURNERS, shared, psalm_body, units, ROOT, BIBLE, ANA,
+    ANA,
+    BIBLE,
+    FESTIVAL,
+    FULL,
+    PRESENT_MOURNERS,
+    psalm_body,
+    shared,
+    units,
 )
+
+from .test_tachanun_conditions import NS, evaluate, fragment
 
 
 def date_values(month, day, israel=None):

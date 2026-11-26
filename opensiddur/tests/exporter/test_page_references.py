@@ -1,6 +1,8 @@
 """Dynamic references must follow surviving content and its source edition."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.exporter.page_references import resolve_page_references
 from opensiddur.tests.exporter.test_reledmac_xslt import _transform
 

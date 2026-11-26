@@ -1,7 +1,9 @@
 """Season boundaries for the winter Sabbath Psalm collection."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build.shabbat_minchah import WINTER
+
 from .test_tachanun_conditions import evaluate
 
 

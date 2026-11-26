@@ -38,10 +38,21 @@ from pathlib import Path
 from opensiddur.common.constants import REPO_ROOT
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
-from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, is_phrase, split_block
+from opensiddur.importer.sefaria.blocks import (
+    Item,
+    Rubric,
+    TextBlock,
+    is_phrase,
+    split_block,
+)
 from opensiddur.importer.sefaria.equivalents import Equivalents
 from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, plain_text
-from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
+from opensiddur.importer.sefaria.phrases import (
+    SAME_PHRASE,
+    map_phrases,
+    similarity,
+    skeleton,
+)
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
     CLOSING_WORDS,
@@ -113,7 +124,7 @@ class TextRecord:
         return json.dumps(data, ensure_ascii=False)
 
     @classmethod
-    def from_json(cls, line: str) -> "TextRecord":
+    def from_json(cls, line: str) -> TextRecord:
         data = json.loads(line)
         return cls(**data)
 

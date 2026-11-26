@@ -5,15 +5,15 @@ import unittest.mock
 
 from lxml import etree
 
+from opensiddur.exporter import marker_reconstruct as mr
 from opensiddur.exporter.constants import JLPTEI_NAMESPACE
 from opensiddur.exporter.external_compiler import PROCESSING_NAMESPACE, TEI_NS
 from opensiddur.exporter.marker_reconstruct import (
     doc_needs_marker_reconstruction,
-    reconstruct_markered_document,
     reconstruct_container,
+    reconstruct_markered_document,
     substantive_content,
 )
-from opensiddur.exporter import marker_reconstruct as mr
 
 P_NS = PROCESSING_NAMESPACE
 J_NS = JLPTEI_NAMESPACE

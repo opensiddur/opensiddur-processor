@@ -2,10 +2,10 @@
 import re
 from html import escape
 
-from .common import PRAYER, SIDDUR, PROJECT_HE, QUORUM, cond, endcond, feature, pb
-from .tachanun_data import PASSAGES
+from .common import PRAYER, PROJECT_HE, QUORUM, SIDDUR, cond, endcond, feature, pb
 from .milestones import Correspondences
-from .tachanun_conditions import occasion, EL_EREKH_OCCASION
+from .tachanun_conditions import EL_EREKH_OCCASION, occasion
+from .tachanun_data import PASSAGES
 
 ROOT = SIDDUR + 'chol/shacharit/tachanun'
 BIBLE = 'urn:x-opensiddur:text:bible:'

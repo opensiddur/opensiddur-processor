@@ -1,8 +1,11 @@
 """The Minchah reading advances the morning's reading, including Simchat Torah."""
 import unittest
-from pyluach.dates import HebrewDate
+
 from pyluach import parshios
+from pyluach.dates import HebrewDate
+
 from opensiddur.exporter.calendar.compute import _next_weekly_parsha, _parsha_slug
+
 
 class TestNextReading(unittest.TestCase):
     def test_shabbat_advances_the_reading(self):

@@ -1,10 +1,11 @@
 """Synthetic checks for second-day scope, repeated cues and semantic alignment."""
-import tempfile
 import unittest
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.build import TEI, XML, J
-from opensiddur.importer.asher_selichot.second_day import pizmon, printed_unit, OPENING
+
+from opensiddur.importer.asher_selichot.build import TEI, XML
 from opensiddur.importer.asher_selichot.first_day import expansion_scope
+from opensiddur.importer.asher_selichot.second_day import OPENING, pizmon, printed_unit
 from opensiddur.importer.scan.reverse import streams
 
 

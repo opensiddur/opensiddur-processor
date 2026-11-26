@@ -7,7 +7,7 @@ from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.importer.siddur_expanded.build import Builder
-from opensiddur.importer.siddur_expanded.xml import Author, T, J, NS
+from opensiddur.importer.siddur_expanded.xml import NS, Author, J, T
 
 
 class TestMorningTorahOpening(unittest.TestCase):

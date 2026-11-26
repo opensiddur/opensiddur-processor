@@ -197,7 +197,9 @@ def join_chapters(leaves: tuple[Leaf, ...], alignments: list[Alignment],
     one leaf and one alignment: the segments numbered on through the leaf, and each chapter
     opening a text at its first phrase. Every other leaf passes through as it is (the Song of
     Songs, whose chapters the Shabbat siddur places one by one)."""
-    from opensiddur.importer.sefaria.blocks import is_phrase  # blocks imports this module
+    from opensiddur.importer.sefaria.blocks import (
+        is_phrase,  # blocks imports this module
+    )
 
     by_leaf = {a.leaf: a for a in alignments}
     joined_leaves: list[Leaf] = []

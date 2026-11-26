@@ -5,13 +5,13 @@ from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.tests.exporter.stylesheet_helpers import transform
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
 from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
 from opensiddur.exporter.linear import LinearData
 from opensiddur.exporter.settings import SettingsYaml
 from opensiddur.importer.scan import reverse
+from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 TEI = 'http://www.tei-c.org/ns/1.0'
 

@@ -20,9 +20,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
 from contextlib import nullcontext
-from typing import Optional
+from pathlib import Path
 
 # Add the project root to the Python path
 project_root = Path(__file__).resolve().parent.parent.parent.parent
@@ -30,6 +29,7 @@ sys.path.insert(0, str(project_root))
 
 from pydantic import ValidationError  # noqa: E402
 
+from opensiddur.common.constants import PROJECT_DIRECTORY  # noqa: E402
 from opensiddur.exporter.cli_common import (  # noqa: E402
     TYPOGRAPHY_SETTINGS_HELP,
     SettingsError,
@@ -37,13 +37,12 @@ from opensiddur.exporter.cli_common import (  # noqa: E402
     load_output_settings,
 )
 from opensiddur.exporter.tex.latex import transform_xml_to_tex  # noqa: E402
-from opensiddur.common.constants import PROJECT_DIRECTORY  # noqa: E402
 
 
 def generate_tex(
     input_file: Path,
     temp_tex_file: Path,
-    settings_file: Optional[Path] = None,
+    settings_file: Path | None = None,
     project_directory: Path = PROJECT_DIRECTORY,
 ) -> bool:
     """Generate a LuaLaTeX file from compiled JLPTEI XML.
@@ -267,7 +266,7 @@ def compile_tex_to_pdf(
     tex_file: Path,
     output_pdf: Path,
     max_runs: int = 6,
-    build_dir: Optional[Path] = None,
+    build_dir: Path | None = None,
 ) -> bool:
     """Compile a LuaLaTeX .tex file to PDF.
 
@@ -333,9 +332,9 @@ def compile_tex_to_pdf(
 def export_to_pdf(
     input_file: Path,
     output_pdf: Path,
-    settings_file: Optional[Path] = None,
-    tex_output: Optional[Path] = None,
-    build_dir: Optional[Path] = None,
+    settings_file: Path | None = None,
+    tex_output: Path | None = None,
+    build_dir: Path | None = None,
     project_directory: Path = PROJECT_DIRECTORY,
 ) -> bool:
     """Convert a compiled JLPTEI XML file to PDF.
@@ -417,7 +416,7 @@ Examples:
         print("Error: --keep-tex and --tex-output are mutually exclusive.", file=sys.stderr)
         sys.exit(2)
 
-    tex_output: Optional[Path] = None
+    tex_output: Path | None = None
     if args.tex_output is not None:
         tex_output = args.tex_output
     elif args.keep_tex:

@@ -10,8 +10,13 @@ from opensiddur.common.constants import OUTPUT_DIRECTORY, SOURCETEXTS_ROOT
 from opensiddur.importer.scan.metadata import derive_pages
 from opensiddur.importer.scan.pages import fetch
 from opensiddur.importer.util.internet_archive import (
-    connect, download_file, fetch_metadata, resolve_agent_model, write_if_changed,
+    connect,
+    download_file,
+    fetch_metadata,
+    resolve_agent_model,
+    write_if_changed,
 )
+
 from . import profile
 
 

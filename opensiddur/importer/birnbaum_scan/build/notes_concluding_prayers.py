@@ -1,7 +1,8 @@
 """Printed notes on 753–790, with Hebrew directional spans."""
-from .concluding_prayers import URNS, MARRIAGE, SEVEN, GRACE, BLESSINGS, BED
+from .concluding_prayers import BED, BLESSINGS, GRACE, MARRIAGE, SEVEN, URNS
 from .concluding_prayers_data import NOTES as READINGS
 from .notes_motzaei_shabbat import xml
+
 TARGETS={'marriage':MARRIAGE,'seven':SEVEN,'grace':GRACE,'zimmun':GRACE+'/zimmun',
  'blessings':BLESSINGS,'bedtime':BED,'adon':BED+'/adon_olam','bed_adon_10':BED+'/adon_olam'}
 NOTES=[]

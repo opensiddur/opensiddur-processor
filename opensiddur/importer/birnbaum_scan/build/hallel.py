@@ -1,12 +1,13 @@
 """Hallel, printed565–574: reusable psalms and an occasion-gated caller."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, AGG, feature, pb, cond, endcond
-from .conclusion import BIBLE, MOURNING, MINYAN, instruction, transclude, text_xml
+
+from .common import AGG, PRAYER, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, MINYAN, MOURNING, instruction, text_xml, transclude
+from .hallel_data import PAGES, ROWS
 from .milestones import marked
 from .shabbat_minchah import kaddish
-from .hallel_data import ROWS, PAGES
-from .tachanun_conditions import holiday
 from .shacharit_end import editorial_head
+from .tachanun_conditions import holiday
 
 ROOT = PRAYER+'hallel'
 SERVICE = SIDDUR+'hallel'

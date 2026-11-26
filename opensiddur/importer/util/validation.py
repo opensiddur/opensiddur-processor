@@ -1,21 +1,21 @@
-from pathlib import Path
-import re
-from lxml import etree
-from lxml.etree import _ElementTree
-from typing import Tuple, List, Optional
 import argparse
-from saxonche import PySaxonProcessor
+import re
 import subprocess
 import tempfile
+from pathlib import Path
 
+from lxml import etree
+from lxml.etree import _ElementTree
+from saxonche import PySaxonProcessor
 
 from .constants import SCHEMA_RNG_PATH, SCHEMA_SCH_XSLT_PATH
 
+
 def validate(xml: Path | str, 
-    schema_file: Optional[Path] = None,
+    schema_file: Path | None = None,
     schema: str = None,
-    schematron_xslt_file: Optional[Path] = None,
-    schematron: str = None) -> Tuple[bool, List[str]]:
+    schematron_xslt_file: Path | None = None,
+    schematron: str = None) -> tuple[bool, list[str]]:
     """
     Validate an XML file against the RelaxNG schema or the Schematron schema
     One of schema_file or schema, and one of schematron_file or schematron must be provided.
@@ -40,7 +40,7 @@ def validate(xml: Path | str,
             xml_str = xml
             xml_doc = etree.fromstring(xml)
         else:
-            with open(xml, "r", encoding="utf-8") as f:
+            with open(xml, encoding="utf-8") as f:
                 xml_str = f.read()
             xml_doc = etree.parse(str(xml))
         
@@ -62,7 +62,7 @@ def validate(xml: Path | str,
 
 def schematron_validate(
     xml_doc: str, 
-    schematron_xslt_file: Optional[str |Path] = None) -> Tuple[bool, List[str]]:
+    schematron_xslt_file: str | Path | None = None) -> tuple[bool, list[str]]:
     schematron_xslt_file = schematron_xslt_file or SCHEMA_SCH_XSLT_PATH
     try:
         # Load and parse the Schematron schema
@@ -102,7 +102,7 @@ def schematron_validate(
 
 def relaxng_validate(
     xml_doc: _ElementTree | str, 
-    schema_file: Optional[str | Path] = None) -> Tuple[bool, List[str]]:
+    schema_file: str | Path | None = None) -> tuple[bool, list[str]]:
     """
     Validate XML against RelaxNG schema using Jing validator.
     
@@ -180,7 +180,7 @@ def _rng_with_start(start_element: str) -> str:
     # make sure the new start exists. It may be named s/:/_/
 
     start_element_ref = start_element.replace(":", "_")
-    with open(SCHEMA_RNG_PATH, "r", encoding="utf-8") as f:
+    with open(SCHEMA_RNG_PATH, encoding="utf-8") as f:
         schema = f.read()
         # Replace the start element in the RelaxNG schema with the given start_element
         # This assumes the schema uses <start>...</start> as the entry point
@@ -283,7 +283,7 @@ def _add_missing_namespaces(xml: str) -> str:
 def validate_with_start(
     xml: str,
     start_element: str,
-) -> Tuple[bool, List[str]]:
+) -> tuple[bool, list[str]]:
     """
     Validate an XML fragment against the schema starting from a specific element.
     Automatically adds TEI and JLPTEI namespace declarations if they're missing.

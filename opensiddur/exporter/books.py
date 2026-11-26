@@ -41,29 +41,28 @@ import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
+import yaml
 from PIL import Image
 from pydantic import ValidationError
-import yaml
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
 from opensiddur.common.version import processor_version, satisfies
-from opensiddur.exporter.settings import BookTarget, SettingsYaml, read_settings
 from opensiddur.exporter import notices, typography
+from opensiddur.exporter.settings import BookTarget, SettingsYaml, read_settings
 
 
 @dataclass
 class BookResult:
     settings_file: Path
     name: str
-    book: Optional[BookTarget] = None
+    book: BookTarget | None = None
     # The formats its settings say it is built in, and those asked for that it is not.
     formats: tuple[str, ...] = ()
     skipped: tuple[str, ...] = ()
-    output_pdf: Optional[Path] = None
-    output_html: Optional[Path] = None
-    error: Optional[str] = None
+    output_pdf: Path | None = None
+    output_html: Path | None = None
+    error: str | None = None
 
     @property
     def ok(self) -> bool:
@@ -95,12 +94,12 @@ def book_name(settings_file: Path, settings_directory: Path) -> str:
 FORMATS = ("pdf", "html")
 
 
-def output_name(name: str, suffix: Optional[str] = None, extension: str = "pdf") -> str:
+def output_name(name: str, suffix: str | None = None, extension: str = "pdf") -> str:
     stem = name.replace("/", "-")
     return f"{stem}-{suffix}.{extension}" if suffix else f"{stem}.{extension}"
 
 
-def _check_fonts(settings: SettingsYaml) -> Optional[str]:
+def _check_fonts(settings: SettingsYaml) -> str | None:
     """ Every font chain the book is typeset with, defaults included, has an installed font.
 
     Settings validation checks only the chains a file names, and skips even those when
@@ -149,7 +148,7 @@ def check(settings_file: Path, settings_directory: Path, project_directory: Path
 def read_raw(settings_file: Path) -> dict:
     """ A settings file's YAML, unvalidated. Raises OSError or yaml.YAMLError if it cannot be
     read, and TypeError if it is not a mapping. """
-    with open(settings_file, "r", encoding="utf-8") as f:
+    with open(settings_file, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     if not isinstance(data, dict):
         raise TypeError(f"{settings_file} is not a mapping")
@@ -171,7 +170,7 @@ def buildable(settings_file: Path) -> bool:
         return True
 
 
-def _check_logo(settings: SettingsYaml, settings_file: Path) -> Optional[str]:
+def _check_logo(settings: SettingsYaml, settings_file: Path) -> str | None:
     """ Why the distribution notice's logo cannot be set, or None if it can. """
     notice = notices.distribution_notice(settings.distribution)
     if notice is None:
@@ -200,8 +199,8 @@ def build(
     settings_directory: Path,
     project_directory: Path,
     output_directory: Path,
-    suffix: Optional[str] = None,
-    formats: Optional[tuple[str, ...]] = None,
+    suffix: str | None = None,
+    formats: tuple[str, ...] | None = None,
 ) -> BookResult:
     """ Compile and render one book, in each of `formats` its settings list (default: all of
     those). A format asked for that the settings do not list is skipped, not failed.
@@ -268,7 +267,7 @@ def _select(settings_files: list[Path], settings_directory: Path, names: list[st
     return selected
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Build a PDF for every settings file in the settings directory. "
                     "The reference database must be built first (python -m opensiddur.exporter.refdb).")

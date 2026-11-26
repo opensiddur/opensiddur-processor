@@ -1,12 +1,13 @@
 """Hanukkah, Megillat Hashmonaim and Purim, IA n733–n754."""
 import re
-from .common import PRAYER, POEM, SIDDUR, PROJECT_HE, SERVICE, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
+
+from .common import POEM, PRAYER, PROJECT_HE, SERVICE, SIDDUR, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
 from .festival import conditional
-from .tachanun_conditions import holiday
-from .shacharit_end import editorial_head
-from .milestones import marked
 from .hanukkah_purim_data import ROWS, RUBRICS
+from .milestones import marked
+from .shacharit_end import editorial_head
+from .tachanun_conditions import holiday
 
 CHANUKAH = SIDDUR+'chanukah'
 PURIM = SIDDUR+'purim'

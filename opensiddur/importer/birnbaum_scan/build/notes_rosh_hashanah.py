@@ -1,7 +1,7 @@
 """All notes from printed655–674; cross-page continuations joined once."""
-from .rosh_hashanah import URNS, AMIDAH, TASHLIKH, KAPPAROT
-from .rosh_hashanah_data import NOTES as READINGS
 from .notes_motzaei_shabbat import xml
+from .rosh_hashanah import AMIDAH, KAPPAROT, TASHLIKH, URNS
+from .rosh_hashanah_data import NOTES as READINGS
 
 TARGETS = dict(URNS, rh_heading=AMIDAH, tashlikh=TASHLIKH,kapparot=KAPPAROT,
     benei_adam_psalm=URNS['benei_adam']+'/psalms/107/10',

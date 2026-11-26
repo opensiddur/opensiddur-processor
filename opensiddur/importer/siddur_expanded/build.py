@@ -4,12 +4,25 @@ Run with --project-directory pointing at opensiddur-projects/project and
 --sourcetexts-root pointing at sourcetexts/sources. No prayer words are copied.
 """
 import argparse
-import json
 from pathlib import Path
+
 from lxml import etree as E
-import yaml
+
 from .compose import Composer
-from .readings import manifest, slots, SHABBAT, YT, CH, RC, HAN, FAST, TISHA, IL, DIASPORA, day
+from .readings import (
+    CH,
+    DIASPORA,
+    FAST,
+    HAN,
+    IL,
+    RC,
+    SHABBAT,
+    TISHA,
+    YT,
+    day,
+    manifest,
+    slots,
+)
 from .xml import *
 
 MAJOR=any_of(SHABBAT,YT)

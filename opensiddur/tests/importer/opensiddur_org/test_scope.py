@@ -2,6 +2,7 @@ import json
 import unittest
 
 from opensiddur.importer.opensiddur_org.parse_post import parse_post
+from opensiddur.importer.opensiddur_org.post_decisions import PostDecisions
 from opensiddur.importer.opensiddur_org.scope import (
     content_scope,
     descendant_categories,
@@ -11,8 +12,12 @@ from opensiddur.importer.opensiddur_org.scope import (
     posts_in_categories,
     project_columns,
 )
-from opensiddur.importer.opensiddur_org.post_decisions import PostDecisions
-from opensiddur.tests.importer.opensiddur_org.support import FIXTURES, cell, make_post, table
+from opensiddur.tests.importer.opensiddur_org.support import (
+    FIXTURES,
+    cell,
+    make_post,
+    table,
+)
 
 
 class TestCategories(unittest.TestCase):

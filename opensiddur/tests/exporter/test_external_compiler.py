@@ -1,16 +1,15 @@
 """Tests for the ExternalCompilerProcessor class."""
 
-import re
-from typing import Optional
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from lxml import etree
+
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
-from opensiddur.exporter.compiler import CompilerProcessor
-from opensiddur.exporter.linear import LinearData, reset_linear_data, get_linear_data
-from opensiddur.exporter.refdb import Reference, ReferenceDatabase, UrnMapping, find_end_of_mapping
+from opensiddur.exporter.linear import get_linear_data, reset_linear_data
+from opensiddur.exporter.refdb import find_end_of_mapping
 from opensiddur.exporter.urn import ResolvedUrn, ResolvedUrnRange
 
 TEI_NS = "http://www.tei-c.org/ns/1.0"
@@ -499,7 +498,8 @@ class TestExternalCompilerProcessor(unittest.TestCase):
         external_tree = etree.fromstring(external_xml_content)
 
         # Mock XMLCache.parse_xml to return the external tree when requested
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from opensiddur.exporter.linear import get_linear_data
 
         linear_data = get_linear_data()
@@ -1768,7 +1768,7 @@ class TestExternalCompilerProcessor(unittest.TestCase):
 
     def test_range_keeps_declarations_made_before_the_start(self):
         """A j:declare preceding the range inside the DCA is still in scope in the range."""
-        xml_bytes = '''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="he">
+        xml_bytes = b'''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:j="http://jewishliturgy.org/ns/jlptei/2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="he">
     <tei:text>
         <tei:body>
             <tei:div>
@@ -1785,7 +1785,7 @@ class TestExternalCompilerProcessor(unittest.TestCase):
         </tei:body>
     </tei:text>
     <j:endDeclare target="#d"/>
-</tei:TEI>'''.encode('utf-8')
+</tei:TEI>'''
         project, file_name = self._create_test_file("declare_before_range.xml", xml_bytes)
 
         root = etree.fromstring(xml_bytes)
@@ -2027,7 +2027,7 @@ class TestExternalCompilerParallelTransclude(unittest.TestCase):
         start = ResolvedUrn(project="parallel", file_name="p.xml", urn="u", element_path="/tei:TEI")
         with (
             patch.object(proc._urn_resolver, "resolve_range", return_value=[start]),
-            patch("opensiddur.exporter.external_compiler.UrnResolver.prioritize_range", return_value=None),
+            patch("opensiddur.exporter.urn.UrnResolver.prioritize_range", return_value=None),
         ):
             got = proc._resolve_parallel_range("urn:x", target_end=None, parallel_project="parallel")
         self.assertIsNone(got)

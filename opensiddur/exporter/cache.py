@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Optional
+
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
+
 
 class XMLCache:
     def __init__(self, base_path: Path = PROJECT_DIRECTORY):
@@ -15,7 +16,7 @@ class XMLCache:
     def _path_of_file(self, project: str, file_name: str) -> Path:
         return self.base_path / project / file_name
 
-    def parse_xml(self, project: str, file_name: str) -> Optional[etree._ElementTree]:
+    def parse_xml(self, project: str, file_name: str) -> etree._ElementTree | None:
         key = (Path(self.base_path), project, file_name)
         cached = self.cache.get(key)
         if cached is not None:

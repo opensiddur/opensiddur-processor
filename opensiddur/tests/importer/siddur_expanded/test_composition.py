@@ -2,11 +2,24 @@
 import tempfile
 import unittest
 from pathlib import Path
-from lxml import etree as E
-from opensiddur.importer.siddur_expanded.compose import Composer
-from opensiddur.importer.siddur_expanded.xml import Author, T, J, NS, TEXT, XID, parse_fragment, service
+
 from opensiddur.exporter.compiler import CompilerProcessor
-from opensiddur.exporter.linear import reset_linear_data, get_linear_data, ConditionalSettingEntry
+from opensiddur.exporter.linear import (
+    ConditionalSettingEntry,
+    get_linear_data,
+    reset_linear_data,
+)
+from opensiddur.importer.siddur_expanded.compose import Composer
+from opensiddur.importer.siddur_expanded.xml import (
+    NS,
+    TEXT,
+    Author,
+    J,
+    T,
+    parse_fragment,
+    service,
+)
+
 
 class TestComposition(unittest.TestCase):
     def setUp(self):

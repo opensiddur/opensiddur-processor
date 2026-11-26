@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of the Akedah and the setting for the Shema, printed pages 19 to 25.
 
 Genesis 22 under its citation; the Ribbono shel Olam that follows it; Le'olam Yehe Adam;
@@ -23,8 +22,8 @@ printed 45 does. Three placements for one vocabulary, so each is read off its ow
 """
 import functools
 
-from .common import PRAYER
 from . import common
+from .common import PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The English of the Akedah and the setting for the Shema, printed pages 20 to 26.
 
 **The Akedah is one paragraph in Hebrew and four in English.** Both sides carry one
@@ -17,8 +16,8 @@ and checked page by page with `reverse`.
 """
 import functools
 
-from .common import PRAYER, POEM
 from . import common
+from .common import POEM, PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

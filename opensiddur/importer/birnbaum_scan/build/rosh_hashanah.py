@@ -1,14 +1,15 @@
 """Rosh Hashanah Minḥah/Ma‘ariv, Kiddush, Tashlikh and Kapparot, IA n679–698."""
 import re
-from .common import cond, endcond, PRAYER, SIDDUR, PROJECT_HE, SERVICE, AGG, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
-from .festival import conditional, MINCHAH, MAARIV, SATURDAY_NIGHT
-from .shabbat_amidah import READER as AMIDAH_READER
-from .shabbat_arvit import SHABBAT
-from .tachanun_conditions import holiday, date
-from .shacharit_end import editorial_head
+
+from .common import PRAYER, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .festival import MAARIV, MINCHAH, SATURDAY_NIGHT, conditional
 from .milestones import marked
 from .rosh_hashanah_data import ROWS, RUBRICS
+from .shabbat_amidah import READER as AMIDAH_READER
+from .shabbat_arvit import SHABBAT
+from .shacharit_end import editorial_head
+from .tachanun_conditions import date, holiday
 
 ROOT = SIDDUR+'rosh_hashanah'
 AMIDAH = ROOT+'/minchah_maariv/amidah'

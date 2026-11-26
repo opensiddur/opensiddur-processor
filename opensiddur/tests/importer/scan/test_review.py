@@ -1,5 +1,11 @@
 import unittest
-from opensiddur.importer.scan.review import review, adjudicate_fragments, review_is_current, reading_hash
+
+from opensiddur.importer.scan.review import (
+    adjudicate_fragments,
+    reading_hash,
+    review,
+    review_is_current,
+)
 
 
 class ReviewTest(unittest.TestCase):

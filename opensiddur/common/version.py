@@ -1,7 +1,6 @@
 """Which opensiddur-processor this is, and whether it is the one a settings file needs."""
 
 from importlib.metadata import PackageNotFoundError, version
-from typing import Optional
 
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import Version
@@ -9,7 +8,7 @@ from packaging.version import Version
 DISTRIBUTION = "opensiddur-processor"
 
 
-def processor_version() -> Optional[str]:
+def processor_version() -> str | None:
     """The installed processor's version (`0.7.0.dev0` on main between releases), or None when
     it is run from a tree that was never installed."""
     try:

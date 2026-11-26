@@ -1,19 +1,20 @@
 """ Resolver for urn:x-opensiddur: URIs.
 """
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 from pydantic import BaseModel
 
-from opensiddur.exporter.refdb import Reference, ReferenceDatabase
 from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.exporter.refdb import Reference, ReferenceDatabase
+
 
 class ResolvedUrn(BaseModel):
     project: str
     file_name: str
     urn: str
     element_path: str
-    end_element_path: Optional[str] = None
+    end_element_path: str | None = None
     end_includes_tail: bool = False
 
 
@@ -26,7 +27,7 @@ class ResolvedUrnRange(BaseModel):
         return self.start.project
 
 
-def split_project(urn: str) -> tuple[str, Optional[str]]:
+def split_project(urn: str) -> tuple[str, str | None]:
     """``urn`` without its ``@project`` suffix, and the project it names (None if none).
 
     The suffix is everything after the last ``@``, so a project name may hold any character
@@ -38,13 +39,13 @@ def split_project(urn: str) -> tuple[str, Optional[str]]:
     return bare, project
 
 
-def with_project(urn: str, project: Optional[str]) -> str:
+def with_project(urn: str, project: str | None) -> str:
     """``urn`` with an ``@project`` suffix, replacing any it already has."""
     bare, _ = split_project(urn)
     return f"{bare}@{project}" if project else bare
 
 
-def split_range(ranged_urn: str) -> Optional[tuple[str, str]]:
+def split_range(ranged_urn: str) -> tuple[str, str] | None:
     """Split a ranged URN into its start and end URNs.
 
     A range is written with '-' in a path component. The part before the dash closes the
@@ -147,7 +148,7 @@ def _below_the_verse(urn: str) -> bool:
             and components[1].isdigit() and components[2].isdigit())
 
 
-def coarsen(urn: str, resolves: Optional[Callable[[str], bool]] = None) -> Optional[str]:
+def coarsen(urn: str, resolves: Callable[[str], bool] | None = None) -> str | None:
     """The verse that contains a sub-verse reference, or None if there is no such fallback.
 
     A project need not carry every division another project does: a translation has no
@@ -174,7 +175,7 @@ def coarsen(urn: str, resolves: Optional[Callable[[str], bool]] = None) -> Optio
     except ValueError:
         return None
 
-    def coarser(one: str) -> Optional[str]:
+    def coarser(one: str) -> str | None:
         """``one`` less its sub-verse component, or None if it is to be kept."""
         if not _below_the_verse(one):
             return None
@@ -201,7 +202,7 @@ def coarsen(urn: str, resolves: Optional[Callable[[str], bool]] = None) -> Optio
 class UrnResolver:
     """Resolves URNs to their corresponding project and file paths."""
     
-    def __init__(self, reference_database: Optional[ReferenceDatabase] = None):
+    def __init__(self, reference_database: ReferenceDatabase | None = None):
         """Initialize the URN resolver with a SQLite database.
         
         Args:
@@ -337,7 +338,7 @@ class UrnResolver:
     def prioritize_range(cls, 
         resolved_urns: list[ResolvedUrn | ResolvedUrnRange | Reference],
         project_priority: list[str],
-        return_all: bool = False) -> Optional[ResolvedUrn | ResolvedUrnRange | Reference | list[ResolvedUrn | ResolvedUrnRange | Reference]]:
+        return_all: bool = False) -> ResolvedUrn | ResolvedUrnRange | Reference | list[ResolvedUrn | ResolvedUrnRange | Reference] | None:
         """Prioritize a list of resolved URNs or URN ranges based on a project priority list.
         
         Args:

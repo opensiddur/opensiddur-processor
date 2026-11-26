@@ -1,23 +1,36 @@
 import re
-import unittest
-from unittest.mock import ANY, patch, MagicMock, mock_open
 import tempfile
-import os
+import unittest
 from pathlib import Path
+from unittest.mock import ANY, MagicMock, mock_open, patch
 
 from lxml import etree
+from saxonche import PySaxonApiError
 
-from opensiddur.exporter.constants import TEI_NS
 from opensiddur.common.versification import JPS_PROJECT
+from opensiddur.exporter.constants import TEI_NS
 from opensiddur.importer.jps1917.convert_wikisource import (
-    get_credits_pages, header, tei_file, process_mediawiki, validate_and_write_tei_file,
-    book_file, index_file, Book, Index, mediawiki_xml_to_tei, main, make_project_directory,
-    TITLE_PAGE, prepend_to_front, FALLBACK_DOWNLOAD_DATE, source_download_date,
+    FALLBACK_DOWNLOAD_DATE,
+    TITLE_PAGE,
+    Book,
+    Index,
+    book_file,
+    get_credits_pages,
+    header,
+    index_file,
+    main,
+    make_project_directory,
+    mediawiki_xml_to_tei,
+    prepend_to_front,
+    process_mediawiki,
+    source_download_date,
+    tei_file,
+    validate_and_write_tei_file,
 )
 from opensiddur.importer.util.pages import jps1917_data_directory
-from opensiddur.importer.util.wikisource_book import save_manifest
 from opensiddur.importer.util.parshiyot import skeleton_map_json
-from opensiddur.importer.util.validation import validate_with_start, validate
+from opensiddur.importer.util.validation import validate, validate_with_start
+from opensiddur.importer.util.wikisource_book import save_manifest
 
 
 class TestGetCreditsPages(unittest.TestCase):
@@ -1042,7 +1055,7 @@ class TestValidateAndWriteTeiFile(unittest.TestCase):
         # Setup mocks
         mock_prettify.return_value = "<tei:TEI>Pretty XML</tei:TEI>"
         mock_validate.return_value = (True, [])
-        mock_file.side_effect = IOError("Permission denied")
+        mock_file.side_effect = OSError("Permission denied")
         
         # Call function and expect exception
         with self.assertRaises(IOError) as context:
@@ -1613,8 +1626,8 @@ class TestMediawikiXmlToTei(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        from opensiddur.importer.jps1917.convert_wikisource import MEDIAWIKI_TO_TEI_XSLT
         from opensiddur.common.xslt import xslt_transform_string
+        from opensiddur.importer.jps1917.convert_wikisource import MEDIAWIKI_TO_TEI_XSLT
         
         self.xslt_path = MEDIAWIKI_TO_TEI_XSLT
         # The stylesheet resolves parshah names against this table and terminates on a name it
@@ -1840,8 +1853,8 @@ class TestParshaMilestones(unittest.TestCase):
     source and were both emitted as unit="parsha" until they collided."""
 
     def setUp(self):
-        from opensiddur.importer.jps1917.convert_wikisource import MEDIAWIKI_TO_TEI_XSLT
         from opensiddur.common.xslt import xslt_transform_string
+        from opensiddur.importer.jps1917.convert_wikisource import MEDIAWIKI_TO_TEI_XSLT
 
         self.parsha_names = skeleton_map_json()
         self.transform = lambda xml, params=None: xslt_transform_string(
@@ -1927,7 +1940,7 @@ class TestParshaMilestones(unittest.TestCase):
 
     def test_unknown_name_terminates(self):
         # Rather than inventing a parshah, which is how the acrostic letters became parshiyot.
-        with self.assertRaises(Exception):
+        with self.assertRaises(PySaxonApiError):
             self._transform_names(["שלום"])
 
     def test_book_opening_parsha_is_emitted_after_the_head(self):

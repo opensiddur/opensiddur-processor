@@ -1,11 +1,12 @@
 """Ashrei through Half Kaddish, read from printed 57–70 (IA n81–n94)."""
 import re
 from html import escape
+
 from .common import PRAYER, SIGIL_PESUKEI, pb
-from .pesukei_passages import BIBLE, ROOT, READER
-from .pesukei_data import PASSAGES as EARLIER
-from .pesukei_completion_data import PASSAGES
 from .milestones import Correspondences
+from .pesukei_completion_data import PASSAGES
+from .pesukei_data import PASSAGES as EARLIER
+from .pesukei_passages import BIBLE, READER, ROOT
 
 ORDER = ('ashrei', 'psalm_146', 'psalm_147', 'psalm_148', 'psalm_149',
          'psalm_150', 'barukh_adonai', 'vayevarekh_david', 'attah_hu',

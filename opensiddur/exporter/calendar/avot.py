@@ -5,7 +5,8 @@ Three complete single-chapter rounds are followed by the final compressed round.
 The computation uses pyluach locally; no network or stored yearly schedule is needed.
 """
 from pyluach.dates import HebrewDate
-from .compute import SettingSnapshot, FS_HEBREW_DATE
+
+from .compute import FS_HEBREW_DATE, SettingSnapshot
 
 FS_AVOT = 'opensiddur:pirkei-avot'
 

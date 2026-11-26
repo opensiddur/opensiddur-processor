@@ -1,7 +1,7 @@
 """The commentary and source citations printed with Rosh Hodesh Musaf."""
+from .notes_motzaei_shabbat import xml
 from .rosh_hodesh_musaf import URNS
 from .rosh_hodesh_musaf_data import PAGES
-from .notes_motzaei_shabbat import xml
 
 NOTES=[]
 def add(key,text,kind='source',n=''):

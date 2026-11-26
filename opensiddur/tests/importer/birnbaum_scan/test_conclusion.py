@@ -1,8 +1,10 @@
 """Synthetic dates and passage boundaries for the service conclusion."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import conclusion as rules
-from .test_tachanun_conditions import evaluate, settings, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment, settings
 
 
 class TestConclusionConditions(unittest.TestCase):

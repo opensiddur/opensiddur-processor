@@ -1,7 +1,9 @@
 """Synthetic checks for source boundaries, page crossings and printed apparatus."""
 import unittest
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.first_day import section, TEI, XML
+
+from opensiddur.importer.asher_selichot.first_day import TEI, XML, section
 from opensiddur.importer.asher_selichot.identities import project_name
 from opensiddur.importer.scan.reverse import streams
 
@@ -22,7 +24,9 @@ class FirstDayTest(unittest.TestCase):
         self.assertEqual(text, ''.join(note.itertext()))
 
     def test_rendered_litany_rejects_collapsed_verses_and_lost_refrains(self):
-        from opensiddur.importer.asher_selichot.check_first_day_pdf import check_mi_sheanah
+        from opensiddur.importer.asher_selichot.check_first_day_pdf import (
+            check_mi_sheanah,
+        )
         rows = [(1, n*15, 'מישענהאבינוהואיעננו') for n in range(20)]
         check_mi_sheanah(rows)
         with self.assertRaisesRegex(ValueError, '20 distinct verse starts'):
@@ -81,10 +85,11 @@ class FirstDayTest(unittest.TestCase):
         """Shared services must supply this conclusion once without a view wrapper."""
         import tempfile
         from pathlib import Path
-        from opensiddur.importer.asher_selichot.build import poem, J, PRAYER
+
         from opensiddur.exporter.compiler import CompilerProcessor
         from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
         from opensiddur.exporter.linear import LinearData
+        from opensiddur.importer.asher_selichot.build import PRAYER, J, poem
         for lang in ('he', 'en'):
             for supplied in (False, True):
                 with self.subTest(lang=lang, supplied=supplied), tempfile.TemporaryDirectory() as temp:
@@ -115,6 +120,7 @@ class FirstDayTest(unittest.TestCase):
         import json
         import tempfile
         from pathlib import Path
+
         from opensiddur.importer.asher_selichot.first_day import documents
         from opensiddur.importer.asher_selichot.identities import TEXTS, text_urn
         title = {'scan':'s3', 'titles':['Selichoth'], 'edition':'Translation',
@@ -156,7 +162,9 @@ class FirstDayTest(unittest.TestCase):
                 references=assembly.findall(f'.//{j}transclude')
                 self.assertEqual([text_urn(identity) for identity in poem_ids],
                                  [node.get('target') for node in references][3:])
-                from opensiddur.importer.asher_selichot.first_day import OBSOLETE_ASSEMBLIES
+                from opensiddur.importer.asher_selichot.first_day import (
+                    OBSOLETE_ASSEMBLIES,
+                )
                 self.assertTrue(all((project,name+'.xml') not in modules for name in OBSOLETE_ASSEMBLIES))
                 for filename in ('index.xml', 'expanded.xml'):
                     self.assertEqual(['urn:x-opensiddur:text:siddur:selichot/first_day'],
@@ -281,6 +289,7 @@ class FirstDayTest(unittest.TestCase):
     def test_first_day_kaddish_overrides_ten_days_and_restores_caller_context(self):
         import tempfile
         from pathlib import Path
+
         from opensiddur.exporter.compiler import CompilerProcessor
         from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
         from opensiddur.exporter.linear import LinearData

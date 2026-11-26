@@ -1,29 +1,47 @@
-# -*- coding: utf-8 -*-
 """Write the Hebrew project: one file per prayer, a unit file per unit, and an index."""
 import argparse
 import sys
-from .common import set_project_directory
-from .common import (PROJECT_EN, PROJECT_HE, PRAYER, SIDDUR, document, write, cond,
-                    endcond, feature, SERVICE, AGG, HOL, PERSON)
-from .front import SECTIONS, front_block, section_body
-from .index import index
+
+from .common import (
+    AGG,
+    HOL,
+    PERSON,
+    PRAYER,
+    PROJECT_EN,
+    PROJECT_HE,
+    SERVICE,
+    SIDDUR,
+    cond,
+    document,
+    endcond,
+    feature,
+    set_project_directory,
+    write,
+)
+from .front import front_block
+from .he_akedah import PRAYERS as AKEDAH_PRAYERS
+from .he_berakhot import BLESSINGS
+from .he_berakhot import PRAYERS as BERAKHOT_PRAYERS
+from .he_ishmael import PRAYERS as ISHMAEL_PRAYERS
+from .he_korbanot import PRAYERS as KORBANOT_PRAYERS
+from .he_pesukei import PRAYERS as PESUKEI_PRAYERS
+from .he_poems import PRAYERS as POEM_PRAYERS
 from .he_prayers import PRAYERS as AMIDAH_PRAYERS
-from .he_yeladim import PRAYERS as YELADIM_PRAYERS
 from .he_tallith import PRAYERS as TALLITH_PRAYERS
 from .he_tefillin import PRAYERS as TEFILLIN_PRAYERS
-from .he_poems import PRAYERS as POEM_PRAYERS
-from .he_berakhot import PRAYERS as BERAKHOT_PRAYERS, BLESSINGS
-from .he_akedah import PRAYERS as AKEDAH_PRAYERS
-from .he_korbanot import PRAYERS as KORBANOT_PRAYERS
-from .he_ishmael import PRAYERS as ISHMAEL_PRAYERS
-from .he_pesukei import PRAYERS as PESUKEI_PRAYERS
+from .he_yeladim import PRAYERS as YELADIM_PRAYERS
+from .index import index
 from .shema import prayers as shema_prayers
+
 SHEMA_PRAYERS = shema_prayers("he")
 from .avinu_malkenu import prayers as avinu_prayers
+
 AVINU_PRAYERS = avinu_prayers("he")
 from .tachanun import prayers as tachanun_prayers
+
 TACHANUN_PRAYERS = tachanun_prayers("he")
 from .torah import prayers as torah_prayers
+
 TORAH_PRAYERS = torah_prayers("he")
 
 #: Every prayer file this project writes, both units.
@@ -31,79 +49,130 @@ PRAYERS = (AMIDAH_PRAYERS + YELADIM_PRAYERS + TALLITH_PRAYERS
            + TEFILLIN_PRAYERS + POEM_PRAYERS + BERAKHOT_PRAYERS
            + AKEDAH_PRAYERS + KORBANOT_PRAYERS + ISHMAEL_PRAYERS + PESUKEI_PRAYERS + SHEMA_PRAYERS + AVINU_PRAYERS + TACHANUN_PRAYERS + TORAH_PRAYERS)
 from .conclusion import prayers as conclusion_prayers
+
 PRAYERS += conclusion_prayers("he", PRAYERS)
 from .shacharit_end import prayers as final_prayers
+
 PRAYERS += final_prayers("he")
-from .minchah import shared as minchah_shared, prayers as minchah_prayers
+from .minchah import prayers as minchah_prayers
+from .minchah import shared as minchah_shared
+
 PRAYERS = minchah_shared("he", PRAYERS) + minchah_prayers("he")
-from .arvit import shared as arvit_shared, prayers as arvit_prayers
+from .arvit import prayers as arvit_prayers
+from .arvit import shared as arvit_shared
+
 PRAYERS = arvit_shared("he", PRAYERS)
 PRAYERS += arvit_prayers("he", PRAYERS)
-from .shabbat_opening import shared as shabbat_shared, prayers as shabbat_prayers
+from .shabbat_opening import prayers as shabbat_prayers
+from .shabbat_opening import shared as shabbat_shared
+
 PRAYERS = shabbat_shared("he", PRAYERS) + shabbat_prayers("he")
-from .kabbalat_shabbat import shared as kabbalat_shared, prayers as kabbalat_prayers
+from .kabbalat_shabbat import prayers as kabbalat_prayers
+from .kabbalat_shabbat import shared as kabbalat_shared
+
 PRAYERS = kabbalat_shared("he", PRAYERS) + kabbalat_prayers("he")
-from .bameh_madlikin import shared as bameh_shared, prayers as bameh_prayers
+from .bameh_madlikin import prayers as bameh_prayers
+from .bameh_madlikin import shared as bameh_shared
+
 PRAYERS = bameh_shared("he", PRAYERS) + bameh_prayers("he")
-from .shabbat_arvit import shared as shabbat_arvit_shared, prayers as shabbat_arvit_prayers
+from .shabbat_arvit import prayers as shabbat_arvit_prayers
+from .shabbat_arvit import shared as shabbat_arvit_shared
+
 PRAYERS = shabbat_arvit_shared("he", PRAYERS)
 PRAYERS += shabbat_arvit_prayers("he", PRAYERS)
-from .leil_shabbat import shared as leil_shabbat_shared, prayers as leil_shabbat_prayers
+from .leil_shabbat import prayers as leil_shabbat_prayers
+from .leil_shabbat import shared as leil_shabbat_shared
+
 PRAYERS = leil_shabbat_shared("he", PRAYERS)
 PRAYERS += leil_shabbat_prayers("he", PRAYERS)
-from .shabbat_pesukei import shared as shabbat_pesukei_shared, prayers as shabbat_pesukei_prayers
+from .shabbat_pesukei import prayers as shabbat_pesukei_prayers
+from .shabbat_pesukei import shared as shabbat_pesukei_shared
+
 PRAYERS = shabbat_pesukei_shared("he", PRAYERS)
 PRAYERS += shabbat_pesukei_prayers("he")
-from .shabbat_shema import shared as shabbat_shema_shared, prayers as shabbat_shema_prayers
+from .shabbat_shema import prayers as shabbat_shema_prayers
+from .shabbat_shema import shared as shabbat_shema_shared
+
 PRAYERS = shabbat_shema_shared("he", PRAYERS)
 PRAYERS += shabbat_shema_prayers("he")
-from .shabbat_amidah import shared as shabbat_amidah_shared, prayers as shabbat_amidah_prayers
+from .shabbat_amidah import prayers as shabbat_amidah_prayers
+from .shabbat_amidah import shared as shabbat_amidah_shared
+
 PRAYERS = shabbat_amidah_shared("he", PRAYERS)
 PRAYERS += shabbat_amidah_prayers("he", PRAYERS)
-from .shabbat_torah import shared as shabbat_torah_shared, prayers as shabbat_torah_prayers
+from .shabbat_torah import prayers as shabbat_torah_prayers
+from .shabbat_torah import shared as shabbat_torah_shared
+
 PRAYERS = shabbat_torah_shared("he", PRAYERS)
 PRAYERS += shabbat_torah_prayers("he", PRAYERS)
-from .shabbat_musaf import shared as musaf_shared, prayers as musaf_prayers
+from .shabbat_musaf import prayers as musaf_prayers
+from .shabbat_musaf import shared as musaf_shared
+
 PRAYERS = musaf_shared("he", PRAYERS)
 PRAYERS += musaf_prayers("he", PRAYERS)
-from .shabbat_day_meal import shared as day_meal_shared, prayers as day_meal_prayers
+from .shabbat_day_meal import prayers as day_meal_prayers
+from .shabbat_day_meal import shared as day_meal_shared
+
 PRAYERS = day_meal_shared("he", PRAYERS)
 PRAYERS += day_meal_prayers("he", PRAYERS)
-from .shabbat_minchah import shared as shabbat_minchah_shared, prayers as shabbat_minchah_prayers
+from .shabbat_minchah import prayers as shabbat_minchah_prayers
+from .shabbat_minchah import shared as shabbat_minchah_shared
+
 PRAYERS = shabbat_minchah_shared("he", PRAYERS)
 PRAYERS += shabbat_minchah_prayers("he", PRAYERS)
 from .avot import prayers as avot_prayers
+
 PRAYERS += avot_prayers("he")
-from .motzaei_shabbat import prayers as motzaei_prayers, shared as motzaei_shared
+from .motzaei_shabbat import prayers as motzaei_prayers
+from .motzaei_shabbat import shared as motzaei_shared
+
 PRAYERS = motzaei_shared("he", PRAYERS)
 PRAYERS += motzaei_prayers("he", PRAYERS)
-from .hallel import shared as hallel_shared, prayers as hallel_prayers
+from .hallel import prayers as hallel_prayers
+from .hallel import shared as hallel_shared
+
 PRAYERS = hallel_shared("he", PRAYERS)
 PRAYERS += hallel_prayers("he")
-from .rosh_hodesh_musaf import prayers as rc_musaf_prayers, shared as rc_musaf_shared
+from .rosh_hodesh_musaf import prayers as rc_musaf_prayers
+from .rosh_hodesh_musaf import shared as rc_musaf_shared
+
 PRAYERS = rc_musaf_shared("he", PRAYERS)
 PRAYERS += rc_musaf_prayers("he")
-from .festival import prayers as festival_prayers, shared as festival_shared
+from .festival import prayers as festival_prayers
+from .festival import shared as festival_shared
+
 PRAYERS = festival_shared("he", PRAYERS)
 PRAYERS += festival_prayers("he")
 from .yizkor import prayers as yizkor_prayers
+
 PRAYERS += yizkor_prayers("he")
-from .festival_musaf import prayers as festival_musaf_prayers, shared as festival_musaf_shared
+from .festival_musaf import prayers as festival_musaf_prayers
+from .festival_musaf import shared as festival_musaf_shared
+
 PRAYERS = festival_musaf_shared("he", PRAYERS)
 PRAYERS += festival_musaf_prayers("he")
 from .omer_akdamut import prayers as omer_akdamut_prayers
+
 PRAYERS += omer_akdamut_prayers("he")
 from .rosh_hashanah import prayers as rosh_hashanah_prayers
+
 PRAYERS += rosh_hashanah_prayers("he")
 from .sukkot_rites import prayers as sukkot_rites_prayers
+
 PRAYERS += sukkot_rites_prayers("he")
-from .hanukkah_purim import prayers as hanukkah_purim_prayers, shared as hanukkah_purim_shared
+from .hanukkah_purim import prayers as hanukkah_purim_prayers
+from .hanukkah_purim import shared as hanukkah_purim_shared
+
 PRAYERS = hanukkah_purim_shared("he", PRAYERS)
 PRAYERS += hanukkah_purim_prayers("he")
-from .lifecycle import prayers as lifecycle_prayers, shared as lifecycle_shared
+from .lifecycle import prayers as lifecycle_prayers
+from .lifecycle import shared as lifecycle_shared
+
 PRAYERS = lifecycle_shared("he", PRAYERS)
 PRAYERS += lifecycle_prayers("he")
-from .concluding_prayers import prayers as concluding_prayers, shared as concluding_shared
+from .concluding_prayers import prayers as concluding_prayers
+from .concluding_prayers import shared as concluding_shared
+
 PRAYERS = concluding_shared("he", PRAYERS)
 PRAYERS += concluding_prayers("he")
 
@@ -576,12 +645,15 @@ def units(project, pages, by_name, amidah_body):
     The two projects foliate differently -- the Hebrew is on 1 and 81-97, the English on
     2 and 82-98 -- which is the same thing the Amidah already does across an opening.
     """
-    from .shema import unit_body as shema_body
     from .avinu_malkenu import unit_body as avinu_body
-    from .tachanun import unit_body as tachanun_body, kaddish_body, torah_intro_body
+    from .conclusion import psalms_body
+    from .conclusion import unit_body as conclusion_body
+    from .shacharit_end import editorial_head, service_body
+    from .shacharit_end import unit_body as final_body
+    from .shema import unit_body as shema_body
+    from .tachanun import kaddish_body, torah_intro_body
+    from .tachanun import unit_body as tachanun_body
     from .torah import unit_body as torah_body
-    from .conclusion import unit_body as conclusion_body, psalms_body
-    from .shacharit_end import service_body, unit_body as final_body, editorial_head
     side = 0 if project == PROJECT_HE else 1
     lang = "he" if side == 0 else "en"
     result = (
@@ -643,34 +715,39 @@ def units(project, pages, by_name, amidah_body):
                             'chol_shacharit_conclusion', 'chol_shacharit_psalms'):
             start, rest = unit['body'].split('>', 1)
             unit['body'] = start + '>\n' + editorial_head(lang, unit['title_he'], unit['title_en']) + rest
-    from .minchah import units as minchah_units
     from .arvit import units as arvit_units
-    from .shabbat_opening import units as shabbat_units
-    from .kabbalat_shabbat import units as kabbalat_units
     from .bameh_madlikin import units as bameh_units
-    from .shabbat_arvit import units as shabbat_arvit_units
+    from .kabbalat_shabbat import units as kabbalat_units
     from .leil_shabbat import units as leil_shabbat_units
+    from .minchah import units as minchah_units
+    from .shabbat_amidah import extend_service as extend_amidah
+    from .shabbat_amidah import units as shabbat_amidah_units
+    from .shabbat_arvit import units as shabbat_arvit_units
+    from .shabbat_opening import units as shabbat_units
     from .shabbat_pesukei import units as shabbat_pesukei_units
-    from .shabbat_shema import units as shabbat_shema_units, extend_service
-    from .shabbat_amidah import units as shabbat_amidah_units, extend_service as extend_amidah
+    from .shabbat_shema import extend_service
+    from .shabbat_shema import units as shabbat_shema_units
     complete = extend_service(result + minchah_units(project, by_name) + arvit_units(project, by_name) + shabbat_units(project) + kabbalat_units(project) + bameh_units(project) + shabbat_arvit_units(project, by_name) + leil_shabbat_units(project) + shabbat_pesukei_units(project, by_name)) + shabbat_shema_units(project, by_name)
-    from .shabbat_torah import units as torah_units, extend_service as extend_torah
-    from .shabbat_musaf import units as musaf_units
     from .avot import units as avot_units
-    from .rosh_hodesh_musaf import units as rc_musaf_units
+    from .concluding_prayers import units as concluding_units
+    from .festival import extend_services
+    from .festival import units as festival_units
+    from .festival_musaf import units as festival_musaf_units
     from .hallel import units as hallel_units
-    from .motzaei_shabbat import units as motzaei_units
-    from .shabbat_minchah import units as shabbat_minchah_units
-    from .shabbat_day_meal import units as day_meal_units
-    from .festival import units as festival_units, extend_services
-    from .yizkor import units as yizkor_units, extend_services as extend_yizkor
     from .hanukkah_purim import units as hanukkah_purim_units
     from .lifecycle import units as lifecycle_units
-    from .concluding_prayers import units as concluding_units
-    from .sukkot_rites import units as sukkot_rites_units
-    from .rosh_hashanah import units as rosh_hashanah_units
+    from .motzaei_shabbat import units as motzaei_units
     from .omer_akdamut import units as omer_akdamut_units
-    from .festival_musaf import units as festival_musaf_units
+    from .rosh_hashanah import units as rosh_hashanah_units
+    from .rosh_hodesh_musaf import units as rc_musaf_units
+    from .shabbat_day_meal import units as day_meal_units
+    from .shabbat_minchah import units as shabbat_minchah_units
+    from .shabbat_musaf import units as musaf_units
+    from .shabbat_torah import extend_service as extend_torah
+    from .shabbat_torah import units as torah_units
+    from .sukkot_rites import units as sukkot_rites_units
+    from .yizkor import extend_services as extend_yizkor
+    from .yizkor import units as yizkor_units
     return extend_yizkor(extend_services(extend_torah(extend_amidah(complete, lang) + shabbat_amidah_units(project, by_name), lang) + torah_units(project, by_name) + musaf_units(project, by_name) + day_meal_units(project) + shabbat_minchah_units(project, by_name) + avot_units(project) + motzaei_units(project, by_name) + hallel_units(project) + rc_musaf_units(project)) + festival_units(project) + yizkor_units(project)) + festival_musaf_units(project) + omer_akdamut_units(project) + rosh_hashanah_units(project) + sukkot_rites_units(project) + hanukkah_purim_units(project) + lifecycle_units(project) + concluding_units(project)
 
 

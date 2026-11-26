@@ -1,11 +1,29 @@
 """Numbered Asher services and their source-verified expansions."""
-from opensiddur.importer.scan.authoring import printed_text
 import json
 import re
-from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spelled_name, spelled_urn
-from .first_day import (poetic_lines, words_with_notes, mixed_words, expansion_scope,
-                        EXPANSION_TARGETS)
-from .identities import text_urn, project_name
+
+from opensiddur.importer.scan.authoring import printed_text
+
+from .build import (
+    PRAYER,
+    TEI,
+    XML,
+    choice,
+    document,
+    element,
+    marker,
+    pb,
+    spelled_name,
+    spelled_urn,
+)
+from .first_day import (
+    EXPANSION_TARGETS,
+    expansion_scope,
+    mixed_words,
+    poetic_lines,
+    words_with_notes,
+)
+from .identities import project_name, text_urn
 from .printings import is_declaration, printing
 
 SECOND_DAY = 'urn:x-opensiddur:text:siddur:selichot/second_day'
@@ -140,8 +158,10 @@ def verify_numbered_readings(source, project_directory, day_name):
     """Follow the printed service order and compare only documentary choice branches."""
     import copy
     import unicodedata
+
     from lxml import etree
-    from opensiddur.importer.scan.reverse import streams, check
+
+    from opensiddur.importer.scan.reverse import check, streams
     normalize = lambda value: ' '.join(unicodedata.normalize('NFKD', value).split())
     day_urn = 'urn:x-opensiddur:text:siddur:selichot/'+day_name+'_day'
     data = json.loads((source/(day_name+'-day.json')).read_text(encoding="utf-8"))

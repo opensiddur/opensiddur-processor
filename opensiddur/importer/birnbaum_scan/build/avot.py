@@ -1,9 +1,10 @@
 """Pirkei Avot, independently addressable and selectable chapter by chapter."""
 from html import escape
-from .common import SIDDUR, PROJECT_HE, pb, cond, endcond, feature
+
+from .avot_data import READINGS
+from .common import PROJECT_HE, SIDDUR, cond, endcond, feature, pb
 from .conclusion import transclude
 from .milestones import Correspondences
-from .avot_data import READINGS
 
 ROOT = SIDDUR+'pirqei_avot'
 MISHNAH = 'urn:x-opensiddur:text:mishnah:avot'

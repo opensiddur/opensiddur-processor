@@ -5,6 +5,7 @@ These operations accept synthetic text/data and are covered independently of boo
 """
 import re
 import unicodedata
+
 from lxml import etree
 
 TEI = 'http://www.tei-c.org/ns/1.0'

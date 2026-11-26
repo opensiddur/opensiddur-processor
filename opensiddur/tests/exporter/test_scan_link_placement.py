@@ -98,6 +98,7 @@ assert(not ok and string.find(message, "Source%-link margin full"))
 class TestScanLinkPdf(unittest.TestCase):
     def test_same_line_margin_links_have_separate_click_targets(self):
         from pypdf import PdfReader
+
         from opensiddur.tests.exporter.stylesheet_helpers import transform
         for lang, words, numbered in [("en", "First short words.", False),
                                       ("he", "מלים ראשונות", False),

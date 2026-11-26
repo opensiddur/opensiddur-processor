@@ -15,11 +15,8 @@ Typography settings (font, paper, layout, fontsize, running heads) are pulled fr
 
 import argparse
 import os
-import re
 import sys
-import unicodedata
 from pathlib import Path
-from typing import Optional
 
 from lxml import etree
 from pydantic import ValidationError
@@ -28,14 +25,9 @@ from pydantic import ValidationError
 project_root = Path(__file__).resolve().parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from opensiddur.common.xslt import xslt_transform_string  # noqa: E402
 from opensiddur.common.constants import PROJECT_DIRECTORY  # noqa: E402
-from opensiddur.exporter.typography import TypographyConfig  # noqa: E402
-from opensiddur.exporter.tex.escape import escape_tex  # noqa: E402
-from opensiddur.exporter.tex.running_heads import (  # noqa: E402
-    build_page_style_tex,
-    escape_with_hebrew_runs,
-)
+from opensiddur.common.xslt import xslt_transform_string  # noqa: E402
+from opensiddur.exporter import metadata, notices  # noqa: E402
 from opensiddur.exporter.cli_common import (  # noqa: E402
     TYPOGRAPHY_SETTINGS_HELP,
     SettingsError,
@@ -44,32 +36,29 @@ from opensiddur.exporter.cli_common import (  # noqa: E402
     prepare_compiled_tree,
     scan_links_wanted,
 )
-from opensiddur.exporter.tex.typography_tex import (  # noqa: E402
-    build_typography_preamble,
-    documentclass_options,
-)
-
 from opensiddur.exporter.metadata import (  # noqa: E402
     ISBN_TYPES,
     ISO_DATE,
-    CreditRecord,
     LicenseRecord,
     RoleCredits,
     SourceRecord,
     build_colophon,
-    extract_credits,
-    group_credits,
-    group_licenses,
-    order_credits,
 )
-from opensiddur.exporter import metadata  # noqa: E402
-from opensiddur.exporter import notices  # noqa: E402
 from opensiddur.exporter.notices import RunKind  # noqa: E402
 from opensiddur.exporter.settings import (  # noqa: E402
     TEX_UNSAFE_PATH_CHARACTERS,
     DistributionNotice,
     DistributionSettings,
 )
+from opensiddur.exporter.tex.running_heads import (  # noqa: E402
+    build_page_style_tex,
+    escape_with_hebrew_runs,
+)
+from opensiddur.exporter.tex.typography_tex import (  # noqa: E402
+    build_typography_preamble,
+    documentclass_options,
+)
+from opensiddur.exporter.typography import TypographyConfig  # noqa: E402
 
 XSLT_FILE = Path(__file__).parent / "reledmac.xslt"
 
@@ -138,7 +127,7 @@ _NOTICE_FILLS = {
 }
 
 
-def distribution_notice_to_tex(notice: Optional[DistributionNotice], logo: Optional[Path]) -> str:
+def distribution_notice_to_tex(notice: DistributionNotice | None, logo: Path | None) -> str:
     """The body of the distribution notice's page, or nothing if the book carries none.
 
     The stylesheet sets it on a page of its own, on the verso of the title page.
@@ -201,37 +190,6 @@ def credits_to_tex(credits: list[RoleCredits]) -> str:
     return tex
 
 
-# Hebrew letters and points, and the geresh and gershayim that end an abbreviation or a
-# numeral (ה׳, תשפ״ו), which belong to the word they end.
-_BIBLIOGRAPHY_HEBREW = re.compile("[\u05d0-\u05ea\u0591-\u05c7\u05f3\u05f4\ufb1d-\ufb4f]+")
-
-
-def _bibliography_text(text: str) -> str:
-    """Escape a bibliographic value, setting each Hebrew phrase as one Hebrew run.
-
-    Wider than ``escape_with_hebrew_runs``: Hebrew words separated only by spaces and
-    punctuation of any kind (quotation marks, parentheses, a geresh) are one phrase. A title
-    such as ספר "החינוך" set as three runs would have its words laid out left to right in
-    the left-to-right bibliography, so the phrase would read backwards.
-    """
-    runs: list[list[int]] = []
-    for match in _BIBLIOGRAPHY_HEBREW.finditer(text):
-        gap = text[runs[-1][1]:match.start()] if runs else None
-        if gap is not None and all(c.isspace() or unicodedata.category(c).startswith("P")
-                                   for c in gap):
-            runs[-1][1] = match.end()
-        else:
-            runs.append([match.start(), match.end()])
-    parts: list[str] = []
-    position = 0
-    for run_start, run_end in runs:
-        parts.append(escape_tex(text[position:run_start]))
-        parts.append(r"\texthebrew{" + escape_tex(text[run_start:run_end]) + "}")
-        position = run_end
-    parts.append(escape_tex(text[position:]))
-    return "".join(parts)
-
-
 def source_to_bibtex(source: SourceRecord) -> str:
     """One source as a BibTeX entry, ending in a blank line.
 
@@ -244,14 +202,14 @@ def source_to_bibtex(source: SourceRecord) -> str:
 
     def add(name: str, value: str) -> None:
         if value:
-            fields.append((name, _bibliography_text(value)))
+            fields.append((name, escape_with_hebrew_runs(value)))
 
     add("title", source.title)
     add("subtitle", source.subtitle)
     if source.editors:
-        fields.append(("editor", " and ".join(map(_bibliography_text, source.editors))))
+        fields.append(("editor", " and ".join(map(escape_with_hebrew_runs, source.editors))))
     if source.authors:
-        fields.append(("author", " and ".join(map(_bibliography_text, source.authors))))
+        fields.append(("author", " and ".join(map(escape_with_hebrew_runs, source.authors))))
     add("edition", source.edition)
     add("publisher", source.publisher)
     # The site that hosts an online source is its organization: biblatex prints
@@ -259,7 +217,7 @@ def source_to_bibtex(source: SourceRecord) -> str:
     # publisher of its own, the distributor is the closest thing to one.
     add("organization" if source.entry_type == "online" else "publisher", source.distributor)
     if source.address:
-        fields.append(("address", ", ".join(map(_bibliography_text, source.address))))
+        fields.append(("address", ", ".join(map(escape_with_hebrew_runs, source.address))))
     # An ISO-shaped date goes in "date", which biblatex parses and formats; anything else
     # stays in "year", which it prints verbatim.
     add("date" if ISO_DATE.match(source.date) else "year", source.date)
@@ -283,7 +241,7 @@ def source_to_bibtex(source: SourceRecord) -> str:
     # Everything explanatory is one addendum: it prints after the publication data and the
     # URL, where a remark on a citation belongs.
     if notes:
-        fields.append(("addendum", " ".join(map(_bibliography_text, notes))))
+        fields.append(("addendum", " ".join(map(escape_with_hebrew_runs, notes))))
     body = "".join(f"  {name} = {{{value}}},\n" for name, value in fields)
     return f"@{source.entry_type}{{{source.key},\n{body}}}\n\n"
 
@@ -361,11 +319,11 @@ def typography_parameters(typography: TypographyConfig, root: etree._Element) ->
 def transform_xml_to_tex(
     input_file,
     xslt_file: Path = XSLT_FILE,
-    output_file: Optional[str] = None,
-    settings_file: Optional[Path] = None,
-    typography: Optional[TypographyConfig] = None,
+    output_file: str | None = None,
+    settings_file: Path | None = None,
+    typography: TypographyConfig | None = None,
     project_directory: Path | None = None,
-    distribution: Optional[DistributionSettings] = None,
+    distribution: DistributionSettings | None = None,
 ) -> str:
     """Transform a compiled JLPTEI XML file into a LuaLaTeX document.
 

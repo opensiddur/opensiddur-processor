@@ -17,8 +17,16 @@ from typing import Any
 from urllib.parse import urlparse
 
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
-from opensiddur.importer.opensiddur_org.convert import load_context, plan_post, select_posts
-from opensiddur.importer.opensiddur_org.match import load_incipit_index, propose, registry_labels
+from opensiddur.importer.opensiddur_org.convert import (
+    load_context,
+    plan_post,
+    select_posts,
+)
+from opensiddur.importer.opensiddur_org.match import (
+    load_incipit_index,
+    propose,
+    registry_labels,
+)
 from opensiddur.importer.opensiddur_org.parse_post import load_post
 from opensiddur.importer.opensiddur_org.scope import project_columns
 from opensiddur.importer.util.pages import opensiddur_org_data_directory

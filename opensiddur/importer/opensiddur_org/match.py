@@ -40,9 +40,21 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import load_spellings
 from opensiddur.importer.opensiddur_org.convert import select_posts
 from opensiddur.importer.opensiddur_org.naming import imported_projects
-from opensiddur.importer.opensiddur_org.parse_post import Post, load_post, node_text, normalize_key
-from opensiddur.importer.opensiddur_org.scope import content_scope, imported_columns, table_views
-from opensiddur.importer.opensiddur_org.tei_builder import row_numbers, titles_by_language
+from opensiddur.importer.opensiddur_org.parse_post import (
+    Post,
+    load_post,
+    node_text,
+    normalize_key,
+)
+from opensiddur.importer.opensiddur_org.scope import (
+    content_scope,
+    imported_columns,
+    table_views,
+)
+from opensiddur.importer.opensiddur_org.tei_builder import (
+    row_numbers,
+    titles_by_language,
+)
 from opensiddur.importer.opensiddur_org.urns import (
     POST_URNS_PATH,
     TEXT_PREFIX,
@@ -109,7 +121,7 @@ class Proposal:
         return json.dumps(data, ensure_ascii=False)
 
     @classmethod
-    def from_json(cls, line: str) -> "Proposal":
+    def from_json(cls, line: str) -> Proposal:
         data = json.loads(line)
         return cls(int(data["post_id"]), data["urn"], {int(n): u for n, u in data["rows"].items()},
                    data["evidence"], {int(n): u for n, u in (data.get("spans") or {}).items()})

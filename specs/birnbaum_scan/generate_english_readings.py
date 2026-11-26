@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Write `scan_reading/english/{page}.txt` from the English Wikisource transcription.
 
 The English pages have something the Hebrew pages do not: a page-by-page transcription of

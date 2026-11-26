@@ -1,11 +1,12 @@
 """Friday-night home prayers and table hymns, printed 283–298."""
 import re
-from .common import cond, endcond, feature, AGG, PRAYER, POEM, SIDDUR, PROJECT_HE, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
-from .milestones import marked
-from .shacharit_end import editorial_head
-from .shabbat_arvit import URNS as ARVIT
+
 from . import leil_shabbat_data as data
+from .common import AGG, POEM, PRAYER, PROJECT_HE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .milestones import marked
+from .shabbat_arvit import URNS as ARVIT
+from .shacharit_end import editorial_head
 
 ROOT = SIDDUR+'shabbat/leil_shabbat'
 SIGIL = '1949 shabbat/leil_shabbat'
