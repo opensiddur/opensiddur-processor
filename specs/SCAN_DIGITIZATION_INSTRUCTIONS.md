@@ -42,6 +42,9 @@ to other editions; apply the edition-specific decisions below only to this book.
   image files before parallel cropping, or use independent decoded images;
   shared lazy decoders can corrupt crops. Inspect representative crops and
   their upper/lower margins, and exclude failed image preparations from approval.
+  Approximate line coordinates do not establish page coverage. Check the first
+  and last actual source lines; before accepting any claim that text is absent,
+  inspect the complete page. Preserve rejected crop-based reviews as history.
 - Preserve immutable independent readings even after adjudication. Encode clear
   source mistakes with `tei:choice/tei:sic` and `tei:corr`, retaining the printed
   reading and an evidenced correction. Do not silently modernize archaic forms.
@@ -191,6 +194,9 @@ to other editions; apply the edition-specific decisions below only to this book.
   when desired. Check both PDF outer margins and HTML gutters, including RTL,
   LTR, narrow displays, link targets and annotation bounds. Preserve source
   markers even when a renderer suppresses a redundant link.
+  Link counts alone cannot show that links are usable: distinct source pages
+  can occupy identical clickable rectangles on one generated line. Check
+  nonoverlap, full click-target size and page bounds in both output formats.
 - Check a canonical range's opening provenance as well as internal page breaks:
   its source page marker may live on a documentary heading outside the selected
   range. Do not reset backlink state at every file to conceal that problem.
