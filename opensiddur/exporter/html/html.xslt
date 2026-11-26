@@ -661,6 +661,21 @@
         </xsl:element>
     </xsl:template>
 
+    <!-- Only literally empty compiler carriers are disposable. A page marker,
+         target, condition, graphic, or unknown attribute keeps its row intact. -->
+    <xsl:function name="f:empty-parallel-carrier" as="xs:boolean">
+        <xsl:param name="node" as="element(p:parallel)"/>
+        <xsl:sequence select="normalize-space($node) = ''
+            and empty($node/* except $node/p:parallelItem)
+            and empty($node/p:parallelItem/*)
+            and empty($node/@* except ($node/@column-order, $node/@p:row))
+            and empty($node/p:parallelItem/@* except
+                      ($node/p:parallelItem/@role, $node/p:parallelItem/@xml:lang,
+                       $node/p:parallelItem/@p:project, $node/p:parallelItem/@p:file_name))"/>
+    </xsl:function>
+
+    <xsl:template match="p:parallel[f:empty-parallel-carrier(.)]" priority="5"/>
+
     <xsl:template match="p:parallel">
         <div>
             <xsl:call-template name="attributes">

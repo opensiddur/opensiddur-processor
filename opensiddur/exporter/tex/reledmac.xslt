@@ -2592,6 +2592,20 @@ end
                     <!-- Paragraph boundary: end current pstart, but don't open a new
                          one until we see actual content. -->
                     <xsl:choose>
+                        <!-- A split paragraph can leave only end scopes and running-head
+                             markers after this boundary. Keep those markers, but do not
+                             separate them from the words with an empty printed line. -->
+                        <xsl:when test="$single-pstart and not($align-verses) and
+                            (every $n in subsequence($leaves, position() + 1) satisfies
+                                (f:is-structural-space($n)
+                                 or $n/self::f:para-break or $n/self::f:block-break
+                                 or $n/self::tei:milestone[@unit = 'chapter'
+                                      or (@unit = 'verse' and not(normalize-space(@n)))]
+                                 or f:renders-nothing($n)))">
+                            <xsl:next-iteration>
+                                <xsl:with-param name="in-pstart" select="$in-pstart"/>
+                            </xsl:next-iteration>
+                        </xsl:when>
                         <xsl:when test="$align-verses">
                             <!-- Verse-aligned mode: paragraph breaks must not affect \pstart counts,
                                  otherwise the two sides can desync. -->
