@@ -193,6 +193,21 @@ class TestSplitLeadingLabels(unittest.TestCase):
             ("מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:", "Blessed are You, Adonoy, King, Lover of justice.", when),
         ])
 
+    def test_with_no_english_replacement_the_english_ending_is_left_whole(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["לְדוֹר וָדוֹר נַגִּיד גָּדְלֶֽךָ. בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:",
+              "<small>בעשי\"ת מסיים:</small> הַמֶּֽלֶךְ הַקָּדוֹשׁ:"]
+        en = ["From generation to generation we will declare Your greatness. Blessed are You, Adonoy, the Holy Almighty.",
+              ""]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת מסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.en).strip(), p.otherwise) for p in pairs[:2]], [
+            ("From generation to generation we will declare Your greatness. Blessed are You, Adonoy, the Holy Almighty.",
+             None),
+            ("", when),
+        ])
+
     def test_a_paragraph_that_is_all_ending_is_said_otherwise_whole(self):
         when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
         he = ["אַתָּה קָדוֹשׁ וְשִׁמְךָ קָדוֹשׁ.",
@@ -242,6 +257,18 @@ class TestDivide(unittest.TestCase):
         ]))
         self.assertEqual(len(items), 1)
         self.assertEqual(len(items[0].pairs), 3)
+
+    def test_small_instructions_are_the_places_rubrics(self):
+        pairs = pairs_of([
+            ("<small>ברכה זו משה תקנה</small>", "<i><b>FIRST BLESSING</b></i>"),
+            ("<b>בָּרוּךְ</b> אַתָּה", "Blessed"),
+            ("<small>(בתענית ציבור אומר כאן הש\"ץ <b>עֲנֵֽנוּ</b>)</small>", "(On Fast Days, the Chazzan says Answer us)"),
+            ("<b>רְאֵה</b> בְעָנְיֵֽנוּ", "Look upon"),
+        ])
+        self.assertEqual([type(i) for i in divide(pairs)], [TextBlock, TextBlock])
+        items = divide(pairs, small_instructions=True)
+        self.assertEqual([type(i) for i in items], [Rubric, TextBlock, Rubric, TextBlock])
+        self.assertIsNone(items[1].head)
 
     def test_a_heading_opens_a_text_and_the_bold_after_it_continues(self):
         items = divide(pairs_of([

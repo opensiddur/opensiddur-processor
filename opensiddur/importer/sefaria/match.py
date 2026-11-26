@@ -40,7 +40,7 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, is_phrase, split_block
 from opensiddur.importer.sefaria.equivalents import Equivalents
-from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, leading_label, plain_text
+from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, leading_label, plain_text, verse_segments
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
@@ -1763,15 +1763,100 @@ def verse_length(urn: str, index: IncipitIndex) -> int | None:
     return len(opening) if len(opening) < COLLECTED_WORDS else None
 
 
-def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
-    """The verses of scripture a text quotes, by the phrase each opens: phrase position ->
-    ``bible:`` verse URN. A verse is found at a phrase that opens like it (six words, confirmed
-    over its collected opening, as :func:`lookup` confirms); a half-verse found first is its
-    verse when it is the first half, and a run of verses found first its first verse."""
-    phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
-    found: dict[int, str] = {}
-    for start in range(len(phrase_words)):
-        following = [w for phrase in phrase_words[start:] for w in phrase]
+#: How little of a verse's words a phrase may agree with and still go on quoting it.
+QUOTED_PHRASE_AGREEMENT = 0.5
+#: How far (in words) a quoted phrase's words may be from where the verse has them.
+QUOTED_DRIFT = 2
+
+
+def quoted_words(urn: str, phrase_words: list[list[str]], index: IncipitIndex) -> int | None:
+    """How many words of the phrases quote a verse, when they leave it for words of their own
+    before the words the index holds of it run out (Daniel 9:7's first half, then a selicha's
+    מה נתאונן) -- inside a phrase too (a paragraph that quotes Psalm 66:9 and goes on in words
+    of its own); ``None`` when they quote all the index holds, or end first."""
+    own = list(index.own_opening(urn))
+    if len(own) < SHORT_INCIPIT_WORDS:
+        return None
+    seen = 0
+    for phrase in phrase_words:
+        phrase = phrase[:len(own) - seen]  # (the index holds no more of the verse to compare)
+        if not phrase:
+            if seen >= len(own):
+                return None
+            continue
+        # Its words near where they would be: a word the source joins or splits otherwise
+        # (יהללו־יה) shifts the rest by one.
+        start = max(0, seen - QUOTED_DRIFT)
+        blocks = SequenceMatcher(None, phrase, own[start:seen + len(phrase) + QUOTED_DRIFT],
+                                 autojunk=False).get_matching_blocks()[:-1]
+        found = sum(block.size for block in blocks)
+        quoted = 0  # how far into the phrase the verse's words run, a word or two apart at most
+        for block in blocks:
+            if block.a - quoted > QUOTED_DRIFT:
+                break
+            quoted = block.a + block.size
+        if found / len(phrase) < QUOTED_PHRASE_AGREEMENT or quoted < len(phrase) - QUOTED_DRIFT:
+            return seen + quoted if seen + quoted else None
+        seen += len(phrase)
+    return None
+
+
+#: How many words a verse is looked for over: more than :func:`confirmed` compares.
+VERSE_SEARCH_WORDS = 64
+
+
+def verse_places(block: TextBlock) -> list[tuple[tuple[int, int], str]]:
+    """The places in a text a verse of scripture can open, in order -- each phrase's start, and
+    each sof pasuq inside a phrase (``verse_segments``) -- with the words from there to the next:
+    ((phrase position, segment), words)."""
+    return [((position, segment), text) for position, pair in enumerate(block.phrases)
+            for segment, text in enumerate(verse_segments(pair.he))]
+
+
+#: How many words short of a verse's quoted length a full stop may come and still not open
+#: another verse (as :data:`tei_builder.LENGTH_SLACK` lets a sof pasuq end one).
+QUOTED_SLACK = 2
+
+
+def _opened_by_full_stop(found: dict[tuple[int, int], str], places: list[tuple[tuple[int, int], str]],
+                         index: IncipitIndex) -> dict[tuple[int, int], str]:
+    """The verses found, less those found after a full stop inside the verse found before: a
+    full stop also stands inside a verse (Genesis 2:2), and the words after one may open another
+    verse too (Exodus 31:17's כִּי שֵׁשֶׁת יָמִים, Exodus 20:11's opening). A verse opens at one
+    only once the words since the verse before reach that verse's quotation, as far as the
+    index holds it (Nehemiah 9:9, after the whole of 9:8)."""
+    order = {place: i for i, (place, _) in enumerate(places)}
+    place_words = [words(text) for _, text in places]
+    kept: dict[tuple[int, int], str] = {}
+    previous: tuple[int, str] | None = None
+    for place in sorted(found):
+        at = order[place]
+        if previous is not None and place[1] and places[at - 1][1].rstrip().endswith("."):
+            start, urn = previous
+            quoted = quoted_words(urn, place_words[start:], index)
+            covered = quoted if quoted is not None else len(index.own_opening(urn))
+            if sum(len(w) for w in place_words[start:at]) < covered - QUOTED_SLACK:
+                continue
+        kept[place] = found[place]
+        previous = (at, found[place])
+    return kept
+
+
+def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[tuple[int, int], str]:
+    """The verses of scripture a text quotes, by the place each opens (:func:`verse_places`):
+    (phrase position, segment) -> ``bible:`` verse URN. A verse is found at a place that opens
+    like it (six words, confirmed over its collected opening, as :func:`lookup` confirms); a
+    half-verse found first is its verse when it is the first half, and a run of verses found
+    first its first verse."""
+    places = verse_places(block)
+    place_words = [words(text) for _, text in places]
+    found: dict[tuple[int, int], str] = {}
+    for start in range(len(places)):
+        following: list[str] = []
+        for more in place_words[start:]:
+            following.extend(more)
+            if len(following) >= VERSE_SEARCH_WORDS:
+                break
         if len(following) < INCIPIT_WORDS:
             break
         verses = set()
@@ -1789,5 +1874,5 @@ def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
                 urn = urn.rsplit("/", 1)[0] + "/" + path[2].split("-", 1)[0]
             verses.add(urn)
         if len(verses) == 1:
-            found[start] = verses.pop()
-    return found
+            found[places[start][0]] = verses.pop()
+    return _opened_by_full_stop(found, places, index)

@@ -361,3 +361,29 @@ def leading_label(nodes: tuple[Node, ...]) -> tuple[Node | None, tuple[Node, ...
             if plain_text(rest):
                 return first, rest
     return None, nodes
+
+
+#: The marks a verse of scripture ends with: a colon, as the Metsudah volumes print sof pasuq,
+#: and sof pasuq itself.
+VERSE_ENDINGS = (":", "׃")
+
+
+#: Where else a verse can open: after a full stop, which some texts print between verses
+#: (Nehemiah 9:6-11) and others inside one (Genesis 2:2), so that it never ends one by itself.
+VERSE_BREAKS = (*VERSE_ENDINGS, ".")
+
+
+def verse_segments(nodes: tuple[Node, ...]) -> list[str]:
+    """A Hebrew phrase's words (after its label), split after each sof pasuq or full stop that
+    more words follow: the places inside it where a verse of scripture can open. A phrase that
+    prints a run of verses (a whole psalm, in a paragraph volume) is one segment per verse."""
+    segments: list[str] = []
+    current: list[str] = []
+    for token in plain_text(leading_label(nodes)[1]).split():
+        current.append(token)
+        if token.endswith(VERSE_BREAKS):
+            segments.append(" ".join(current))
+            current = []
+    if current or not segments:
+        segments.append(" ".join(current))
+    return segments

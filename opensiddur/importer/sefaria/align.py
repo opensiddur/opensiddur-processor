@@ -403,7 +403,11 @@ def _replaced_endings(pairs: list[Pair], ending: Callable[[str], Any]) -> list[P
                     replacing = split_leading(pair.en, {"italic", "small"}, hebrew=False)
                     replacing_en = plain_text(replacing[1] if replacing is not None else pair.en)
                     keep_en = _ENGLISH_BLESSING.match(replacing_en.strip()) is None
-                    before_en, ending_en = _split_english_ending(was.en, keep_en)
+                    if replacing_en.strip():
+                        before_en, ending_en = _split_english_ending(was.en, keep_en)
+                    else:
+                        # No English for the other ending: the English keeps its own, said always.
+                        before_en, ending_en = was.en, ()
                     out[previous:previous + 1] = [dataclasses.replace(was, he=split[0], en=before_en),
                                                   Pair(was.he_index, was.en_index, split[1], ending_en,
                                                        otherwise=when)]

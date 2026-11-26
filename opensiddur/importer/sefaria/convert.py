@@ -45,7 +45,7 @@ from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, 
 from opensiddur.importer.sefaria.download import load_manifest
 from opensiddur.importer.sefaria.conditions import Conditions, load_conditions
 from opensiddur.importer.sefaria.equivalents import apply_joins, load_equivalents
-from opensiddur.importer.sefaria.markup import HebrewKind, leading_label, plain_text
+from opensiddur.importer.sefaria.markup import HebrewKind, plain_text
 from opensiddur.importer.sefaria.match import (
     URNS_PATH,
     Decisions,
@@ -55,7 +55,9 @@ from opensiddur.importer.sefaria.match import (
     load_records,
     registry_urns,
     save_records,
+    quoted_words,
     scripture_verses,
+    verse_places,
     verse_length,
 )
 from opensiddur.importer.sefaria.phrases import clashing_paths, recorded_phrases, skeleton, text_path
@@ -77,7 +79,7 @@ from opensiddur.importer.sefaria.tei_builder import (
     variant_urn,
 )
 from opensiddur.importer.sefaria.works import LANGUAGES, Work, load_works, select_works
-from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index
+from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index, words
 from opensiddur.importer.util.tei_project import prune_stale_files, validate_and_write
 
 logger = logging.getLogger(__name__)
@@ -117,8 +119,8 @@ class WorkPlan:
     alignments: list[Alignment]
     items: dict[str, list[Item]]
     decisions: Decisions
-    #: the verses of scripture each text quotes: (leaf, block) -> phrase position -> verse URN
-    verses: dict[tuple[str, int], dict[int, str]] = field(default_factory=dict)
+    #: the verses of scripture each text quotes: (leaf, block) -> (phrase position, segment) -> verse URN
+    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = field(default_factory=dict)
     #: the length in words of each verse whose length the index knows
     verse_lengths: dict[str, int] = field(default_factory=dict)
     #: the conditions the book prints (conditions.yaml)
@@ -171,7 +173,8 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
     def is_condition_label(pair: Pair) -> bool:
         return conditions.for_label(plain_text(pair.he)) is not None
 
-    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs, is_condition_label, a.opens), equivalents)
+    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs, is_condition_label, a.opens,
+                                                     small_instructions=work.layout == "paragraph"), equivalents)
              for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
                             recorded_phrases=phrases, spellings=spellings,
@@ -181,7 +184,7 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
     items = {leaf: placed_rubrics(leaf_items, conditions) for leaf, leaf_items in items.items()}
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
     # quoted by two texts is marked in the first.
-    verses: dict[tuple[str, int], dict[int, str]] = {}
+    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = {}
     marked: set[str] = set()
     for leaf, leaf_items in items.items():
         for block in leaf_items:
@@ -190,20 +193,25 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             record = decisions.records[(work.key, leaf, block.first_index)]
             if record.kind not in ("existing", "new"):
                 continue
-            found: dict[int, str] = {}
-            for position, urn in sorted(scripture_verses(block, index).items()):
+            found: dict[tuple[int, int], str] = {}
+            for place, urn in sorted(scripture_verses(block, index).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
-                if work.layout == "paragraph" and ":" in plain_text(
-                        leading_label(block.phrases[position].he)[1]).rstrip().rstrip(":"):
-                    continue  # a paragraph of verses: a verse's scope would claim them all
                 if urn not in marked:  # a verse repeated, even within one text, is marked once
                     marked.add(urn)
-                    found[position] = urn
+                    found[place] = urn
             if found:
                 verses[(leaf, block.first_index)] = found
     lengths = {urn: n for found in verses.values() for urn in found.values()
                if (n := verse_length(urn, index)) is not None}
+    for (leaf, first), found in verses.items():
+        block = next(b for b in items[leaf] if isinstance(b, TextBlock) and b.first_index == first)
+        places = verse_places(block)
+        order = {place: i for i, (place, _) in enumerate(places)}
+        place_words = [words(text) for _, text in places]
+        for place, urn in found.items():
+            if (count := quoted_words(urn, place_words[order[place]:], index)) is not None:
+                lengths[urn] = count
     return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths,
                     conditions, clashes, equivalents.openings())
 
@@ -455,7 +463,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
         body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions,
-                         leading)
+                         leading, plan.conditions.text_gates(work.key))
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
     out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang, gates), lang))

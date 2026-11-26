@@ -289,6 +289,11 @@ def index_document(index: IncipitIndex, root: etree._Element) -> None:
 
     def finish(entry: list) -> None:
         urn, collected, own = entry[0], entry[1], entry[2]
+        if urn in index.incipit_of:
+            # The first holding of a text decides its length, long or short: a later document
+            # that quotes part of it (Kiddush Levana's half of Exodus 15:16, after Birnbaum's Az
+            # Yashir holds it whole) does not shorten it.
+            return
         index.add(urn, collected)
         if own is not None and urn not in index.length_of:
             index.length_of[urn] = own
@@ -460,13 +465,23 @@ def project_language(project: Path) -> str:
     return etree.parse(str(index_file)).getroot().get("{http://www.w3.org/XML/1998/namespace}lang", "")
 
 
+#: Projects that are their texts' own source, read before the rest: the first holding of a text
+#: decides its length, and a verse's length is the Bible's, not a prayer's that quotes it.
+SOURCE_PROJECTS = ("tanakh-",)
+
+
+def reading_order(project: Path) -> tuple[bool, str]:
+    """Source projects first, then the rest by name."""
+    return (not project.name.startswith(SOURCE_PROJECTS), project.name)
+
+
 def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
                         exclude: Collection[Path] = ()) -> IncipitIndex:
     """The index of every Hebrew project in ``project_directory`` but those in ``exclude``
     (an importer leaves out its own projects, which are not evidence of themselves)."""
     index = IncipitIndex()
     excluded = {Path(p) for p in exclude}
-    for project in sorted(p for p in project_directory.iterdir() if p.is_dir()):
+    for project in sorted((p for p in project_directory.iterdir() if p.is_dir()), key=reading_order):
         if project in excluded:
             continue
         if project_language(project).split("-")[0] not in HEBREW_LANGUAGES:
@@ -487,7 +502,9 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #: 7: a milestone's scope ends with the division it was set in.
 #: 8: a word split across elements is one word; a prefixed divine name keeps its prefix; a
 #:    paseq separates words.
-INDEX_VERSION = 8
+#: 9: a text's first holding decides its length, though a later one holds it shorter.
+#: 10: the Bible's projects are read first, so a verse's length is the Bible's.
+INDEX_VERSION = 10
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:

@@ -90,10 +90,14 @@ Item = TextBlock | Rubric | Heading
 
 def divide(pairs: tuple[Pair, ...] | list[Pair],
            is_condition_label: Callable[[Pair], bool] | None = None,
-           opens: frozenset[int] = frozenset()) -> list[Item]:
+           opens: frozenset[int] = frozenset(), *, small_instructions: bool = False) -> list[Item]:
     """The leaf's texts, rubrics and headings. ``is_condition_label`` says which unpointed labels
     are conditions (``conditions.yaml`` labels: <b>לפסח</b> "On Pesach"): such a label is a rubric
-    inside the text it governs, however it is printed, not a heading that opens a new text."""
+    inside the text it governs, however it is printed, not a heading that opens a new text.
+    With ``small_instructions`` (a volume of whole paragraphs), Hebrew wholly in small type beside
+    English that reads as text is an instruction or a note -- when a passage is said, who says
+    it, why -- and so the place's rubric, not the next text's heading; and so is a segment wholly
+    in small type in parentheses (``(בתענית ציבור אומר כאן הש"ץ עננו)``), not a phrase."""
     items: list[Item] = []
     block: TextBlock | None = None
     pending: list[Pair] = []
@@ -119,8 +123,11 @@ def divide(pairs: tuple[Pair, ...] | list[Pair],
         block = None
 
     for pair in pairs:
-        if is_rubric(pair) or (is_condition_label is not None and is_heading(pair)
-                               and is_condition_label(pair)):
+        if is_rubric(pair) or (is_heading(pair) and (
+                (is_condition_label is not None and is_condition_label(pair))
+                or (small_instructions and wholly(pair.he, {"small"})))) or (
+                small_instructions and is_phrase(pair) and wholly(pair.he, {"small"})
+                and plain_text(pair.he).lstrip().startswith("(")):
             pending.append(pair)
             previous_wholly_bold = False  # a rubric between them: the next bold opens a text
             continue

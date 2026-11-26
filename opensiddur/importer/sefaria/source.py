@@ -82,14 +82,19 @@ def _primary_title(node: dict[str, Any], lang: str) -> str:
     return node.get("title" if lang == "en" else "heTitle", "")
 
 
-def _child(text: Any, key: str) -> Any:
+def _child(text: Any, key: str, title: str = "") -> Any:
     """A child of a version's text tree. A default node's text is under ``""``; a section a
-    version leaves out is an empty list."""
+    version leaves out is an empty list. Some versions key a node by its English title where
+    that differs from its schema key (Siddur Ashkenaz: "Pesukei Dezimra" for the key
+    "Pesukei D'Zimra")."""
     if not isinstance(text, dict):
         return []
     if key == "default":
         return text.get("", text.get("default", []))
-    return text.get(key, [])
+    found = text[key] if key in text else text.get(title, []) if title else []
+    # (nodes that share a title, as Musaf's three Mourner's Kaddishes do, may collapse into one
+    # empty string under it)
+    return [] if isinstance(found, str) else found
 
 
 def _strings(value: Any, where: str) -> tuple[str, ...]:
@@ -108,7 +113,8 @@ def _walk(node: dict[str, Any], he: Any, en: Any, keys: tuple[str, ...],
             child_keys = keys if key == "default" else keys + (key,)
             child_titles = titles if key == "default" else titles + (
                 (_primary_title(child, "en"), _primary_title(child, "he")),)
-            yield from _walk(child, _child(he, key), _child(en, key), child_keys, child_titles)
+            title = _primary_title(child, "en")
+            yield from _walk(child, _child(he, key, title), _child(en, key, title), child_keys, child_titles)
         return
     depth = node.get("depth", 1)
     where = PATH_SEPARATOR.join(keys)

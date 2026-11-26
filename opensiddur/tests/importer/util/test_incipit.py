@@ -1,11 +1,13 @@
 """What the incipit index records of a document: openings, lengths, closings and transclusions.
 Synthetic documents only."""
 
+import tempfile
 import unittest
+from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.importer.util.incipit import IncipitIndex, index_document, words
+from opensiddur.importer.util.incipit import IncipitIndex, build_incipit_index, index_document, words
 
 T = "urn:x-opensiddur:text:"
 TEI = "http://www.tei-c.org/ns/1.0"
@@ -53,6 +55,37 @@ class TestLengths(unittest.TestCase):
                         f'{SHORT}</tei:p></tei:div><tei:div corresp="{T}prayer:next"><tei:p>{LONG}</tei:p></tei:div>')
         self.assertEqual(index.length_of[T + "bible:ps/1/1"], 4)
         self.assertEqual(index.closing(T + "bible:ps/1/1"), tuple(words(SHORT)))
+
+    def test_the_first_holding_of_a_text_decides_its_length(self):
+        verse = f"{T}bible:ps/1/1"
+        half = " ".join(LONG.split()[:6])
+        quoted = (f'<tei:div corresp="{T}prayer:q"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{half} '
+                  f'<tei:milestone unit="verse"/>{SHORT} {CLOSING}</tei:p></tei:div>')
+        whole = (f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{LONG} '
+                 f'<tei:milestone unit="verse" corresp="{T}bible:ps/1/2"/>{SHORT}</tei:p></tei:div>')
+        index = indexed(whole, quoted)
+        self.assertNotIn(verse, index.length_of)  # held long first: a later half does not shorten it
+        self.assertEqual(index.own_opening(verse), tuple(words(LONG))[:16])
+        self.assertEqual(indexed(quoted, whole).length_of[verse], 6)
+
+    def test_the_bible_is_read_before_a_prayer_that_sorts_first(self):
+        verse = f"{T}bible:ps/1/1"
+        half = " ".join(LONG.split()[:6])
+        bodies = {"a_prayer-someone-2000-he": f'<tei:div corresp="{T}prayer:q"><tei:p><tei:milestone unit="verse" '
+                                              f'corresp="{verse}"/>{half} <tei:milestone unit="verse"/>{SHORT}</tei:p></tei:div>',
+                  "tanakh-someone-he": f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" '
+                                       f'corresp="{verse}"/>{LONG}</tei:p></tei:div>'}
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, body in bodies.items():
+                project = Path(tmp) / name
+                project.mkdir()
+                for stem, content in (("index", ""), ("text", body)):
+                    (project / f"{stem}.xml").write_text(
+                        f'<tei:TEI xmlns:tei="{TEI}" xml:lang="he"><tei:text><tei:body>{content}'
+                        "</tei:body></tei:text></tei:TEI>", encoding="utf-8")
+            index = build_incipit_index(Path(tmp))
+        self.assertNotIn(verse, index.length_of)
+        self.assertEqual(index.own_opening(verse), tuple(words(LONG))[:16])
 
 
 class TestTransclusions(unittest.TestCase):

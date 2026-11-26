@@ -1,3 +1,4 @@
+import re
 import unittest
 
 from lxml import etree
@@ -5,7 +6,7 @@ from lxml import etree
 from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.source import Leaf
-from opensiddur.importer.sefaria.tei_builder import Notes, VariantPrinting, file_stem, render, text_body
+from opensiddur.importer.sefaria.tei_builder import Notes, VariantPrinting, _insert_cuts, file_stem, render, text_body
 from opensiddur.importer.sefaria.markup import parse_segment
 from opensiddur.importer.util.hebrew import to_nfkd
 
@@ -77,7 +78,7 @@ class TestTextBody(unittest.TestCase):
             ("אֲרוֹמִמְךָ אֱלוֹהַי הַמֶּלֶךְ:", "I will exalt You"),
             ("וְעוֹד דָּבָר", "and more"),
         ])
-        verses = {0: T + "bible:psalms/145/1"}
+        verses = {(0, 0): T + "bible:psalms/145/1"}
         for lang in ("he", "en"):
             body = parse(text_body(T + "prayer:ashrei", block, [1, 2, 3], lang, Notes("note"), (), verses))
             marks = body.xpath("//tei:milestone[@unit='verse']", namespaces=NS)
@@ -95,13 +96,53 @@ class TestTextBody(unittest.TestCase):
             ("וְעוֹד", "more"),
         ])
         verse = T + "bible:psalms/145/1"
-        by_length = parse(text_body(T + "prayer:x", block, [1, 2, 3], "he", Notes("note"), (), {0: verse},
+        by_length = parse(text_body(T + "prayer:x", block, [1, 2, 3], "he", Notes("note"), (), {(0, 0): verse},
                                     {verse: 2}))
         closes = by_length.xpath("//tei:milestone[@unit='verse'][not(@corresp)]", namespaces=NS)
         self.assertEqual(closes[0].xpath("following::tei:milestone[@corresp][1]/@corresp", namespaces=NS),
                          [T + "metsudah:x/2"])
-        by_rubric = parse(text_body(T + "prayer:x", block, [1, 2, 3], "he", Notes("note"), (), {0: verse}))
+        by_rubric = parse(text_body(T + "prayer:x", block, [1, 2, 3], "he", Notes("note"), (), {(0, 0): verse}))
         self.assertEqual(len(by_rubric.xpath("//tei:milestone[@unit='verse'][not(@corresp)]", namespaces=NS)), 1)
+
+    def test_a_verse_that_opens_and_ends_inside_a_phrase_is_marked_there(self):
+        (block,) = blocks([
+            ("<b>אַחַת</b> שְׁתַּיִם: שָׁלֹשׁ אַרְבַּע חָמֵשׁ: שֵׁשׁ", "One, two. Three, four, five. Six"),
+        ])
+        verse = T + "bible:psalms/3/2"
+        marked = {}
+        for lang in ("he", "en"):
+            xml = text_body(T + "prayer:x", block, [1], lang, Notes("note"), (), {(0, 1): verse})
+            text = re.sub(r'<tei:milestone unit="verse" corresp="[^"]*"/>', "[", xml)
+            text = re.sub(r'<tei:milestone unit="verse"/>', "]", text)
+            marked[lang] = re.sub(r"<[^>]*>", "", text).strip()
+        # in Hebrew, at the sof pasuq; in English, after the punctuation nearest the same place
+        self.assertEqual(marked["he"], "אַחַת שְׁתַּיִם: [שָׁלֹשׁ אַרְבַּע חָמֵשׁ: ]שֵׁשׁ")
+        self.assertEqual(marked["en"], "One, two. [Three, four, five. ]Six")
+
+    @staticmethod
+    def verse_marks(block, verses, lengths, lang="he") -> str:
+        xml = text_body(T + "prayer:x", block, [1], lang, Notes("note"), (), verses, lengths)
+        text = re.sub(r'<tei:milestone unit="verse" corresp="[^"]*"/>', "[", xml)
+        return " ".join(re.sub(r"<[^>]*>", "", re.sub(r'<tei:milestone unit="verse"/>', "]", text)).split()) \
+            .replace("[ ", "[")
+
+    def test_a_verse_ends_at_its_length_inside_a_phrase(self):
+        (block,) = blocks([("<b>אַחַת</b> שְׁתַּיִם שָׁלֹשׁ אַרְבַּע חָמֵשׁ שֵׁשׁ", "One two three four five six")])
+        verse = T + "bible:psalms/66/9"
+        self.assertEqual(self.verse_marks(block, {(0, 0): verse}, {verse: 3}),
+                         "[אַחַת שְׁתַּיִם שָׁלֹשׁ ]אַרְבַּע חָמֵשׁ שֵׁשׁ")
+
+    def test_a_colon_short_of_a_verses_length_does_not_end_it(self):
+        (block,) = blocks([("<b>וְקָרָא</b> זֶה אֶל זֶה וְאָמַר: קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ: וְעוֹד דָּבָר אַחֵר אַחֲרָיו",
+                            "And one called to another and said: Holy, holy, holy. And more")])
+        verse = T + "bible:isaiah/6/3"
+        self.assertEqual(self.verse_marks(block, {(0, 0): verse}, {verse: 8}),
+                         "[וְקָרָא זֶה אֶל זֶה וְאָמַר: קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ: ]וְעוֹד דָּבָר אַחֵר אַחֲרָיו")
+
+    def test_a_correction_before_a_cut_counts_once(self):
+        xml = ('אַחַת <tei:choice><tei:sic>שְׁתַּיִם שָׁלֹשׁ</tei:sic><tei:corr>שְׁתַּיִם:</tei:corr></tei:choice> '
+               'אַרְבַּע')
+        self.assertEqual(_insert_cuts(xml, [(2, 3, "|")], "he"), xml.replace(" אַרְבַּע", " |אַרְבַּע"))
 
     def test_a_footnote_in_a_heading_is_kept(self):
         (block,) = blocks([
@@ -130,7 +171,7 @@ class TestVariantParts(unittest.TestCase):
                            ("יְהֹוָה אֶחָד:", "is One"), ("בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ", "Blessed")])
         verse = T + "bible:deuteronomy/6/4"
         variants = tuple(VariantPrinting(name, lined, [n, n + 1, 2], {n: verse}) for name, n in (("a", 3), ("b", 5)))
-        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), variants, {0: verse}))
+        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), variants, {(0, 0): verse}))
         self.assertEqual(he.xpath(f"count(//tei:milestone[@corresp='{verse}'])", namespaces=NS), 1)
 
     def test_a_part_ends_where_a_part_already_marked_begins(self):
@@ -141,7 +182,7 @@ class TestVariantParts(unittest.TestCase):
                              ("שְׁמַע יִשְׂרָאֵל שֵׁנִית", "Hear again"), ("וְאָהַבְתָּ", "And you shall love")])
         verse, blessed = T + "bible:deuteronomy/6/4", T + "prayer:barukh_shem"
         variant = VariantPrinting("a", passage, [1, 3, 4, 2], {3: blessed, 4: verse})
-        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), (variant,), {0: verse}))
+        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), (variant,), {(0, 0): verse}))
         # The passage's own part ends before the verse already marked: an empty milestone.
         inside = he.xpath("//j:conditional/following-sibling::*[following-sibling::j:endConditional]"
                           "[self::tei:milestone]", namespaces=NS)
@@ -486,6 +527,32 @@ class TestLeafGates(unittest.TestCase):
              "<i><b>FIRST BERACHA</b></i>", "Blessed are You"), table)
         for lang in ("he", "en"):
             self.assertEqual(self.gated(body(lang)), [["t0", "t1"]], lang)
+
+    def test_a_text_gate_gates_each_transclusion_of_its_text(self):
+        from opensiddur.importer.sefaria.conditions import TextGate
+        motzaei = {"day-of-week": {"hebrew-day": 1}}
+        _, _, body = self.leaf(("<b>אַתָּה</b> חוֹנֵן", "<b>אַתָּה</b> חוֹנַנְתָּנוּ", "<b>חָנֵּנוּ</b> מֵאִתְּךָ"),
+                               ("You favor", "You have favored us", "Grant us"), conditions(),
+                               text_gates={f"{T}prayer:t1": TextGate("w", f"{T}prayer:t1", motzaei,
+                                                                     "On the night after Shabbat:")})
+        for lang, note in (("he", ""), ("en", "On the night after Shabbat:")):
+            xml = body(lang)
+            self.assertEqual(self.gated(xml), [["t1"]], lang)
+            self.assertEqual(xml.xpath("string(//j:conditional/tei:note)", namespaces=NS), note)
+
+    def test_an_instruction_label_stays_before_its_conditional(self):
+        import dataclasses
+        from opensiddur.importer.sefaria.conditions import LabelCondition
+        from opensiddur.importer.util.incipit import words
+        table = dataclasses.replace(conditions(), labels=(
+            LabelCondition(tuple(words("בראש חודש מדלגין")), {"hallel": {"full": True}}, instruction=True),))
+        _, _, body = self.leaf(("<small>בראש חודש מדלגין:</small>", "<b>לֹא</b> לָנוּ", "<b>יְבָרֵךְ</b> אֶת"),
+                               ("", "Not for our sake", "He will bless"), table)
+        xml = body("he")
+        self.assertEqual(self.gated(xml), [["t0"]])
+        self.assertEqual(xml.xpath("string(//j:conditional/tei:note)", namespaces=NS), "")
+        self.assertEqual(xml.xpath("string(//tei:note[following-sibling::j:conditional])", namespaces=NS),
+                         "בראש חודש מדלגין:")
 
     def test_a_woman_says_makes_the_text_before_the_alternative(self):
         import re as _re

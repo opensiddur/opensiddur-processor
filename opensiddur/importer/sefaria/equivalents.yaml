@@ -43,6 +43,56 @@ texts:
     note: "the long Vehu Rachum of Monday and Thursday mornings"
 
   # -- The Metsudah Siddur Ashkenaz (Sefaria's Siddur Ashkenaz) ------------------------------
+  - opens: אני מאמין באמונה שלמה שהבורא יתברך שמו הוא יחיד
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/2
+  - opens: אני מאמין באמונה שלמה שהבורא יתברך שמו אינו גוף
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/3
+  - opens: אני מאמין באמונה שלמה שהבורא יתברך שמו הוא ראשון
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/4
+  - opens: אני מאמין באמונה שלמה שהבורא יתברך שמו לו לבדו
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/5
+  - opens: אני מאמין באמונה שלמה שנבואת משה
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/7
+  - opens: אני מאמין באמונה שלמה שכל התורה
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/8
+  - opens: אני מאמין באמונה שלמה שזאת התורה
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/9
+  - opens: אני מאמין באמונה שלמה שהבורא יתברך שמו יודע כל
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/10
+  - opens: אני מאמין באמונה שלמה שהבורא יתברך שמו גומל טוב
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/11
+  - opens: אני מאמין באמונה שלמה בביאת המשיח
+    leaf: "Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith"
+    urn: urn:x-opensiddur:text:prayer:ani_maamin/12
+  - opens: ויהי בנסע הארן ויאמר משה
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Vayhi Binsoa"
+    urn: urn:x-opensiddur:text:prayer:vayehi_binsoa
+    note: "Numbers 10:35, Isaiah 2:3 and בריך שמיה's opening (ברוך שנתן): said as the ark is opened"
+  - opens: ואתה קדוש יושב תהלות ישראל
+    leaf: "Weekday / Maariv / Additions for Motza'ei Shabbat / Vyehi Noam (includes v'atah kadosh)"
+    urn: urn:x-opensiddur:text:prayer:veattah_qadosh
+    note: "ובא לציון without its first two verses, said after ויהי נעם at the close of Shabbat"
+  - opens: ברוך אתה יהוה אלהינו ואלהי אבותינו
+    leaf: "Shabbat / Maariv / Seven Faceted Blessing"
+    urn: urn:x-opensiddur:text:prayer:amidah/birkat_petichah_lemeein_sheva
+  - opens: מגן אבות בדברו
+    leaf: "Shabbat / Maariv / Seven Faceted Blessing"
+    urn: urn:x-opensiddur:text:prayer:amidah/magen_avot
+  - opens: אשת חיל מי ימצא
+    leaf: "Shabbat / Shabbat Evening / Ashet Chayil"
+    urn: urn:x-opensiddur:text:bible:proverbs/31/10-31
+  - opens: הללויה הללו את יהוה מן השמים
+    leaf: "Weekday / Maariv / Bircat Levana"
+    urn: urn:x-opensiddur:text:bible:psalms/148/1-6
   - opens: ראה בענינו וריבה ריבנו
     urn: urn:x-opensiddur:text:prayer:amidah/geullah
     note: "Birnbaum prints ראה נא בענינו"
@@ -52,8 +102,18 @@ texts:
     note: "the winter line before the summer one, as the weekday Amidah prints them the other way round"
   - opens: אתה חונן לאדם דעת
     leaf: "Weekday / Maariv / Amidah / Knowledge"
-    urn: urn:x-opensiddur:text:prayer:amidah/binah
-    note: "with אתה חוננתנו for the night after Shabbat"
+    urn: urn:x-opensiddur:text:prayer:amidah/binah/opening
+    note: "before אתה חוננתנו, said the night after Shabbat, as Birnbaum divides it"
+  - opens: חננו מאתך דעה בינה והשכל
+    leaf: "Weekday / Maariv / Amidah / Knowledge"
+    urn: urn:x-opensiddur:text:prayer:amidah/binah/conclusion
+  - opens: שמע קולנו יהוה אלהינו
+    leaf: "Weekday / Minchah / Amida / Response to Prayer"
+    urn: urn:x-opensiddur:text:prayer:amidah/tefillah/opening
+    note: "before the fast-day עננו, as Birnbaum divides it"
+  - opens: כי אתה שומע תפלת עמך ישראל ברחמים
+    leaf: "Weekday / Minchah / Amida / Response to Prayer"
+    urn: urn:x-opensiddur:text:prayer:amidah/tefillah/seal
   - opens: הרחמן הוא ישלח לנו את אליהו
     urn: urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishlach_lanu
   - opens: לעמתם ברוך יאמרו
@@ -390,6 +450,26 @@ texts:
 
 joins:
   # Paragraphs of a text the Ashkenaz siddur sets apart, a paragraph to a segment.
+  - opens: הוד והדר לפניו
+    leaf: "Weekday / Shacharit / Pesukei D'Zimra / Hodu"
+  - opens: והוא רחום יכפר עון ולא ישחית
+    leaf: "Weekday / Shacharit / Pesukei D'Zimra / Hodu"
+  - opens: הושיעה את עמך
+    leaf: "Weekday / Shacharit / Pesukei D'Zimra / Hodu"
+  - opens: אז ישיר משה
+    leaf: "Weekday / Shacharit / Pesukei D'Zimra / Az Yashir"
+  - opens: הודו על ארץ ושמים
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / Yehalelu"
+  - opens: אמר רבי אלעזר אמר רבי חנינא
+    leaf: "Weekday / Shacharit / Concluding Prayers / (Israel:) Korbanot / Pitum HaKetoret"
+  - opens: שלום עליכם
+    leaf: "Weekday / Maariv / Bircat Levana"
+  - opens: עליכם שלום
+    leaf: "Weekday / Maariv / Bircat Levana"
+  - opens: להתענג בתענוגים
+    leaf: "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Ma Y'didut"
+  - opens: ברוך שם כבוד מלכותו לעולם ועד
+    leaf: "Weekday / Shacharit / Preparatory Prayers / Sovereignty of Heaven (**L'olam, Shema)"
   - opens: תהלות לאל עליון
     leaf: "Weekday / Shacharit / Blessings of the Shema / Blessing after Shema"
   - opens: על כן נקוה לך
@@ -397,11 +477,11 @@ joins:
   - opens: ואתה קדוש יושב תהלות ישראל
     after: ובא לציון גואל
   - opens: יהוה מלכותה קאים
-    leaf: "Weekday / Shacharit / Concluding Prayers / Uva Letzion"
+    leaf: ["Weekday / Shacharit / Concluding Prayers / Uva Letzion", "Weekday / Maariv / Additions for Motza'ei Shabbat / Vyehi Noam (includes v'atah kadosh)"]
   - opens: מן המצר קראתי
     after: הודו ליהוה כי טוב
   - opens: יהוה ימלך לעולם ועד
-    leaf: "Weekday / Shacharit / Concluding Prayers / Uva Letzion"
+    leaf: ["Weekday / Shacharit / Concluding Prayers / Uva Letzion", "Weekday / Maariv / Additions for Motza'ei Shabbat / Vyehi Noam (includes v'atah kadosh)"]
   - opens: רק השמר לך
     leaf: "Weekday / Shacharit / Post Service / Six Remembrances"
   - opens: זכור את אשר עשה לך עמלק

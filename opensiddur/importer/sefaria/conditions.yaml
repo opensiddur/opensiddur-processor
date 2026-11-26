@@ -50,6 +50,9 @@ definitions:
     none:
       - *tachanun_omitted
       - all: [{service-time: {minha: true}}, *minchah_tachanun_omitted_days]
+  # The same at Minchah, written out for places that declare no service time.
+  minchah_tachanun_said: &minchah_tachanun_said
+    none: [*tachanun_omitted, *minchah_tachanun_omitted_days]
   monday_or_thursday: &monday_or_thursday
     any: [{day-of-week: {hebrew-day: 2}}, {day-of-week: {hebrew-day: 5}}]
   # A weekday on which the Torah is read, with a minyan (Birnbaum's torah_reading_day).
@@ -71,6 +74,16 @@ definitions:
     any: [{hebrew-date: {month: 6}}, {hebrew-date: {month: 7, day: [1, 22]}}]
   parents_host: &parents_host
     any: [{meal-context: {father-is-host: true}}, {meal-context: {mother-is-host: true}}]
+  # The reader's repetition, with a minyan (Birnbaum's weekday_qedushah).
+  repetition: &repetition
+    all: [{recitation: {repetition: true}}, {quorum: {minyan: true}}]
+  # The reader says אלהינו ואלהי אבותינו ברכנו when no kohanim bless.
+  reader_blesses: &reader_blesses
+    all: [{quorum: {minyan: true}}, {recitation: {repetition: true}}, {none: [{practice: {birkat-kohanim: true}}]}]
+  ten_days: &ten_days
+    holiday-aggregate: {aseret-ymei-tshuva: true}
+  public_fast: &public_fast
+    any: [{holiday-aggregate: {minor-fast: true}}, {holiday: {tzom-tammuz: true}}]
   kohanim_bless: &kohanim_bless
     all: [{quorum: {minyan: true}}, {recitation: {repetition: true}}, {practice: {birkat-kohanim: true}}]
 
@@ -398,6 +411,7 @@ labels:
     # "skip on Rosh Chodesh and Chol Hamoed Pesach": the words are said only in the full Hallel
     # (as Birnbaum encodes it), which the last days of Pesach do not say either
     when: {hallel: {full: true}}
+    instruction: true
 
 inline:
   - label: 'בעשי"ת'
@@ -431,6 +445,153 @@ leaves:
   - work: shabbat_siddur_sefard_linear
     leaf: "The Morning Prayers / Pesukei Dezimrah"
     when: {paratext: {include: true}}
+
+  # -- The Metsudah Siddur Ashkenaz: what the book prints with no rubric before it, or with its
+  # rubric as a text's heading.
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Amidah / Holiness of God"
+    when: {none: [*repetition]}
+    # אתה קדוש in the silent prayer; the Kedushah replaces it in the repetition (Birnbaum)
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Amidah / Keduasha"
+    when: *repetition
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Amidah / Birkat Kohanim"
+    when: *reader_blesses
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Post Amidah / Vidui and 13 Middot"
+    when: *tachanun_said
+    # said with Tachanun
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Post Amidah / Avinu Malkenu"
+    when: {any: [*ten_days, *public_fast]}
+    # the rubric is the text's heading: בתענית ציבור ובעשי"ת
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Post Amidah / Tachanun / V'hu Rachum"
+    when: {all: [*monday_or_thursday, *tachanun_said]}
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Post Amidah / Tachanun / Nefilat Apayim"
+    when: *tachanun_said
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Post Amidah / Tachanun / God of Israel (for Monday &amp; Thursday)"
+    when: {all: [*monday_or_thursday, *tachanun_said]}
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Post Amidah / Tachanun / Shomer Yisrael"
+    when: *tachanun_said
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / El Erech Appayim"
+    when: {all: [*monday_or_thursday, *tachanun_said]}
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Av Harachamim"
+    when: {all: [*monday_or_thursday, *tachanun_said]}
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Minchah / Amida / Holiness of God"
+    when: {none: [*repetition]}
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Minchah / Amida / Keduasha"
+    when: *repetition
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Minchah / Amida / Birkat Kohanim"
+    when: *reader_blesses
+    # on public fasts (the rubric inside)
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Minchah / Post Amidah / Avinu Malkenu"
+    when: {any: [*ten_days, {holiday-aggregate: {minor-fast: true}}]}
+    # Birnbaum's minchah_avinu
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Minchah / Post Amidah / Tachanun / Nefilat Appayim"
+    when: *minchah_tachanun_said
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Minchah / Post Amidah / Tachanun / Shomer Yisrael"
+    when: *minchah_tachanun_said
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Maariv / Additions for Motza'ei Shabbat / Vyehi Noam (includes v'atah kadosh)"
+    when: {all: [{holiday-aggregate: {motzaei-shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}]}]}
+    # Birnbaum's occasion_shabbat_conclusion
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Maariv / Counting The Omer"
+    when: {holiday: {omer: [1, 49]}}
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Vayhi Binsoa"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Brich Shmei (Zohar 369a)"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Lekha Hashem"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / V'tigaleh V'teraeh"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Birkat Hatorah"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Birkat Hagomel"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Chatzi Kaddish"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Raising the Torah"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / Yehalelu"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / LeDavid Mizmor"
+    when: *torah_reading_day
+  - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / Uvenuchah Yomar"
+    when: *torah_reading_day
+
+# Texts said only on some days where the book marks them only by type: each transclusion of the
+# text in the work's structure files is gated.
+texts:
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:amidah/attah_chonantanu
+    # in small type; the night after Shabbat or a festival (Birnbaum's arvit_chonantanu)
+    when:
+      any:
+        - day-of-week: {hebrew-day: 1}
+        - hebrew-date: {month: 7, day: 3}
+        - hebrew-date: {month: 7, day: 11}
+        - all:
+            - none: [{israel: {is-israel: false}}]
+            - any: [{hebrew-date: {month: 1, day: 16}}, {hebrew-date: {month: 1, day: 22}}, {hebrew-date: {month: 3, day: 7}},
+                    {hebrew-date: {month: 7, day: 16}}, {hebrew-date: {month: 7, day: 23}}]
+        - all:
+            - israel: {is-israel: false}
+            - any: [{hebrew-date: {month: 1, day: 17}}, {hebrew-date: {month: 1, day: 23}}, {hebrew-date: {month: 3, day: 8}},
+                    {hebrew-date: {month: 7, day: 17}}, {hebrew-date: {month: 7, day: 24}}]
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:amidah/hodaah/modim_derabbanan
+    # its rubric is the text's heading
+    when: *repetition
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/kotvenu_geullah
+    when: *ten_days
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/kotvenu_parnasah
+    when: *ten_days
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/kotvenu_zekhuyyot
+    when: *ten_days
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/kotvenu_selichah
+    when: *ten_days
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_geullah
+    when: *public_fast
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_parnasah
+    when: *public_fast
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_zekhuyyot
+    when: *public_fast
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_selichah
+    when: *public_fast
 
 # Rubrics that read like conditions, reviewed: stage directions, where to turn, an explanation,
 # or a choice among blessings no setting makes (what you see, smell or eat). They stay
