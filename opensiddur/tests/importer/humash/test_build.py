@@ -645,6 +645,91 @@ class TestMaftirMilestoneTitle(unittest.TestCase):
         self.assertEqual(len(titles), 5)
 
 
+class _Settings:
+    """Active settings for a condition: whether the place is in Israel, and the day of Sukkot.
+    None is undefined, as an undeclared feature is."""
+
+    def __init__(self, israel: bool | None, sukkot: int | None):
+        self.values = {
+            ("opensiddur:israel", "is-israel"): israel,
+            ("opensiddur:holiday", "sukkot"): sukkot,
+        }
+
+    def get_active_setting(self, fs_type, feature_name):
+        return self.values.get((fs_type, feature_name))
+
+
+class TestDayMaftirCondition(unittest.TestCase):
+    """Which of the maftirs of Shabbat Chol HaMoed Sukkot each date and place keeps.
+
+    hebcal numbers them by @hebcal/core's day of Chol HaMoed, which begins on 17 Tishrei, the
+    third day of Sukkot, in the Diaspora, and on 16 Tishrei, the second, in Israel.
+    """
+
+    def _kept(self, israel: bool | None, sukkot: int | None) -> list[int]:
+        from opensiddur.exporter.condition_eval import (
+            TriState, evaluate_condition, parse_condition_element,
+        )
+
+        kept = []
+        for day in range(1, 6):
+            conditional = etree.fromstring(
+                f'<root xmlns:tei="{TEI[1:-1]}" xmlns:j="{J[1:-1]}">'
+                f'{build._day_maftir_conditional(day, "")}</root>'
+            )[0]
+            result = evaluate_condition(
+                parse_condition_element(conditional), _Settings(israel, sukkot)
+            )
+            if result != TriState.FALSE:
+                kept.append(day)
+        return kept
+
+    def test_with_no_date_every_maftir_is_kept(self):
+        self.assertEqual(self._kept(None, None), [1, 2, 3, 4, 5])
+        self.assertEqual(self._kept(False, None), [1, 2, 3, 4, 5])
+        self.assertEqual(self._kept(True, None), [1, 2, 3, 4, 5])
+
+    def test_in_the_diaspora_the_third_day_of_sukkot_reads_the_first(self):
+        self.assertEqual(
+            {sukkot: self._kept(False, sukkot) for sukkot in range(1, 8)},
+            {1: [], 2: [], 3: [1], 4: [2], 5: [3], 6: [4], 7: [5]},
+        )
+
+    def test_in_israel_the_second_day_of_sukkot_reads_the_first(self):
+        self.assertEqual(
+            {sukkot: self._kept(True, sukkot) for sukkot in range(1, 8)},
+            {1: [], 2: [1], 3: [2], 4: [3], 5: [4], 6: [5], 7: []},
+        )
+
+    def test_with_a_date_but_no_place_each_places_maftir_is_kept(self):
+        self.assertEqual(self._kept(None, 2), [1])
+        self.assertEqual(self._kept(None, 4), [2, 3])
+        self.assertEqual(self._kept(None, 7), [5])
+
+    def test_outside_sukkot_no_maftir_is_kept(self):
+        self.assertEqual(self._kept(False, 0), [])
+        self.assertEqual(self._kept(True, 0), [])
+
+    def test_each_maftir_is_printed_inside_its_condition(self):
+        spans = [
+            ReadingSpan(UNIT_MAFTIR, f"maftir_day{day}", VerseRef("numbers", 29, start),
+                        VerseRef("numbers", 29, start + 5))
+            for day, start in enumerate((17, 20, 23, 26, 29), start=1)
+        ]
+        reading = {"name": "Sukkot Shabbat Chol ha-Moed", "aliyot": spans, "haftarot": []}
+        _, document = build.festival_file("sukkot_shabbat_chol_hamoed", reading)
+        division = etree.fromstring(document.encode()).find(f"{TEI}text/{TEI}body/{TEI}div")
+        children = [(child.tag, child.get("unit"), child.get("n")) for child in division][1:]
+        self.assertEqual(children[:4], [
+            (f"{J}conditional", None, None),
+            (f"{TEI}milestone", "citation", "במדבר 29:17–29:22"),
+            (f"{TEI}milestone", "maftir.annual", "מַפְטִיר לְיוֹם א׳"),
+            (f"{J}transclude", None, None),
+        ])
+        self.assertEqual(children[4][0], f"{J}endConditional")
+        self.assertEqual(len(children), 5 * 5)
+
+
 class TestCycleQualifier(unittest.TestCase):
     """A triennial division of a single inside a pair belongs to one shape of the cycle.
 
