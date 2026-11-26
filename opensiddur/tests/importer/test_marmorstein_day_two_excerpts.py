@@ -1,10 +1,10 @@
 """Draft excerpt invariants with invented text and source inputs."""
-import hashlib
 import copy
+import hashlib
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from lxml import etree
@@ -89,7 +89,9 @@ class ExcerptTests(unittest.TestCase):
         self.assertEqual(path.read_bytes(), previous)
 
     def test_optional_word_has_registered_variant_condition_not_literal_brackets(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            excerpt_document,
+        )
         unit = self.recipe['units'][0]
         feature = 'urn:x-opensiddur:condition:prayer:amidah/melokh_al_kol_haolam/malkenu'
         witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [
@@ -105,7 +107,9 @@ class ExcerptTests(unittest.TestCase):
                          '#optional_word')
 
     def test_repeated_quotation_keeps_source_attribution_without_a_second_verse_identity(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            excerpt_document,
+        )
         unit = self.recipe['units'][0]
         source = 'urn:x-opensiddur:text:bible:exodus/15/18'
         witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [[
@@ -115,7 +119,9 @@ class ExcerptTests(unittest.TestCase):
         self.assertEqual(root.xpath('//t:milestone[@unit="verse"]/@corresp', namespaces=NS), [])
 
     def test_subverse_has_its_own_number_and_matching_scope_terminator(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            excerpt_document,
+        )
         unit = self.recipe['units'][0]
         source = 'urn:x-opensiddur:text:bible:psalms/55/15/b'
         witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [[
@@ -129,7 +135,9 @@ class ExcerptTests(unittest.TestCase):
         self.assertFalse(root.xpath('//t:milestone[@unit="verse"][@corresp]', namespaces=NS))
 
     def test_page_inside_optional_span_updates_the_bibliography(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            excerpt_document,
+        )
         unit = self.recipe['units'][0]
         witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [[
             {'marked_variant': {'id': 'nested', 'feature': 'invented', 'content': [
@@ -141,7 +149,9 @@ class ExcerptTests(unittest.TestCase):
         self.assertIn('/page/n24', root.xpath('string(//t:seg/@facs)', namespaces=NS))
 
     def test_prayer_parts_derive_and_check_bibliographic_end_page(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import prayer_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            prayer_document,
+        )
         unit = self.recipe['units'][0]
         witness = {'scan_page': 23, 'printed_page': '9', 'parts': [
             {'urn': unit['urn']+'/opening', 'content': ['Before ',
@@ -154,7 +164,9 @@ class ExcerptTests(unittest.TestCase):
 
 
     def test_whole_prayer_needs_no_invented_part_and_keeps_page_continuations(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            excerpt_document,
+        )
         unit = self.recipe['units'][0]
         witness = {'scan_page': 23, 'printed_page': '9', 'text_language': 'arc', 'paragraphs': [
             ['First ', {'page_break': {'scan_page': 25, 'printed_page': '10'}},
@@ -196,7 +208,9 @@ class ExcerptTests(unittest.TestCase):
         self.assertEqual(len(root.xpath('//t:body//t:p', namespaces=NS)), 2)
 
     def test_prayer_quotation_source_tracks_a_preceding_page_break(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import prayer_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            prayer_document,
+        )
         unit = self.recipe['units'][0]
         witness = {'scan_page': 23, 'printed_page': '9', 'parts': [
             {'urn': unit['urn']+'/a', 'content': ['Before ',
@@ -211,7 +225,9 @@ class ExcerptTests(unittest.TestCase):
             prayer_document(unit, 'he', witness)
 
     def test_aramaic_prayer_language_is_local_to_its_paragraphs(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import prayer_document
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import (
+            prayer_document,
+        )
         unit = self.recipe['units'][0]
         witness = {'scan_page': 23, 'printed_page': '9', 'text_language': 'arc', 'parts': [
             {'urn': unit['urn']+'/a', 'content': ['Invented.']},

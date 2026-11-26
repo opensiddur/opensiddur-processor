@@ -12,9 +12,10 @@ from pathlib import Path
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
-from opensiddur.importer.scan.authoring import TEI, J, XML, element, write_documents
+from opensiddur.importer.scan.authoring import TEI, XML, J, element, write_documents
 from opensiddur.importer.util.internet_archive import page_image_url
 from opensiddur.importer.util.validation import validate
+
 from . import BOOK, IDENTIFIER, PROJECTS, ROOT_URN
 from .build import opening_document
 from .draft_prayers import excerpt_header

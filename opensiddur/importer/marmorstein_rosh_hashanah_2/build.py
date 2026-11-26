@@ -4,16 +4,25 @@ This builder writes a volume-specific index.xml. It never writes
 day-one projects. Full service assembly follows image adjudication.
 """
 import argparse
-import json
 import hashlib
+import json
 from pathlib import Path
 
 from lxml import etree
 
 from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
-from opensiddur.importer.scan.authoring import TEI, J, XML, element, append_words, write_documents, conditional_scope
+from opensiddur.importer.scan.authoring import (
+    TEI,
+    XML,
+    J,
+    append_words,
+    conditional_scope,
+    element,
+    write_documents,
+)
 from opensiddur.importer.util.internet_archive import page_image_url
 from opensiddur.importer.util.validation import validate
+
 from . import BOOK, IDENTIFIER, PROJECTS, ROOT_URN, SOURCE_RECORD
 
 

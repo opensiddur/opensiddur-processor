@@ -1,9 +1,9 @@
 """Draft orchestration and front-matter semantics, using invented source data."""
 import hashlib
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from lxml import etree
@@ -87,7 +87,7 @@ class OpeningBuildTests(unittest.TestCase):
             self.assertEqual((self.base/'projects'/project/'index.xml').read_text(encoding='utf-8'), 'existing index')
 
     def test_day_one_projects_are_never_written(self):
-        for lang, project in PROJECTS.items():
+        for project in PROJECTS.values():
             old = project.replace('_second_day', '')
             directory = self.base/'projects'/old
             directory.mkdir()

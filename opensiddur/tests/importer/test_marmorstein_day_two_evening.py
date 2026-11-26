@@ -1,9 +1,13 @@
 """Synthetic service order and contextual scope checks; no real source fixtures."""
 import unittest
+
 from lxml import etree
 
 from opensiddur.importer.marmorstein_rosh_hashanah_2.evening import (
-    dependency_provenance, documentary_documents, render_sequence, settings,
+    dependency_provenance,
+    documentary_documents,
+    render_sequence,
+    settings,
 )
 
 NS = {'t': 'http://www.tei-c.org/ns/1.0', 'j': 'http://jewishliturgy.org/ns/jlptei/2'}

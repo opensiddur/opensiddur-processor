@@ -4,11 +4,16 @@ import os
 from pathlib import Path
 
 from opensiddur.common.constants import OUTPUT_DIRECTORY, SOURCETEXTS_ROOT
+
 # These existing operations accept an explicit BookProfile and contain no
 # first-day assembly or transcription rules. Keep the download behavior shared.
-from opensiddur.importer.marmorstein_rosh_hashanah_1.download import download, regenerate
+from opensiddur.importer.marmorstein_rosh_hashanah_1.download import (
+    download,
+    regenerate,
+)
 from opensiddur.importer.scan.pages import fetch
 from opensiddur.importer.util.internet_archive import connect, resolve_agent_model
+
 from . import profile
 
 
