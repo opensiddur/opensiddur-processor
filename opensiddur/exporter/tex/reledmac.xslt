@@ -175,6 +175,9 @@
         <!-- For the logo in the distribution notice. -->
         <xsl:text>\usepackage{graphicx}&#10;</xsl:text>
         <xsl:text>\usepackage{hyperref}&#10;</xsl:text>
+        <!-- Printed folios restart at title leaves and at main matter. Name page
+             destinations with hyperref's independent shipout counter instead. -->
+        <xsl:text>\hypersetup{hypertexnames=false}&#10;</xsl:text>
         <!-- Headings go four deep (index > section > haftarah > rite), and f:heading-toc-level
              emits the fourth as \addcontentsline{toc}{paragraph}. The book class stops the
              table of contents at subsection, and hyperref takes its bookmark depth from that,
