@@ -131,6 +131,10 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
                 continue
             div = element(parent, 'div')
             div.set(XML+'id', item['id'])
+            page = item.get('source_pages', {}).get(lang)
+            if page:
+                element(div, 'pb', ed='1965', n=page['printed_page'],
+                        facs=page_image_url(IDENTIFIER, page['scan_page']-1))
             headings = (item.get('expanded_headings', item['headings']).items() if expanded
                         else [(lang, item['headings'][lang])])
             for language, heading in headings:
@@ -141,7 +145,8 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
             raise ValueError('Unsupported sequence item: '+kind)
 
 
-def sequence_document(recipe, units, lang, *, expanded=False, expanded_index=None):
+def sequence_document(recipe, units, lang, *, expanded=False, expanded_index=None,
+                      documentary_urn=EVENING_URN):
     if expanded:
         root = etree.Element(f'{{{TEI}}}TEI', nsmap={'tei': TEI, 'j': J}, attrib={XML+'lang': 'he'})
         root.append(copy.deepcopy(expanded_index.find(f'{{{TEI}}}teiHeader')))
@@ -164,11 +169,14 @@ def sequence_document(recipe, units, lang, *, expanded=False, expanded_index=Non
                     ', '.join(dependency['targets']))
         text = element(root, 'text')
     else:
-        unit = {'urn': EVENING_URN, 'titles': recipe['titles']}
-        root = excerpt_header(unit, lang, {'printed_page': '1', 'printed_page_end': '11'})
+        unit = {'urn': documentary_urn, 'titles': recipe['titles']}
+        start = '1' if lang == 'he' and documentary_urn == EVENING_URN else '2'
+        root = excerpt_header(unit, lang, {'printed_page': start,
+                                         'printed_page_end': '11' if lang == 'he' else '10'})
         text = root.find(f'{{{TEI}}}text')
         text.clear()
-    div = element(element(text, 'body'), 'div', corresp=EXPANDED_URN if expanded else EVENING_URN)
+    div = element(element(text, 'body'), 'div',
+                  corresp=EXPANDED_URN if expanded else documentary_urn)
     if expanded:
         gate = element(div, 'j:conditional')
         gate.set(XML+'id', 'second_night_selection')
@@ -222,6 +230,19 @@ def titqabbal_document(project_directory, expected_hash):
     copied.set('facs', page.get('facs'))
     paragraph.append(copied)
     return root
+
+
+def documentary_documents(recipe, units, lang):
+    """Keep the shared evening preamble out of the untranslated entrance."""
+    if len(recipe['sequence']) != 2:
+        raise ValueError('Evening recipe needs entrance and service sections')
+    service = sequence_document(dict(recipe, sequence=recipe['sequence'][1:]), units, lang,
+                                documentary_urn=EVENING_URN+'/service')
+    root = sequence_document(dict(recipe, sequence=recipe['sequence'][:1]), units, lang)
+    entry = root.find(f'{{{TEI}}}text/{{{TEI}}}body/{{{TEI}}}div')
+    element(entry, 'j:transclude', type='external',
+            target=EVENING_URN+'/service@'+PROJECTS[lang])
+    return root, service
 
 
 def integrate_expanded_index(root, recipe):
@@ -307,7 +328,11 @@ def main(argv=None):
     layouts = json.loads((source/'front_layout.json').read_text())
     targets = []
     for lang in PROJECTS:
-        root = sequence_document(recipe, units, lang)
+        # Pair the evening heading only after the Hebrew-only entrance. A shared
+        # transcluded service boundary prevents its English preamble drifting
+        # onto the entrance when the two documentary roots are compiled together.
+        root, service = documentary_documents(recipe, units, lang)
+        targets.append((args.project_directory/PROJECTS[lang]/'maariv_service.xml', service))
         targets.append((args.project_directory/PROJECTS[lang]/'second_night.xml', root))
         index = opening_document(lang, front['pages'], layouts)
         index.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc/{{{TEI}}}editionStmt/{{{TEI}}}edition').text = (

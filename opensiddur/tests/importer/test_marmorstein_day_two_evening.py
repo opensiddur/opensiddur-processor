@@ -3,7 +3,7 @@ import unittest
 from lxml import etree
 
 from opensiddur.importer.marmorstein_rosh_hashanah_2.evening import (
-    integrate_expanded_index, render_sequence, settings,
+    documentary_documents, integrate_expanded_index, render_sequence, settings,
 )
 
 NS = {'t': 'http://www.tei-c.org/ns/1.0', 'j': 'http://jewishliturgy.org/ns/jlptei/2'}
@@ -62,6 +62,20 @@ class EveningSequenceTests(unittest.TestCase):
                              {'type': 'opensiddur:service-time', 'feature': 'maariv', 'value': True}])
         self.assertEqual(self.root.xpath('//t:numeric/@value', namespaces=NS), ['2'])
         self.assertEqual(self.root.xpath('//t:binary/@value', namespaces=NS), ['true'])
+
+    def test_evening_heading_cannot_be_paired_with_untranslated_entrance(self):
+        recipe = {'titles': {'he': 'בדיקה', 'en': 'Test'}, 'sequence': [
+            {'kind': 'section', 'id': 'entrance', 'headings': {'he': 'כניסה'},
+             'items': [{'kind': 'module', 'file': 'invented'}]},
+            {'kind': 'section', 'id': 'service', 'headings': {'he': 'ערבית', 'en': 'Evening'},
+             'items': []}]}
+        wrapper, service = documentary_documents(recipe, self.units, 'en')
+        self.assertFalse(wrapper.xpath('//t:body//t:head', namespaces=NS))
+        self.assertEqual(service.xpath('//t:body//t:head/text()', namespaces=NS), ['Evening'])
+        self.assertIn('/service@', wrapper.xpath('string(//j:transclude/@target)', namespaces=NS))
+        recipe['sequence'].append({'kind': 'section'})
+        with self.assertRaisesRegex(ValueError, 'entrance and service'):
+            documentary_documents(recipe, self.units, 'en')
 
     def test_condition_label_is_inside_scope_and_empty_counterpart_is_absent(self):
         sequence = [{'kind': 'condition', 'id': 'optional', 'expressions': [],
