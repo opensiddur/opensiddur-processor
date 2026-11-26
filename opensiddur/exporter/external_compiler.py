@@ -51,6 +51,10 @@ logger = logging.getLogger(__name__)
 AlignmentKey = str | tuple[str, str]
 
 
+class _EmptyParallelCounterpart(Exception):
+    """A resolved counterpart has no body content under the current settings."""
+
+
 def _alignment_boundaries(elements: list[ElementBase]) -> list[AlignmentKey | None]:
     """Keys before milestones and the opening/closing markers of bounded units."""
     structural: dict[str, str] = {}
@@ -100,6 +104,29 @@ def _alignment_boundaries(elements: list[ElementBase]) -> list[AlignmentKey | No
 
 def _is_annotation(element: ElementBase) -> bool:
     return element.tag == f"{{{TEI_NS}}}note" and element.get("type") not in RUBRIC_NOTE_TYPES
+
+
+def _has_parallel_content(elements: list[ElementBase]) -> bool:
+    """Require body content before assigning a counterpart its own column.
+
+    A resolved range can disappear after condition evaluation. Headers, apparatus,
+    alignment boundaries and page markers alone must not claim the counterpart's
+    annotations and thereby remove them from the primary fallback.
+    """
+    ignored = {f"{{{TEI_NS}}}{name}" for name in ("teiHeader", "standOff")}
+    nontext_content = {f"{{{TEI_NS}}}{name}" for name in ("graphic", "gap", "ref", "ptr")}
+
+    def has_content(element):
+        if not is_element_node(element) or element.tag in ignored or _is_annotation(element):
+            return False
+        if element.tag == f"{{{TEI_NS}}}TEI":
+            body = element.find(f"{{{TEI_NS}}}text/{{{TEI_NS}}}body")
+            return body is not None and has_content(body)
+        if element.tag in nontext_content or (element.text or "").strip():
+            return True
+        return any(has_content(child) or (child.tail or "").strip() for child in element)
+
+    return any(has_content(element) or (element.tail or "").strip() for element in elements)
 
 
 def _alignment_corresps(elements: list[ElementBase]) -> set[AlignmentKey]:
@@ -816,9 +843,14 @@ class ExternalCompilerProcessor(CompilerProcessor):
                             reference_database=self._refdb)
                         parallel_proc.marker_stack = []
                         parallel_result = parallel_proc.process()
+                        if not _has_parallel_content(parallel_result):
+                            raise _EmptyParallelCounterpart
                     parallel_project = p_project
                     parallel_file = p_file
                     break
+                except _EmptyParallelCounterpart:
+                    parallel_result = None
+                    continue
                 except Exception:
                     logger.warning(
                         "parallel: compiling %s/%s as the parallel column for %s failed; "
@@ -931,7 +963,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
 
         return None
 
-    def _select_root_parallel_project(self) -> tuple[str, str] | None:
+    def _select_root_parallel_project(self, excluded: set[str] | None = None) -> tuple[str, str] | None:
         """Pick the project holding this document's counterpart, as (project, file_name).
 
         Correspondence is decided by URN, not by file name: two documents pair up only when
@@ -954,7 +986,7 @@ class ExternalCompilerProcessor(CompilerProcessor):
 
         for proj in self.linear_data.parallel_projects:
             # Never parallelize a project against itself.
-            if proj == self.project:
+            if proj == self.project or proj in (excluded or ()):
                 continue
             try:
                 resolved = self._urn_resolver.resolve_range(
@@ -989,22 +1021,35 @@ class ExternalCompilerProcessor(CompilerProcessor):
             return None
         parallel_project, parallel_file = selected
 
+        tried = set()
+        parallel_result = None
         with self._parallel_sub_compilation():
-            try:
-                with self._printed_annotations_rollback(), self._parallel_priority(parallel_project):
-                    parallel_proc = ExternalCompilerProcessor(
-                        parallel_project, parallel_file,
-                        linear_data=self.linear_data,
-                        reference_database=self._refdb)
-                    parallel_proc.marker_stack = []
-                    parallel_result = parallel_proc.process()
-            except Exception:
-                logger.warning(
-                    "parallel: compiling %s/%s as the parallel column for %s/%s failed; "
-                    "falling back to per-transclusion parallels",
-                    parallel_project, parallel_file, self.project, self.file_name,
-                    exc_info=True)
-                parallel_result = None
+            while selected is not None:
+                parallel_project, parallel_file = selected
+                tried.add(parallel_project)
+                try:
+                    with self._printed_annotations_rollback(), self._parallel_priority(parallel_project):
+                        parallel_proc = ExternalCompilerProcessor(
+                            parallel_project, parallel_file,
+                            linear_data=self.linear_data,
+                            reference_database=self._refdb)
+                        parallel_proc.marker_stack = []
+                        parallel_result = parallel_proc.process()
+                        if not _has_parallel_content(parallel_result):
+                            raise _EmptyParallelCounterpart
+                except _EmptyParallelCounterpart:
+                    parallel_result = None
+                except Exception:
+                    logger.warning(
+                        "parallel: compiling %s/%s as the parallel column for %s/%s failed; "
+                        "falling back to per-transclusion parallels",
+                        parallel_project, parallel_file, self.project, self.file_name,
+                        exc_info=True)
+                    parallel_result = None
+
+                if parallel_result is not None:
+                    break
+                selected = self._select_root_parallel_project(excluded=tried)
 
             if parallel_result is not None:
                 with self._primary_annotations(parallel_project):
