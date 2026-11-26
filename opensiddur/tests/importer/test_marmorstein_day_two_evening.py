@@ -54,7 +54,8 @@ class EveningSequenceTests(unittest.TestCase):
                       'readings': {'he': {'text': 'Heading', 'language': 'he'}},
                       'targets': ['urn:x-opensiddur:text:poem:invented']}], expanded=True)
         self.assertEqual(self.root.xpath('string(t:div/t:head)', namespaces=NS), 'Heading')
-        self.assertEqual(etree.QName(self.root[1]).localname, 'transclude')
+        self.assertEqual(len(self.root), 1)
+        self.assertEqual(len(self.root.xpath('t:div/j:transclude', namespaces=NS)), 1)
 
     def test_motzaei_scope_stops_before_following_blessing(self):
         self.render([{'kind': 'condition', 'id': 'boundary',

@@ -111,8 +111,10 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
             source_notes(parent, readings_for(item, lang, expanded),
                          description=item.get('rubric_kind') == 'description')
         elif kind == 'direction':
+            target_parent = parent
             if expanded and item.get('separate_heading'):
                 container = element(parent, 'div')
+                target_parent = container
                 for reading in readings_for(item, lang, expanded):
                     heading = element(container, 'head', reading['text'])
                     heading.set(XML+'lang', reading['language'])
@@ -122,7 +124,7 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
                 source_notes(parent, readings_for(item, lang, expanded), description=expanded)
             if expanded:
                 for target in item['targets']:
-                    element(parent, 'j:transclude', type='external', target=target)
+                    element(target_parent, 'j:transclude', type='external', target=target)
         elif kind == 'condition':
             temporary = etree.Element(f'{{{TEI}}}div')
             render_sequence(temporary, item['items'], lang, expanded=expanded, units=units)
