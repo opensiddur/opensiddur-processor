@@ -68,9 +68,11 @@ Second-night decisions: preserve the printed doubled leela and omit English
 where absent. Malkenu is the existing named optional wording, independent of the
 calendar. Vattodienu and the fire/Havdalah pair depend on Motzaei Shabbat; close
 their scopes before Vattitten Lanu and Shehecheyanu respectively. Keep Yigdal
-outside the minyan/mourner gate. The existing user723 holam-supply convention for
-the literal Tetragrammaton applies here too: record supplied marks separately from
-the unchanged scan readings and leave the two-yod abbreviation as printed.
+outside the minyan/mourner gate. Preserve the printed Divine Name forms, including
+an absent holam and the two-yod abbreviation. User723 concerns the combined
+shin-dot/holam in שָׁלֹשׁ; it does not authorize supplying a missing holam in the
+Tetragrammaton. The earlier broader statement here was an unsupported inference
+and is withdrawn. Genuine authorized reconstructions remain separately evidenced.
 
 The second-night entry has its own day2/Maariv selection and output profile in
 the existing expanded project. Preserve the first-day index and its shipped

@@ -3,12 +3,11 @@
 Read `specs/SCAN_DIGITIZATION_INSTRUCTIONS.md` and
 `specs/MARMORSTEIN_ROSH_HASHANAH_2.md` before continuing.
 
-The startup imports the complete 385-leaf inventory and OCR candidates, caches
-images separately, and builds **draft front matter only**. It does not yet
-assemble the service, provide second-day export settings, or claim full-volume acceptance. Scans1–4 have completed their separate batch acceptance;
-the remaining381 scans are unaccepted.
-The Hebrew cover emblem and title signature were settled by user adjudications860–861. The blind
-review's omissions and effort-report discrepancy are recorded in source evidence.
+The importer inventories all 385 scans and keeps images outside Git. Current
+acceptance is recorded in the source `progress.json` and per-batch checklists;
+historical startup reports are not the current status. Scans 25–45 add the
+opening morning service, with canonical shared printings and documentary and
+expanded order. Generation alone does not accept a batch.
 
 Use explicit roots for the coordinated standalone source/project worktrees:
 
@@ -116,3 +115,28 @@ The expanded first-day index/profile remain unchanged; the second-night profile
 selects its own entry in that project. Documentary `maariv_service.xml` is a shared
 structural boundary after the untranslated entrance, keeping facing headings and
 speaker descriptions beside their proper section.
+
+Generate the morning installment after the evening generation stages above:
+
+```bash
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.morning_witnesses \
+  --draft --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.morning_shared \
+  --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.morning \
+  --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project
+```
+
+The first stage writes literal units; the second selects hash-bound shared
+printings without replacing canonical identities or filling earlier translation
+gaps; the final stage restores the complete documentary indexes and release
+profiles after evening regeneration, and builds the expanded morning entry.
+The five-unit Torah-study block moves with the German-rite setting, and the
+Shabbat offering remains conditional. The source preserves both printed page
+directions; the expanded entry inserts the prayers in recitation order.
+Recipes bind approved raw readings and source-approval hashes. Correct earlier
+unsupported normalizations through the recorded source amendment before taking
+a new template snapshot.

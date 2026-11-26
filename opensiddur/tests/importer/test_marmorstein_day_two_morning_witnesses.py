@@ -1,11 +1,17 @@
 """Synthetic tests for independent source ranges in a new physical volume."""
 import copy
+import hashlib
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from lxml import etree
 
 from opensiddur.importer.marmorstein_rosh_hashanah_2 import IDENTIFIER, PROJECTS
 from opensiddur.importer.marmorstein_rosh_hashanah_2.morning_witnesses import (
+    main,
     retain_range_provenance,
     witness_document,
 )
@@ -125,3 +131,25 @@ class MorningWitnessTests(unittest.TestCase):
         half = root.find('.//'+T+'milestone[@corresp="'+verse+'/a"]')
         self.assertTrue(half.getnext().get('facs').endswith('/page/n7.jpg'))
         self.assertTrue(whole.getnext().get('facs').endswith('/page/n8.jpg'))
+
+    def test_recipe_must_hash_readings_and_the_approval_record(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2 import BOOK
+        for missing in ('readings.json', 'approval.json'):
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as tmp:
+                source = Path(tmp)/BOOK
+                source.mkdir()
+                (source/'readings.json').write_text('{}')
+                (source/'approval.json').write_text(json.dumps({
+                    'status': 'approved_source_only', 'working_readings_sha256': None}))
+                recipe = {
+                    'readings': 'readings.json', 'source_approval': 'approval.json',
+                    'input_sha256': {name: hashlib.sha256((source/name).read_bytes()).hexdigest()
+                                     for name in ('readings.json', 'approval.json') if name != missing},
+                    'units': [], 'protected_files': []}
+                (source/'recipe.json').write_text(json.dumps(recipe))
+                with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.'
+                           'morning_witnesses.write_documents') as write:
+                    with self.assertRaisesRegex(ValueError, 'bind both'):
+                        main(['--draft', '--source-root', tmp, '--recipe', 'recipe.json',
+                              '--project-directory', str(Path(tmp)/'projects')])
+                    write.assert_not_called()

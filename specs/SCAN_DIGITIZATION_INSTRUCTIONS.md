@@ -48,6 +48,15 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Preserve immutable independent readings even after adjudication. Encode clear
   source mistakes with `tei:choice/tei:sic` and `tei:corr`, retaining the printed
   reading and an evidenced correction. Do not silently modernize archaic forms.
+  A legitimate lexical or orthographic alternative is ordinary source text, not
+  a mistake: difference from familiar prayer wording alone does not justify
+  `sic/corr`. For example, retain this edition’s לַעֲשׂוֹק without correction;
+  the user confirmed its sin spelling as a legitimate alternative.
+- Encode both logical characters where one printed dot serves as shin dot and
+  holam, following `BIRNBAUM_FROM_SCAN.md`'s combined-dot rule. User723 confirms
+  that case in שָׁלֹשׁ; it does not authorize adding absent vowels to other words
+  or to the Divine Name. Preserve a source Tetragrammaton without holam unless
+  a separate, explicit authorization or source reconstruction applies.
 - Distinguish an absent printed mark from an editorial normalization required by
   project conventions. Record the latter explicitly; do not describe it as a
   mark seen in the image. Preserve Divine Name semantics through transclusion.
@@ -356,3 +365,22 @@ lower stroke as a vowel. A Rashi alef's detached lower limb can resemble a patah
 a tight crop alone can conceal that distinction. Give a dedicated reader the
 enlarged word and wider font context. Resolve each occurrence independently and
 keep genuinely uncertain marks for human review.
+
+### Reused printings and electronic review
+
+- When several documentary printings share a canonical identity, keep the canonical
+  boundary outside the printing options, and select page provenance with the
+  corresponding words. Expose interior verse ranges independently of printed
+  paragraphs. Keep local printing declarations in the service that selects them.
+- Adding a later translation must not fill an earlier edition's translation gap.
+  Check earlier callers after adding shared providers, including a counterpart
+  whose selected conditions leave no visible content. Inspect the complete
+  generated correspondence graph, including contextual quotations and provider
+  fallbacks, rather than just newly registered roots.
+- In electronic-book QA, `content-visibility: auto` can omit off-screen rows from
+  `innerText` while the rows remain correctly available to the reader. Verify
+  conditional visibility through DOM nodes and computed styles, and scroll the
+  relevant section into view before claiming text is missing.
+- Preserve exact reviewed artifact hashes. A bounded correction after a review
+  needs an explicit amendment and refreshed affected exports; a historical
+  approval is not approval of a changed artifact.
