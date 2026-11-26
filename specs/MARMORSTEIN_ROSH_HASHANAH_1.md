@@ -149,7 +149,13 @@ The opening page's complete collection has the structural identity
 `urn:x-opensiddur:text:siddur:rosh_hashanah/entering_synagogue`; its component
 prayers and verses retain their existing identities. Documentary transclusions
 select the edition explicitly, while expanded prayer transclusions remain
-edition-independent. Hebrew dependencies precede English projects in source
+edition-independent. The build drops the edition from an expanded reference
+that names one, except the two in `EXPANDED_EDITION_PINS` (the pins stay in
+`readings.json`, whose expanded-order hash every realization review binds): the Half Kaddish of the
+preparatory weekday Minchah and the Mourner's Kaddish of Kabbalat Shabbat
+outside the Ten Days. Both are said outside the Ten Days, where Heidenheim's
+Ten Days Kaddish, first in the volume's priorities, would be wrong; they keep
+Birnbaum's calendar-responsive wording. Hebrew dependencies precede English projects in source
 priority, with translations selected separately as parallel witnesses.
 
 Following the comparison with Birnbaum, the reusable Kedushah is conditioned
