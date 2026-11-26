@@ -4,8 +4,9 @@ Track execution in the [working checklist](MARMORSTEIN_ROSH_HASHANAH_2_CHECKLIST
 Each page batch must complete its source, encoding, order and presentation gates
 before acceptance is recorded and the next batch begins.
 
-**Current acceptance: scans1–4, 4/385 complete scans.** All front-matter batch gates
-are closed; the next batch begins at scan5. Startup checkpoints below are historical.
+Current acceptance is recorded in the source repository's `progress.json` and
+`batches/maariv_s5_s24/checklist.json`. The opening implementation covers scans
+1–24 of 385; scan 25 begins morning material. Startup checkpoints below are historical.
 
 ## Scope and source
 
@@ -207,3 +208,27 @@ Scan24 prints Aleinu without an English counterpart in this batch; leave that
 translation absent. Scan15 prints “Thou has created”: keep that wording in source
 evidence and encode an eventual obvious-typo correction with `sic`/`corr`, rather
 than silently changing the transcription.
+
+## Implemented opening installment
+
+The source-bound recipes generate 47 prayer modules with 87 Hebrew/English
+witnesses. Documentary `second_night.xml` keeps the Hebrew-only entrance before
+the shared `maariv_service.xml` boundary, so the English evening heading cannot
+float above the entrance. Each language preserves its own printed roles.
+
+The expanded project's `second_day_evening.yaml` selects `second_night.xml`
+directly. Its first-day `index.xml` and `undated.yaml` remain unchanged. One
+global priority list cannot preserve both volumes' translation gaps in a combined
+undated entry. The second-night profile prefers this volume's Hebrew and English,
+with compatible first-day Hebrew dependencies and no substitute English.
+
+Aleinu maps only its established whole-prayer identity; this witness does not
+claim incompatible first-day child scopes. Complete Kaddish combines the new
+half Kaddish with existing ending identities. Borrowed Kaddish and Yigdal retain
+first-day scan provenance inside the actual transcluded ranges. Their words and
+canonical scopes remain unchanged; the provenance and paragraph changes have
+separate equivalence evidence.
+
+Final code, condition-matrix, schema/reference and PDF/HTML presentation approvals
+are bound to frozen inputs in the source batch ledger. Excerpt and historical
+checkpoint approvals do not replace that complete-batch acceptance record.

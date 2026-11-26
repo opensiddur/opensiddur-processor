@@ -110,7 +110,7 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
 - [ ] Finish linked PRs and CI; merge processor dependencies first, rerun dependent
       project checks, merge and close out managed worktrees preserving needed outputs.
 
-## Batch B checkpoint — 2026-11-26
+## Historical batch B checkpoint — 2026-11-26
 
 - [x] Resolve questions931–976 with dedicated readers, returning only the
       unresolved973 host letter to the user; record the gimel adjudication.
@@ -150,3 +150,20 @@ The compiled matrix passes communal/individual recitation, mourner presence,
 optional Malkenu, Motzaei Shabbat true/false, two real evening dates and first-/
 second-day selection. Final rubric/dependency closure and complete PDF/HTML
 presentation review are still required; accepted coverage remains4/385.
+
+
+## Implemented batch B architecture
+
+- The complete entrance and second-night service use 47 prayer modules and 87
+  witnesses, documentary wrappers and one shared expanded sequence.
+- The second-night expanded profile selects its own entry. The accepted first-day
+  entry and profile stay unchanged; borrowed Kaddish/Yigdal provenance is reviewed
+  separately without changing their prayer words or canonical scopes.
+- Final checks cover the actual shipped first-day profile, real evening dates,
+  individual/communal recitation, mourners, optional Malkenu, exact compiled words,
+  paired rubric direction and source-arrow hitboxes on every output page.
+- Exporter corrections are isolated in PR 344, before processor PR 331 and the
+  dependent projects PR 110. Source readings and review evidence are in PR 60.
+
+The source batch checklist is the current gate status and acceptance record.
+Historical counts and pending gates above describe their earlier checkpoints.

@@ -215,6 +215,22 @@ to other editions; apply the edition-specific decisions below only to this book.
   Link counts alone cannot show that links are usable: distinct source pages
   can occupy identical clickable rectangles on one generated line. Check
   nonoverlap, full click-target size and page bounds in both output formats.
+- In buffered PDF text, resolve page parity at shipout rather than while building
+  paragraphs. Test multiple output pages, both margins, and whether each link
+  rectangle contains its visible symbol and clears the text. Distinguish the
+  normal PDF link padding from an actual glyph collision.
+- A whole-text facsimile attribute does not necessarily supply a page marker to
+  an independently transcluded subrange. Verify provenance within each borrowed
+  range, preserve source anchors and text tails, and retain the donor's words,
+  canonical scopes, credits and licence when exposing additional boundaries.
+- Shared bilingual rubrics must follow the actual column geometry. Match writing
+  direction, including Hebrew-script German, rather than exact language tags;
+  preserve each language and role. Check paragraph direction, both column orders,
+  indentation and left/center/right placement. Rubrics already inside a column
+  must not become page-wide boxes.
+- A structural heading must contain the text it titles, including transclusions.
+  An empty heading-only division followed by a sibling prayer misleads contents
+  and electronic navigation even if the printed page looks plausible.
 - Check a canonical range's opening provenance as well as internal page breaks:
   its source page marker may live on a documentary heading outside the selected
   range. Do not reset backlink state at every file to conceal that problem.
@@ -232,12 +248,19 @@ to other editions; apply the edition-specific decisions below only to this book.
   exporting. Assert actual counterpart discovery and parallel output mode; a
   warning about fallback to per-transclusion parallels can hide missing English
   while a front-matter-only preview still looks correct.
+- Run `opensiddur.exporter.books --check` for new book profiles. Each profile
+  must declare `requires_processor`; passing feature validation alone does not
+  verify the book-profile contract.
 - Inspect documentary Hebrew, documentary parallel and expanded PDF/HTML.
   Verify actual links, direction, columns, notes, bookmarks and conditional
   alternatives. Record visual sampling separately from mechanical all-page QA.
 - Freeze complete reports and artifact hashes before final independent export
   review. A still-running test log or screenshots from an earlier artifact do
   not certify the current output. Re-render after relevant changes.
+- Record processor/project commits and input/settings hashes before running
+  acceptance checks, then verify unchanged inputs afterward. Keep reviewed
+  inputs frozen during independent review. For a metadata-only follow-up,
+  preserve explicit before/after equivalence evidence and review its scope.
 - After interrupted LaTeX builds, restore or rebuild a consistent auxiliary
   cache and rerun until references settle. PDF existence alone proves nothing.
 - Report accepted coverage from current evidence, including blanks. Distinguish
