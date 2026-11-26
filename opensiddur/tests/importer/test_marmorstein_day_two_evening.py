@@ -26,6 +26,23 @@ class EveningSequenceTests(unittest.TestCase):
         self.assertEqual(self.root[0].get('target'), self.units['invented']['urn'])
         self.assertNotIn('@', self.root[0].get('target'))
 
+    def test_expanded_bilingual_roles_share_one_rubric_with_language_and_role(self):
+        self.render([{'kind': 'note', 'readings': {
+            'he': {'text': 'ח׳', 'language': 'he', 'role': 'reader', 'expansion': 'חזן'},
+            'en': {'text': 'Reader:', 'language': 'en', 'role': 'reader'}}}], expanded=True)
+        self.assertEqual(len(self.root), 1)
+        phrases = self.root.xpath('t:note/t:foreign', namespaces=NS)
+        self.assertEqual(len(phrases), 2)
+        self.assertTrue(all(p.get('corresp').endswith('/reader') for p in phrases))
+        self.assertEqual(phrases[0].xpath('string(t:choice/t:abbr)', namespaces=NS), 'ח׳')
+
+    def test_expanded_heading_direction_is_a_separate_structural_paragraph(self):
+        self.render([{'kind': 'direction', 'separate_heading': True,
+                      'readings': {'he': {'text': 'Heading', 'language': 'he'}},
+                      'targets': ['urn:x-opensiddur:text:poem:invented']}], expanded=True)
+        self.assertEqual(len(self.root.xpath('t:div/t:p/t:note', namespaces=NS)), 1)
+        self.assertEqual(etree.QName(self.root[1]).localname, 'transclude')
+
     def test_motzaei_scope_stops_before_following_blessing(self):
         self.render([{'kind': 'condition', 'id': 'boundary',
                       'expressions': [{'type': 'opensiddur:holiday-aggregate',

@@ -69,6 +69,24 @@ def readings_for(item, lang, expanded):
             yield reading
 
 
+def source_notes(parent, readings, *, description=False):
+    """Keep a shared bilingual rubric together without swapping its columns."""
+    readings = list(readings)
+    if len(readings) == 2 and len({r['language'] for r in readings}) == 2:
+        note = element(parent, 'note', type='description' if description or any(
+            r.get('role') for r in readings) else 'instruction')
+        for reading in readings:
+            temporary = etree.Element(f'{{{TEI}}}div')
+            source = source_note(temporary, reading, description=description)
+            phrase = element(note, 'foreign', source.text)
+            phrase.attrib.update(source.attrib)
+            phrase.attrib.pop('type', None)
+            phrase.extend(source)
+        return
+    for reading in readings:
+        source_note(parent, reading, description=description)
+
+
 def render_sequence(parent, sequence, lang, *, expanded, units):
     for item in sequence:
         kind = item['kind']
@@ -87,11 +105,12 @@ def render_sequence(parent, sequence, lang, *, expanded, units):
                 attributes = {'target': unit['urn']+suffix}
             element(parent, 'j:transclude', type='external', **attributes)
         elif kind == 'note':
-            for reading in readings_for(item, lang, expanded):
-                source_note(parent, reading, description=item.get('rubric_kind') == 'description')
+            source_notes(parent, readings_for(item, lang, expanded),
+                         description=item.get('rubric_kind') == 'description')
         elif kind == 'direction':
-            for reading in readings_for(item, lang, expanded):
-                source_note(parent, reading, description=expanded)
+            container = (element(element(parent, 'div'), 'p')
+                         if expanded and item.get('separate_heading') else parent)
+            source_notes(container, readings_for(item, lang, expanded), description=expanded)
             if expanded:
                 for target in item['targets']:
                     element(parent, 'j:transclude', type='external', target=target)
@@ -253,13 +272,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
     source = args.source_root/BOOK
     path = source/'batches/maariv_s5_s24/evening_sequence.json'
-    recipe = json.loads(path.read_text())
+    recipe = json.loads(path.read_text(encoding="utf-8"))
     for relative, expected in recipe['input_sha256'].items():
         if hashlib.sha256((source/relative).read_bytes()).hexdigest() != expected:
             raise ValueError('Stale evening sequence input: '+relative)
     units = {}
     for relative in recipe['prayer_recipes']:
-        prayer_recipe = json.loads((source/relative).read_text())
+        prayer_recipe = json.loads((source/relative).read_text(encoding="utf-8"))
         for reading, expected in prayer_recipe['input_sha256'].items():
             if hashlib.sha256((source/reading).read_bytes()).hexdigest() != expected:
                 raise ValueError('Stale prayer recipe input: '+reading)
@@ -268,11 +287,11 @@ def main(argv=None):
                 raise ValueError('Prayer recipe ownership collision: '+unit['file'])
             units[unit['file']] = unit
     front_path = source/'front_resolved.json'
-    front = json.loads(front_path.read_text())
-    front_check = json.loads((source/'batches/front_matter_s1_s4/checklist.json').read_text())
+    front = json.loads(front_path.read_text(encoding="utf-8"))
+    front_check = json.loads((source/'batches/front_matter_s1_s4/checklist.json').read_text(encoding="utf-8"))
     if hashlib.sha256(front_path.read_bytes()).hexdigest() != front_check['gates']['adjudication']['resolved_sha256']:
         raise ValueError('Stale front-matter adjudication')
-    layouts = json.loads((source/'front_layout.json').read_text())
+    layouts = json.loads((source/'front_layout.json').read_text(encoding="utf-8"))
     targets = []
     for lang in PROJECTS:
         # Pair the evening heading only after the Hebrew-only entrance. A shared
