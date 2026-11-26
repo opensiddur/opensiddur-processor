@@ -79,3 +79,11 @@ continuation may omit `urn` to keep the current part across paragraphs. Bounded
 chapter/verse terminators and current-page provenance. Contextual role and ritual
 instructions belong in the service spine. Recipes must mark actual Divine Name
 words; matching two adjacent yods inside an ordinary word is not sufficient.
+
+The `hashkivenu_kaddish_units.json` recipe keeps Hashkivenu in one printed
+paragraph while exposing its opening and existing `hapores_sukkat_shalom`
+variant root as reusable ranges. The service spine must use that root or the
+whole prayer; this witness does not supply the deeper `/text` identity.
+Kaddish uses `text_language: arc` on its witness, which annotates only its
+paragraphs and preserves the Hebrew publication language. Contextual role,
+calendar and quorum selection remain separate service-review gates.

@@ -170,3 +170,17 @@ PDF/HTML excerpts passed independent presentation review with this setting.
 This is a configured-output decision, not a change to the exporter default.
 The source record `batches/maariv_s5_s24/shema_remaining_presentation_review.json`
 binds the reviewed outputs; its excerpt approval does not accept complete scans.
+
+## Reviewed night-service module decisions
+
+The scan12 Hashkivenu witness preserves one printed paragraph and maps its ending
+through the existing `hashkivenu/hapores_sukkat_shalom` root milestone. Use that
+root or the whole prayer in the service spine; this witness does not provide the
+deeper `/text` identity used by the first-day separate ending file. Kaddish uses
+Aramaic paragraphs inside the Hebrew project. Contextual speaker directions and
+calendar/quorum or seasonal selection are still separate required spine audits.
+
+Scan24 prints Aleinu without an English counterpart in this batch; leave that
+translation absent. Scan15 prints “Thou has created”: keep that wording in source
+evidence and encode an eventual obvious-typo correction with `sic`/`corr`, rather
+than silently changing the transcription.

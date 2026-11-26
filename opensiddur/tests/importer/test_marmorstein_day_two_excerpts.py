@@ -94,6 +94,16 @@ class ExcerptTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'disagrees'):
             prayer_document(unit, 'he', witness)
 
+    def test_aramaic_prayer_language_is_local_to_its_paragraphs(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import prayer_document
+        unit = self.recipe['units'][0]
+        witness = {'scan_page': 23, 'printed_page': '9', 'text_language': 'arc', 'parts': [
+            {'urn': unit['urn']+'/a', 'content': ['Invented.']},
+            {'urn': unit['urn']+'/b', 'new_paragraph': True, 'content': ['Continuation.']}]}
+        root = prayer_document(unit, 'he', witness)
+        self.assertEqual(root.get('{http://www.w3.org/XML/1998/namespace}lang'), 'he')
+        self.assertEqual(root.xpath('//t:body//t:p/@xml:lang', namespaces=NS), ['arc', 'arc'])
+
     def test_prayer_rejects_empty_and_duplicate_parts_before_writes(self):
         unit = self.recipe['units'][0]
         for parts in [[], [{'urn': unit['urn']+'/a', 'content': ['a']},

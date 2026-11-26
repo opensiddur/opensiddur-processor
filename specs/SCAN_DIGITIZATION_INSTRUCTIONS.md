@@ -307,3 +307,11 @@ two yods can wrongly mark an ordinary word such as בחיים without changing i
 visible letters. Identify actual Divine Name tokens, inspect surrounding words
 and legitimate attached prefixes, and review every generated `j:divineName`.
 Exact-text comparison alone cannot catch this error.
+
+### Small Rashi-script glyphs
+
+Inspect the complete letterform and surrounding type before treating a detached
+lower stroke as a vowel. A Rashi alef's detached lower limb can resemble a patah;
+a tight crop alone can conceal that distinction. Give a dedicated reader the
+enlarged word and wider font context. Resolve each occurrence independently and
+keep genuinely uncertain marks for human review.

@@ -122,7 +122,7 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
 - [x] Close independent Emet source/encoding/code and configured PDF/HTML
       presentation review; preserve the rejected Divine Name markup finding
       and its corrected evidence. Integrate merged exporter PR341 from main.
-- [x] Pass branch lint and 42 focused tests (19 subtests).
+- [x] Pass branch lint and 43 focused tests (19 subtests).
 - [x] Close independent encoding review of the three scan12–13 scripture modules,
       including single-verse identity/provenance and earlier Shema provenance equivalence.
 - [ ] Inspect and independently review the three scripture modules’ exports.
@@ -132,3 +132,11 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
 Complete accepted scans remain **4/385**. Excerpt approval and complete source
 readings do not change that count while service, encoding or presentation gates
 for a complete scan remain open.
+
+The complete source5–24 image audit and application verification are complete
+except the initial small rubric mark on scan16 (question977). All other source
+readings are independently approved, including opening5–7. Hashkivenu and half
+Kaddish have independent source/encoding/alignment approval, including local
+Aramaic paragraph language; their exports and service/seasonal audit remain open.
+The progress ledger records23 approved source readings among scans1–24 separately
+from the unchanged4/385 complete accepted scans.

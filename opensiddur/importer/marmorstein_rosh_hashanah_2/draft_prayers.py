@@ -116,6 +116,8 @@ def prayer_document(unit, lang, witness):
             seen_parts.add(urn)
         if paragraph is None or part.get('new_paragraph', False):
             paragraph = element(div, 'p')
+            if witness.get('text_language'):
+                paragraph.set(XML+'lang', witness['text_language'])
         if urn is not None:
             element(paragraph, 'milestone', unit='prayer-part', corresp=urn)
         current_page = append_prayer_content(paragraph, part['content'], current_page)
