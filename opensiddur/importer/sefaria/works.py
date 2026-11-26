@@ -6,7 +6,7 @@ stages themselves are the same for all of them. See ``specs/SEFARIA_IMPORT.md``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -35,6 +35,13 @@ class Work:
     #: the namespace a new text the book numbers (``markup.is_numbered``) is minted in: the
     #: Selichot numbers its selichot, which are poems; every other new text is a prayer
     numbered_texts: str = "prayer"
+    #: a second version per language, for the leaves the main version leaves empty (Sefaria's
+    #: Siddur Ashkenaz has the Metsudah Hallel only in another Hebrew version)
+    supplements: dict[str, str] = field(default_factory=dict)
+    #: "linear", one phrase of the book's linear layout to a segment, or "paragraph"
+    layout: str = "linear"
+    #: what the English is, when it is not simply the translator's linear translation
+    translation_note: str = ""
 
     @property
     def schema_file_title(self) -> str:
@@ -76,7 +83,14 @@ def load_works(path: Path = WORKS_FILE) -> dict[str, Work]:
             translator=entry["translator"],
             date=str(entry["date"]),
             numbered_texts=str(entry.get("numbered_texts", "prayer")),
+            supplements=dict(entry.get("supplements") or {}),
+            layout=str(entry.get("layout", "linear")),
+            translation_note=" ".join(str(entry.get("translation_note", "")).split()),
         )
+        if set(works[key].supplements) - set(LANGUAGES):
+            raise ValueError(f"{path}: {key}: supplements are per language ({LANGUAGES})")
+        if works[key].layout not in ("linear", "paragraph"):
+            raise ValueError(f"{path}: {key}: layout is linear or paragraph")
     return works
 
 

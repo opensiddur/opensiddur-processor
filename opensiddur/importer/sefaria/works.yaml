@@ -15,6 +15,11 @@
 # numbered_texts the namespace a new text is minted in when the book numbers it (א., ב., ...):
 #                prayer (the default), or poem for the selichot of a book of selichot; a text
 #                the book does not number is a prayer
+# supplements    a second version per language, for the leaves the main version leaves empty
+# layout         linear (the default: one phrase of the book's linear layout to a segment) or
+#                paragraph (one paragraph to a segment)
+# translation_note
+#                what the English is, when it is not simply the translator's linear translation
 
 weekday_siddur_sefard_linear:
   title: Weekday Siddur Sefard Linear
@@ -73,3 +78,29 @@ selichot_nusach_lita_linear:
   translator: Avrohom Davis
   date: "1986"
   numbered_texts: poem
+
+siddur_ashkenaz:
+  # Sefaria's shared Ashkenaz index, which holds many siddurim; the Metsudah versions fill its
+  # weekday services, Friday night and Birkat HaMazon, a paragraph to a segment.
+  title: Siddur Ashkenaz
+  versions:
+    he: "The Metsudah siddur, 1981"
+    en: "Translation based on the Metsudah linear siddur, by Avrohom Davis, 1981"
+  supplements:
+    # Only Rosh Chodesh Hallel, untranslated
+    he: "The Metsudah siddur: a new linear siddur with English translation by Avrohom Davis, 1981"
+  projects:
+    he: metsudah_siddur_ashkenaz-davis-1981-he
+    en: metsudah_siddur_ashkenaz-davis-1981-en
+  title_en: "The Metsudah Siddur (Ashkenaz)"
+  title_he: "סידור אשכנז"
+  rite: Nusach Ashkenaz, the Ashkenazi rite.
+  licence: https://creativecommons.org/licenses/by/3.0/
+  publisher: Metsudah Publications
+  place: New York
+  translator: Avrohom Davis
+  date: "1981"
+  layout: paragraph
+  translation_note: >-
+    The English is based on Avrohom Davis’s translation in the Metsudah linear siddur, as
+    Sefaria describes its version, and is set out a paragraph at a time.

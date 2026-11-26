@@ -31,11 +31,12 @@ Rendering:
 
 from __future__ import annotations
 
+import dataclasses
 import html
 import re
 
 from lxml import etree
-from collections.abc import Collection, Iterable
+from collections.abc import Collection, Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -51,8 +52,11 @@ from opensiddur.importer.sefaria.markup import (
     Styled,
     Text,
     english_kind,
+    VERSE_ENDINGS,
     leading_label,
     plain_text,
+    split_leading,
+    verse_segments,
 )
 from opensiddur.importer.sefaria.conditions import Conditions, LeafGate, condition_xml, negated_xml
 from opensiddur.importer.sefaria.phrases import phrase_urn
@@ -188,19 +192,53 @@ def rubric_xml(pair: Pair, lang: str, notes: Notes | None) -> str:
     return instruction(nodes, lang, notes, kind=kind)
 
 
-def phrase_xml(pair: Pair, lang: str, notes: Notes, milestone: str | None, *, label: bool = True) -> str:
+def phrase_xml(pair: Pair, lang: str, notes: Notes, milestone: str | None, *, label: bool = True,
+               cuts: list[tuple[int, int, str]] | None = None) -> str:
     """A phrase in one language. Its Hebrew label (``לְר"ח:``) is an instruction before it,
-    unless ``label`` is false: the label is then the note of the phrase's conditional."""
+    unless ``label`` is false: the label is then the note of the phrase's conditional. ``cuts``
+    are milestones set inside its words (:func:`_insert_cuts`): the verses that open and end
+    inside it."""
     nodes = pair.he if lang == "he" else pair.en
     mark = f'<tei:milestone unit="phrase" corresp="{attr(milestone)}"/>' if milestone else ""
     if not plain_text(nodes) and not footnotes_in(nodes):
-        return mark
+        return mark + "".join(m for _, _, m in cuts or ())
     prefix = ""
     if lang == "he":
         found, nodes = leading_label(nodes)
         if found is not None and label:
             prefix = instruction((found,), lang, notes) + " "
-    return f"{mark}{prefix}{_trim(render(nodes, lang, notes))}"
+    body = _trim(render(nodes, lang, notes))
+    if cuts:
+        body = _insert_cuts(body, cuts, lang, verse_segments(pair.he) if lang != "he" else None)
+    return f"{mark}{prefix}{body}"
+
+
+def english_instruction(nodes: tuple[Node, ...]) -> tuple[tuple[Node, ...], tuple[Node, ...]] | None:
+    """An English phrase that opens with its instruction, the English of a Hebrew label
+    (``<i>During the Ten Days of Penitence:</i> Blessed are You``): the instruction, and the
+    words; None when it does not open so."""
+    split = split_leading(nodes, {"italic", "small"}, hebrew=False)
+    if split is not None and plain_text(split[0]).rstrip().endswith(":"):
+        return split
+    return None
+
+
+def rubric_condition(table: Conditions, pair: Pair):
+    """The condition a rubric gives, if it is a condition rubric: an English rubric known by its
+    words, a Hebrew one known by its label (``בחול קודם ברכת המזון אומרים``), or a label standing
+    on its own line before the words it governs (<b>לפסח</b>, "On Pesach"), known by its Hebrew
+    or else by its English."""
+    if pair.he_kind is HebrewKind.EMPTY:
+        return table.for_rubric(plain_text(pair.en))
+    label = table.for_label(plain_text(pair.he))
+    if label is None and pair.he_kind is HebrewKind.LABEL:
+        return table.for_rubric(plain_text(pair.en))
+    return label
+
+
+def rubric_note(pair: Pair, lang: str, notes: Notes | None) -> str:
+    """A condition rubric as its conditional's note, in the project's language."""
+    return instruction(pair.he if lang == "he" else pair.en, lang, notes)
 
 
 def head_xml(pair: Pair, lang: str, notes: Notes | None, *, element: str = "head") -> str:
@@ -215,8 +253,169 @@ def head_xml(pair: Pair, lang: str, notes: Notes | None, *, element: str = "head
 PHRASE_END = '<tei:milestone unit="phrase"/>'
 #: Closes a verse's scope.
 VERSE_END = '<tei:milestone unit="verse"/>'
-#: How a phrase that ends a verse of scripture ends (sof pasuq, or the colon prayer books use).
-VERSE_ENDINGS = (":", "\u05c3")
+
+
+#: A piece of an XML fragment: a tag, an entity (one character of text) or a character.
+_XML_PIECE = re.compile(r"<[^>]*>|&[^;]*;|[^<&]", re.DOTALL)
+#: The punctuation an English verse milestone is set after, strongest first: a sentence's end,
+#: then a clause's.
+_SENTENCE_ENDS, _CLAUSE_ENDS = ".;:!?", ","
+#: How far (as a share of the phrase) an English cut moves to stand after a sentence's end rather
+#: than a clause's, or after a clause's rather than between two words.
+_CLAUSE_PENALTY, _WORD_PENALTY = 0.05, 0.15
+#: What may follow a sentence's end and still end it (``…is Mine.”``).
+_CLOSING_QUOTES = frozenset({'"', "'", "’", "”", ")", "]", "&quot;", "&apos;", "&#8217;", "&#8221;"})
+
+
+def _word_starts(xml: str) -> tuple[list[tuple[int, int, int]], str]:
+    """Where each word but the first of an XML fragment's text may be cut before -- (the text
+    offset of its first character, the fragment offset just after the whitespace before it,
+    whether that whitespace follows a sentence's end (0), a clause's (1) or neither (2)) -- and
+    the text, an entity as one character. The text of a ``tei:sic`` is not the phrase's (``plain_text`` reads
+    the correction), so it is passed over."""
+    starts: list[tuple[int, int, int]] = []
+    text = 0
+    characters: list[str] = []
+    in_sic = 0
+    previous = " "  # the last text character
+    punctuation = ""  # the last text character but a closing quote or bracket
+    before_space = ""  # that character, before the last run of whitespace
+    after_space = 0  # the fragment offset after the last run of whitespace
+    words = False  # whether a word has begun
+    for match in _XML_PIECE.finditer(xml):
+        piece = match.group()
+        if piece.startswith("<"):
+            in_sic += piece.startswith("<tei:sic") - piece.startswith("</tei:sic")
+            continue
+        if in_sic:
+            continue
+        if piece.isspace():
+            if not previous.isspace():
+                before_space = punctuation
+            after_space = match.end()
+        elif previous.isspace() and words:
+            kind = 0 if before_space in _SENTENCE_ENDS else 1 if before_space in _CLAUSE_ENDS else 2
+            starts.append((text, after_space, kind))
+        if not piece.isspace():
+            words = True
+            if piece not in _CLOSING_QUOTES:
+                punctuation = piece
+        previous = piece
+        text += 1
+        characters.append(piece if len(piece) == 1 else "\ufffc")
+    return starts, "".join(characters)
+
+
+#: Gale and Church's costs (-log of how often each is seen) of one bead of an alignment of
+#: sentences: (Hebrew sentences, English sentences) -> cost.
+_BEADS = {(1, 1): 0.0, (1, 2): 2.3, (2, 1): 2.3, (2, 2): 4.4, (1, 3): 4.6, (3, 1): 4.6, (1, 0): 4.6, (0, 1): 4.6}
+
+
+#: How far a sentence's length in translation varies, per letter (Gale and Church's s²).
+_LENGTH_VARIANCE = 4.0
+
+
+def _hebrew_letters(text: str) -> int:
+    return sum("\u05d0" <= c <= "\u05ea" for c in text)
+
+
+def align_sentences(hebrew: list[int], english: list[int]) -> list[tuple[int, int, int, int]]:
+    """Gale and Church's alignment of a phrase's Hebrew sentences with its English ones, by their
+    lengths (in letters): beads (first Hebrew, last Hebrew + 1, first English, last English + 1),
+    in order, covering both. Lengths are compared in proportion to the whole, so that the
+    alignment comes back into step at every sentence rather than drifting over a long paragraph."""
+    ratio = sum(english) / max(1, sum(hebrew))
+    n, m = len(hebrew), len(english)
+    inf = float("inf")
+    cost = [[inf] * (m + 1) for _ in range(n + 1)]
+    back: list[list[tuple[int, int] | None]] = [[None] * (m + 1) for _ in range(n + 1)]
+    cost[0][0] = 0.0
+    for i in range(n + 1):
+        for j in range(m + 1):
+            if cost[i][j] == inf:
+                continue
+            for (di, dj), prior in _BEADS.items():
+                if i + di > n or j + dj > m:
+                    continue
+                he, en = ratio * sum(hebrew[i:i + di]), sum(english[j:j + dj])
+                delta = (en - he) / ((he + en) / 2 * _LENGTH_VARIANCE + 1) ** 0.5
+                total = cost[i][j] + prior + delta * delta / 2
+                if total < cost[i + di][j + dj]:
+                    cost[i + di][j + dj] = total
+                    back[i + di][j + dj] = (di, dj)
+    beads = []
+    i, j = n, m
+    while i or j:
+        di, dj = back[i][j]  # type: ignore[misc]
+        beads.append((i - di, i, j - dj, j))
+        i, j = i - di, j - dj
+    return beads[::-1]
+
+
+def _insert_cuts(xml: str, cuts: list[tuple[int, int, str]], lang: str,
+                 hebrew: list[str] | None = None) -> str:
+    """Set milestones inside a phrase's words: each cut is (the words of the phrase's Hebrew before
+    it, all its Hebrew words, the milestone). In Hebrew, before that word. English has no word of
+    the Hebrew's: given the phrase's ``hebrew`` sentences (``verse_segments``), the English
+    sentences are aligned with them (:func:`align_sentences`), and a cut is set where the
+    sentences it falls between meet, or inside the English of its sentence, at the punctuation
+    nearest the same share of it; else at the punctuation nearest the same share of the phrase."""
+    starts, text = _word_starts(xml)
+    length = len(text)
+    if not starts:
+        return xml + "".join(milestone for _, _, milestone in cuts)
+    penalty = (0.0, _CLAUSE_PENALTY, _WORD_PENALTY)
+    spans = _english_spans(starts, text, hebrew) if lang != "he" and hebrew else None
+    chosen: list[tuple[int, str]] = []
+    last = -1
+    for before, total, milestone in cuts:
+        candidates = [i for i in range(len(starts)) if i > last]
+        if not candidates:
+            chosen.append((len(xml), milestone))
+            continue
+        if lang == "he":
+            # the word ``before`` words in: the start after ``before - 1`` word starts
+            best = min(candidates, key=lambda i: abs(i + 1 - before))
+        elif spans is not None:
+            # the bead the cut falls in: its Hebrew words, and the English text that is theirs
+            he_start, he_end, en_start, en_end = next(
+                (span for span in spans if span[0] <= before < span[1]), spans[-1])
+            target = en_start + (before - he_start) / max(1, he_end - he_start) * (en_end - en_start)
+            inside = [i for i in candidates if en_start <= starts[i][0] <= en_end] or candidates
+            best = min(inside, key=lambda i: abs(starts[i][0] - target) / max(1, en_end - en_start)
+                       + (0.0 if starts[i][0] == en_start else penalty[starts[i][2]]))
+        else:
+            share = before / max(1, total)
+            best = min(candidates, key=lambda i: abs(starts[i][0] / max(1, length) - share) + penalty[starts[i][2]])
+        last = best
+        chosen.append((starts[best][1], milestone))
+    for position, _, milestone in sorted(((p, i, m) for i, (p, m) in enumerate(chosen)), reverse=True):
+        xml = xml[:position] + milestone + xml[position:]
+    return xml
+
+
+def _english_letters(text: str) -> int:
+    """The letters of English text that translate words: not the words the translator adds in
+    brackets (``there is [long] life``)."""
+    return sum(c.isalpha() for c in re.sub(r"\[[^\]]*\]", "", text))
+
+
+def _english_spans(starts: list[tuple[int, int, int]], text: str,
+                   hebrew: list[str]) -> list[tuple[int, int, int, int]] | None:
+    """The beads of the alignment of a phrase's Hebrew sentences with its English: (first Hebrew
+    word, last Hebrew word + 1, first English text offset, last English text offset); None where
+    either has one sentence, or the English has none of its own."""
+    english_breaks = [0] + [offset for offset, _, kind in starts if kind == 0] + [len(text)]
+    if len(hebrew) < 2 or len(english_breaks) < 3:
+        return None
+    english = [_english_letters(text[a:b]) for a, b in zip(english_breaks, english_breaks[1:])]
+    hebrew_words = [0]
+    for sentence in hebrew:
+        hebrew_words.append(hebrew_words[-1] + len(sentence.split()))
+    spans = []
+    for he_first, he_last, en_first, en_last in align_sentences([_hebrew_letters(t) for t in hebrew], english):
+        spans.append((hebrew_words[he_first], hebrew_words[he_last], english_breaks[en_first], english_breaks[en_last]))
+    return spans
 
 
 # --------------------------------------------------------------------------------------------
@@ -308,10 +507,13 @@ class _TextWriter:
     def open_calendar(self, pair: Pair, when, through: tuple[str, ...] = ()) -> None:
         self.close_calendar()
         xml_id = self.next_id("when")
-        note = instruction(pair.en, "en", self.notes) if self.lang == "en" else ""
+        # The rubric is the conditional's note: in Hebrew, its label (<small>בשבועות:</small>).
+        note = rubric_note(pair, self.lang, self.notes)
         self.parts.append(conditional_open(xml_id, note, condition_xml(when)))
-        # [id, depth, parenthesized, to close, the words that end it, the words so far]
-        self.calendars.append([xml_id, len(self.open_variants), None, False, through, []])
+        # [id, depth, parenthesized, to close, the words that end it, the words so far,
+        #  the paragraph a paragraph's label governs: the first after it, "next" until known]
+        self.calendars.append([xml_id, len(self.open_variants), None, False, through, [],
+                               "next" if pair.paragraph_label else None])
 
     def close_calendar(self, *, everything: bool = False) -> None:
         """Close the condition rubric's conditional opened at this level (or, with
@@ -339,12 +541,23 @@ class _TextWriter:
             self.parts.append(VERSE_END)
             self.verse_open = False
 
-    def phrase(self, pair: Pair, number: int) -> None:
+    def phrase(self, pair: Pair, number: int, cuts: list[tuple[int, int, str]] | None = None) -> None:
         # The Hebrew makes the phrase, so both languages mark it, the English even where it
         # leaves the phrase untranslated: the row is then set with an empty English cell,
         # rather than the Hebrew running on into the row before.
         hebrew = plain_text(pair.he)
         current = self.calendar
+        # A paragraph's label governs one paragraph: the rest of its own, or the next -- which
+        # may be printed inside a variant's conditional opened after the label.
+        governing = self.calendars[-1] if self.calendars else None
+        if governing is not None and governing[6] == "next":
+            governing[6] = pair.he_index
+        elif governing is not None and governing[6] is not None and pair.he_index != governing[6]:
+            if governing is current:
+                self.close_calendar()
+                current = self.calendar
+            else:
+                governing[3] = True  # to close when the variant's conditional does
         if current is not None and current[2] is None:
             current[2] = hebrew.lstrip().startswith("(")
         label, _ = leading_label(pair.he)
@@ -355,9 +568,22 @@ class _TextWriter:
             # the conditional's note.
             self.end_phrase()
             xml_id = self.next_id("when")
-            note = instruction((label,), "he", self.notes) if self.lang == "he" else ""
+            if self.lang == "he":
+                note = instruction((label,), "he", self.notes)
+            elif (split := english_instruction(pair.en)) is not None:
+                # ... and in English, the instruction the phrase opens with.
+                note = instruction(split[0], "en", self.notes)
+                pair = dataclasses.replace(pair, en=split[1])
+            else:
+                note = ""
             self.parts.append(conditional_open(xml_id, note, condition_xml(labelled.when)))
-        xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number, self.clashes), label=labelled is None)
+        elif pair.otherwise is not None:
+            # A blessing's ending that another, after its label, replaces: said otherwise.
+            self.end_phrase()
+            xml_id = self.next_id("when")
+            self.parts.append(conditional_open(xml_id, "", negated_xml(pair.otherwise)))
+        xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number, self.clashes), label=labelled is None,
+                         cuts=cuts)
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
         self.parts.append(xml)
@@ -477,14 +703,7 @@ class _TextWriter:
         # languages, whichever the rubric is printed in, so that the two divide alike.
         self.end_phrase()
         self.verse(None)
-        found = None
-        if pair.he_kind is HebrewKind.EMPTY:
-            found = self.table.for_rubric(plain_text(pair.en))
-        elif pair.he_kind is HebrewKind.LABEL:
-            # A label standing on its own line before the words it governs (<b>לפסח</b>, "On
-            # Pesach"): known by its Hebrew, or else by its English.
-            label = self.table.for_label(plain_text(pair.he))
-            found = label if label is not None else self.table.for_rubric(plain_text(pair.en))
+        found = rubric_condition(self.table, pair)
         current = self.calendar
         if found is None and current is not None and current[2] is None:
             # A rubric between a condition rubric and the first words it governs ("Chazzan:",
@@ -594,8 +813,28 @@ def variant_passages(variant: VariantPrinting, base: set[int]) -> dict[int | Non
     return passages
 
 
+#: How many words a verse's length, counted in another document, may be off by: a sof pasuq
+#: that near it ends the verse, and the verse waits for one that near.
+LENGTH_SLACK = 2
+
+
+def _verse_ended(text: str, verse_words: int, verse_length: int | None, following: Sequence[str] = ()) -> bool:
+    """Whether a verse ends after ``text`` (its last words; ``following``, the words after it in
+    the phrase). Where its length is known, at its length -- a colon before a quotation (Isaiah
+    6:3's וְאָמַר:) does not end it -- or at a sof pasuq near it; else at a sof pasuq."""
+    at_sof_pasuq = text.endswith(VERSE_ENDINGS)
+    if verse_length is None:
+        return at_sof_pasuq
+    if at_sof_pasuq:
+        return verse_words >= verse_length - LENGTH_SLACK
+    if verse_words < verse_length:
+        return False
+    # (at its length, a full stop ends it: the words after are the book's, וּכְתִיב בַּתְרֵהּ:)
+    return text.endswith(".") or not any(word.endswith(VERSE_ENDINGS) for word in following[:LENGTH_SLACK])
+
+
 def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, notes: Notes,
-              variants: tuple[VariantPrinting, ...] = (), verses: dict[int, str] | None = None,
+              variants: tuple[VariantPrinting, ...] = (), verses: dict[tuple[int, int], str] | None = None,
               verse_lengths: dict[str, int] | None = None, conditions: Conditions | None = None,
               clashes: Collection[str] = frozenset(), opening: tuple[str, int] | None = None) -> str:
     """A text's division: its heading, then its phrases and the rubrics among them.
@@ -604,10 +843,12 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     variant leaves out conditional on that variant being false, and each variant's own words,
     after the phrase they follow, conditional on it being true.
 
-    ``verses`` (``match.scripture_verses``) gives the verse of scripture each phrase that opens
-    one opens: its ``bible:`` URN is set before the phrase, in both languages, and its scope
-    closed after the phrase that ends it -- by its punctuation, or by its length in words where
-    ``verse_lengths`` knows it -- or before a rubric, unless another verse follows at once.
+    ``verses`` (``match.scripture_verses``) gives the verse of scripture each place that opens
+    one opens -- (phrase position, ``verse_segments`` segment): its ``bible:`` URN is set there,
+    in both languages, and its scope closed where it ends -- at a sof pasuq, or by its length in
+    words where ``verse_lengths`` knows it -- or before a rubric, unless another verse follows at
+    once. A verse that opens or ends inside a phrase is marked inside it: in Hebrew at the sof
+    pasuq, in English at the punctuation nearest the same place.
 
     With ``opening`` -- a text's URN and a number of phrases -- the text opens with that text,
     transcluded in place of its first phrases and the rubrics among them (the full Kaddish, with
@@ -625,7 +866,7 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     # unless the text's own words, or another variant's, already mark it (two printings of the
     # Shema lining שְׁמַע יִשְׂרָאֵל otherwise, each naming Deuteronomy 6:4).
     skip = opening[1] if opening else 0
-    marked = {verse for position, verse in verses.items() if position >= skip}
+    marked = {verse for (position, _), verse in verses.items() if position >= skip}
 
     def insert(anchor: int | None) -> None:
         for variant, by_anchor in passages:
@@ -667,19 +908,44 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
         if position < skip:
             insert(number)  # (the transcluded text's own words: only after its last, a variant's)
             continue
-        if position in verses:
-            writer.verse(verses[position])
-            verse_words, verse_length = 0, verse_lengths.get(verses[position])
-        verse_words += len(plain_text(pair.he).split())
+        if (position, 0) in verses:
+            writer.verse(verses[(position, 0)])
+            verse_words, verse_length = 0, verse_lengths.get(verses[(position, 0)])
+        # A verse that opens or ends inside the phrase: its milestone is set before the word. A
+        # verse ends at its length (in the index's words), or, where that is not known, at a sof
+        # pasuq; one opens at a sof pasuq or full stop (``verse_segments``).
+        segments = verse_segments(pair.he)
+        tokens = [token for segment in segments for token in segment.split()]
+        opens: dict[int, str] = {}
+        boundary = 0
+        for segment, text in enumerate(segments):
+            if segment and (position, segment) in verses:
+                opens[boundary] = verses[(position, segment)]
+            boundary += len(text.split())
+        cuts: list[tuple[int, int, str]] = []
+        # (the writer's state changes only once the phrase is written: writing it may first close
+        # a condition, and with it a verse open before the phrase)
+        verse_open = writer.verse_open
+        for index, token in enumerate(tokens):
+            if index and index in opens:
+                cuts.append((index, len(tokens), f'<tei:milestone unit="verse" corresp="{attr(opens[index])}"/>'))
+                verse_open = True
+                verse_words, verse_length = 0, verse_lengths.get(opens[index])
+            elif index and verse_open and _verse_ended(tokens[index - 1], verse_words, verse_length,
+                                                       tokens[index:]):
+                cuts.append((index, len(tokens), VERSE_END))
+                verse_open = False
+            verse_words += len(words(token))
         if absent.get(number):
             xml_id = writer.open_condition([(variant_urn(urn, name), False) for name in absent[number]])
-            writer.phrase(pair, number)
+            writer.phrase(pair, number, cuts)
             writer.close_condition(xml_id)
         else:
-            writer.phrase(pair, number)
-        ended = plain_text(pair.he).rstrip().endswith(VERSE_ENDINGS) or (
-            verse_length is not None and verse_words >= verse_length)
-        if writer.verse_open and ended and position + 1 not in verses:
+            writer.phrase(pair, number, cuts)
+        if cuts:
+            writer.verse_open = cuts[-1][2] != VERSE_END
+        ended = _verse_ended(plain_text(pair.he).rstrip(), verse_words, verse_length)
+        if writer.verse_open and ended and (position + 1, 0) not in verses:
             writer.end_phrase()
             writer.verse(None)
         insert(number)
@@ -690,11 +956,23 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     return f'<tei:body><tei:div corresp="{attr(urn)}">{head}{transclusion}{paragraph}</tei:div></tei:body>'
 
 
+def _text_gate(text_gates: dict[str, Any], urn: str) -> Any:
+    """The gate of a text, or of the text it is part of (Birnbaum's אתה חוננתנו holds the words
+    the Metsudah text is, ``prayer:amidah/attah_chonantanu/text``)."""
+    while urn:
+        if urn in text_gates:
+            return text_gates[urn]
+        head, _, tail = urn.rpartition("/")
+        urn = head if tail and ":" in head[len(TEXT_PREFIX):] else ""
+    return None
+
+
 def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: dict[int, str],
               lang: str, notes: Notes,
               declarations: dict[int, list[tuple[str, bool]]] | None = None,
               conditions: Conditions | None = None,
-              leading: dict[int, Pair] | None = None) -> str:
+              leading: dict[int, Pair] | None = None,
+              text_gates: dict[str, Any] | None = None) -> str:
     """A leaf's structure division: its heading, then its rubrics, headings and texts.
     ``text_urns`` maps each text block (by ``id``) to its URN; ``declarations``, to the
     variants of its text that are and are not printed here, declared around its transclusion.
@@ -702,7 +980,8 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
     A condition rubric (``conditions``) between texts gates the next text's transclusion --
     or, for a rubric that governs a section, everything to the next heading -- its words the
     conditional's note. ``leading`` gives, for a text printed before (whose own file is the first
-    printing's), the condition rubric it opens with, which then gates its transclusion here."""
+    printing's), the condition rubric it opens with, which then gates its transclusion here.
+    ``text_gates`` (``conditions.yaml`` texts) gates each transclusion of a text by its URN."""
     leading = leading or {}
     declarations = declarations or {}
     table = conditions or Conditions()
@@ -727,7 +1006,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
     for item in items:
         if isinstance(item, Rubric):
             for pair in item.pairs:
-                found = table.for_rubric(plain_text(pair.en)) if pair.he_kind is HebrewKind.EMPTY else None
+                found = rubric_condition(table, pair)
                 if found is None:
                     ends = gate is not None and until is not None and bool(
                         until.search(" ".join(plain_text(pair.en).split())))
@@ -749,7 +1028,13 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 gates += 1
                 gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
                 until_included = found.until_included
-                note = instruction(pair.en, "en", notes) if lang == "en" else ""
+                if getattr(found, "instruction", False):
+                    xml = rubric_xml(pair, lang, notes)
+                    if xml:
+                        parts.append(xml)
+                    note = ""
+                else:
+                    note = rubric_note(pair, lang, notes)
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
         elif isinstance(item, Heading):
             if gate is not None and section and until is None and texts:
@@ -767,11 +1052,13 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 transclude = (f'<j:declare xml:id="{xml_id}">{variant_fs(declarations[id(item)])}</j:declare>'
                               f'{transclude}<j:endDeclare target="#{xml_id}"/>')
             lead = leading.get(id(item))
-            found = table.for_rubric(plain_text(lead.en)) if lead is not None else None
-            # The rubric a section's condition runs to may open the next text's block.
+            found = rubric_condition(table, lead) if lead is not None else None
+            # The rubric a section's condition runs to may open the next text's block, or be its
+            # heading.
+            opening = item.pairs[:next((k for k, p in enumerate(item.pairs) if is_phrase(p)), 0)]
             ends = gate is not None and until is not None and any(
                 until.search(" ".join(plain_text(pair.en).split()))
-                for pair in item.pairs[:next((k for k, p in enumerate(item.pairs) if is_phrase(p)), 0)])
+                for pair in ([item.head] if item.head is not None else []) + list(opening))
             if ends and not until_included:
                 close_gate()
             if lead is not None:
@@ -781,7 +1068,7 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 for pair in item.pairs:
                     if pair is lead or is_phrase(pair):
                         break
-                    if pair.he_kind is HebrewKind.EMPTY and table.for_rubric(plain_text(pair.en)):
+                    if rubric_condition(table, pair):
                         continue  # an earlier condition, overridden by the one the text opens with
                     xml = rubric_xml(pair, lang, notes)
                     if xml:
@@ -795,12 +1082,19 @@ def leaf_body(urn: str, titles: tuple[str, str], items: list[Item], text_urns: d
                 gates += 1
                 gate, section, until, texts = f"when_{gates}", found.section, found.until, 0
                 until_included = found.until_included
-                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                note = rubric_note(lead, lang, notes)
                 parts.append(conditional_open(gate, note, condition_xml(found.when)))
             elif found is not None and gate is None:
                 gates += 1
-                note = instruction(lead.en, "en", notes) if lang == "en" else ""
+                note = rubric_note(lead, lang, notes)
                 transclude = (conditional_open(f"when_{gates}", note, condition_xml(found.when))
+                              + f'{transclude}<j:endConditional target="#when_{gates}"/>')
+            text_gate = _text_gate(text_gates or {}, text_urns[id(item)])
+            if text_gate is not None:
+                gates += 1
+                note = (f'<tei:note type="instruction" xml:lang="en">{esc(text_gate.note)}</tei:note>'
+                        if text_gate.note and lang == "en" else "")
+                transclude = (conditional_open(f"when_{gates}", note, condition_xml(text_gate.when))
                               + f'{transclude}<j:endConditional target="#when_{gates}"/>')
             parts.append(transclude)
             previous = len(parts) - 1
@@ -856,6 +1150,8 @@ class SourceInfo:
     last_export: str
     version_url: dict[str, str]
     md5: dict[str, str]
+    #: the md5 of each language's supplement (``Work.supplements``)
+    supplement_md5: dict[str, str] = field(default_factory=dict)
 
 
 def _publication(work: Work) -> str:
@@ -889,6 +1185,17 @@ def source_bibl(work: Work, lang: str, info: SourceInfo) -> str:
     place = f"<tei:pubPlace>{esc(work.place)}</tei:pubPlace>" if work.place else ""
     accessed = info.last_export[:10]
     other = "en" if lang == "he" else "he"
+    linear = work.layout == "linear"
+    translation = work.translation_note or (
+        f"The English is {work.translator}’s translation, printed in the book’s linear layout "
+        "opposite the Hebrew." if linear else f"The English is {work.translator}’s translation.")
+    unit = "one phrase of the linear layout to a phrase milestone" if linear else "one paragraph to a phrase milestone"
+    supplement = ""
+    if lang in work.supplements:
+        supplement = (f'<tei:idno type="sefaria">{esc(work.supplements[lang])}</tei:idno>'
+                      f"<tei:note>Texts the version “{esc(version_title)}” leaves empty are from the "
+                      f"version “{esc(work.supplements[lang])}” (md5 {esc(info.supplement_md5.get(lang, ''))}), "
+                      "with no translation.</tei:note>")
     return (
         f'<tei:bibl xml:id="{PROJECT_SOURCE_BIBL_ID}">'
         f'<tei:title xml:lang="en">{esc(work.title_en)}</tei:title>'
@@ -899,17 +1206,16 @@ def source_bibl(work: Work, lang: str, info: SourceInfo) -> str:
         f'<tei:distributor><tei:ref target="{SEFARIA_URL}">Sefaria</tei:ref></tei:distributor>'
         f'<tei:date type="accessed" when="{attr(accessed)}">{esc(accessed)}</tei:date>'
         f'<tei:idno type="url">{esc(info.version_url[lang])}</tei:idno>'
-        f'<tei:idno type="sefaria">{esc(version_title)}</tei:idno>'
+        f'<tei:idno type="sefaria">{esc(version_title)}</tei:idno>{supplement}'
         f"<tei:note>Rite: {esc(work.rite)}</tei:note>"
-        f"<tei:note xml:lang=\"en\">The English is {esc(work.translator)}’s translation, printed in the "
-        "book’s linear layout opposite the Hebrew.</tei:note>"
+        f"<tei:note xml:lang=\"en\">{esc(translation)}</tei:note>"
         f"<tei:note>Digitized by Sefaria as the {'Hebrew' if lang == 'he' else 'English'} version "
         f"“{esc(version_title)}” of {esc(work.title)}; its "
         f"{'English translation' if lang == 'he' else 'Hebrew text'} is the project "
         f"{esc(work.projects[other])}.</tei:note>"
         '<tei:note type="encoding">Converted from the Sefaria export of '
-        f"{esc(info.last_export)} (md5 {esc(info.md5[lang])}), one phrase of the linear layout "
-        "to a phrase milestone. See specs/SEFARIA_IMPORT.md in opensiddur-processor.</tei:note>"
+        f"{esc(info.last_export)} (md5 {esc(info.md5[lang])}), {unit}. "
+        "See specs/SEFARIA_IMPORT.md in opensiddur-processor.</tei:note>"
         "</tei:bibl>"
     )
 

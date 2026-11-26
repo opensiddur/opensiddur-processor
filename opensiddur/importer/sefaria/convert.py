@@ -38,7 +38,8 @@ import yaml
 from opensiddur.common.constants import OUTPUT_DIRECTORY, PROJECT_DIRECTORY
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings
-from opensiddur.importer.sefaria.align import Alignment, Pair, align_work, join_chapters, load_decisions
+from opensiddur.importer.sefaria.align import (Alignment, Pair, align_work, join_chapters, load_decisions,
+                                               split_leading_labels)
 from opensiddur.importer.sefaria.corrections import apply_corrections, load_corrections
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, divide, is_phrase
 from opensiddur.importer.sefaria.download import load_manifest
@@ -54,7 +55,9 @@ from opensiddur.importer.sefaria.match import (
     load_records,
     registry_urns,
     save_records,
+    quoted_words,
     scripture_verses,
+    verse_places,
     verse_length,
 )
 from opensiddur.importer.sefaria.phrases import clashing_paths, recorded_phrases, skeleton, text_path
@@ -76,7 +79,7 @@ from opensiddur.importer.sefaria.tei_builder import (
     variant_urn,
 )
 from opensiddur.importer.sefaria.works import LANGUAGES, Work, load_works, select_works
-from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index
+from opensiddur.importer.util.incipit import TEXT_PREFIX, IncipitIndex, load_incipit_index, words
 from opensiddur.importer.util.tei_project import prune_stale_files, validate_and_write
 
 logger = logging.getLogger(__name__)
@@ -116,8 +119,8 @@ class WorkPlan:
     alignments: list[Alignment]
     items: dict[str, list[Item]]
     decisions: Decisions
-    #: the verses of scripture each text quotes: (leaf, block) -> phrase position -> verse URN
-    verses: dict[tuple[str, int], dict[int, str]] = field(default_factory=dict)
+    #: the verses of scripture each text quotes: (leaf, block) -> (phrase position, segment) -> verse URN
+    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = field(default_factory=dict)
     #: the length in words of each verse whose length the index knows
     verse_lengths: dict[str, int] = field(default_factory=dict)
     #: the conditions the book prints (conditions.yaml)
@@ -147,6 +150,14 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                             load_decisions(decisions_path) if decisions_path else load_decisions())
     corrections = load_corrections(corrections_path) if corrections_path else load_corrections()
     alignments = apply_corrections(alignments, corrections.get(work.key, []))
+    if work.layout == "paragraph":
+        labels = load_conditions(conditions_path) if conditions_path else load_conditions()
+        def ending(text: str):
+            found = labels.for_label(text)
+            return found.when if found is not None and found.ending else None
+
+        alignments = [split_leading_labels(a, lambda text: labels.for_label(text) is not None, ending)
+                      for a in alignments]
     # A leaf of depth 2 is aligned chapter by chapter, and placed and divided whole.
     table = yaml.safe_load((structure_path or work.structure_file()).read_text(encoding="utf-8")) or {}
     # (A placed inner node of the same name -- the Song of Songs, which holds its preface -- is
@@ -162,7 +173,8 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
     def is_condition_label(pair: Pair) -> bool:
         return conditions.for_label(plain_text(pair.he)) is not None
 
-    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs, is_condition_label, a.opens), equivalents)
+    items = {a.leaf.path: apply_joins(a.leaf.path, divide(a.pairs, is_condition_label, a.opens,
+                                                     small_instructions=work.layout == "paragraph"), equivalents)
              for a in alignments if structure.get(a.leaf.path)}
     decisions = decide_work(work.key, list(items.items()), index, records, taken,
                             recorded_phrases=phrases, spellings=spellings,
@@ -172,7 +184,7 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
     items = {leaf: placed_rubrics(leaf_items, conditions) for leaf, leaf_items in items.items()}
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
     # quoted by two texts is marked in the first.
-    verses: dict[tuple[str, int], dict[int, str]] = {}
+    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = {}
     marked: set[str] = set()
     for leaf, leaf_items in items.items():
         for block in leaf_items:
@@ -181,17 +193,25 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             record = decisions.records[(work.key, leaf, block.first_index)]
             if record.kind not in ("existing", "new"):
                 continue
-            found: dict[int, str] = {}
-            for position, urn in sorted(scripture_verses(block, index).items()):
+            found: dict[tuple[int, int], str] = {}
+            for place, urn in sorted(scripture_verses(block, index, record.urn).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
                 if urn not in marked:  # a verse repeated, even within one text, is marked once
                     marked.add(urn)
-                    found[position] = urn
+                    found[place] = urn
             if found:
                 verses[(leaf, block.first_index)] = found
     lengths = {urn: n for found in verses.values() for urn in found.values()
                if (n := verse_length(urn, index)) is not None}
+    for (leaf, first), found in verses.items():
+        block = next(b for b in items[leaf] if isinstance(b, TextBlock) and b.first_index == first)
+        places = verse_places(block)
+        order = {place: i for i, (place, _) in enumerate(places)}
+        place_words = [words(text) for _, text in places]
+        for place, urn in found.items():
+            if (count := quoted_words(urn, place_words[order[place]:], index)) is not None:
+                lengths[urn] = count
     return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths,
                     conditions, clashes, equivalents.openings())
 
@@ -443,7 +463,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
         body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions,
-                         leading)
+                         leading, plan.conditions.text_gates(work.key))
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
     out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang, gates), lang))
@@ -455,8 +475,9 @@ def source_info(work: Work, directory: Path) -> SourceInfo:
     if not manifest:
         raise ConvertError(f"{directory}: no manifest; run the download first")
     files = manifest["files"]
-    for lang in LANGUAGES:
-        licence = files[f"{lang}.json"].get("license")
+    for name in [f"{lang}.json" for lang in LANGUAGES] + [f"{lang}_supplement.json" for lang in work.supplements]:
+        licence = files[name].get("license")
+        lang = name.removesuffix(".json")
         if licence != "CC-BY":
             # works.yaml records CC BY 3.0 for Sefaria's "CC-BY"; anything else needs a decision.
             raise ConvertError(
@@ -466,6 +487,7 @@ def source_info(work: Work, directory: Path) -> SourceInfo:
         last_export=manifest["last_export"],
         version_url={lang: f"https://www.sefaria.org/{work.schema_file_title}" for lang in LANGUAGES},
         md5={lang: files[f"{lang}.json"]["md5Hash"] for lang in LANGUAGES},
+        supplement_md5={lang: files[f"{lang}_supplement.json"]["md5Hash"] for lang in work.supplements},
     )
 
 

@@ -1,11 +1,13 @@
 """What the incipit index records of a document: openings, lengths, closings and transclusions.
 Synthetic documents only."""
 
+import tempfile
 import unittest
+from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.importer.util.incipit import IncipitIndex, index_document, words
+from opensiddur.importer.util.incipit import IncipitIndex, build_incipit_index, index_document, words
 
 T = "urn:x-opensiddur:text:"
 TEI = "http://www.tei-c.org/ns/1.0"
@@ -53,6 +55,55 @@ class TestLengths(unittest.TestCase):
                         f'{SHORT}</tei:p></tei:div><tei:div corresp="{T}prayer:next"><tei:p>{LONG}</tei:p></tei:div>')
         self.assertEqual(index.length_of[T + "bible:ps/1/1"], 4)
         self.assertEqual(index.closing(T + "bible:ps/1/1"), tuple(words(SHORT)))
+
+    def test_the_first_holding_of_a_text_decides_its_length(self):
+        verse = f"{T}bible:ps/1/1"
+        half = " ".join(LONG.split()[:6])
+        quoted = (f'<tei:div corresp="{T}prayer:q"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{half} '
+                  f'<tei:milestone unit="verse"/>{SHORT} {CLOSING}</tei:p></tei:div>')
+        whole = (f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{LONG} '
+                 f'<tei:milestone unit="verse" corresp="{T}bible:ps/1/2"/>{SHORT}</tei:p></tei:div>')
+        index = indexed(whole, quoted)
+        self.assertNotIn(verse, index.length_of)  # held long first: a later half does not shorten it
+        self.assertEqual(index.own_opening(verse), tuple(words(LONG))[:16])
+        self.assertEqual(indexed(quoted, whole).length_of[verse], 6)
+
+    def projects(self, **bodies: str) -> IncipitIndex:
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, body in bodies.items():
+                project = Path(tmp) / name.replace("_", "-")
+                project.mkdir()
+                for stem, content in (("index", ""), ("text", body)):
+                    (project / f"{stem}.xml").write_text(
+                        f'<tei:TEI xmlns:tei="{TEI}" xmlns:j="{J}" xml:lang="he"><tei:text><tei:body>{content}'
+                        "</tei:body></tei:text></tei:TEI>", encoding="utf-8")
+            return build_incipit_index(Path(tmp))
+
+    def test_the_bible_decides_a_verse_a_prayer_read_first_holds_otherwise(self):
+        verse = f"{T}bible:ps/1/1"
+        bible = (f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{SHORT} '
+                 f'{CLOSING}<tei:milestone unit="verse" corresp="{T}bible:ps/1/2"/>{LONG}</tei:p></tei:div>')
+        reworded = " ".join(SHORT.split()[:3])  # a prayer that words the verse otherwise, and goes on
+        prayer = (f'<tei:div corresp="{T}prayer:q"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{reworded} '
+                  f'<tei:milestone unit="verse"/>{LONG}</tei:p></tei:div>')
+        # "a_prayer" is read before "tanakh"
+        index = self.projects(a_prayer=prayer, tanakh_wlc=bible)
+        self.assertEqual(index.length_of[verse], 9)
+        self.assertEqual(index.own_opening(verse), tuple(words(f"{SHORT} {CLOSING}")))
+        # ... but it is still found by the words the prayer book prints
+        self.assertEqual(index.incipit_of[verse][:3], tuple(words(reworded)))
+        again = IncipitIndex.from_json(index.to_json())
+        self.assertEqual(again.own_opening(verse), index.own_opening(verse))
+
+    def test_a_verse_the_bible_holds_long_has_no_length_from_a_half_quoted_first(self):
+        verse = f"{T}bible:ps/1/1"
+        half = " ".join(LONG.split()[:6])
+        prayer = (f'<tei:div corresp="{T}prayer:q"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{half} '
+                  f'<tei:milestone unit="verse"/>{SHORT}</tei:p></tei:div>')
+        bible = f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>{LONG}</tei:p></tei:div>'
+        index = self.projects(a_prayer=prayer, tanakh_wlc=bible)
+        self.assertNotIn(verse, index.length_of)
+        self.assertEqual(index.own_opening(verse), tuple(words(LONG))[:16])
 
 
 class TestTransclusions(unittest.TestCase):
@@ -106,6 +157,27 @@ class TestWords(unittest.TestCase):
         self.assertEqual(anchored.own_opening(T + "bible:ps/112/1"), tuple(words("אֶת יְהוָה בְּמִצְוֹתָיו חָפֵץ מְאֹד")))
         # ... and a milestone between two texts still ends a word
         self.assertEqual(index.own_opening(T + "bible:ps/136/2")[0], words("הוֹדוּ")[0])
+
+
+class TestKetiv(unittest.TestCase):
+    def test_a_ketiv_is_not_indexed(self):
+        index = indexed(f'<tei:div corresp="{T}bible:ps/145/6"><tei:p>וֶעֱזוּז נוֹרְאֹתֶיךָ יֹאמֵרוּ <tei:choice>'
+                        '<j:written>וגדולתיך</j:written> <j:read>וּגְדוּלָּתְךָ</j:read></tei:choice> אֲסַפְּרֶנָּה'
+                        '</tei:p></tei:div>')
+        self.assertEqual(index.own_opening(T + "bible:ps/145/6"),
+                         tuple(words("וֶעֱזוּז נוֹרְאֹתֶיךָ יֹאמֵרוּ וּגְדוּלָּתְךָ אֲסַפְּרֶנָּה")))
+
+
+class TestBibleMarkup(unittest.TestCase):
+    def test_a_bibles_note_anchor_is_inside_a_word_and_its_second_option_is_not_read(self):
+        verse = f"{T}bible:ex/20/9"
+        body = (f'<tei:div corresp="{T}bible:ex/20"><tei:p><tei:milestone unit="verse" corresp="{verse}"/>'
+                f'שֵׁ<tei:anchor/>שֶׁת יָמִים <tei:choice><j:option>תַּעֲבֹד וְעָשִׂיתָ</j:option>'
+                f'<j:option>תַּעֲבֹד וְעָשִׂיתָ</j:option></tei:choice> כָּל מְלַאכְתֶּךָ</tei:p></tei:div>')
+        expected = tuple(words("שֵׁשֶׁת יָמִים תַּעֲבֹד וְעָשִׂיתָ כָּל מְלַאכְתֶּךָ"))
+        self.assertEqual(TestLengths().projects(tanakh_wlc=body).own_opening(verse), expected)
+        # ... but a prayer book's anchor stands between words
+        self.assertEqual(TestLengths().projects(a_prayer=body).own_opening(verse)[:2], (*words("שֵׁ"), *words("שֶׁת")))
 
 
 class TestJson(unittest.TestCase):

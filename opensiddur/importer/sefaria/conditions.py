@@ -8,7 +8,9 @@ alternatives, as ``j:conditional``.
   Pesach you should say:", "On Sunday:"), found by a regular expression. Such a rubric becomes the
   conditional's note (``descriptive-vs-conditional`` rubrics: a condition, dropped once true).
 - ``labels``: a Hebrew label set before a phrase (``<small>לְר"ח:</small> רֹאשׁ הַחֹדֶשׁ הַזֶּה``):
-  the phrase is conditional, the label its note.
+  the phrase is conditional, the label its note. With ``ending: true``, the label's words are
+  another ending of the blessing before it (``<small>בעשי"ת מסיים:</small> בָּרוּךְ אַתָּה יְהֹוָה
+  הַמֶּֽלֶךְ הַקָּדוֹשׁ:``): the ending they replace is conditional on the opposite.
 - ``inline``: an abbreviation that opens a parenthesized alternative inside a phrase
   (``(בעשי"ת הַשָּׁלוֹם)``): the alternative is a marked conditional, the abbreviation its note.
 - ``replacements``: an inline alternative that replaces words beside it rather than adding to
@@ -20,12 +22,15 @@ alternatives, as ``j:conditional``.
 - ``leaves``: a work's leaf said only on some days, though the book prints no rubric before it
   (it says so at the end of the leaf before: "On days when the Torah is not read continue with
   Ashrei"): its transclusion is gated.
+- ``texts``: a work's text said only on some days, where the book marks it only by type (אתה
+  חוננתנו in small type in the weekday Maariv Amidah): each transclusion of it is gated.
 
 A rubric entry may say how far it governs: by default the next text (between texts) or the
 passage to the next rubric (inside one); with ``section: true``, everything to the next heading,
 or, with ``until``, to the rubric that matches it. With ``instead_of_previous: true`` (between
 texts), the text before the rubric is what is said otherwise, and is conditional on the opposite.
 Inside a text, ``through`` (Hebrew words) ends the passage with the phrase that ends with them.
+A label standing between texts may say the same, but for ``through``.
 
 A condition (``when``) is written in a small grammar: a mapping of feature structure type to
 features (the types and features of ``opensiddur/exporter/features.yaml``, without the
@@ -124,6 +129,25 @@ class LeafGate:
 class LabelCondition:
     label: tuple[str, ...]
     when: Any
+    #: the label's words replace the ending of the blessing before them
+    ending: bool = False
+    #: between texts, how far the label governs, as a rubric does (``RubricCondition``)
+    section: bool = False
+    until: re.Pattern[str] | None = None
+    instead_of_previous: bool = False
+    until_included: bool = False
+    #: between texts, the label stays an instruction before the conditional, which takes no note
+    #: (the label says when the text is skipped, the condition when it is said)
+    instruction: bool = False
+
+
+@dataclass(frozen=True)
+class TextGate:
+    work: str
+    urn: str
+    when: Any
+    #: the conditional's English note, if any
+    note: str = ""
 
 
 @dataclass(frozen=True)
@@ -140,6 +164,7 @@ class Conditions:
     replacements: tuple[Replacement, ...] = ()
     directives: tuple[re.Pattern[str], ...] = ()
     leaves: tuple[LeafGate, ...] = ()
+    texts: tuple[TextGate, ...] = ()
 
     def is_directive(self, english: str) -> bool:
         text = " ".join(english.split())
@@ -147,6 +172,10 @@ class Conditions:
 
     def leaf_gate(self, work: str, leaf: str) -> LeafGate | None:
         return next((g for g in self.leaves if g.work == work and g.leaf == leaf), None)
+
+    def text_gates(self, work: str) -> dict[str, TextGate]:
+        """The work's texts gated wherever they are transcluded, by URN."""
+        return {g.urn: g for g in self.texts if g.work == work}
 
     def for_rubric(self, english: str) -> RubricCondition | None:
         text = " ".join(english.split())
@@ -191,7 +220,12 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
             if not label:
                 raise ConditionsError(f"{where}: a label is needed")
             condition_xml(entry.get("when"), where)
-            found.append(LabelCondition(label, entry["when"]))
+            until = _pattern(entry["until"], where) if entry.get("until") else None
+            found.append(LabelCondition(label, entry["when"], bool(entry.get("ending")),
+                                        bool(entry.get("section")) or until is not None, until,
+                                        bool(entry.get("instead_of_previous")),
+                                        bool(entry.get("until_included")),
+                                        bool(entry.get("instruction"))))
     replacements = [Replacement(tuple(words(str(e["alternative"]))), tuple(words(str(e["replaces"]))))
                     for e in data.get("replacements") or ()]
     directives = tuple(_pattern(m, f"{path.name} directives #{n}")
@@ -203,8 +237,15 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
             raise ConditionsError(f"{where}: a work and a leaf are needed")
         condition_xml(entry.get("when"), where)
         leaves.append(LeafGate(str(entry["work"]), str(entry["leaf"]), entry["when"], str(entry.get("note") or "")))
+    texts = []
+    for n, entry in enumerate(data.get("texts") or (), start=1):
+        where = f"{path.name} texts #{n}"
+        if not entry.get("work") or not entry.get("urn"):
+            raise ConditionsError(f"{where}: a work and a urn are needed")
+        condition_xml(entry.get("when"), where)
+        texts.append(TextGate(str(entry["work"]), str(entry["urn"]), entry["when"], str(entry.get("note") or "")))
     return Conditions(tuple(rubrics), tuple(labels), tuple(inline), tuple(replacements), directives,
-                      tuple(leaves))
+                      tuple(leaves), tuple(texts))
 
 
 def _pattern(text: Any, where: str) -> re.Pattern[str]:

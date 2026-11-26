@@ -165,3 +165,40 @@ selichot_nusach_lita_linear:
     as_of: {he: 02778b2ddf670dac830be312d391bf2d0d92b98dfb9cb3f09c76bd3af6b3b3c8, en: 0c8e7397e5972ebc38354a1b12006c26c16d5eea31f560a2a3a0e45d9a2e93ee}
     he_only: [68, 69, 70, 71, 72, 73, 74, 75, 76]
     note: "the rest of the service, printed in Hebrew paragraphs without a translation"
+siddur_ashkenaz:
+  "Weekday / Minchah / Amida / Response to Prayer":
+    as_of: {he: 4041cc672d0f205de4ee20ca1ba8046a068d851c0b2dfef4f086aeb0e71f27c6, en: 2b5843cb6086dbeddccd6e3f9839630129c46f83d1859a8715a0e16ab9eacd60}
+    opens: [4]
+    note: "the blessing's closing (כי אתה שומע), said every day, after the fast-day עננו"
+  "Weekday / Maariv / Amidah / Knowledge":
+    as_of: {he: 989f3607b770970a61e12b4495018134f7cb1d0f1fdc5ed3b2ec9b41f2177a29, en: 46fa5aacbe96be4e9fc387b68432b363274cbd31ad974fa0202a2fbd432a6d6d}
+    opens: [2, 3]
+    note: "אתה חוננתנו (small type: after Shabbat or a festival), then the blessing's closing (חננו מאתך), said every night"
+  "Shabbat / Shabbat Evening / Master of all worlds":
+    as_of: {he: 200c36b3083511638203159e4e0a0b9d6dc73003e3f5ccd0019e86ef1726bbad, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6]
+    note: "Ribbon Kol HaOlamim, with no English in this version"
+  "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Kol M'kadesh":
+    as_of: {he: b7dc774a443d6dd477f5ffe8f033155149156c5a6433219f277ddb5324eb6f58, en: 02316ee3fd8a476832ad2f5636d057612c2c79501a64ee1ed64c3a586339b5f1}
+    he_only: [30, 31, 32, 33]
+    note: "the last stanza (Kaddeshem Bemitzvotekha), printed in brackets and untranslated"
+  "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Ma Y'didut":
+    as_of: {he: e95c8271f6f4c4d62ab6734cd03221100cd8dc51fe7f1bad2a4339dc0faec71a, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+    note: "Mah Yedidut, with no English in this version"
+  "Shabbat / Kabbalat Shabbat / Bameh Madlikin":
+    as_of: {he: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945, en: 1f9625766c5edc06c8446eea5c64fb06e19f67d2ad9f9026b1670c4bb0d25a0d}
+    en_only: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    note: "the English of the passage that closes Bameh Madlikin (Rabbi Elazar said ...), with no Hebrew in this version"
+  "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Yom zeh L'yisrael":
+    as_of: {he: 3be4f5840ebaa9f8282053e37cafb4553fed7e107e47555dc9d11dd6860357de, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+    note: "a song the English version leaves untranslated"
+  "Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Tzamah Nafshi":
+    as_of: {he: 6171e261ed71fa2a208ea9c6a993d263ec31eba46fccacbffa097c1e2c3bb10e, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
+    note: "a song the English version leaves untranslated"
+  "Festivals / Rosh Chodesh / Hallel / Psalm 118":
+    as_of: {he: f3b640e0e83630f72bd2d3cca0033a7f288e8fa3b6fd210c7cdce9c24a06b0be, en: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945}
+    he_only: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    note: "Hallel is in the Hebrew supplement only, untranslated"

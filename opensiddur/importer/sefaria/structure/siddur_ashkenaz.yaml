@@ -1,0 +1,539 @@
+# Where each node of Sefaria's Siddur Ashkenaz schema sits, for the Metsudah versions: its
+# siddur: URN (specs/SIDDUR_URN_SCHEME.md), scoped to the Metsudah Ashkenaz projects by
+# @project. The schema is Sefaria's shared index, which many siddurim fill; the Metsudah
+# versions fill only the weekday services, Friday night, Birkat HaMazon and (in the Hebrew
+# supplement) Rosh Chodesh Hallel. Every other node is listed with no path and is skipped.
+#
+# The order is the schema's, which is the order of the services. Sefaria's grouping nodes
+# (Preparatory Prayers, Post Amidah, ...) are divisions of their own.
+
+Weekday: chol
+Weekday / Shacharit: chol/shacharit
+Weekday / Shacharit / Preparatory Prayers: chol/shacharit/preparatory
+Weekday / Shacharit / Preparatory Prayers / Modeh Ani: chol/shacharit/preparatory/modeh_ani
+Weekday / Shacharit / Preparatory Prayers / Netilat Yadayim: chol/shacharit/preparatory/netilat_yadayim
+Weekday / Shacharit / Preparatory Prayers / Asher Yatzar: chol/shacharit/preparatory/asher_yatzar
+Weekday / Shacharit / Preparatory Prayers / Elokai Neshama: chol/shacharit/preparatory/elohai_neshamah
+Weekday / Shacharit / Preparatory Prayers / Tzitzit (**Includes Yehi Ratzon): chol/shacharit/preparatory/tzitzit
+Weekday / Shacharit / Preparatory Prayers / Torah Blessings (**All 3 blessings): chol/shacharit/preparatory/birkhot_hatorah
+Weekday / Shacharit / Preparatory Prayers / Torah Study: chol/shacharit/preparatory/torah_study
+Weekday / Shacharit / Preparatory Prayers / Tallit: chol/shacharit/preparatory/tallit
+Weekday / Shacharit / Preparatory Prayers / Tefillin: chol/shacharit/preparatory/tefillin
+Weekday / Shacharit / Preparatory Prayers / Ma Tovu: chol/shacharit/preparatory/mah_tovu
+Weekday / Shacharit / Preparatory Prayers / Adon Olam: chol/shacharit/preparatory/adon_olam
+Weekday / Shacharit / Preparatory Prayers / Yigdal: chol/shacharit/preparatory/yigdal
+Weekday / Shacharit / Preparatory Prayers / Morning Blessings: chol/shacharit/preparatory/birkhot_hashachar
+Weekday / Shacharit / Preparatory Prayers / Akedah: chol/shacharit/preparatory/aqedah
+Weekday / Shacharit / Preparatory Prayers / Sovereignty of Heaven (**L'olam, Shema): chol/shacharit/preparatory/leolam_yehe_adam
+Weekday / Shacharit / Preparatory Prayers / Korbanot: chol/shacharit/preparatory/qorbanot
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Kiyor: chol/shacharit/preparatory/qorbanot/kiyyor
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Terumat HaDeshen: chol/shacharit/preparatory/qorbanot/terumat_hadeshen
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Korban HaTamid: chol/shacharit/preparatory/qorbanot/qorban_tamid
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Ketoret: chol/shacharit/preparatory/qorbanot/qetoret
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Order of the Temple Service (Ana Bekoach): chol/shacharit/preparatory/qorbanot/anna_bekhoach
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Laws of Sacrifices: chol/shacharit/preparatory/qorbanot/eizehu_meqoman
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Baraita of Rabbi Yishmael: chol/shacharit/preparatory/qorbanot/rabbi_yishmael
+Weekday / Shacharit / Preparatory Prayers / Korbanot / Kaddish DeRabbanan: chol/shacharit/preparatory/qorbanot/kaddish_derabbanan
+Weekday / Shacharit / Pesukei D'Zimra: chol/shacharit/pesuqei_dezimrah
+Weekday / Shacharit / Pesukei D'Zimra / Introductory Psalm: chol/shacharit/pesuqei_dezimrah/mizmor_shir
+Weekday / Shacharit / Pesukei D'Zimra / Kaddish Yatom: chol/shacharit/pesuqei_dezimrah/kaddish_yatom
+Weekday / Shacharit / Pesukei D'Zimra / Baruch SheAmar: chol/shacharit/pesuqei_dezimrah/barukh_sheamar
+Weekday / Shacharit / Pesukei D'Zimra / Hodu: chol/shacharit/pesuqei_dezimrah/hodu
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 100: chol/shacharit/pesuqei_dezimrah/mizmor_letodah
+Weekday / Shacharit / Pesukei D'Zimra / Y'hi Chavod (18 verses): chol/shacharit/pesuqei_dezimrah/yehi_khevod
+Weekday / Shacharit / Pesukei D'Zimra / Ashrei: chol/shacharit/pesuqei_dezimrah/ashrei
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 146: chol/shacharit/pesuqei_dezimrah/psalm_146
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 147: chol/shacharit/pesuqei_dezimrah/psalm_147
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 148: chol/shacharit/pesuqei_dezimrah/psalm_148
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 149: chol/shacharit/pesuqei_dezimrah/psalm_149
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 150: chol/shacharit/pesuqei_dezimrah/psalm_150
+Weekday / Shacharit / Pesukei D'Zimra / Closing Verses: chol/shacharit/pesuqei_dezimrah/barukh_adonai_leolam
+Weekday / Shacharit / Pesukei D'Zimra / Vayivarech David: chol/shacharit/pesuqei_dezimrah/vayevarekh_david
+Weekday / Shacharit / Pesukei D'Zimra / Ata Hu: chol/shacharit/pesuqei_dezimrah/attah_hu
+Weekday / Shacharit / Pesukei D'Zimra / Az Yashir: chol/shacharit/pesuqei_dezimrah/az_yashir
+Weekday / Shacharit / Pesukei D'Zimra / Yishtabach: chol/shacharit/pesuqei_dezimrah/yishtabbach
+Weekday / Shacharit / Pesukei D'Zimra / Psalm 130: chol/shacharit/pesuqei_dezimrah/psalm_130
+Weekday / Shacharit / Pesukei D'Zimra / Chatzi Kaddish: chol/shacharit/pesuqei_dezimrah/chatzi_kaddish
+Weekday / Shacharit / Blessings of the Shema: chol/shacharit/birkhot_keriat_shema
+Weekday / Shacharit / Blessings of the Shema / Barchu: chol/shacharit/birkhot_keriat_shema/barekhu
+Weekday / Shacharit / Blessings of the Shema / First Blessing before Shema: chol/shacharit/birkhot_keriat_shema/first_blessing_before_shema
+Weekday / Shacharit / Blessings of the Shema / Second Blessing before Shema: chol/shacharit/birkhot_keriat_shema/second_blessing_before_shema
+Weekday / Shacharit / Blessings of the Shema / Shema: chol/shacharit/birkhot_keriat_shema/keriat_shema
+Weekday / Shacharit / Blessings of the Shema / Blessing after Shema: chol/shacharit/birkhot_keriat_shema/blessing_after_shema
+Weekday / Shacharit / Amidah: chol/shacharit/shemoneh_esreh
+Weekday / Shacharit / Amidah / Patriarchs: chol/shacharit/shemoneh_esreh/avot
+Weekday / Shacharit / Amidah / Divine Might: chol/shacharit/shemoneh_esreh/gevurot
+Weekday / Shacharit / Amidah / Holiness of God: chol/shacharit/shemoneh_esreh/qedushat_hashem
+Weekday / Shacharit / Amidah / Keduasha: chol/shacharit/shemoneh_esreh/qedushah
+Weekday / Shacharit / Amidah / Knowledge: chol/shacharit/shemoneh_esreh/binah
+Weekday / Shacharit / Amidah / Repentance: chol/shacharit/shemoneh_esreh/teshuvah
+Weekday / Shacharit / Amidah / Forgiveness: chol/shacharit/shemoneh_esreh/selichah
+Weekday / Shacharit / Amidah / Redemption: chol/shacharit/shemoneh_esreh/geullah
+Weekday / Shacharit / Amidah / Healing: chol/shacharit/shemoneh_esreh/refuah
+Weekday / Shacharit / Amidah / Prosperity: chol/shacharit/shemoneh_esreh/birkat_hashanim
+Weekday / Shacharit / Amidah / Gathering the Exiles: chol/shacharit/shemoneh_esreh/qibbutz_galuyot
+Weekday / Shacharit / Amidah / Justice: chol/shacharit/shemoneh_esreh/mishpat
+Weekday / Shacharit / Amidah / Against Enemies: chol/shacharit/shemoneh_esreh/minim
+Weekday / Shacharit / Amidah / The Righteous: chol/shacharit/shemoneh_esreh/tzaddiqim
+Weekday / Shacharit / Amidah / Rebuilding Jerusalem: chol/shacharit/shemoneh_esreh/binyan_yerushalayim
+Weekday / Shacharit / Amidah / Kingdom of David: chol/shacharit/shemoneh_esreh/malkhut_beit_david
+Weekday / Shacharit / Amidah / Response to Prayer: chol/shacharit/shemoneh_esreh/shomea_tefillah
+Weekday / Shacharit / Amidah / Temple Service: chol/shacharit/shemoneh_esreh/avodah
+Weekday / Shacharit / Amidah / Thanksgiving: chol/shacharit/shemoneh_esreh/hodaah
+Weekday / Shacharit / Amidah / Birkat Kohanim: chol/shacharit/shemoneh_esreh/birkat_kohanim
+Weekday / Shacharit / Amidah / Peace: chol/shacharit/shemoneh_esreh/shalom
+Weekday / Shacharit / Amidah / Concluding Passage: chol/shacharit/shemoneh_esreh/elohai_netzor
+Weekday / Shacharit / Post Amidah: chol/shacharit/after_amidah
+Weekday / Shacharit / Post Amidah / Vidui and 13 Middot: chol/shacharit/after_amidah/viduy
+Weekday / Shacharit / Post Amidah / Avinu Malkenu: chol/shacharit/after_amidah/avinu_malkenu
+Weekday / Shacharit / Post Amidah / Tachanun: chol/shacharit/after_amidah/tachanun
+Weekday / Shacharit / Post Amidah / Tachanun / V'hu Rachum: chol/shacharit/after_amidah/tachanun/vehu_rachum
+Weekday / Shacharit / Post Amidah / Tachanun / Nefilat Apayim: chol/shacharit/after_amidah/tachanun/nefilat_appayim
+Weekday / Shacharit / Post Amidah / Tachanun / God of Israel (for Monday &amp; Thursday): chol/shacharit/after_amidah/tachanun/elohei_yisrael
+Weekday / Shacharit / Post Amidah / Tachanun / Shomer Yisrael: chol/shacharit/after_amidah/tachanun/shomer_yisrael
+Weekday / Shacharit / Post Amidah / Tachanun / Chatzi Kaddish: chol/shacharit/after_amidah/tachanun/chatzi_kaddish
+Weekday / Shacharit / Keriat Hatorah: chol/shacharit/keriat_hatorah
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark: chol/shacharit/keriat_hatorah/removing
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / El Erech Appayim: chol/shacharit/keriat_hatorah/removing/el_erekh_appayim
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Vayhi Binsoa: chol/shacharit/keriat_hatorah/removing/vayehi_binsoa
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Brich Shmei (Zohar 369a): chol/shacharit/keriat_hatorah/removing/berikh_shemeh
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Lekha Hashem: chol/shacharit/keriat_hatorah/removing/lekha_adonai
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Av Harachamim: chol/shacharit/keriat_hatorah/removing/av_harachamim
+Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / V'tigaleh V'teraeh: chol/shacharit/keriat_hatorah/removing/vetiggaleh
+Weekday / Shacharit / Keriat Hatorah / Reading from Sefer: chol/shacharit/keriat_hatorah/reading
+Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Birkat Hatorah: chol/shacharit/keriat_hatorah/reading/birkat_hatorah
+Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Birkat Hagomel: chol/shacharit/keriat_hatorah/reading/birkat_hagomel
+Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Chatzi Kaddish: chol/shacharit/keriat_hatorah/reading/chatzi_kaddish
+Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Raising the Torah: chol/shacharit/keriat_hatorah/reading/hagbahah
+Weekday / Shacharit / Keriat Hatorah / Reading from Sefer / Prayers for Welfare of the People:
+Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron: chol/shacharit/keriat_hatorah/returning
+Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / Yehalelu: chol/shacharit/keriat_hatorah/returning/yehallelu
+Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / LeDavid Mizmor: chol/shacharit/keriat_hatorah/returning/ledavid_mizmor
+Weekday / Shacharit / Keriat Hatorah / Returning Sefer to Aron / Uvenuchah Yomar: chol/shacharit/keriat_hatorah/returning/uvenuchoh_yomar
+Weekday / Shacharit / Concluding Prayers: chol/shacharit/conclusion
+Weekday / Shacharit / Concluding Prayers / Ashrei: chol/shacharit/conclusion/ashrei
+Weekday / Shacharit / Concluding Prayers / Lamenatze'ach: chol/shacharit/conclusion/lamenatzeach
+Weekday / Shacharit / Concluding Prayers / Uva Letzion: chol/shacharit/conclusion/uva_letziyyon
+Weekday / Shacharit / Concluding Prayers / Kaddish Shalem: chol/shacharit/conclusion/kaddish_shalem
+Weekday / Shacharit / Concluding Prayers / Alenu: chol/shacharit/conclusion/aleinu
+Weekday / Shacharit / Concluding Prayers / Kaddish Yatom: chol/shacharit/conclusion/kaddish_yatom
+Weekday / Shacharit / Concluding Prayers / Shir shel Yom: chol/shacharit/conclusion/shir_shel_yom
+Weekday / Shacharit / Concluding Prayers / Barchi Nafshi: chol/shacharit/conclusion/barekhi_nafshi
+Weekday / Shacharit / Concluding Prayers / L'David: chol/shacharit/conclusion/ledavid
+Weekday / Shacharit / Concluding Prayers / (Israel:) Korbanot: chol/shacharit/conclusion/qorbanot
+Weekday / Shacharit / Concluding Prayers / (Israel:) Korbanot / Ein Kelohenu: chol/shacharit/conclusion/qorbanot/ein_keloheinu
+Weekday / Shacharit / Concluding Prayers / (Israel:) Korbanot / Pitum HaKetoret: chol/shacharit/conclusion/qorbanot/pittum_haqetoret
+Weekday / Shacharit / Concluding Prayers / (Israel:) Korbanot / Kaddish Yatom: chol/shacharit/conclusion/qorbanot/kaddish_yatom
+Weekday / Shacharit / Concluding Prayers / (Israel:) Korbanot / Barchu: chol/shacharit/conclusion/qorbanot/barekhu
+Weekday / Shacharit / Post Service: chol/shacharit/after_service
+Weekday / Shacharit / Post Service / Six Remembrances: chol/shacharit/after_service/shesh_zekhirot
+Weekday / Shacharit / Post Service / 10 Commandments:
+Weekday / Shacharit / Post Service / Thirteen Principles of Jewish Faith: chol/shacharit/after_service/thirteen_principles
+Weekday / Minchah: chol/minchah
+Weekday / Minchah / Ashrei: chol/minchah/ashrei
+Weekday / Minchah / Amida: chol/minchah/shemoneh_esreh
+Weekday / Minchah / Amida / Patriarchs: chol/minchah/shemoneh_esreh/avot
+Weekday / Minchah / Amida / Divine Might: chol/minchah/shemoneh_esreh/gevurot
+Weekday / Minchah / Amida / Holiness of God: chol/minchah/shemoneh_esreh/qedushat_hashem
+Weekday / Minchah / Amida / Keduasha: chol/minchah/shemoneh_esreh/qedushah
+Weekday / Minchah / Amida / Knowledge: chol/minchah/shemoneh_esreh/binah
+Weekday / Minchah / Amida / Repentance: chol/minchah/shemoneh_esreh/teshuvah
+Weekday / Minchah / Amida / Forgiveness: chol/minchah/shemoneh_esreh/selichah
+Weekday / Minchah / Amida / Redemption: chol/minchah/shemoneh_esreh/geullah
+Weekday / Minchah / Amida / Healing: chol/minchah/shemoneh_esreh/refuah
+Weekday / Minchah / Amida / Prosperity: chol/minchah/shemoneh_esreh/birkat_hashanim
+Weekday / Minchah / Amida / Gathering the Exiles: chol/minchah/shemoneh_esreh/qibbutz_galuyot
+Weekday / Minchah / Amida / Justice: chol/minchah/shemoneh_esreh/mishpat
+Weekday / Minchah / Amida / Against Enemies: chol/minchah/shemoneh_esreh/minim
+Weekday / Minchah / Amida / The Righteous: chol/minchah/shemoneh_esreh/tzaddiqim
+Weekday / Minchah / Amida / Rebuilding Jerusalem: chol/minchah/shemoneh_esreh/binyan_yerushalayim
+Weekday / Minchah / Amida / Kingdom of David: chol/minchah/shemoneh_esreh/malkhut_beit_david
+Weekday / Minchah / Amida / Response to Prayer: chol/minchah/shemoneh_esreh/shomea_tefillah
+Weekday / Minchah / Amida / Temple Service: chol/minchah/shemoneh_esreh/avodah
+Weekday / Minchah / Amida / Thanksgiving: chol/minchah/shemoneh_esreh/hodaah
+Weekday / Minchah / Amida / Birkat Kohanim: chol/minchah/shemoneh_esreh/birkat_kohanim
+Weekday / Minchah / Amida / Peace: chol/minchah/shemoneh_esreh/shalom
+Weekday / Minchah / Amida / Concluding Passage: chol/minchah/shemoneh_esreh/elohai_netzor
+Weekday / Minchah / Post Amidah: chol/minchah/after_amidah
+Weekday / Minchah / Post Amidah / Vidui and 13 Middot:
+Weekday / Minchah / Post Amidah / Avinu Malkenu: chol/minchah/after_amidah/avinu_malkenu
+Weekday / Minchah / Post Amidah / Tachanun: chol/minchah/after_amidah/tachanun
+Weekday / Minchah / Post Amidah / Tachanun / Nefilat Appayim: chol/minchah/after_amidah/tachanun/nefilat_appayim
+Weekday / Minchah / Post Amidah / Tachanun / Shomer Yisrael: chol/minchah/after_amidah/tachanun/shomer_yisrael
+Weekday / Minchah / Post Amidah / Kaddish Shalem: chol/minchah/after_amidah/kaddish_shalem
+Weekday / Minchah / Concluding Prayers: chol/minchah/conclusion
+Weekday / Minchah / Concluding Prayers / Alenu: chol/minchah/conclusion/aleinu
+Weekday / Minchah / Concluding Prayers / Kaddish Yatom: chol/minchah/conclusion/kaddish_yatom
+Weekday / Maariv: chol/arvit
+Weekday / Maariv / Vehu Rachum: chol/arvit/vehu_rachum
+Weekday / Maariv / Barchu: chol/arvit/barekhu
+Weekday / Maariv / Blessings of the Shema: chol/arvit/birkhot_keriat_shema
+Weekday / Maariv / Blessings of the Shema / First Blessing before Shema: chol/arvit/birkhot_keriat_shema/first_blessing_before_shema
+Weekday / Maariv / Blessings of the Shema / Second Blessing before Shema: chol/arvit/birkhot_keriat_shema/second_blessing_before_shema
+Weekday / Maariv / Blessings of the Shema / Shema: chol/arvit/birkhot_keriat_shema/keriat_shema
+Weekday / Maariv / Blessings of the Shema / First Blessing after Shema: chol/arvit/birkhot_keriat_shema/first_blessing_after_shema
+Weekday / Maariv / Blessings of the Shema / Second Blessing after Shema: chol/arvit/birkhot_keriat_shema/second_blessing_after_shema
+Weekday / Maariv / Blessings of the Shema / Third Blessing after Shema: chol/arvit/birkhot_keriat_shema/third_blessing_after_shema
+Weekday / Maariv / Blessings of the Shema / Chatzi Kaddish: chol/arvit/birkhot_keriat_shema/chatzi_kaddish
+Weekday / Maariv / Amidah: chol/arvit/shemoneh_esreh
+Weekday / Maariv / Amidah / Patriarchs: chol/arvit/shemoneh_esreh/avot
+Weekday / Maariv / Amidah / Divine Might: chol/arvit/shemoneh_esreh/gevurot
+Weekday / Maariv / Amidah / Holiness of God: chol/arvit/shemoneh_esreh/qedushat_hashem
+Weekday / Maariv / Amidah / Knowledge: chol/arvit/shemoneh_esreh/binah
+Weekday / Maariv / Amidah / Repentance: chol/arvit/shemoneh_esreh/teshuvah
+Weekday / Maariv / Amidah / Forgiveness: chol/arvit/shemoneh_esreh/selichah
+Weekday / Maariv / Amidah / Redemption: chol/arvit/shemoneh_esreh/geullah
+Weekday / Maariv / Amidah / Healing: chol/arvit/shemoneh_esreh/refuah
+Weekday / Maariv / Amidah / Prosperity: chol/arvit/shemoneh_esreh/birkat_hashanim
+Weekday / Maariv / Amidah / Gathering the Exiles: chol/arvit/shemoneh_esreh/qibbutz_galuyot
+Weekday / Maariv / Amidah / Justice: chol/arvit/shemoneh_esreh/mishpat
+Weekday / Maariv / Amidah / Against Enemies: chol/arvit/shemoneh_esreh/minim
+Weekday / Maariv / Amidah / The Righteous: chol/arvit/shemoneh_esreh/tzaddiqim
+Weekday / Maariv / Amidah / Rebuilding Jerusalem: chol/arvit/shemoneh_esreh/binyan_yerushalayim
+Weekday / Maariv / Amidah / Kingdom of David: chol/arvit/shemoneh_esreh/malkhut_beit_david
+Weekday / Maariv / Amidah / Response to Prayer: chol/arvit/shemoneh_esreh/shomea_tefillah
+Weekday / Maariv / Amidah / Temple Service: chol/arvit/shemoneh_esreh/avodah
+Weekday / Maariv / Amidah / Thanksgiving: chol/arvit/shemoneh_esreh/hodaah
+Weekday / Maariv / Amidah / Peace: chol/arvit/shemoneh_esreh/shalom
+Weekday / Maariv / Amidah / Concluding Passage: chol/arvit/shemoneh_esreh/elohai_netzor
+Weekday / Maariv / Kaddish Shalem: chol/arvit/kaddish_shalem
+Weekday / Maariv / Additions for Motza'ei Shabbat: chol/arvit/motzaei_shabbat
+Weekday / Maariv / Additions for Motza'ei Shabbat / Vyehi Noam (includes v'atah kadosh): chol/arvit/motzaei_shabbat/vihi_noam
+Weekday / Maariv / Additions for Motza'ei Shabbat / Vayiten Lekha:
+Weekday / Maariv / Counting The Omer: chol/arvit/sefirat_haomer
+Weekday / Maariv / Alenu: chol/arvit/aleinu
+Weekday / Maariv / Kaddish Yatom: chol/arvit/kaddish_yatom
+Weekday / Maariv / L'David: chol/arvit/ledavid
+Weekday / Maariv / Bircat Levana: chol/arvit/birkat_halevanah
+Weekday / Maariv / Keri'at Shema al Hamita: chol/arvit/keriat_shema_al_hamittah
+Shabbat: shabbat
+Shabbat / Kabbalat Shabbat: shabbat/qabbalat_shabbat
+Shabbat / Kabbalat Shabbat / Yedid Nefesh: shabbat/qabbalat_shabbat/yedid_nefesh
+Shabbat / Kabbalat Shabbat / Psalm 95: shabbat/qabbalat_shabbat/psalm_95
+Shabbat / Kabbalat Shabbat / Psalm 96: shabbat/qabbalat_shabbat/psalm_96
+Shabbat / Kabbalat Shabbat / Psalm 97: shabbat/qabbalat_shabbat/psalm_97
+Shabbat / Kabbalat Shabbat / Psalm 98: shabbat/qabbalat_shabbat/psalm_98
+Shabbat / Kabbalat Shabbat / Psalm 99: shabbat/qabbalat_shabbat/psalm_99
+Shabbat / Kabbalat Shabbat / Psalm 29: shabbat/qabbalat_shabbat/psalm_29
+Shabbat / Kabbalat Shabbat / Ana Bekoach: shabbat/qabbalat_shabbat/anna_bekhoach
+Shabbat / Kabbalat Shabbat / Lecha Dodi: shabbat/qabbalat_shabbat/lekha_dodi
+Shabbat / Kabbalat Shabbat / Psalm 92: shabbat/qabbalat_shabbat/psalm_92
+Shabbat / Kabbalat Shabbat / Psalm 93: shabbat/qabbalat_shabbat/psalm_93
+Shabbat / Kabbalat Shabbat / Kaddish Yatom: shabbat/qabbalat_shabbat/kaddish_yatom
+Shabbat / Kabbalat Shabbat / Bameh Madlikin: shabbat/qabbalat_shabbat/bameh_madliqin
+Shabbat / Kabbalat Shabbat / Kaddish DeRabbanan: shabbat/qabbalat_shabbat/kaddish_derabbanan
+Shabbat / Maariv: shabbat/arvit
+Shabbat / Maariv / Barchu: shabbat/arvit/barekhu
+Shabbat / Maariv / Blessings of the Shema: shabbat/arvit/birkhot_keriat_shema
+Shabbat / Maariv / Blessings of the Shema / First Blessing before Shema: shabbat/arvit/birkhot_keriat_shema/first_blessing_before_shema
+Shabbat / Maariv / Blessings of the Shema / Second Blessing before Shema: shabbat/arvit/birkhot_keriat_shema/second_blessing_before_shema
+Shabbat / Maariv / Blessings of the Shema / Shema: shabbat/arvit/birkhot_keriat_shema/keriat_shema
+Shabbat / Maariv / Blessings of the Shema / First Blessing after Shema: shabbat/arvit/birkhot_keriat_shema/first_blessing_after_shema
+Shabbat / Maariv / Blessings of the Shema / Second Blessing after Shema: shabbat/arvit/birkhot_keriat_shema/second_blessing_after_shema
+Shabbat / Maariv / Veshamru: shabbat/arvit/veshameru
+Shabbat / Maariv / Chatzi Kadish: shabbat/arvit/chatzi_kaddish
+Shabbat / Maariv / Amidah: shabbat/arvit/shemoneh_esreh
+Shabbat / Maariv / Amidah / Patriarchs: shabbat/arvit/shemoneh_esreh/avot
+Shabbat / Maariv / Amidah / Divine Might: shabbat/arvit/shemoneh_esreh/gevurot
+Shabbat / Maariv / Amidah / Holines of God's Name: shabbat/arvit/shemoneh_esreh/qedushat_hashem
+Shabbat / Maariv / Amidah / Holiness of the Day: shabbat/arvit/shemoneh_esreh/qedushat_hayom
+Shabbat / Maariv / Amidah / Temple Service: shabbat/arvit/shemoneh_esreh/avodah
+Shabbat / Maariv / Amidah / Thanksgiving: shabbat/arvit/shemoneh_esreh/hodaah
+Shabbat / Maariv / Amidah / Peace: shabbat/arvit/shemoneh_esreh/shalom
+Shabbat / Maariv / Amidah / Concluding Passage: shabbat/arvit/shemoneh_esreh/elohai_netzor
+Shabbat / Maariv / Vayechulu: shabbat/arvit/vaykhulu
+Shabbat / Maariv / Seven Faceted Blessing: shabbat/arvit/meein_sheva
+Shabbat / Maariv / Kaddish Shalem: shabbat/arvit/kaddish_shalem
+Shabbat / Maariv / Sefirat HaOmer: shabbat/arvit/sefirat_haomer
+Shabbat / Maariv / Aleinu: shabbat/arvit/aleinu
+Shabbat / Maariv / Kaddish Yatom: shabbat/arvit/kaddish_yatom
+Shabbat / Maariv / L'David: shabbat/arvit/ledavid
+Shabbat / Maariv / Yigdal: shabbat/arvit/yigdal
+Shabbat / Maariv / Adon Olam: shabbat/arvit/adon_olam
+Shabbat / Shabbat Evening: shabbat/leil_shabbat
+Shabbat / Shabbat Evening / Blessing the Children: shabbat/leil_shabbat/birkat_habanim
+Shabbat / Shabbat Evening / Shalom Aleichem: shabbat/leil_shabbat/shalom_aleikhem
+Shabbat / Shabbat Evening / Kiddush: shabbat/leil_shabbat/kiddush
+Shabbat / Shabbat Evening / Master of all worlds: shabbat/leil_shabbat/ribbon_kol_haolamim
+Shabbat / Shabbat Evening / Ashet Chayil: shabbat/leil_shabbat/eshet_chayil
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening: shabbat/leil_shabbat/zemirot
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Kol M'kadesh: shabbat/leil_shabbat/zemirot/kol_meqaddesh
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Menucha v'Simcha: shabbat/leil_shabbat/zemirot/menuchah_vesimchah
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Ma Y'didut: shabbat/leil_shabbat/zemirot/mah_yedidut
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Yom zeh L'yisrael: shabbat/leil_shabbat/zemirot/yom_zeh_leyisrael
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Yah Ribon: shabbat/leil_shabbat/zemirot/yah_ribbon
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Tzamah Nafshi: shabbat/leil_shabbat/zemirot/tzameah_nafshi
+Shabbat / Shabbat Evening / Zemirot for Shabbat Evening / Tzur Mishelo: shabbat/leil_shabbat/zemirot/tzur_mishello
+Shabbat / Shacharit:
+Shabbat / Shacharit / Preparatory Prayers:
+Shabbat / Shacharit / Preparatory Prayers / Modeh Ani:
+Shabbat / Shacharit / Preparatory Prayers / Netilat Yadayim:
+Shabbat / Shacharit / Preparatory Prayers / Asher Yatzar:
+Shabbat / Shacharit / Preparatory Prayers / Elokai Neshama:
+Shabbat / Shacharit / Preparatory Prayers / Tzitzit (**Include Yehi Ratzon):
+Shabbat / Shacharit / Preparatory Prayers / Tallit:
+Shabbat / Shacharit / Preparatory Prayers / Ma Tovu:
+Shabbat / Shacharit / Preparatory Prayers / Adon Olam:
+Shabbat / Shacharit / Preparatory Prayers / Yigdal:
+Shabbat / Shacharit / Preparatory Prayers / Morning Blessings:
+Shabbat / Shacharit / Preparatory Prayers / Akedah:
+Shabbat / Shacharit / Preparatory Prayers / Sovereignty of Heaven (**L'olam, Shema):
+Shabbat / Shacharit / Preparatory Prayers / Korbanot:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Kiyor:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Terumat HaDeshen:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Korban HaTamid:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Ketoret:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Order of the Temple Service (Ana Bekoach):
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Laws of Sacrifices:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Baraita of Rabbi Yishmael:
+Shabbat / Shacharit / Preparatory Prayers / Korbanot / Kaddish DeRabbanan:
+Shabbat / Shacharit / Pesukei D'Zimra:
+Shabbat / Shacharit / Pesukei D'Zimra / Mizmor Shir:
+Shabbat / Shacharit / Pesukei D'Zimra / Kaddish Yatom:
+Shabbat / Shacharit / Pesukei D'Zimra / Baruch SheAmar:
+Shabbat / Shacharit / Pesukei D'Zimra / Hodu (passage from Divrei Hayamim and selected verses):
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 100:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 19:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 34:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 90:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 91:
+Shabbat / Shacharit / Pesukei D'Zimra / Pslam 135:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 136:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 33:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 92:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 93:
+Shabbat / Shacharit / Pesukei D'Zimra / Yehi Chavod (Verses with 18 mentions of Divine Name):
+Shabbat / Shacharit / Pesukei D'Zimra / Ashrei:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 146:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 147:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 148:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 149:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 150:
+Shabbat / Shacharit / Pesukei D'Zimra / Baruch Hashem:
+Shabbat / Shacharit / Pesukei D'Zimra / Vayivarech David:
+Shabbat / Shacharit / Pesukei D'Zimra / Shirat HaYam:
+Shabbat / Shacharit / Pesukei D'Zimra / Nishmat Kol Chai:
+Shabbat / Shacharit / Pesukei D'Zimra / Shochen Ad:
+Shabbat / Shacharit / Pesukei D'Zimra / Yishtabach:
+Shabbat / Shacharit / Pesukei D'Zimra / Psalm 130 (for Aseret Y'mei Teshuvah):
+Shabbat / Shacharit / Pesukei D'Zimra / Chatzi Kaddish:
+Shabbat / Shacharit / Blessings of the Shema:
+Shabbat / Shacharit / Blessings of the Shema / Barchu:
+Shabbat / Shacharit / Blessings of the Shema / First Blessing before Shema:
+Shabbat / Shacharit / Blessings of the Shema / Second Blessing before Shema:
+Shabbat / Shacharit / Blessings of the Shema / Shema:
+Shabbat / Shacharit / Blessings of the Shema / Blessing after Shema (Redeemer of Israel):
+Shabbat / Shacharit / Amidah:
+Shabbat / Shacharit / Amidah / Patriarchs:
+Shabbat / Shacharit / Amidah / Divine Might:
+Shabbat / Shacharit / Amidah / Kedushah:
+Shabbat / Shacharit / Amidah / Holiness of God:
+Shabbat / Shacharit / Amidah / Holiness of The Day (for Shacharit):
+Shabbat / Shacharit / Amidah / Temple Service:
+Shabbat / Shacharit / Amidah / Thanksgiving:
+Shabbat / Shacharit / Amidah / Birkat Kohanim:
+Shabbat / Shacharit / Amidah / Sim Shalom:
+Shabbat / Shacharit / Amidah / Concluding Passage:
+Shabbat / Shacharit / Amidah / Kaddish Shalem:
+Shabbat / Shacharit / Keriat Hatorah:
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark:
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark / Ein Kamocha:
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark / Vayhi Binsoa:
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark / Brich Shmei (Zohar 369a):
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark / Shema Yisrael (Gadlu):
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark / Lecha Hashem:
+Shabbat / Shacharit / Keriat Hatorah / Removing the Torah from the Ark / V'yazor V'yagen:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Birkat Haotrah:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Birkat Hagomel:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / For an Oleh:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / For Sickness (includes man and woman):
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / For Birth:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / For Birth / Birth of a Son:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / For Birth / Birth of Daughter:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / Bar Mitzvah:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Mi Sheberach / Bat Mitzvah:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Chatzi Kaddish:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Raising the Torah:
+Shabbat / Shacharit / Keriat Hatorah / Reading from Sefer / Haftarah (Includes Berachot):
+Shabbat / Shacharit / Communal Prayers:
+Shabbat / Shacharit / Communal Prayers / Yekum Purkan:
+Shabbat / Shacharit / Communal Prayers / Prayer of the State of Israel:
+Shabbat / Shacharit / Communal Prayers / Prayer for Israeli Soldiers:
+Shabbat / Shacharit / Communal Prayers / Prayer for Those Being Held in Captivity:
+Shabbat / Shacharit / Communal Prayers / Birkat Hachodesh:
+Shabbat / Shacharit / Communal Prayers / Av HaRachamim:
+Shabbat / Shacharit / Ashrei:
+Shabbat / Shacharit / Returning Sefer to Aron:
+Shabbat / Shacharit / Chatzi Kaddish:
+Shabbat / Musaf L'Shabbat:
+Shabbat / Musaf L'Shabbat / Amidah:
+Shabbat / Musaf L'Shabbat / Amidah / Patriarchs:
+Shabbat / Musaf L'Shabbat / Amidah / Divine Might:
+Shabbat / Musaf L'Shabbat / Amidah / Kedushah:
+Shabbat / Musaf L'Shabbat / Amidah / Holiness of God:
+Shabbat / Musaf L'Shabbat / Amidah / Holiness of The Day:
+Shabbat / Musaf L'Shabbat / Amidah / Holiness of The Day / for Shabbat:
+Shabbat / Musaf L'Shabbat / Amidah / Holiness of The Day / for Shabbat Rosh Chodesh:
+Shabbat / Musaf L'Shabbat / Amidah / Temple Service:
+Shabbat / Musaf L'Shabbat / Amidah / Thanksgiving:
+Shabbat / Musaf L'Shabbat / Amidah / Birkat Kohanim:
+Shabbat / Musaf L'Shabbat / Amidah / Sim Shalom:
+Shabbat / Musaf L'Shabbat / Amidah / Concluding Passage:
+Shabbat / Musaf L'Shabbat / Amidah / Kaddish Shalem:
+Shabbat / Musaf L'Shabbat / Kaddish Shalem:
+Shabbat / Musaf L'Shabbat / Ein Keloheinu:
+Shabbat / Musaf L'Shabbat / Pitum Haketoret (for Shabbat):
+Shabbat / Musaf L'Shabbat / Kaddish Derabbanan:
+Shabbat / Musaf L'Shabbat / Alenu:
+Shabbat / Musaf L'Shabbat / Kaddish Yatom:
+Shabbat / Musaf L'Shabbat / Mizmor Shir L'Yom HaShabbat:
+Shabbat / Musaf L'Shabbat / L'David:
+Shabbat / Musaf L'Shabbat / Shir HaKavod:
+Shabbat / Musaf L'Shabbat / Adon Olam:
+Shabbat / Daytime Meal:
+Shabbat / Daytime Meal / Kiddusha Rabba:
+Shabbat / Daytime Meal / Zemirot for Second Meal:
+Shabbat / Daytime Meal / Zemirot for Second Meal / Baruch Kel Elyon:
+Shabbat / Daytime Meal / Zemirot for Second Meal / Yom Zeh Mechubad:
+Shabbat / Daytime Meal / Zemirot for Second Meal / Yom Shabbaton:
+Shabbat / Daytime Meal / Zemirot for Second Meal / Shimru Shabtotai:
+Shabbat / Daytime Meal / Zemirot for Second Meal / Ki Eshmera:
+Shabbat / Daytime Meal / Zemirot for Second Meal / Dror Yikrah:
+Shabbat / Minchah:
+Shabbat / Minchah / Ashrei:
+Shabbat / Minchah / Uva Letzion:
+Shabbat / Minchah / Chatzi Kaddish:
+Shabbat / Minchah / Keriat HaTorah:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / Va'ani Tefillati:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / Vayhi Binsoa:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / Brich Shmei:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / Gadlu:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / Lekha Hashem:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / Av Harachamim:
+Shabbat / Minchah / Keriat HaTorah / Removing The Torah From Ark / V'tigaleh v'teraeh:
+Shabbat / Minchah / Keriat HaTorah / Reading from Sefer:
+Shabbat / Minchah / Keriat HaTorah / Reading from Sefer / Birkat Hatorah:
+Shabbat / Minchah / Keriat HaTorah / Reading from Sefer / Raising the Torah:
+Shabbat / Minchah / Keriat HaTorah / Returning Sefer to Aron:
+Shabbat / Minchah / Keriat HaTorah / Returning Sefer to Aron / Yehalelu:
+Shabbat / Minchah / Keriat HaTorah / Returning Sefer to Aron / LeDavid:
+Shabbat / Minchah / Keriat HaTorah / Returning Sefer to Aron / Uvenuchah Yomar:
+Shabbat / Minchah / Amidah:
+Shabbat / Minchah / Amidah / Patriarchs:
+Shabbat / Minchah / Amidah / Divine Might:
+Shabbat / Minchah / Amidah / Kedushah:
+Shabbat / Minchah / Amidah / Holiness of God:
+Shabbat / Minchah / Amidah / Holiness of The Day (for Mincha):
+Shabbat / Minchah / Amidah / Temple Service:
+Shabbat / Minchah / Amidah / Thanksgiving:
+Shabbat / Minchah / Amidah / Thanksgiving / Modim and Modim deRabanan:
+Shabbat / Minchah / Amidah / Thanksgiving / Al Hanisim for Chanukkah:
+Shabbat / Minchah / Amidah / Thanksgiving / Al Hanisim for Purim:
+Shabbat / Minchah / Amidah / Sim Shalom:
+Shabbat / Minchah / Amidah / Concluding Passage:
+Shabbat / Minchah / Tzidkatkhah Tzedek:
+Shabbat / Minchah / Kaddish Shalem:
+Shabbat / Minchah / Alenu:
+Shabbat / Minchah / Kaddish Yatom:
+Shabbat / Minchah / Barchi Nafshi:
+Shabbat / Third Meal:
+Shabbat / Third Meal / Atkinu:
+Shabbat / Third Meal / Mizmor L'David:
+Shabbat / Third Meal / Yedid Nefesh:
+Shabbat / Havdalah:
+Festivals: festivals
+Festivals / Rosh Chodesh: festivals/rosh_chodesh
+Festivals / Rosh Chodesh / Hallel: festivals/rosh_chodesh/hallel
+Festivals / Rosh Chodesh / Hallel / Berakhah:
+Festivals / Rosh Chodesh / Hallel / Psalm 113: festivals/rosh_chodesh/hallel/psalm_113
+Festivals / Rosh Chodesh / Hallel / Psalm 114: festivals/rosh_chodesh/hallel/psalm_114
+Festivals / Rosh Chodesh / Hallel / Psalm 115: festivals/rosh_chodesh/hallel/psalm_115
+Festivals / Rosh Chodesh / Hallel / Psalm 116: festivals/rosh_chodesh/hallel/psalm_116
+Festivals / Rosh Chodesh / Hallel / Psalm 117: festivals/rosh_chodesh/hallel/psalm_117
+Festivals / Rosh Chodesh / Hallel / Psalm 118: festivals/rosh_chodesh/hallel/psalm_118
+Festivals / Rosh Chodesh / Hallel / Berakhah for end of Hallel: festivals/rosh_chodesh/hallel/yehallelukha
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Avot:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Gevurot:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Kedushah:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Kedushah / Kedushat HaShem:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Kedushat Hayom (for Rosh Chodesh):
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Avodah:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Hodayah:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Birkat Kohanim:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Sim Shalom:
+Festivals / Rosh Chodesh / Musaf Amidah for Rosh Chodesh / Passages Ending Amidah:
+Festivals / Shalosh Regalim:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Avot:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Gevurot:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Kedusha:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Sanctity of the Day:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Avodah:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Modin:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Birkat Kohanim:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Blessing for Peace:
+Festivals / Shalosh Regalim / Amida for Maariv, Shacharit, Mincha / Concluding Prayer:
+Festivals / Shalosh Regalim / Mussaf:
+Festivals / Shalosh Regalim / Mussaf / Avot:
+Festivals / Shalosh Regalim / Mussaf / Gevurot:
+Festivals / Shalosh Regalim / Mussaf / Kedusha:
+Festivals / Shalosh Regalim / Mussaf / Sanctity of the Name:
+Festivals / Shalosh Regalim / Mussaf / Sanctity of the Day:
+Festivals / Shalosh Regalim / Mussaf / Avodah:
+Festivals / Shalosh Regalim / Mussaf / Modim:
+Festivals / Shalosh Regalim / Mussaf / Birkat Kohanim:
+Festivals / Shalosh Regalim / Mussaf / Blessing of Peace:
+Festivals / Shalosh Regalim / Mussaf / Concluding Prayer:
+Festivals / Prayer for Dew:
+Festivals / Prayer for Rain:
+Festivals / Sukkot:
+Festivals / Sukkot / Prayers in the Sukkah:
+Festivals / Sukkot / Prayers in the Sukkah / Entering the Sukkah:
+Festivals / Sukkot / Prayers in the Sukkah / Ushpizin:
+Festivals / Sukkot / Prayers in the Sukkah / Leaving the Sukkah:
+Festivals / Sukkot / Blessing on Lulav:
+Festivals / Sukkot / Hosha'anot:
+Festivals / Sukkot / Hosha'anot / Any Day of Sukkot that Fall on Shabbat:
+Festivals / Sukkot / Hosha'anot / First Day of Sukkot:
+Festivals / Sukkot / Hosha'anot / Second Day of Sukkot:
+Festivals / Sukkot / Hosha'anot / Third Day of Sukkot:
+Festivals / Sukkot / Hosha'anot / Fourth Day of Sukkot:
+Festivals / Sukkot / Hosha'anot / Fifth Day of Sukkot:
+Festivals / Sukkot / Hosha'anot / Sixth Day of Sukkot:
+Festivals / Sukkot / Hosha'anot / Hosha'ana Rabba:
+Festivals / Chanukah:
+Festivals / Chanukah / Service for Lighting Chanukah Candles:
+Festivals / Chanukah / Service for Lighting Chanukah Candles / Blessings on Chanukah Candles:
+Festivals / Chanukah / Service for Lighting Chanukah Candles / Hanerot Hallalu:
+Festivals / Chanukah / Service for Lighting Chanukah Candles / Maoz Tzur:
+Festivals / Selichot:
+Festivals / Selichot / Tzom Gedaliya:
+Festivals / Selichot / Asarah b'Tevet:
+Festivals / Selichot / Ta'anit Esther:
+Festivals / Selichot / Shiv'ah Asar B'Tammuz:
+Festivals / Selichot / Yom Kippur Katan:
+Festivals / Selichot / BaHaB:
+Berachot: berakhot
+Berachot / Birkat HaMazon: berakhot/birkat_hamazon
+Berachot / Birkat Hanehenin:
+Berachot / Birkat Hanehenin / Eating:
+Berachot / Birkat Hanehenin / Eating / Barachot Rishonot:
+Berachot / Birkat Hanehenin / Eating / Brachot Achronot:
+Berachot / Birkat Hanehenin / Eating / Brachot Achronot / Al Hamichyah:
+Berachot / Birkat Hanehenin / Eating / Brachot Achronot / Borei Nefashot:
+Berachot / Birkat Hanehenin / Blessings on Sights Sounds and Smells:
+Berachot / Birkhot Hamitzvot:
+Berachot / Michayeh Maitim(for cemeteries):
+Berachot / Tefillat HaDerech:
+Berachot / Havinenu (the shortened Amidah):
+Kaddish:
+Kaddish / Chatzi Kadish:
+Kaddish / Kaddish Yatom:
+Kaddish / Kaddish Shalem:
+Kaddish / Kaddish d'Rabbanan:
+Kaddish / Kaddish achar HaKevura:
+Kaddish / Kaddish achar Hashlamat Meschet:

@@ -102,5 +102,25 @@ class TestSelichotKinds(unittest.TestCase):
         bold = '<b>ש"ץ מתחיל בקול רם והצבור עונין אחריו פסוק אחר פסוק עד "ככלות כחנו אל תעזבנו"</b>'
         self.assertIsNot(hebrew_kind(parse_segment(bold)), HebrewKind.LABEL)
 
+class TestParagraphMarkup(unittest.TestCase):
+    """The Ashkenaz siddur's paragraphs."""
+
+    def test_an_instruction_quoting_bold_words_is_a_label(self):
+        instruction = '<small>אומרים הקהל <b>וִיהִי נֹֽעַם</b>:</small>'
+        self.assertIs(hebrew_kind(parse_segment(instruction)), HebrewKind.LABEL)
+        self.assertIsNot(hebrew_kind(parse_segment("<small>בָּרוּךְ שֵׁם</small>")), HebrewKind.LABEL)
+
+    def test_a_note_quoting_pointed_words_is_a_label(self):
+        note = "<small>אם שכח לומר טַל וּמָטָר ונזכר קודם שהתחיל אומרו במקום</small>"
+        self.assertIs(hebrew_kind(parse_segment(note)), HebrewKind.LABEL)
+        self.assertIsNot(hebrew_kind(parse_segment("<small>טַל וּמָטָר לִבְרָכָה עַל פְּנֵי</small>")), HebrewKind.LABEL)
+
+    def test_a_label_a_line_above_the_words_in_one_run_of_small_print(self):
+        from opensiddur.importer.sefaria.markup import split_leading
+        label, words = split_leading(parse_segment("<small>אומרים כאן<br><b>עַל הַנִּסִּים</b> וְעַל</small>"),
+                                     {"small"}, hebrew=True)
+        self.assertEqual((plain_text(label), plain_text(words)), ("אומרים כאן", "עַל הַנִּסִּים וְעַל"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -46,6 +46,26 @@ Hebrew segment *n* is translated by English segment *n*. An English rubric stand
 empty Hebrew segment. The two versions mostly have the same number of segments per leaf; where
 they do not, it is decided (see Align).
 
+**The paragraph layout.** The Metsudah Siddur Ashkenaz is not a volume of its own on Sefaria
+but versions of Sefaria's shared *Siddur Ashkenaz* index, which many siddurim fill. Its segments
+are whole paragraphs, Hebrew *n* still translated by English *n* (`layout: paragraph` in
+`works.yaml`; the headers say so). A paragraph often opens with a label or instruction in small
+print before the words it governs (`<small>בחורף:</small> מַשִּׁיב הָרֽוּחַ`, with the English's
+`<i>In winter:</i>`), and a condition label may stand inside one (`... <small>בקיץ:</small> מוֹרִיד
+הַטָּל`). After alignment such a paragraph is split: the label becomes a pair of its own, as the
+linear volumes print it, carrying the English's leading italic run if there is one
+(`align.split_leading_labels`). A label set apart so (`Pair.paragraph_label`) governs the rest of
+its own paragraph only — its conditional ends where the next segment begins — and does not mark
+where a new text may start; the matcher reads the paragraph's words without it. An instruction
+in small print that quotes the words it names in pointed bold (`... אומרים הקהל <b>וִיהִי נֹֽעַם</b>`)
+is a label, not text. The Ashkenaz versions fill only the weekday services, Friday night and
+Birkat HaMazon; the rest of the index is empty for them and left unplaced.
+
+**Supplements.** A work may name a second version of a language (`supplements` in
+`works.yaml`), downloaded beside the main one as `<lang>_supplement.json`; it gives the segments
+of each leaf the main version leaves empty (`Leaf.supplied`), and the header credits it. The
+Ashkenaz siddur's Rosh Chodesh Hallel is in another Metsudah Hebrew version, untranslated.
+
 **Markup.** `<b>` (the opening words of a prayer; unpointed and whole, a heading), `<small>`
 (Hebrew: a quieter line, a seasonal insertion, or an unpointed label; English: a rubric), `<i>`
 (English: a transliterated word or a rubric), `<big>`, `<span>` (Hebrew inside English), `<br>`,
@@ -98,7 +118,8 @@ only. Seasonal and variant wording is in parentheses.
 uv run python -m opensiddur.importer.sefaria.download [--work KEY ...]
 ```
 
-Writes `sourcetexts/sources/sefaria/<work>/`: `schema.json`, `he.json`, `en.json` (indented,
+Writes `sourcetexts/sources/sefaria/<work>/`: `schema.json`, `he.json`, `en.json`, any
+`<lang>_supplement.json` (indented,
 one segment to a line, so that a later export reads as a diff), `README.md` and
 `manifest.json`. The manifest records each file's URL, the bucket's `md5Hash` and
 `generation`, the sha256 as stored, the export date, and for every leaf its segment counts and
@@ -486,8 +507,9 @@ needs review or failed to convert. The report,
 
 ## Later work
 
-- The other four volumes: a `works.yaml` entry and a structure table each; their phrases
-  reuse the Weekday Siddur's numbers where the text is shared.
+- The Rosh Hashanah and Yom Kippur machzorim: a `works.yaml` entry and a structure table each.
+- The rest of the Ashkenaz siddur (Shabbat morning, Musaf and Minchah, the festivals), should
+  Sefaria add it.
 - **Conditions with no setting.** A choice no registered feature makes — which blessing for
   what you see, smell or eat beyond מעין שלש, having forgotten רצה or יעלה ויבוא — stays an
   instruction (`directives`); a feature for it is a registry change first.

@@ -7,6 +7,7 @@ from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.match import (
     later_text,
+    quoted_words,
     verse_run,
     TextRecord,
     decide_work,
@@ -85,6 +86,49 @@ class TestVerseRun(unittest.TestCase):
 
     def test_a_single_verse_is_not_a_run(self):
         self.assertIsNone(verse_run(T + "bible:psalms/1/2", words(VERSES[1]), verses_index()))
+
+
+class TestQuotedPhrases(unittest.TestCase):
+    # A long verse (Daniel 9:7's kind), whose collected opening is all the index holds of it.
+    LONG = "לְךָ אֲדֹנָי הַצְּדָקָה וְלָנוּ בֹּשֶׁת הַפָּנִים כַּיּוֹם הַזֶּה לְאִישׁ יְהוּדָה וּלְיוֹשְׁבֵי יְרוּשָׁלִַם וּלְכָל יִשְׂרָאֵל הַקְּרֹבִים"
+    URN = T + "bible:daniel/9/7"
+
+    def index(self) -> IncipitIndex:
+        index = IncipitIndex()
+        index.add(self.URN, words(self.LONG))
+        return index
+
+    def test_a_quotation_that_leaves_the_verse_ends_where_it_leaves(self):
+        phrases = [words("לְךָ אֲדֹנָי הַצְּדָקָה"), words("וְלָנוּ בֹּשֶׁת הַפָּנִים"), words("מַה נִּתְאוֹנֵן"),
+                   words("וּמַה נֹּאמַר")]
+        self.assertEqual(quoted_words(self.URN, phrases, self.index()), 6)
+
+    def test_a_quotation_in_its_own_order_still_quotes(self):
+        phrases = [words("לְךָ אֲדֹנָי הַצְּדָקָה"), words("וְלָנוּ הַפָּנִים בֹּשֶׁת"), words("מַה נִּתְאוֹנֵן")]
+        self.assertEqual(quoted_words(self.URN, phrases, self.index()), 6)
+
+    def test_a_quotation_that_leaves_the_verse_inside_a_phrase_ends_there(self):
+        # a paragraph that quotes the verse's opening, then goes on in words of its own
+        phrases = [words("לְךָ אֲדֹנָי הַצְּדָקָה וְלָנוּ בֹּשֶׁת הַפָּנִים מַה נִּתְאוֹנֵן וּמַה נֹּאמַר מַה נְּדַבֵּר וּמַה נִּצְטַדָּק")]
+        self.assertEqual(quoted_words(self.URN, phrases, self.index()), 6)
+
+    def test_a_word_split_otherwise_does_not_end_the_quotation(self):
+        # The index holds יהללו־יה as one word; a source may give it as two (Psalm 115:17).
+        index = IncipitIndex()
+        urn = T + "bible:psalms/115/17"
+        index.add(urn, ["לא", "המתם", "יהללה", "ולא", "כל", "ירד", "דמה", "ואנחנ", "נברך", "יה", "מעתה",
+                        "ועד", "עלם", "הללה"])
+        index.length_of[urn] = 8  # as the index holds it: a word past the verse
+        phrases = [["לא", "המתם", "יהלל", "יה"], ["ולא", "כל", "ירד"], ["דמה"], ["ואנחנ", "נברך", "יה"]]
+        self.assertIsNone(quoted_words(urn, phrases, index))
+
+    def test_a_quotation_of_all_the_index_holds_is_not_cut(self):
+        phrases = [words(self.LONG), words("מַה נִּתְאוֹנֵן")]
+        self.assertIsNone(quoted_words(self.URN, phrases, self.index()))
+
+    def test_a_block_that_ends_inside_the_verse_is_not_cut(self):
+        phrases = [words("לְךָ אֲדֹנָי הַצְּדָקָה"), words("וְלָנוּ בֹּשֶׁת הַפָּנִים")]
+        self.assertIsNone(quoted_words(self.URN, phrases, self.index()))
 
 
 VIHI_NOAM = "וִיהִי נֹעַם אֲדֹנָי אֱלֹהֵינוּ עָלֵינוּ וּמַעֲשֵׂה יָדֵינוּ כּוֹנְנָה עָלֵינוּ"
@@ -459,7 +503,88 @@ class TestScriptureVerses(unittest.TestCase):
         index = IncipitIndex()
         index.add(T + "bible:deuteronomy/25/17", words(verse))
         (block,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם", verse) if isinstance(i, TextBlock)]
-        self.assertEqual(scripture_verses(block, index), {1: T + "bible:deuteronomy/25/17"})
+        self.assertEqual(scripture_verses(block, index), {(1, 0): T + "bible:deuteronomy/25/17"})
+
+    def test_a_run_of_verses_another_text_is_named_by_is_its_first_verse(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        verse = "זָכוֹר אֵת אֲשֶׁר עָשָׂה לְךָ עֲמָלֵק בַּדֶּרֶךְ בְּצֵאתְכֶם מִמִּצְרָיִם"
+        index = IncipitIndex()
+        index.add(T + "bible:deuteronomy/25/17", words(verse))
+        index.add(T + "bible:deuteronomy/25/17-19", words(verse))
+        (block,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם", verse) if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {(1, 0): T + "bible:deuteronomy/25/17"})
+
+
+    def test_a_verse_is_found_after_a_sof_pasuq_inside_a_phrase(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        verse = "זָכוֹר אֵת אֲשֶׁר עָשָׂה לְךָ עֲמָלֵק בַּדֶּרֶךְ בְּצֵאתְכֶם מִמִּצְרָיִם"
+        index = IncipitIndex()
+        index.add(T + "bible:deuteronomy/25/17", words(verse))
+        (block,) = [i for i in items(f"<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם: {verse}:") if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {(0, 1): T + "bible:deuteronomy/25/17"})
+
+
+    def test_a_verse_is_found_after_a_full_stop(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        verse = "זָכוֹר אֵת אֲשֶׁר עָשָׂה לְךָ עֲמָלֵק בַּדֶּרֶךְ בְּצֵאתְכֶם מִמִּצְרָיִם"
+        index = IncipitIndex()
+        index.add(T + "bible:deuteronomy/25/17", words(verse))
+        (block,) = [i for i in items(f"<b>הִנֵּה</b> אֲנִי מוּכָן לְקַיֵּם. {verse}.") if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {(0, 1): T + "bible:deuteronomy/25/17"})
+
+
+    def test_a_full_stop_inside_a_verse_does_not_open_another(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        # the words after the full stop open another verse too (Exodus 31:17, then 20:11's opening)
+        first = "בֵּינִי וּבֵין בְּנֵי יִשְׂרָאֵל אוֹת הִיא לְעֹלָם"
+        second = "כִּי שֵׁשֶׁת יָמִים עָשָׂה יְהֹוָה אֶת הַשָּׁמַיִם וְאֶת הָאָרֶץ"
+        index = IncipitIndex()
+        index.add(T + "bible:exodus/31/17", words(f"{first} {second} וּבַיּוֹם הַשְּׁבִיעִי"))
+        index.add(T + "bible:exodus/20/11", words(f"{second} אֶת הַיָּם וְאֶת כָּל אֲשֶׁר בָּם"))
+        (block,) = [i for i in items(f"<b>בֵּינִי</b> {first.split(' ', 1)[1]}. {second} וּבַיּוֹם הַשְּׁבִיעִי:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {(0, 0): T + "bible:exodus/31/17"})
+
+
+    def test_a_phrase_inside_a_verse_does_not_open_another(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        # Exodus 31:17 printed over two phrases, the second opening as Exodus 20:11 does
+        first = "בֵּינִי וּבֵין בְּנֵי יִשְׂרָאֵל אוֹת הִיא לְעֹלָם"
+        second = "כִּי שֵׁשֶׁת יָמִים עָשָׂה יְהֹוָה אֶת הַשָּׁמַיִם וְאֶת הָאָרֶץ"
+        index = IncipitIndex()
+        index.add(T + "bible:exodus/31/17", words(f"{first} {second} וּבַיּוֹם הַשְּׁבִיעִי"))
+        index.add(T + "bible:exodus/20/11", words(f"{second} אֶת הַיָּם וְאֶת כָּל אֲשֶׁר בָּם"))
+        (block,) = [i for i in items(f"<b>בֵּינִי</b> {first.split(' ', 1)[1]}", f"{second} וּבַיּוֹם הַשְּׁבִיעִי:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index), {(0, 0): T + "bible:exodus/31/17"})
+        # ... but after a sof pasuq, it does
+        (after,) = [i for i in items(f"<b>בֵּינִי</b> {first.split(' ', 1)[1]}:", f"{second} אֶת הַיָּם:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(after, index),
+                         {(0, 0): T + "bible:exodus/31/17", (1, 0): T + "bible:exodus/20/11"})
+
+    def test_of_verses_worded_alike_the_one_after_the_verse_before_is_found(self):
+        from opensiddur.importer.sefaria.match import scripture_verses
+        eighth = "זָכוֹר אֶת יוֹם הַשַּׁבָּת לְקַדְּשׁוֹ"
+        ninth = "שֵׁשֶׁת יָמִים תַּעֲבֹד וְעָשִׂיתָ כָּל מְלַאכְתֶּךָ"
+        index = IncipitIndex()
+        index.add(T + "bible:exodus/20/8", words(f"{eighth} {ninth}"))
+        index.add(T + "bible:exodus/20/9", words(ninth))
+        index.add(T + "bible:deuteronomy/5/13", words(ninth))
+        (block,) = [i for i in items(f"<b>זָכוֹר</b> {eighth.split(' ', 1)[1]}:", f"{ninth}:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(block, index),
+                         {(0, 0): T + "bible:exodus/20/8", (1, 0): T + "bible:exodus/20/9"})
+        # ... with no verse before, neither is, unless the text is scripture of the one's chapter
+        (alone,) = [i for i in items("<b>הִנֵּה</b> אֲנִי מוּכָן", f"{ninth}:") if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(alone, index), {})
+        self.assertEqual(scripture_verses(alone, index, T + "bible:exodus/20/8-11"), {(1, 0): T + "bible:exodus/20/9"})
+        # ... or after a verse it does not follow
+        index.add(T + "bible:psalms/1/1", words("אַשְׁרֵי הָאִישׁ אֲשֶׁר לֹא הָלַךְ בַּעֲצַת רְשָׁעִים"))
+        (after,) = [i for i in items("<b>אַשְׁרֵי</b> הָאִישׁ אֲשֶׁר לֹא הָלַךְ בַּעֲצַת רְשָׁעִים:", f"{ninth}:")
+                    if isinstance(i, TextBlock)]
+        self.assertEqual(scripture_verses(after, index, T + "bible:exodus/20/8-11"),
+                         {(0, 0): T + "bible:psalms/1/1", (1, 0): T + "bible:exodus/20/9"})
 
 
 class TestMint(unittest.TestCase):
@@ -802,6 +927,20 @@ class TestKaddishParts(unittest.TestCase):
                               equivalents=table, registered=set())
         self.assertEqual([r.urn.rsplit(":", 1)[-1] for r in outcome.decided][-1], "kaddish/chatzi")
         self.assertEqual(len(outcome.decided), 2)
+
+
+
+class TestParagraphLabels(unittest.TestCase):
+    def test_a_label_set_apart_from_its_paragraph_introduces_nothing(self):
+        from opensiddur.importer.sefaria.align import Pair
+        from opensiddur.importer.sefaria.markup import parse_segment
+        from opensiddur.importer.sefaria.match import introduced_phrases
+        words_ = Pair(1, 1, parse_segment("אֱלֹהֵֽינוּ"), parse_segment("Our God"))
+        label = Pair(2, 2, parse_segment("<small>בשבועות:</small>"), ())
+        rest = Pair(2, 2, parse_segment("חַג הַשָּׁבֻעוֹת"), ())
+        self.assertEqual(introduced_phrases(TextBlock(None, [words_, label, rest])), frozenset({1}))
+        set_apart = Pair(2, 2, label.he, (), paragraph_label=True)
+        self.assertEqual(introduced_phrases(TextBlock(None, [words_, set_apart, rest])), frozenset())
 
 
 if __name__ == "__main__":

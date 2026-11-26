@@ -5,9 +5,10 @@ from opensiddur.importer.sefaria.align import (
     LeafDecision,
     align_leaf,
     align_work,
+    split_leading_labels,
 )
 from opensiddur.importer.sefaria.blocks import Heading, Rubric, TextBlock, divide, split_block
-from opensiddur.importer.sefaria.markup import plain_text
+from opensiddur.importer.sefaria.markup import leading_label, plain_text
 from opensiddur.importer.sefaria.source import Leaf, segments_hash
 
 
@@ -88,6 +89,153 @@ class TestAlign(unittest.TestCase):
         self.assertIn("Gone: a decision for a leaf the work no longer has", message)
 
 
+class TestSplitLeadingLabels(unittest.TestCase):
+    """A paragraph's leading label is set apart, as the linear volumes print it."""
+
+    def split(self, he, en):
+        return split_leading_labels(align_leaf(leaf([he], [en]))).pairs
+
+    def test_a_label_and_its_english_become_a_pair_before_the_words(self):
+        pairs = self.split("<small>בחורף:</small> מַשִּׁיב הָרֽוּחַ", "<i>In winter:</i> Who causes the wind")
+        self.assertEqual([(plain_text(p.he), plain_text(p.en)) for p in pairs],
+                         [("בחורף:", "In winter:"), ("מַשִּׁיב הָרֽוּחַ", "Who causes the wind")])
+        self.assertEqual({(p.he_index, p.en_index) for p in pairs}, {(1, 1)})
+
+    def test_an_english_instruction_with_roman_names_inside_it_is_whole(self):
+        pairs = self.split("<small>בקיץ:</small> מוֹרִיד הַטָּל",
+                           "<i>From the Musaf of </i>Shemini Atzeres<i> until the </i>Musaf<i> you should say:</i> Causer of the dew")
+        self.assertEqual([plain_text(p.en) for p in pairs],
+                         ["From the Musaf of Shemini Atzeres until the Musaf you should say:", "Causer of the dew"])
+
+    def test_an_english_instruction_stops_before_a_second_instruction(self):
+        pairs = self.split("<small>בחורף:</small> מַשִּׁיב הָרֽוּחַ",
+                           "<i>From the Musaf of </i>Shemini Atzeres<i> you should say:</i> Causer of the wind."
+                           "<br><i>From Pesach one should say:</i> He causes the dew.")
+        self.assertEqual(plain_text(pairs[0].en), "From the Musaf of Shemini Atzeres you should say:")
+        self.assertIn("Causer of the wind", plain_text(pairs[1].en))
+
+    def test_a_label_the_english_does_not_print_stands_alone(self):
+        pairs = self.split("<small>חזן:</small> בָּרְכוּ", "Bless Adonoy")
+        self.assertEqual([(plain_text(p.he), plain_text(p.en)) for p in pairs],
+                         [("חזן:", ""), ("בָּרְכוּ", "Bless Adonoy")])
+
+    def test_a_condition_label_inside_the_words_governs_them_to_the_sof_pasuq(self):
+        he = "מַשִּׁיב הָרֽוּחַ: <small>בקיץ:</small> מוֹרִיד הַטָּל: מְכַלְכֵּל חַיִּים"
+        pairs = split_leading_labels(align_leaf(leaf([he], ["Who causes the wind"])),
+                                     lambda text: text == "בקיץ:").pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en), p.paragraph_label) for p in pairs],
+                         [("מַשִּׁיב הָרֽוּחַ:", "Who causes the wind", False),
+                          ("בקיץ: מוֹרִיד הַטָּל:", "", False), ("מְכַלְכֵּל חַיִּים", "", False)])
+        self.assertEqual(plain_text(leading_label(pairs[1].he)[0].children), "בקיץ:")
+
+    def test_alternatives_share_out_their_italic_english(self):
+        he = ('זִכְרוֹנֵֽנוּ בְּיוֹם <small>לר"ח:</small> רֹאשׁ הַחֹֽדֶשׁ הַזֶּה: <small>לפסח:</small> '
+              'חַג הַמַּצּוֹת הַזֶּה: זָכְרֵֽנוּ בּוֹ לְטוֹבָה:')
+        en = "our remembrance on this day of the: <i>Rosh Chodesh/Festival of Matzos</i>. Remember us for good."
+        pairs = split_leading_labels(align_leaf(leaf([he], [en])), lambda text: text in ('לר"ח:', "לפסח:")).pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en).strip()) for p in pairs], [
+            ("זִכְרוֹנֵֽנוּ בְּיוֹם", "our remembrance on this day of the:"),
+            ('לר"ח: רֹאשׁ הַחֹֽדֶשׁ הַזֶּה:', "Rosh Chodesh."),
+            ("לפסח: חַג הַמַּצּוֹת הַזֶּה:", "Festival of Matzos."),
+            ("זָכְרֵֽנוּ בּוֹ לְטוֹבָה:", "Remember us for good."),
+        ])
+
+    def test_a_label_at_the_head_of_alternatives_is_the_first_of_them(self):
+        he = "<small>בחורף:</small> מַשִּׁיב הָרֽוּחַ: <small>בקיץ:</small> מוֹרִיד הַטָּל"
+        en = ("<i>From the Musaf of </i>Shemini Atzeres<i> you should say:</i> Causer of the wind."
+              "<br><i>From Pesach one should say:</i> He causes the dew.")
+        pairs = split_leading_labels(align_leaf(leaf([he], [en])), lambda text: text in ("בחורף:", "בקיץ:")).pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en).strip(), p.paragraph_label) for p in pairs], [
+            ("בחורף: מַשִּׁיב הָרֽוּחַ:", "From the Musaf of Shemini Atzeres you should say: Causer of the wind.", False),
+            ("בקיץ: מוֹרִיד הַטָּל", "From Pesach one should say: He causes the dew.", False),
+        ])
+
+    def test_an_ending_label_sets_apart_the_ending_it_replaces(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["אַתָּה קָדוֹשׁ: בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:",
+              "<small>בעשי\"ת מסיים:</small> בָּרוּךְ אַתָּה יְהֹוָה הַמֶּֽלֶךְ הַקָּדוֹשׁ:"]
+        en = ["You are holy. Blessed are You, Adonoy, the holy God.",
+              "<i>During the Ten Days:</i> Blessed are You, Adonoy, the holy King."]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת מסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en).strip(), p.otherwise) for p in pairs], [
+            ("אַתָּה קָדוֹשׁ:", "You are holy.", None),
+            ("בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:", "Blessed are You, Adonoy, the holy God.", when),
+            ('בעשי"ת מסיים: בָּרוּךְ אַתָּה יְהֹוָה הַמֶּֽלֶךְ הַקָּדוֹשׁ:',
+             "During the Ten Days: Blessed are You, Adonoy, the holy King.", None),
+        ])
+
+    def test_an_ending_without_the_blessing_opening_replaces_what_follows_it(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["בָּרוּךְ אַתָּה יְהֹוָה מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:",
+              "<small>בעשי\"ת יסיים:</small> הַמֶּֽלֶךְ הַמִּשְׁפָּט:"]
+        en = ["Blessed are You, Adonoy, King, Lover of justice.", "<i>During the Ten Days:</i> the King of Justice."]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת יסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en).strip(), p.otherwise) for p in pairs[:2]], [
+            ("בָּרוּךְ אַתָּה יְהֹוָה", "Blessed are You, Adonoy,", None),
+            ("מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:", "King, Lover of justice.", when),
+        ])
+
+    def test_an_english_replacement_with_the_opening_replaces_the_whole_english_ending(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["בָּרוּךְ אַתָּה יְהֹוָה מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:",
+              "<small>בעשי\"ת יסיים:</small> הַמֶּֽלֶךְ הַמִּשְׁפָּט:"]
+        en = ["Blessed are You, Adonoy, King, Lover of justice.",
+              "<i>During the Ten Days:</i> Blessed are You, Adonoy, the King of Justice."]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת יסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.he).strip(), plain_text(p.en).strip(), p.otherwise) for p in pairs[:2]], [
+            ("בָּרוּךְ אַתָּה יְהֹוָה", "", None),
+            ("מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:", "Blessed are You, Adonoy, King, Lover of justice.", when),
+        ])
+
+    def test_with_no_english_replacement_the_english_ending_is_left_whole(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["לְדוֹר וָדוֹר נַגִּיד גָּדְלֶֽךָ. בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:",
+              "<small>בעשי\"ת מסיים:</small> הַמֶּֽלֶךְ הַקָּדוֹשׁ:"]
+        en = ["From generation to generation we will declare Your greatness. Blessed are You, Adonoy, the Holy Almighty.",
+              ""]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת מסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.en).strip(), p.otherwise) for p in pairs[:2]], [
+            ("From generation to generation we will declare Your greatness. Blessed are You, Adonoy, the Holy Almighty.",
+             None),
+            ("", when),
+        ])
+
+    def test_a_paragraph_that_is_all_ending_is_said_otherwise_whole(self):
+        when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
+        he = ["אַתָּה קָדוֹשׁ וְשִׁמְךָ קָדוֹשׁ.",
+              "בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:",
+              "<small>בעשי\"ת מסיים:</small> בָּרוּךְ אַתָּה יְהֹוָה הַמֶּֽלֶךְ הַקָּדוֹשׁ:"]
+        en = ["You are holy.", "Blessed are You, Adonoy, the Holy Almighty.",
+              "<i>During the Ten Days:</i> Blessed are You, Adonoy, the Holy King."]
+        is_label = lambda text: text.rstrip(": ") == 'בעשי"ת מסיים'
+        pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
+                                     lambda text: when if is_label(text) else None).pairs
+        self.assertEqual([(plain_text(p.he).strip(), p.otherwise) for p in pairs[:2]], [
+            ("אַתָּה קָדוֹשׁ וְשִׁמְךָ קָדוֹשׁ.", None),
+            ("בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:", when),
+        ])
+        self.assertEqual(plain_text(pairs[1].en).strip(), "Blessed are You, Adonoy, the Holy Almighty.")
+
+    def test_a_label_and_its_words_in_one_run_of_small_print_are_set_apart(self):
+        he = "<small>לתענית ציבור: <b>שִׂים שָׁלוֹם</b> טוֹבָה</small>"
+        pairs = split_leading_labels(align_leaf(leaf([he], ["x"])), lambda text: text.rstrip(": ") == "לתענית ציבור").pairs
+        self.assertEqual([(plain_text(p.he).strip(), p.paragraph_label) for p in pairs],
+                         [("לתענית ציבור:", True), ("שִׂים שָׁלוֹם טוֹבָה", False)])
+
+    def test_words_in_small_print_a_heading_or_bold_are_not_split(self):
+        for he in ("<small>בָּרוּךְ שֵׁם</small>", "<small>מציאות השם</small>", "<b>בָּרוּךְ</b> אַתָּה"):
+            with self.subTest(he=he):
+                self.assertEqual(len(self.split(he, "x")), 1)
+
+
 class TestDivide(unittest.TestCase):
     def test_rubrics_between_texts_and_bold_openings(self):
         items = divide(pairs_of([
@@ -109,6 +257,18 @@ class TestDivide(unittest.TestCase):
         ]))
         self.assertEqual(len(items), 1)
         self.assertEqual(len(items[0].pairs), 3)
+
+    def test_small_instructions_are_the_places_rubrics(self):
+        pairs = pairs_of([
+            ("<small>ברכה זו משה תקנה</small>", "<i><b>FIRST BLESSING</b></i>"),
+            ("<b>בָּרוּךְ</b> אַתָּה", "Blessed"),
+            ("<small>(בתענית ציבור אומר כאן הש\"ץ <b>עֲנֵֽנוּ</b>)</small>", "(On Fast Days, the Chazzan says Answer us)"),
+            ("<b>רְאֵה</b> בְעָנְיֵֽנוּ", "Look upon"),
+        ])
+        self.assertEqual([type(i) for i in divide(pairs)], [TextBlock, TextBlock])
+        items = divide(pairs, small_instructions=True)
+        self.assertEqual([type(i) for i in items], [Rubric, TextBlock, Rubric, TextBlock])
+        self.assertIsNone(items[1].head)
 
     def test_a_heading_opens_a_text_and_the_bold_after_it_continues(self):
         items = divide(pairs_of([

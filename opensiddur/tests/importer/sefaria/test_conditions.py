@@ -39,6 +39,10 @@ leaves:
     leaf: "Morning / Reading of the Torah"
     when: {day-of-week: {hebrew-day: 2}}
     note: "On Mondays:"
+texts:
+  - work: w
+    urn: urn:x-opensiddur:text:prayer:attah_chonantanu
+    when: {day-of-week: {hebrew-day: 1}}
 """
 
 
@@ -131,10 +135,22 @@ class TestDirectivesAndLeaves(unittest.TestCase):
         self.assertEqual((gate.when, gate.note), ({"day-of-week": {"hebrew-day": 2}}, "On Mondays:"))
         self.assertIsNone(table().leaf_gate("other", "Morning / Reading of the Torah"))
 
+    def test_a_text_gate_is_found_by_its_work_and_urn(self):
+        gates = table().text_gates("w")
+        self.assertEqual(gates["urn:x-opensiddur:text:prayer:attah_chonantanu"].when, {"day-of-week": {"hebrew-day": 1}})
+        self.assertEqual(table().text_gates("other"), {})
+
+    def test_a_label_may_stay_an_instruction(self):
+        found = table("labels:\n  - label: 'מדלגין'\n    when: {hallel: {full: true}}\n    instruction: true\n"
+                      ).for_label("מדלגין")
+        self.assertTrue(found.instruction)
+
     def test_malformed_entries_are_errors(self):
         for bad in ("directives: ['(']\n",
                     "leaves:\n  - leaf: x\n    when: {holiday: {purim: true}}\n",
                     "leaves:\n  - work: w\n    leaf: x\n",
+                    "texts:\n  - work: w\n    when: {holiday: {purim: true}}\n",
+                    "texts:\n  - work: w\n    urn: x\n",
                     "rubrics:\n  - match: x\n    when: {holiday: {purim: true}}\n    until: '('\n"):
             with self.assertRaises(ConditionsError, msg=bad):
                 table(bad)

@@ -13,6 +13,7 @@ its chapters a selichah or a run of the service.
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 from collections.abc import Iterator
@@ -35,6 +36,8 @@ class Leaf:
     en: tuple[str, ...]
     #: the chapter's number, for a chapter of a leaf of depth 2; 0 for a leaf of depth 1
     chapter: int = 0
+    #: the languages whose segments come from the work's supplement, not its main version
+    supplied: tuple[str, ...] = ()
 
     @property
     def path(self) -> str:
@@ -79,14 +82,19 @@ def _primary_title(node: dict[str, Any], lang: str) -> str:
     return node.get("title" if lang == "en" else "heTitle", "")
 
 
-def _child(text: Any, key: str) -> Any:
+def _child(text: Any, key: str, title: str = "") -> Any:
     """A child of a version's text tree. A default node's text is under ``""``; a section a
-    version leaves out is an empty list."""
+    version leaves out is an empty list. Some versions key a node by its English title where
+    that differs from its schema key (Siddur Ashkenaz: "Pesukei Dezimra" for the key
+    "Pesukei D'Zimra")."""
     if not isinstance(text, dict):
         return []
     if key == "default":
         return text.get("", text.get("default", []))
-    return text.get(key, [])
+    found = text[key] if key in text else text.get(title, []) if title else []
+    # (nodes that share a title, as Musaf's three Mourner's Kaddishes do, may collapse into one
+    # empty string under it)
+    return [] if isinstance(found, str) else found
 
 
 def _strings(value: Any, where: str) -> tuple[str, ...]:
@@ -105,7 +113,8 @@ def _walk(node: dict[str, Any], he: Any, en: Any, keys: tuple[str, ...],
             child_keys = keys if key == "default" else keys + (key,)
             child_titles = titles if key == "default" else titles + (
                 (_primary_title(child, "en"), _primary_title(child, "he")),)
-            yield from _walk(child, _child(he, key), _child(en, key), child_keys, child_titles)
+            title = _primary_title(child, "en")
+            yield from _walk(child, _child(he, key, title), _child(en, key, title), child_keys, child_titles)
         return
     depth = node.get("depth", 1)
     where = PATH_SEPARATOR.join(keys)
@@ -124,10 +133,27 @@ def _walk(node: dict[str, Any], he: Any, en: Any, keys: tuple[str, ...],
         raise ValueError(f"{where}: a leaf of depth {depth} is not supported")
 
 
-def read_work_source(index: dict[str, Any], he: dict[str, Any], en: dict[str, Any]) -> WorkSource:
+def _filled(segments: tuple[str, ...]) -> bool:
+    return any(s.strip() for s in segments)
+
+
+def read_work_source(index: dict[str, Any], he: dict[str, Any], en: dict[str, Any],
+                     supplements: dict[str, dict[str, Any]] | None = None) -> WorkSource:
+    """The work's nodes and leaves. A supplement (a second version of a language) gives the
+    segments of a leaf the main version leaves empty."""
     nodes: list[Node] = []
     leaves: list[Leaf] = []
+    supplied: dict[str, dict[str, tuple[str, ...]]] = {}
+    for lang, version in (supplements or {}).items():
+        texts = (version.get("text", {}), {}) if lang == "he" else ({}, version.get("text", {}))
+        supplied[lang] = {item.path: getattr(item, lang) for item in _walk(index["schema"], *texts, (), ())
+                          if isinstance(item, Leaf)}
     for item in _walk(index["schema"], he.get("text", {}), en.get("text", {}), (), ()):
+        if isinstance(item, Leaf):
+            for lang, segments in supplied.items():
+                if not _filled(getattr(item, lang)) and _filled(segments.get(item.path, ())):
+                    item = dataclasses.replace(item, **{lang: segments[item.path]},
+                                               supplied=item.supplied + (lang,))
         (leaves if isinstance(item, Leaf) else nodes).append(item)
     return WorkSource(
         title_en=index.get("title", ""),
@@ -143,7 +169,9 @@ def read_work_source(index: dict[str, Any], he: dict[str, Any], en: dict[str, An
 def load_work_source(directory: Path) -> WorkSource:
     def load(name: str) -> dict[str, Any]:
         return json.loads((directory / name).read_text(encoding="utf-8"))
-    return read_work_source(load("schema.json"), load("he.json"), load("en.json"))
+    supplements = {lang: load(f"{lang}_supplement.json") for lang in ("he", "en")
+                   if (directory / f"{lang}_supplement.json").exists()}
+    return read_work_source(load("schema.json"), load("he.json"), load("en.json"), supplements)
 
 
 def segments_hash(segments: tuple[str, ...]) -> str:

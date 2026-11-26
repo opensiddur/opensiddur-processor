@@ -40,7 +40,14 @@ from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.common.validate_names import Spellings, load_spellings
 from opensiddur.importer.sefaria.blocks import Item, Rubric, TextBlock, is_phrase, split_block
 from opensiddur.importer.sefaria.equivalents import Equivalents
-from opensiddur.importer.sefaria.markup import is_numbered, is_pointed, plain_text
+from opensiddur.importer.sefaria.markup import (
+    VERSE_ENDINGS,
+    is_numbered,
+    is_pointed,
+    leading_label,
+    plain_text,
+    verse_segments,
+)
 from opensiddur.importer.sefaria.phrases import SAME_PHRASE, map_phrases, similarity, skeleton
 from opensiddur.importer.util.incipit import (
     BLESSING_FORMULA,
@@ -138,8 +145,10 @@ def block_text(block: TextBlock) -> str:
 
 def matching_words(pair) -> list[str]:
     """A phrase's words as matching compares them: without an alternative or insertion the
-    book prints in parentheses (``(בעשי"ת הַשָּׁלוֹם)``)."""
-    return words(re.sub(r"\([^)]*\)", " ", plain_text(pair.he)))
+    book prints in parentheses (``(בעשי"ת הַשָּׁלוֹם)``), or the label the phrase opens with
+    (``<small>בעשי"ת יסיים:</small> הַמֶּֽלֶךְ הַמִּשְׁפָּט``), which is its condition's note."""
+    label, rest = leading_label(pair.he)
+    return words(re.sub(r"\([^)]*\)", " ", plain_text(rest if label is not None else pair.he)))
 
 
 def block_hash(block: TextBlock) -> str:
@@ -987,7 +996,9 @@ BLESSING_DISTINCTIVE_WORDS = 3
 
 def introduced_phrases(block: TextBlock) -> frozenset[int]:
     """The positions of a block's phrases that a rubric comes directly before, or that open a
-    parenthesis: the book sets the passage off (``(אַתָּה חוֹנַנְתָּֽנוּ`` at Maariv)."""
+    parenthesis: the book sets the passage off (``(אַתָּה חוֹנַנְתָּֽנוּ`` at Maariv). A label set
+    apart from its paragraph (``Pair.paragraph_label``) sets nothing off: it governs the
+    paragraph's words as a label inside a phrase does (``לְר"ח: רֹאשׁ הַחֹדֶשׁ``)."""
     found: set[int] = set()
     position = 0
     after_rubric = False
@@ -997,7 +1008,7 @@ def introduced_phrases(block: TextBlock) -> frozenset[int]:
                 found.add(position)
             position += 1
             after_rubric = False
-        else:
+        elif not pair.paragraph_label:
             after_rubric = True
     return frozenset(found)
 
@@ -1253,6 +1264,14 @@ class _Decider:
     def cut(self, leaf: str, blocks: list[Item], i: int, at: int) -> TextBlock:
         # The block cut stays referenced: :attr:`done` holds ids, which Python would otherwise
         # give to a new block.
+        # A text is cut between the book's segments, never inside one -- a paragraph set apart
+        # into phrases (align.split_leading_labels) -- since a text is keyed by the segment it
+        # opens with: the cut moves on to the next segment, and without one is not made.
+        phrases = blocks[i].phrases
+        while 0 < at < len(phrases) and phrases[at].he_index == phrases[at - 1].he_index:
+            at += 1
+        if not 0 < at < len(phrases):
+            return blocks[i]
         self.replaced.append(blocks[i])
         first, rest = split_block(blocks[i], at)
         blocks[i:i + 1] = [first, rest]
@@ -1718,8 +1737,12 @@ class _Decider:
         """Cut the first printing of ``urn`` after ``length`` phrases, and decide the rest."""
         printing = self.printed[urn]
         i = printing.blocks.index(printing.block)
+        whole = printing.blocks[i]
         first = self.cut(printing.leaf, printing.blocks, i, length)
-        previous = self.outcome.records[self.key(printing.leaf, first)]
+        if first is whole:
+            return  # (not inside one of the book's segments)
+        length = len(first.phrases)
+        previous =self.outcome.records[self.key(printing.leaf, first)]
         self.save(TextRecord(
             work=self.work_key, leaf=printing.leaf, block=first.first_index, urn=urn, kind=previous.kind,
             incipit=previous.incipit, as_of=block_hash(first),
@@ -1747,15 +1770,102 @@ def verse_length(urn: str, index: IncipitIndex) -> int | None:
     return len(opening) if len(opening) < COLLECTED_WORDS else None
 
 
-def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
-    """The verses of scripture a text quotes, by the phrase each opens: phrase position ->
-    ``bible:`` verse URN. A verse is found at a phrase that opens like it (six words, confirmed
-    over its collected opening, as :func:`lookup` confirms); a half-verse found first is its
-    verse when it is the first half."""
-    phrase_words = [words(plain_text(pair.he)) for pair in block.phrases]
-    found: dict[int, str] = {}
-    for start in range(len(phrase_words)):
-        following = [w for phrase in phrase_words[start:] for w in phrase]
+#: How little of a verse's words a phrase may agree with and still go on quoting it.
+QUOTED_PHRASE_AGREEMENT = 0.5
+#: How far (in words) a quoted phrase's words may be from where the verse has them.
+QUOTED_DRIFT = 2
+
+
+def quoted_words(urn: str, phrase_words: list[list[str]], index: IncipitIndex) -> int | None:
+    """How many words of the phrases quote a verse, when they leave it for words of their own
+    before the words the index holds of it run out (Daniel 9:7's first half, then a selicha's
+    מה נתאונן) -- inside a phrase too (a paragraph that quotes Psalm 66:9 and goes on in words
+    of its own); ``None`` when they quote all the index holds, or end first."""
+    own = list(index.own_opening(urn))
+    if len(own) < SHORT_INCIPIT_WORDS:
+        return None
+    seen = 0
+    for phrase in phrase_words:
+        phrase = phrase[:len(own) - seen]  # (the index holds no more of the verse to compare)
+        if not phrase:
+            if seen >= len(own):
+                return None
+            continue
+        # Its words near where they would be: a word the source joins or splits otherwise
+        # (יהללו־יה) shifts the rest by one.
+        start = max(0, seen - QUOTED_DRIFT)
+        blocks = SequenceMatcher(None, phrase, own[start:seen + len(phrase) + QUOTED_DRIFT],
+                                 autojunk=False).get_matching_blocks()[:-1]
+        found = sum(block.size for block in blocks)
+        quoted = 0  # how far into the phrase the verse's words run, a word or two apart at most
+        for block in blocks:
+            if block.a - quoted > QUOTED_DRIFT:
+                break
+            quoted = block.a + block.size
+        if found / len(phrase) < QUOTED_PHRASE_AGREEMENT or quoted < len(phrase) - QUOTED_DRIFT:
+            return seen + quoted if seen + quoted else None
+        seen += len(phrase)
+    return None
+
+
+#: How many words a verse is looked for over: more than :func:`confirmed` compares.
+VERSE_SEARCH_WORDS = 64
+
+
+def verse_places(block: TextBlock) -> list[tuple[tuple[int, int], str]]:
+    """The places in a text a verse of scripture can open, in order -- each phrase's start, and
+    each sof pasuq inside a phrase (``verse_segments``) -- with the words from there to the next:
+    ((phrase position, segment), words)."""
+    return [((position, segment), text) for position, pair in enumerate(block.phrases)
+            for segment, text in enumerate(verse_segments(pair.he))]
+
+
+#: How many words short of a verse's quoted length a full stop may come and still not open
+#: another verse (as :data:`tei_builder.LENGTH_SLACK` lets a sof pasuq end one).
+QUOTED_SLACK = 2
+
+
+def _opened_inside(found: dict[tuple[int, int], str], places: list[tuple[tuple[int, int], str]],
+                   index: IncipitIndex) -> dict[tuple[int, int], str]:
+    """The verses found, less those found inside the verse found before: the words after a full
+    stop, or at a phrase that starts inside a verse, may open another verse too (Exodus 31:17's
+    כִּי שֵׁשֶׁת יָמִים, Exodus 20:11's opening; Numbers 28:18's כָּל מְלֶאכֶת עֲבֹדָה לֹא תַעֲשׂוּ).
+    Except after a sof pasuq, a verse opens only once the words since the verse before reach
+    that verse's quotation, as far as the index holds it (Nehemiah 9:9, after the whole of 9:8)."""
+    order = {place: i for i, (place, _) in enumerate(places)}
+    place_words = [words(text) for _, text in places]
+    kept: dict[tuple[int, int], str] = {}
+    previous: tuple[int, str] | None = None
+    for place in sorted(found):
+        at = order[place]
+        if previous is not None and not places[at - 1][1].rstrip().endswith(VERSE_ENDINGS):
+            start, urn = previous
+            quoted = quoted_words(urn, place_words[start:], index)
+            covered = quoted if quoted is not None else len(index.own_opening(urn))
+            if sum(len(w) for w in place_words[start:at]) < covered - QUOTED_SLACK:
+                continue
+        kept[place] = found[place]
+        previous = (at, found[place])
+    return kept
+
+
+def scripture_verses(block: TextBlock, index: IncipitIndex, urn: str | None = None) -> dict[tuple[int, int], str]:
+    """The verses of scripture a text quotes, by the place each opens (:func:`verse_places`):
+    (phrase position, segment) -> ``bible:`` verse URN. A verse is found at a place that opens
+    like it (six words, confirmed over its collected opening, as :func:`lookup` confirms); a
+    half-verse found first is its verse when it is the first half, and a run of verses found
+    first its first verse. Of verses worded alike, the one after the verse found before is
+    taken, or else the one in the chapter of ``urn``, the text's own, where it is scripture."""
+    chapter = _chapter_of(urn) if urn else None
+    places = verse_places(block)
+    place_words = [words(text) for _, text in places]
+    found: dict[tuple[int, int], str] = {}
+    for start in range(len(places)):
+        following: list[str] = []
+        for more in place_words[start:]:
+            following.extend(more)
+            if len(following) >= VERSE_SEARCH_WORDS:
+                break
         if len(following) < INCIPIT_WORDS:
             break
         verses = set()
@@ -1767,7 +1877,29 @@ def scripture_verses(block: TextBlock, index: IncipitIndex) -> dict[int, str]:
                 if path[3] != "a":
                     continue
                 urn = urn.rsplit("/", 1)[0]
+            elif "-" in path[2]:
+                # A run of verses another text is named by (bible:exodus/31/16-17) opens with its
+                # first verse: the verse found here.
+                urn = urn.rsplit("/", 1)[0] + "/" + path[2].split("-", 1)[0]
             verses.add(urn)
+        if len(verses) > 1 and found:
+            # Verses worded alike (Exodus 20:9 and Deuteronomy 5:13): the one after the verse before.
+            verses = verses & {_following_verse(list(found.values())[-1])} or verses
+        if len(verses) > 1 and chapter:
+            verses = {verse for verse in verses if _chapter_of(verse) == chapter}
         if len(verses) == 1:
-            found[start] = verses.pop()
-    return found
+            found[places[start][0]] = verses.pop()
+    return _opened_inside(found, places, index)
+
+
+def _chapter_of(urn: str) -> str | None:
+    """The chapter of a ``bible:`` chapter, verse or run of verses (``bible:exodus/20/8-11`` ->
+    ``bible:exodus/20``), or None."""
+    namespace, path = _namespace_and_path(urn)
+    return urn.rsplit("/", len(path) - 2)[0] if namespace == "bible" and len(path) >= 2 else None
+
+
+def _following_verse(urn: str) -> str:
+    """The verse after ``urn`` in its chapter (``bible:exodus/20/8`` -> ``bible:exodus/20/9``)."""
+    head, _, number = urn.rpartition("/")
+    return f"{head}/{int(number) + 1}" if number.isdigit() else urn

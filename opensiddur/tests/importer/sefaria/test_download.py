@@ -1,4 +1,5 @@
 import base64
+import dataclasses
 import hashlib
 import json
 import tempfile
@@ -67,6 +68,32 @@ def bucket(he=None, en=None) -> dict[str, bytes]:
         HE_URL: json.dumps(he or make_version(tree, "he")).encode(),
         EN_URL: json.dumps(en or make_version(tree, "en")).encode(),
     }
+
+
+SUPPLEMENT_URL = f"{BUCKET_URL}/json/Liturgy/Test%20Siddur/Hebrew/Test%20Siddur%20Linear.json"
+
+
+class TestSupplement(unittest.TestCase):
+    """A work's second version of a language is downloaded beside its main versions."""
+
+    def test_the_supplement_is_located_fetched_and_recorded(self):
+        work = dataclasses.replace(WORK, supplements={"he": "Test Siddur: Linear"})
+        index = books()
+        index["books"].append({"title": "Test Siddur", "language": "Hebrew",
+                               "versionTitle": "Test Siddur Linear", "json_url": SUPPLEMENT_URL})
+        files = bucket()
+        tree = {"Blessings": [("<b>בָּרוּךְ</b>", "Blessed")]}
+        files[SUPPLEMENT_URL] = json.dumps(make_version(tree, "he", version_title="Test Siddur: Linear")).encode()
+        self.assertEqual(locate(work, index)["he_supplement"].url, SUPPLEMENT_URL)
+        client = FakeClient(files)
+        client.get_json = lambda url, _get=client.get_json: index if url == BOOKS_INDEX_URL else _get(url)
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "w"
+            result = download_work(work, client, index, directory)
+            self.assertIn("he_supplement.json", result.fetched)
+            manifest = json.loads((directory / "manifest.json").read_text())
+            self.assertEqual(manifest["files"]["he_supplement.json"]["version_title"], "Test Siddur: Linear")
+            self.assertIn("he_supplement.json", (directory / "README.md").read_text())
 
 
 class TestDownload(unittest.TestCase):
