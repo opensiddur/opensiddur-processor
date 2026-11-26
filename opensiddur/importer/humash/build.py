@@ -12,7 +12,7 @@ the sources are converted to it as they are read.
 The conditionals this emits
 ===========================
 
-Four kinds, each on a feature the compiler decides from the volume's declarations. A feature
+Five kinds, each on a feature the compiler decides from the volume's declarations. A feature
 left undeclared is undefined, and undefined keeps the text it guards, so a volume that
 declares nothing carries every variant. See ``doc/humash-settings.example.yaml`` for how a
 volume narrows them.
@@ -27,6 +27,17 @@ volume narrows them.
     condition reads it as true on any day of the festival. Exclusive per occasion — one
     date makes at most one true — but nothing stops a volume declaring several, and one
     that declares none carries all five.
+
+``opensiddur:holiday`` ``sukkot`` and ``opensiddur:israel`` (numeric and binary, `_day_maftir_condition`)
+    The maftir of Shabbat Chol HaMoed Sukkot, which depends on the day the Shabbat falls on.
+    hebcal gives five, ``maftir_day1`` to ``maftir_day5``, numbered by the day of Chol HaMoed,
+    which counts from 17 Tishrei in the Diaspora and from 16 Tishrei in Israel. Each is printed
+    with its own citation under a condition on that day of Sukkot. **Alternatives, not
+    additions**: a date and a place select one. The day of Sukkot is derived only from a date
+    with a location, so a volume that declares no date, or a date but no location, leaves it
+    undefined and prints all five, each headed with its day. Where the day is known but not
+    whether the place is in Israel (``opensiddur:holiday`` declared directly), the two that
+    the Diaspora and Israel would read are printed.
 
 ``opensiddur:reading-cycle`` (binary, `_cycle_condition`)
     ``annual`` and ``triennial-year-{1,2,3}``, guarding haftarot. **Alternatives, not
@@ -431,6 +442,10 @@ def _reading_runs(
     Numbers 7. Segmenting each run by itself keeps the verses between two runs out of the
     reading.
 
+    A maftir of Shabbat Chol HaMoed Sukkot that depends on the day (`_is_day_maftir`) is a run
+    by itself, and nothing joins it: only one of them is read, so each is printed whole, under
+    its own condition and citation, and none continues another.
+
     hebcal states every festival aliyah in whole verses, and `model.segment_by_union` cuts only
     at whole verses, so an aliyah bounded inside a verse is refused rather than misprinted.
     """
@@ -441,7 +456,7 @@ def _reading_runs(
                 f"{span.unit} {span.label}: a festival aliyah bounded inside a verse "
                 f"({span.start}-{span.end}) is not supported"
             )
-        if runs:
+        if runs and not _is_day_maftir(span) and not _is_day_maftir(runs[-1][0]):
             extent = _run_extent(runs[-1])
             if span.book == extent.book and (
                 extent.start <= span.end
@@ -484,6 +499,46 @@ def _conditional(feature_type: str, feature: str, content: str, prefix: str) -> 
         f'<tei:fs type="{feature_type}"><tei:f name="{feature}">'
         f'<tei:binary value="true"/></tei:f></tei:fs>'
         f"</j:conditional>{content}"
+        f'<j:endConditional target="#{identifier}"/>'
+    )
+
+
+def _is_day_maftir(span: ReadingSpan) -> bool:
+    """Whether `span` is one of the maftirs of Shabbat Chol HaMoed Sukkot keyed by the day."""
+    return span.unit == UNIT_MAFTIR and span.label.startswith(model.DAY_MAFTIR_PREFIX)
+
+
+# hebcal picks the maftir of Shabbat Chol HaMoed Sukkot by @hebcal/core's `cholHaMoedDay`, which
+# numbers the intermediate days from 17 Tishrei, the third day of Sukkot, in the Diaspora, and
+# from 16 Tishrei, the second, in Israel. So `maftir_day<K>` is read on day K + 2 of Sukkot
+# in the Diaspora and on day K + 1 in Israel.
+DAY_MAFTIR_SUKKOT_DAY = {False: 2, True: 1}
+
+
+def _day_maftir_condition(day: int) -> str:
+    """The test that `maftir_day<day>` is the maftir of this Shabbat.
+
+    Without a date and a location, the day of Sukkot is undefined and so is the test, which
+    keeps every maftir. With the day known but `opensiddur:israel` undefined, the maftir each
+    locale would read is kept, and the others are not.
+    """
+    alternatives = "".join(
+        "<j:all>"
+        f'<tei:fs type="opensiddur:israel"><tei:f name="is-israel">'
+        f'<tei:binary value="{"true" if israel else "false"}"/></tei:f></tei:fs>'
+        f'<tei:fs type="opensiddur:holiday"><tei:f name="sukkot">'
+        f'<tei:numeric value="{day + offset}"/></tei:f></tei:fs>'
+        "</j:all>"
+        for israel, offset in DAY_MAFTIR_SUKKOT_DAY.items()
+    )
+    return f"<j:any>{alternatives}</j:any>"
+
+
+def _day_maftir_conditional(day: int, content: str) -> str:
+    identifier = _condition_id(model.DAY_MAFTIR_PREFIX)
+    return (
+        f'<j:conditional xml:id="{identifier}">{_day_maftir_condition(day)}</j:conditional>'
+        f"{content}"
         f'<j:endConditional target="#{identifier}"/>'
     )
 
@@ -885,6 +940,9 @@ def festival_file(
     unit and label, which for every reading in hebcal's data is the order they are read. It is
     emitted a run at a time (`_reading_runs`). A citation listing a book's runs opens them, and
     a citation of its own opens each later run, as in a discontinuous haftarah (`_passage_xml`).
+    A maftir that depends on the day is left out of that list: it is printed with its own
+    citation inside its condition (`_day_maftir_conditional`), so that a volume for one date
+    cites only the maftir it prints.
     """
     urn_base = f"{URN_PREFIX}:reading/{slug}"
     name = reading["name"]
@@ -893,8 +951,19 @@ def festival_file(
     runs = _reading_runs(reading["aliyot"], sourcetexts_root)
     segmented = [_segment_run(run, sourcetexts_root) for run in runs]
     model.mark_repeats([segment for segments in segmented for segment in segments])
-    for _, group in groupby(zip(runs, segmented), key=lambda item: item[0][0].book):
+    for (_, by_day), group in groupby(
+        zip(runs, segmented), key=lambda item: (item[0][0].book, _is_day_maftir(item[0][0]))
+    ):
         book_runs = list(group)
+        if by_day:
+            for run, segments in book_runs:
+                (span,) = run
+                content = _citation_milestone(_citation([_run_extent(run)])) + "".join(
+                    _segment_xml(s, urn_base, sourcetexts_root) for s in segments
+                )
+                day = int(span.label[len(model.DAY_MAFTIR_PREFIX):])
+                parts.append(_day_maftir_conditional(day, content))
+            continue
         extents = [_run_extent(run) for run, _ in book_runs]
         parts.append(_citation_milestone(_citation(extents)))
         for index, ((_, segments), extent) in enumerate(zip(book_runs, extents)):
