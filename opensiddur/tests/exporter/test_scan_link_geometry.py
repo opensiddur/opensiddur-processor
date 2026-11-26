@@ -165,8 +165,8 @@ class TestScanLinkGeometry(unittest.TestCase):
                     self.assertNotIn('! LaTeX Error:', log)
                     self.assertEqual(len(links), 2)
                     reader = next(w for w in words if w.text == 'Reader')
-                    def same_row(word):
-                        return not (word.y1 <= reader.y0 or word.y0 >= reader.y1)
+                    def same_row(word, reference=reader):
+                        return not (word.y1 <= reference.y0 or word.y0 >= reference.y1)
                     label_hebrew = [w for w in words if same_row(w)
                                     and any('א' <= c <= 'ת' for c in w.text)]
                     body_hebrew = [w for w in words if not same_row(w)
