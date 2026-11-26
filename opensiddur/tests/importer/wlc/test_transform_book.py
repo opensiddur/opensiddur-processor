@@ -1,6 +1,7 @@
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
+
 from lxml import etree
 
 from opensiddur.common.xslt import xslt_transform_string

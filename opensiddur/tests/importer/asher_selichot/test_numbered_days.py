@@ -1,7 +1,9 @@
 """Numbered services preserve edition-dependent stanza and rubric structure."""
 import unittest
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.second_day import pizmon, TEI
+
+from opensiddur.importer.asher_selichot.second_day import TEI, pizmon
 
 
 class NumberedDaysTest(unittest.TestCase):
@@ -39,8 +41,8 @@ class NumberedDaysTest(unittest.TestCase):
         with self.assertRaises(ValueError):day_bookmarks(rows,[word+' DAY' for word in words])
 
     def test_mixed_footnote_keeps_hebrew_language_and_anchor(self):
-        from opensiddur.importer.asher_selichot.first_day import words_with_notes
         from opensiddur.importer.asher_selichot.build import XML
+        from opensiddur.importer.asher_selichot.first_day import words_with_notes
         node=etree.Element(f'{{{TEI}}}p')
         words_with_notes(node,'A friend is remembered.',[{'anchor':'friend','text':'קרן הפוך is an allusion to Job.'}],'en')
         note=node.find(f'{{{TEI}}}note')

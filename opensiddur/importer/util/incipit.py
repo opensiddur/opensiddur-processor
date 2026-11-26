@@ -257,7 +257,7 @@ class IncipitIndex:
                 "milestone_scoped": sorted(self.milestone_scoped)}
 
     @classmethod
-    def from_json(cls, data: dict) -> "IncipitIndex":
+    def from_json(cls, data: dict) -> IncipitIndex:
         index = cls()
         incipits = data.get("incipits", {}) if "incipits" in data else data
         for urn, words in incipits.items():

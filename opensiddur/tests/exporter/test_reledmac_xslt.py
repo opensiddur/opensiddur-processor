@@ -20,12 +20,14 @@ not as floating ``\\footnote``s.
 
 import re
 import unittest
-from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.tests.exporter.stylesheet_helpers import stylesheet_parameters, transform
 from opensiddur.exporter.marker_reconstruct import reconstruct_markered_document
+from opensiddur.tests.exporter.stylesheet_helpers import (
+    stylesheet_parameters,
+    transform,
+)
 
 
 def _transform(xml: str, **params) -> str:
@@ -5393,6 +5395,7 @@ class TestScanLinks(unittest.TestCase):
 
     def test_source_page_link_survives_a_continuing_instruction(self):
         from lxml import etree
+
         from opensiddur.exporter.scan_links import mark_scan_links
         root = etree.fromstring(self._document(
             '<tei:note type="instruction">before '

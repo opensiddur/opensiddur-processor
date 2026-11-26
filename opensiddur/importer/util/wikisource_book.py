@@ -50,7 +50,7 @@ def load_manifest(data_dir: Path) -> dict[str, Any]:
     """Read the manifest, or return an empty one if this is a first run."""
     path = manifest_path(data_dir)
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         return {}

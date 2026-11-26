@@ -15,13 +15,13 @@ from unittest.mock import patch
 from pydantic import ValidationError
 
 from opensiddur.exporter import typography as typography_module
-from opensiddur.exporter.typography import NamedSize, TextStyle, TypographyConfig
 from opensiddur.exporter.tex.typography_tex import (
     INLINE_ROLE_MACROS,
     build_typography_preamble,
     documentclass_options,
     style_tokens,
 )
+from opensiddur.exporter.typography import NamedSize, TextStyle, TypographyConfig
 
 
 def _no_fontconfig():
@@ -511,7 +511,7 @@ class TestNotes(unittest.TestCase):
     def test_the_lemma_is_not_a_setting(self):
         """A note anchors at a point, so there are no annotated words to repeat;
         the apparatus lemma is the mark itself."""
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValidationError):
             _tex({"notes": {"show_lemma": True}})
 
 

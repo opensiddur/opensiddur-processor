@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Extract Birnbaum's footnotes from the English transcription and key them to URNs.
 
 The English Wikisource transcription of this scan carries every note as a `<ref>` at the
@@ -47,12 +46,11 @@ Run from the repository root:
 
     uv run python specs/birnbaum_scan/extract_notes.py
 """
-import json
-import textwrap
 import os
 import pathlib
 import re
 import sys
+import textwrap
 
 sys.path.insert(0, ".")
 

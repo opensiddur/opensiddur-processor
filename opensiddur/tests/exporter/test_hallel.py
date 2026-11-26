@@ -1,8 +1,14 @@
 """Hallel occasion boundaries and calendar integration."""
 import unittest
+
 from pyluach.dates import HebrewDate
-from opensiddur.exporter.calendar.hallel import hallel_on, compute_hallel, FS_HALLEL
-from opensiddur.exporter.calendar.compute import SettingSnapshot, FS_HEBREW_DATE, FS_ISRAEL
+
+from opensiddur.exporter.calendar.compute import (
+    FS_HEBREW_DATE,
+    FS_ISRAEL,
+    SettingSnapshot,
+)
+from opensiddur.exporter.calendar.hallel import FS_HALLEL, compute_hallel, hallel_on
 
 
 class TestHallel(unittest.TestCase):
@@ -35,8 +41,12 @@ class TestHallel(unittest.TestCase):
 
     def test_derivation_graph(self):
         from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
-        from opensiddur.exporter.derived_settings import recalculate_derived_settings, SettingChangeTrigger, get_active_setting_entry
-        from opensiddur.exporter.linear import reset_linear_data,get_linear_data
+        from opensiddur.exporter.derived_settings import (
+            SettingChangeTrigger,
+            get_active_setting_entry,
+            recalculate_derived_settings,
+        )
+        from opensiddur.exporter.linear import get_linear_data, reset_linear_data
         for israel,full in [(True,False),(False,True)]:
             reset_linear_data()
             try:

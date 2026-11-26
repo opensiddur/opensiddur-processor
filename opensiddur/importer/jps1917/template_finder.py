@@ -5,10 +5,10 @@ This module provides functionality to identify all MediaWiki templates
 used across all pages in the 1917 JPS Wikisource project.
 """
 
-import mwparserfromhell
 from collections import Counter, defaultdict
-from typing import Dict, Optional
 from pathlib import Path
+
+import mwparserfromhell
 
 # Import the get_page function from the page utilities
 from opensiddur.importer.util.pages import default_sourcetexts_root, get_page
@@ -16,9 +16,9 @@ from opensiddur.importer.util.pages import default_sourcetexts_root, get_page
 
 def find_all_tags(
     start_page: int = 1,
-    end_page: Optional[int] = None,
-    sourcetexts_root: Optional[Path] = None,
-) -> Dict[str, Dict]:
+    end_page: int | None = None,
+    sourcetexts_root: Path | None = None,
+) -> dict[str, dict]:
     """
     Find all MediaWiki tags used across all pages.
     
@@ -95,9 +95,9 @@ def find_all_tags(
 
 def find_all_templates(
     start_page: int = 1,
-    end_page: Optional[int] = None,
-    sourcetexts_root: Optional[Path] = None,
-) -> Dict[str, Dict]:
+    end_page: int | None = None,
+    sourcetexts_root: Path | None = None,
+) -> dict[str, dict]:
     """
     Find all MediaWiki templates used across all pages.
     
@@ -172,7 +172,7 @@ def find_all_templates(
     }
 
 
-def extract_tags_from_wikitext(wikitext: str) -> Dict[str, Dict]:
+def extract_tags_from_wikitext(wikitext: str) -> dict[str, dict]:
     """
     Extract tag information from MediaWiki wikitext.
     
@@ -201,7 +201,7 @@ def extract_tags_from_wikitext(wikitext: str) -> Dict[str, Dict]:
             # Extract attributes
             if hasattr(tag, 'attributes') and tag.attributes:
                 if isinstance(tag.attributes, dict):
-                    for attr_name, attr_value in tag.attributes.items():
+                    for attr_name, _attr_value in tag.attributes.items():
                         tags[tag_name]['attributes'].add(attr_name)
                 elif isinstance(tag.attributes, list):
                     for attr in tag.attributes:
@@ -225,7 +225,7 @@ def extract_tags_from_wikitext(wikitext: str) -> Dict[str, Dict]:
     return tags
 
 
-def extract_templates_from_wikitext(wikitext: str) -> Dict[str, Dict]:
+def extract_templates_from_wikitext(wikitext: str) -> dict[str, dict]:
     """
     Extract template information from MediaWiki wikitext.
     
@@ -272,7 +272,7 @@ def extract_templates_from_wikitext(wikitext: str) -> Dict[str, Dict]:
     return templates
 
 
-def find_page_range(sourcetexts_root: Optional[Path] = None) -> tuple[int, int]:
+def find_page_range(sourcetexts_root: Path | None = None) -> tuple[int, int]:
     """
     Find the last available page by checking for consecutive missing pages.
     
@@ -298,7 +298,7 @@ def find_page_range(sourcetexts_root: Optional[Path] = None) -> tuple[int, int]:
     return first_page, last_page
 
 
-def print_tag_summary(tag_data: Dict) -> None: # pragma: no cover
+def print_tag_summary(tag_data: dict) -> None: # pragma: no cover
     """
     Print a summary of found tags.
     
@@ -332,7 +332,7 @@ def print_tag_summary(tag_data: Dict) -> None: # pragma: no cover
         print(f"{tag_name}: {count} uses")
 
 
-def print_template_summary(template_data: Dict) -> None: # pragma: no cover
+def print_template_summary(template_data: dict) -> None: # pragma: no cover
     """
     Print a summary of found templates.
     
@@ -366,7 +366,7 @@ def print_template_summary(template_data: Dict) -> None: # pragma: no cover
         print(f"{template_name}: {count} uses")
 
 
-def save_tag_analysis(tag_data: Dict, output_file: str = "tag_analysis.json") -> None: # pragma: no cover
+def save_tag_analysis(tag_data: dict, output_file: str = "tag_analysis.json") -> None: # pragma: no cover
     """
     Save tag analysis to a JSON file.
     
@@ -390,7 +390,7 @@ def save_tag_analysis(tag_data: Dict, output_file: str = "tag_analysis.json") ->
     print(f"Tag analysis saved to {output_file}")
 
 
-def save_template_analysis(template_data: Dict, output_file: str = "template_analysis.json") -> None: # pragma: no cover
+def save_template_analysis(template_data: dict, output_file: str = "template_analysis.json") -> None: # pragma: no cover
     """
     Save template analysis to a JSON file.
     

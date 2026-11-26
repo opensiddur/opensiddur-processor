@@ -1,10 +1,12 @@
 """Edition differences at the Gedaliah refrain and supplied Kaddish boundaries."""
-import unittest
 import hashlib
 import json
 import tempfile
+import unittest
 from pathlib import Path
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import tzom_gedaliah as gedaliah
 from opensiddur.importer.asher_selichot.build import TEI, XML
 from opensiddur.importer.scan.reverse import streams

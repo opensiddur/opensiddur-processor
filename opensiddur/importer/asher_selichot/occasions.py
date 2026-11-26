@@ -12,7 +12,16 @@ each service's gate is the union of its date over all four.
 """
 
 from opensiddur.importer.util.occasion import (
-    DAY_OF_WEEK, HEBREW_DATE, Condition, Feature, aggregate, all_of, any_of, gate, holiday)
+    DAY_OF_WEEK,
+    HEBREW_DATE,
+    Condition,
+    Feature,
+    aggregate,
+    all_of,
+    any_of,
+    gate,
+    holiday,
+)
 
 ELUL, TISHREI = 6, 7
 SHABBAT = 7

@@ -6,7 +6,11 @@ import unittest
 from pathlib import Path
 
 from opensiddur.release.downloads import (
-    BookEntry, book_entries, human_size, main, render_downloads,
+    BookEntry,
+    book_entries,
+    human_size,
+    main,
+    render_downloads,
 )
 
 TAG = "v20990101"

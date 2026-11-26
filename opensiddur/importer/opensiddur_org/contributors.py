@@ -93,7 +93,7 @@ class Contributors:
         self.by_slug = {entry.get("author_slug", ""): entry for entry in by_id.values()}
 
     @classmethod
-    def load(cls, path: Path) -> "Contributors":
+    def load(cls, path: Path) -> Contributors:
         return cls(json.loads(path.read_text(encoding="utf-8")))
 
     def person_slug(self, profile_slug: str) -> str:

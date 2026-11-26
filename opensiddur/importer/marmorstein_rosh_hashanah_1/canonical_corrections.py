@@ -2,9 +2,10 @@
 from copy import deepcopy
 from pathlib import Path
 
-from . import PROJECTS
-from .realizations import _range_segments, segment_identity, overlays
 from opensiddur.importer.scan.authoring import apply_corrections
+
+from . import PROJECTS
+from .realizations import _range_segments, overlays, segment_identity
 
 
 def _pattern(item):

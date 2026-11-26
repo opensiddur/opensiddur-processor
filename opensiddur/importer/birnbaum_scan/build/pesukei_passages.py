@@ -1,9 +1,10 @@
 """Biblical identifications and printed paragraph order for the pre-Ashrei passages."""
 import re
 from html import escape
+
 from .common import SIDDUR, SIGIL_PESUKEI, pb
-from .pesukei_data import PASSAGES
 from .milestones import Correspondences
+from .pesukei_data import PASSAGES
 
 BIBLE = 'urn:x-opensiddur:text:bible:'
 ROOT = SIDDUR + 'chol/shacharit/pesuqei_dezimrah/'

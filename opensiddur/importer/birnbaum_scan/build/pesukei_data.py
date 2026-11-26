@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Read from IA n75–n82 (printed 51–58), Hodu up to but not including Ashrei.
 
 Each row gives a biblical reference, Hebrew, and English. Curly-braced page markers

@@ -1,9 +1,15 @@
 """Synthetic calendar precedence and service-extension boundaries."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build.shabbat_shema import (
-    SHABBAT, FESTIVAL_WEEKDAY, SERVICE, ROOT, extend_service,
+    FESTIVAL_WEEKDAY,
+    ROOT,
+    SERVICE,
+    SHABBAT,
+    extend_service,
 )
+
 from .test_tachanun_conditions import evaluate
 
 

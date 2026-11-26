@@ -16,7 +16,7 @@ the section's own conditions on them are decided even where the date is not.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal, Union
+from typing import Literal
 
 HOLIDAY = "opensiddur:holiday"
 AGGREGATE = "opensiddur:holiday-aggregate"
@@ -65,13 +65,13 @@ class Feature:
 @dataclass(frozen=True)
 class Combination:
     op: Literal["all", "any", "none"]
-    args: tuple["Condition", ...]
+    args: tuple[Condition, ...]
 
     def markup(self) -> str:
         return f"<j:{self.op}>" + "".join(arg.markup() for arg in self.args) + f"</j:{self.op}>"
 
 
-Condition = Union[Feature, Combination]
+Condition = Feature | Combination
 
 
 def all_of(*args: Condition) -> Combination:

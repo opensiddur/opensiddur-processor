@@ -9,10 +9,11 @@ own template/tag handlers.
 from __future__ import annotations
 
 import re
-import mwparserfromhell
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any
+
+import mwparserfromhell
 
 
 class ProcessingStage(Enum):
@@ -27,10 +28,10 @@ class ProcessingStage(Enum):
 class ConversionResult:
     """Result of a conversion operation"""
     xml_content: str
-    metadata: Dict[str, Any]
-    warnings: List[str]
-    errors: List[str]
-    wikilinks: List[Dict[str, Any]]
+    metadata: dict[str, Any]
+    warnings: list[str]
+    errors: list[str]
+    wikilinks: list[dict[str, Any]]
 
 
 class MediaWikiProcessor:
@@ -550,7 +551,7 @@ class MediaWikiProcessor:
         attr_str = ' ' + ' '.join([f'{k}="{v}"' for k, v in attributes.items()]) if attributes else ''
         return f'<pagequality{attr_str}>{content}</pagequality>'
     
-    def _extract_tag_attributes(self, tag) -> Dict[str, str]:
+    def _extract_tag_attributes(self, tag) -> dict[str, str]:
         """Extract all attributes from a tag"""
         attributes = {}
         if hasattr(tag, 'attributes') and tag.attributes:
@@ -627,7 +628,7 @@ class MediaWikiProcessor:
         
         return ''.join(result_parts)
     
-    def _extract_metadata(self, content: str) -> Dict[str, Any]:
+    def _extract_metadata(self, content: str) -> dict[str, Any]:
         """Extract metadata from content"""
         metadata = {}
         # Extract page quality information
@@ -774,7 +775,7 @@ class MediaWikiProcessor:
         """Add a custom postprocessor"""
         self.postprocessors.append(postprocessor_func)
     
-    def get_wikilinks(self) -> List[Dict[str, Any]]:
+    def get_wikilinks(self) -> list[dict[str, Any]]:
         """Get all captured wikilinks"""
         return self.wikilinks.copy()
     

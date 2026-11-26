@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Birnbaum's English for Seder Hanachath Tefillin, from printed pages 6, 8, 10 and 12.
 
 Same URNs as the Hebrew, which is what aligns them. Three page turns, all mid-sentence and
@@ -12,8 +11,8 @@ inside running roman text, which is the opposite of the rubrics' case and the sa
 """
 import functools
 
-from .common import PRAYER
 from . import common
+from .common import PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

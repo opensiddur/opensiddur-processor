@@ -1,6 +1,6 @@
 """Commentary read from printed 439–476, including the winter Psalms."""
 from .notes_minchah import note
-from .shabbat_minchah import ROOT, ATAH, BIBLE
+from .shabbat_minchah import ATAH, BIBLE, ROOT
 
 NOTES = [
  note(ROOT+'/uva_letziyyon','is postponed till Minḥah on Sabbaths and festivals. The reason is explained on page 131.',lemma='ובא לציון'),

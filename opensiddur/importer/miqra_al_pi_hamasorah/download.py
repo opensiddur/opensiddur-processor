@@ -42,7 +42,7 @@ import sys
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -116,7 +116,7 @@ def _rate_limit_reset(response: requests.Response) -> str:
     reset = response.headers.get("X-RateLimit-Reset", "")
     if not reset.isdigit():
         return ""
-    return f" until {datetime.fromtimestamp(int(reset), timezone.utc).isoformat()}"
+    return f" until {datetime.fromtimestamp(int(reset), UTC).isoformat()}"
 
 
 class Client:
@@ -340,7 +340,7 @@ def download(
         "plus_path": PLUS_PATH,
         "license_path": LICENSE_PATH,
         "documentation": DOCUMENTATION_URL,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "files": entries,
     }
     result.manifest_written = _write_bytes_if_changed(

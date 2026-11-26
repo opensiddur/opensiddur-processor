@@ -1,5 +1,7 @@
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.scan.authoring import TEI, J
 from opensiddur.importer.scan.navigation import append_instruction
 

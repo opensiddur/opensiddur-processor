@@ -26,7 +26,7 @@ import argparse
 import logging
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -149,7 +149,7 @@ def download_book(
         "source": wiki.server,
         "book_name": BOOK_NAME,
         "namespace": WIKI_NAMESPACE,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "pages": scans.pages,
     }
     save_manifest(manifest, data_dir)

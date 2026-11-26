@@ -1,11 +1,11 @@
 """Optional real-engine regression for lines escaping a parallel column."""
 
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import unittest
+from pathlib import Path
 
 from lxml import etree
 

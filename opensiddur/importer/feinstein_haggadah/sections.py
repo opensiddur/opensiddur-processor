@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Iterator, Literal
+from typing import Literal
 
 from opensiddur.importer.util.hebrew import normalize_hebrew
 
@@ -328,7 +329,7 @@ def iter_index_files() -> Iterator[str]:
 
 def leaf_slugs() -> list[str]:
     leaves: list[str] = []
-    for parent, children in INDEX_CHILDREN.items():
+    for _parent, children in INDEX_CHILDREN.items():
         for child in children:
             if child not in INDEX_NODES:
                 leaves.append(child)

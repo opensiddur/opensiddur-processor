@@ -1,7 +1,10 @@
 """Apparatus and counters must not interrupt rendered body-word checks."""
 import unittest
+
 from lxml import etree
-from opensiddur.importer.asher_selichot.check_fast_pdf import glyph_rows,body_text
+
+from opensiddur.importer.asher_selichot.check_fast_pdf import body_text, glyph_rows
+
 
 class BodyRowsTests(unittest.TestCase):
     def test_body_word_across_counter_and_apparatus(self):

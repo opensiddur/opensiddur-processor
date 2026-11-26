@@ -1,7 +1,5 @@
 import io
 import json
-import subprocess
-import sys
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,8 +7,8 @@ from unittest.mock import patch
 
 from lxml import etree
 
-from opensiddur.exporter.refdb import ReferenceDatabase
 from opensiddur.exporter import validate_urn_references
+from opensiddur.exporter.refdb import ReferenceDatabase
 from opensiddur.exporter.validate_urn_references import (
     UnresolvableUrnReference,
     _format_failure,
@@ -19,7 +17,6 @@ from opensiddur.exporter.validate_urn_references import (
     validate_project_contributor_references,
     validate_project_urn_references,
 )
-
 
 TEI_NS = "http://www.tei-c.org/ns/1.0"
 JLPTEI_NS = "http://jewishliturgy.org/ns/jlptei/2"

@@ -23,11 +23,12 @@ nothing else. A macro the stylesheet relies on is therefore *defined* here, with
 
 from __future__ import annotations
 
-from typing import Optional
-
 from opensiddur.exporter.tex.escape import escape_tex
 from opensiddur.exporter.typography import (
+    HEBREW_FAMILY,
+    LATIN_FAMILY,
     Alignment,
+    Binding,
     ChapterStart,
     ColumnPosition,
     ConditionalBlock,
@@ -35,18 +36,15 @@ from opensiddur.exporter.typography import (
     FontStyle,
     FontVariant,
     FontWeight,
-    HEBREW_FAMILY,
-    Binding,
     InterleavedLineNumbers,
-    LATIN_FAMILY,
     LineNumberMargin,
     NamedSize,
     NoteAnchor,
     Numerals,
     Orientation,
     PaperType,
-    ScanLinkPlacement,
     ParallelLayout,
+    ScanLinkPlacement,
     Sides,
     TextStyle,
     TypographyConfig,
@@ -54,7 +52,6 @@ from opensiddur.exporter.typography import (
     resolve_font,
     right_bound_pages,
 )
-
 
 # ---------------------------------------------------------------------------
 # Size and style tokens
@@ -82,7 +79,7 @@ _SHAPE_COMMANDS = {FontStyle.NORMAL: r"\upshape", FontStyle.ITALIC: r"\itshape"}
 _VARIANT_COMMANDS = {FontVariant.NORMAL: "", FontVariant.SMALL_CAPS: r"\scshape"}
 
 
-def _size_command(size: Optional[str], line_spacing: float) -> str:
+def _size_command(size: str | None, line_spacing: float) -> str:
     """The TeX command that selects a size.
 
     A named size is one of the ten scale commands. An absolute length needs an
@@ -112,7 +109,7 @@ def _format_number(value: float) -> str:
     return text or "0"
 
 
-def _font_command(family: Optional[str]) -> str:
+def _font_command(family: str | None) -> str:
     """The command that selects a declared family.
 
     ``latin`` is the document's main font, so selecting it is just returning to
@@ -191,7 +188,7 @@ def _inline_aligned(style: TextStyle, content: str) -> str:
     return before + content + after
 
 
-def _vspace(length: Optional[str]) -> str:
+def _vspace(length: str | None) -> str:
     return rf"\vspace{{{length}}}" if length else ""
 
 
@@ -267,7 +264,7 @@ def documentclass_options(config: TypographyConfig) -> str:
 
 def _font_declaration(
     command: str, options: str, names: list[str],
-    entries: Optional[list[FontFace]] = None, selector: str = "",
+    entries: list[FontFace] | None = None, selector: str = "",
     *, at_compile_time: bool = False, optional: bool = False,
 ) -> list[str]:
     """Declare a font family, falling back through the chain if need be.

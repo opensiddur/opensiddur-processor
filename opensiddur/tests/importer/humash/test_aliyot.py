@@ -9,11 +9,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from opensiddur.common.versification import NUMBERING_COMMON, NUMBERING_MASORAH
 from opensiddur.importer.humash import aliyot
 from opensiddur.importer.humash.names import slug_for_hebrew
-from opensiddur.common.versification import NUMBERING_COMMON, NUMBERING_MASORAH
 from opensiddur.importer.humash.refs import (
-    canonical_ref,
     UNIT_ALIYAH,
     UNIT_ALIYAH_COMBINED,
     UNIT_MAFTIR,
@@ -22,6 +21,7 @@ from opensiddur.importer.humash.refs import (
     UNIT_WEEKDAY_COMBINED,
     ReadingSpan,
     VerseRef,
+    canonical_ref,
     verses_in_chapter,
 )
 from opensiddur.importer.miqra_al_pi_hamasorah.miqra_plus import PlusFormatError

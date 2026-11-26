@@ -1,8 +1,11 @@
 """Synthetic passage boundaries and service transclusion structure."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.importer.birnbaum_scan.build import shacharit_end as end
-from .test_tachanun_conditions import fragment, NS
+
+from .test_tachanun_conditions import NS, fragment
 
 
 class TestFinalReadings(unittest.TestCase):

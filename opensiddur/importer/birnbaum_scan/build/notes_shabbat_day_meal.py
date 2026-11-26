@@ -1,8 +1,9 @@
 """Commentary read directly from printed 424–436."""
 from copy import deepcopy
-from .notes_minchah import note
-from .shabbat_day_meal import ROOT, URNS, LEIL
+
 from .notes_leil_shabbat import NOTES as OLD_NOTES
+from .notes_minchah import note
+from .shabbat_day_meal import LEIL, ROOT, URNS
 
 NOTES = [
 note(ROOT+'/kiddush','the great Kiddush, so called by way of inversion, since it is of later origin and of less importance than the Kiddush recited in the evening.',lemma='קדושא רבא'),

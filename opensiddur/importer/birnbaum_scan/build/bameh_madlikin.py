@@ -1,10 +1,11 @@
 """The study and Kaddish closing Kabbalat Shabbat, printed 251–256."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml, MINYAN
+
+from .bameh_madlikin_data import ELAZAR_EN, ELAZAR_HE, EN, HE, VERSES
+from .common import PRAYER, PROJECT_HE, SIDDUR, pb
+from .conclusion import BIBLE, MINYAN, instruction, text_xml, transclude
 from .milestones import marked
 from .shacharit_end import editorial_head
-from .bameh_madlikin_data import HE, EN, ELAZAR_HE, ELAZAR_EN, VERSES
 
 MISHNAH = 'urn:x-opensiddur:text:mishnah:shabbat/2'
 TALMUD = 'urn:x-opensiddur:text:talmud:berakhot/64a/amar_rabbi_elazar'
@@ -71,7 +72,7 @@ def shared(lang, prayers):
 
 
 def units(project):
-    from .kabbalat_shabbat import conditional, FESTIVAL, FULL
+    from .kabbalat_shabbat import FESTIVAL, FULL, conditional
     lang='he' if project==PROJECT_HE else 'en'
     side=int(lang=='en')
     occasion='<j:all><j:none>'+FESTIVAL+'</j:none>'+FULL+'</j:all>'
@@ -83,8 +84,8 @@ def units(project):
             # Draw the local realization from the shared reading. Keeping its
             # paragraph inline under one correspondence aligns both languages;
             # transcluding a whole addressed div here creates nested segments.
-            from .he_ishmael import PRAYERS as HE_SHARED
             from .en_ishmael import PRAYERS as EN_SHARED
+            from .he_ishmael import PRAYERS as HE_SHARED
             original=next(p for p in (EN_SHARED if side else HE_SHARED)
                           if p['name']=='kaddish_derabbanan_yehe_shelama')
             text=re.search(r'<tei:p>(.*?)</tei:p>',original['body'],re.S).group(1)

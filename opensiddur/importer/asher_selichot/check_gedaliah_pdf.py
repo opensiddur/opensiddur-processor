@@ -1,9 +1,12 @@
 """Check Gedaliah stanza alignment, apparatus, and fulfilled reference boundaries."""
 import copy
+
 from lxml import etree
-from .check_pdf import MAX_BASELINE_DIFFERENCE, plain, strip_line_numbers
-from .check_first_day_pdf import latin_note_runs
+
 from opensiddur.importer.scan.pdf_direction import base
+
+from .check_first_day_pdf import latin_note_runs
+from .check_pdf import MAX_BASELINE_DIFFERENCE, plain, strip_line_numbers
 
 ANCHORS = [('הוריתדרך', 'Thou didst teach the way'),
            ('אזמאזמקדם', 'From the earliest times'),

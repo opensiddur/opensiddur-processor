@@ -17,28 +17,49 @@ through the p:project/p:file_name attributes (metadata.build_colophon).
 """
 
 import argparse
-from contextlib import contextmanager
-from enum import Enum
 import hashlib
 import json
 import logging
-from pathlib import Path
 import re
 import sys
-from typing import Any, Literal, Optional, TypedDict
-from lxml.etree import ElementBase
-from lxml import etree
+from contextlib import contextmanager
+from enum import Enum
+from pathlib import Path
+from typing import Any, Literal, TypedDict
 
-from opensiddur.exporter.whitespace import prefix_after_omission
+from lxml import etree
+from lxml.etree import ElementBase
+
+from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.exporter.annotation_placement import (
+    place_structural_annotations_in_tree,
+)
+from opensiddur.exporter.client_settings import is_reader_supplied
+from opensiddur.exporter.condition_eval import (
+    TriState,
+    condition_features,
+    evaluate_condition,
+    parse_condition_element,
+    value_to_json,
+)
+from opensiddur.exporter.conditional_markers import check_pairing
+from opensiddur.exporter.conditional_settings import (
+    CONDITIONAL_CONTROL_TAGS,
+    J_CONDITION,
+    J_CONDITIONAL,
+    J_DECLARE,
+    J_END_CONDITIONAL,
+    J_END_DECLARE,
+    XML_ID,
+    parse_declare_element,
+)
 from opensiddur.exporter.constants import (
-    RUBRIC_NOTE_TYPES,
     JLPTEI_NAMESPACE,
     PROCESSING_NAMESPACE,
+    RUBRIC_NOTE_TYPES,
     TEI_NS,
     is_element_node,
 )
-
-from opensiddur.exporter.client_settings import is_reader_supplied
 from opensiddur.exporter.day_gates import is_day_gate
 from opensiddur.exporter.derivation_graph import DERIVED_FS_TYPES, READ_FEATURES
 from opensiddur.exporter.derived_settings import (
@@ -55,29 +76,15 @@ from opensiddur.exporter.linear import (
     get_linear_data,
     reset_linear_data,
 )
-from opensiddur.exporter.conditional_settings import (
-    CONDITIONAL_CONTROL_TAGS,
-    J_CONDITION,
-    J_CONDITIONAL,
-    J_DECLARE,
-    J_END_CONDITIONAL,
-    J_END_DECLARE,
-    XML_ID,
-    parse_declare_element,
-)
-from opensiddur.exporter.conditional_markers import check_pairing
-from opensiddur.exporter.condition_eval import (
-    TriState,
-    condition_features,
-    evaluate_condition,
-    parse_condition_element,
-    value_to_json,
-)
-from opensiddur.exporter.refdb import ReferenceDatabase, file_hash
-from opensiddur.exporter.annotation_placement import place_structural_annotations_in_tree
 from opensiddur.exporter.milestone_annotations import place_milestone_annotations
-from opensiddur.exporter.urn import ResolvedUrnRange, UrnResolver, coarsen, split_project
-from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.exporter.refdb import ReferenceDatabase, file_hash
+from opensiddur.exporter.urn import (
+    ResolvedUrnRange,
+    UrnResolver,
+    coarsen,
+    split_project,
+)
+from opensiddur.exporter.whitespace import prefix_after_omission
 
 logger = logging.getLogger(__name__)
 
@@ -109,9 +116,9 @@ class _AnnotationCommand(Enum):
 class _ProcessingContext(TypedDict):
     project: str
     file_name: str
-    element_path: Optional[str]
-    from_start: Optional[str]
-    to_end: Optional[str]
+    element_path: str | None
+    from_start: str | None
+    to_end: str | None
     before_start: bool
     after_end: bool
     include_tail_after_end: bool
@@ -164,8 +171,8 @@ class CompilerProcessor:
         self, 
         project: str,
         file_name: str,
-        linear_data: Optional[LinearData] = None,
-        reference_database: Optional[ReferenceDatabase] = None):
+        linear_data: LinearData | None = None,
+        reference_database: ReferenceDatabase | None = None):
         """ Process the given file/project.
         Args:
             project: The project name
@@ -242,7 +249,7 @@ class CompilerProcessor:
         """
         return self.linear_data.parallel_compilation_depth > 0
 
-    def _get_in_scope_language(self, element: ElementBase) -> Optional[str]:
+    def _get_in_scope_language(self, element: ElementBase) -> str | None:
         """ Get the xml:lang attribute from the element or its ancestors.
         Returns the first xml:lang found walking up the ancestor chain, or None if not found.
         """
@@ -253,7 +260,7 @@ class CompilerProcessor:
                 return lang
         return None
 
-    def _get_path_hash(self, element: Optional[ElementBase] = None, length: int = 8) -> str:
+    def _get_path_hash(self, element: ElementBase | None = None, length: int = 8) -> str:
         """ Get a hash of the path taken to get to the current processing context and element if available
 
         ``length`` hex digits: 8 suffice for an id, which need only differ from the other
@@ -341,9 +348,9 @@ class CompilerProcessor:
         return element
 
     def _get_start_and_end_elements_from_ranges(self,
-        from_start: Optional[str] = None,
-        to_end: Optional[str] = None
-    ) -> tuple[Optional[ElementBase], Optional[ElementBase]]:
+        from_start: str | None = None,
+        to_end: str | None = None
+    ) -> tuple[ElementBase | None, ElementBase | None]:
         """ Get the start and end elements from element XPath paths.
         Args:
             from_start: The start element path, if available
@@ -453,8 +460,8 @@ class CompilerProcessor:
 
     def _transclude(self, 
         element: ElementBase, 
-        type_override: Optional[Literal['external', 'inline']] = None
-    ) -> Optional[ElementBase]:
+        type_override: Literal['external', 'inline'] | None = None
+    ) -> ElementBase | None:
         """
         Transclude a new root tree from the given transclusion element
         """
@@ -507,7 +514,7 @@ class CompilerProcessor:
             
             return processing_element
 
-    def _annotate(self, element: ElementBase, root: Optional[ElementBase] = None) -> tuple[list[ElementBase], _AnnotationCommand]:
+    def _annotate(self, element: ElementBase, root: ElementBase | None = None) -> tuple[list[ElementBase], _AnnotationCommand]:
         """
         Annotate the given element with the file source and project.
 
@@ -670,10 +677,10 @@ class CompilerProcessor:
         return element
 
     def _mark_file_source(self, element: ElementBase,
-        project: Optional[str] = None,
-        file_name: Optional[str] = None,
+        project: str | None = None,
+        file_name: str | None = None,
         *,
-        enclosing: Optional[tuple[str, str]] = None,
+        enclosing: tuple[str, str] | None = None,
         ) -> ElementBase:
         """Mark where ``element`` comes from, if that is not the file that encloses it.
 
@@ -687,7 +694,7 @@ class CompilerProcessor:
             element.set(f"{{{PROCESSING_NAMESPACE}}}project", source[0])
         return element
 
-    def _enclosing_source(self, *, own_frame_on_stack: bool) -> Optional[tuple[str, str]]:
+    def _enclosing_source(self, *, own_frame_on_stack: bool) -> tuple[str, str] | None:
         """The (project, file) of the context enclosing this processor's, if any."""
         stack = self.linear_data.processing_context
         depth = len(stack) - (2 if own_frame_on_stack else 1)
@@ -728,8 +735,8 @@ class CompilerProcessor:
     def _get_start_and_end_from_ranges(
         self,
         target: str,
-        target_end: Optional[str] = None,
-        project_priority: Optional[list[str]] = None,
+        target_end: str | None = None,
+        project_priority: list[str] | None = None,
         ) -> ResolvedUrnRange:
         """The start and end, inclusive, of what ``target`` (through ``target_end``) names.
 
@@ -1053,7 +1060,7 @@ class CompilerProcessor:
     # Used by the range processors, ExternalCompilerProcessor and InlineCompilerProcessor.
 
     def _place_conditional_marker(
-        self, element: ElementBase, marker: Optional[ElementBase], before_start: bool,
+        self, element: ElementBase, marker: ElementBase | None, before_start: bool,
     ) -> list[ElementBase]:
         """Emit a conditional's marker so the range's scopes stay paired.
 
@@ -1249,7 +1256,7 @@ class CompilerProcessor:
                 return
         yield from element
 
-    def _process_element(self, element: ElementBase, root: Optional[ElementBase] = None) -> ElementBase:
+    def _process_element(self, element: ElementBase, root: ElementBase | None = None) -> ElementBase:
         # Comments and processing instructions carry no JLPTEI meaning and cannot be rebuilt from
         # their tag. Drop them before the processing context sees them; the caller carries the tail.
         if not is_element_node(element):
@@ -1330,7 +1337,7 @@ class CompilerProcessor:
         if header is not None:
             gather_credits(header, self.linear_data)
 
-    def process(self, root: Optional[ElementBase] = None):
+    def process(self, root: ElementBase | None = None):
         """
         Recursively process elements and text nodes of root_tree as an identity transform.
         If root is not provided, use self.root_tree.
@@ -1554,7 +1561,11 @@ def main(argv: list[str] | None = None):  # pragma: no cover
     )
     args = parser.parse_args(argv)
 
-    from opensiddur.exporter.settings import load_default_settings, load_settings, read_settings
+    from opensiddur.exporter.settings import (
+        load_default_settings,
+        load_settings,
+        read_settings,
+    )
 
     project_directory = args.project_directory.resolve()
     if args.project is None or args.file_name is None:

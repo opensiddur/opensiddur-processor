@@ -1,12 +1,17 @@
 """An attested printing has page events without duplicating its shared words."""
+import unittest
 from copy import deepcopy
 from pathlib import Path
-import unittest
+
 from lxml import etree
+
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import PROJECTS
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import build as b
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import realizations as r
-from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_printings import bindings, apply
+from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_printings import (
+    apply,
+    bindings,
+)
 
 P='urn:x-opensiddur:text:prayer:example/part'
 A='urn:x-opensiddur:condition:prayer:example/old'
@@ -98,7 +103,7 @@ class CanonicalPrintingsTest(unittest.TestCase):
 
     def test_scan_links_choose_only_the_current_printing(self):
         from opensiddur.exporter.constants import PROCESSING_NAMESPACE
-        from opensiddur.exporter.scan_links import mark_scan_links, SCAN_LINK
+        from opensiddur.exporter.scan_links import SCAN_LINK, mark_scan_links
         data=fixture();docs=self.generated(data)
         home=next(root for path,root in docs if path.stem=='words')
         page=home.xpath('//t:pb',namespaces=NS)[0]
@@ -114,6 +119,7 @@ class CanonicalPrintingsTest(unittest.TestCase):
 
     def test_real_compiler_preserves_external_boundary_and_words(self):
         import tempfile
+
         from opensiddur.exporter.compiler import CompilerProcessor
         from opensiddur.exporter.linear import LinearData
         from opensiddur.exporter.refdb import ReferenceDatabase

@@ -17,7 +17,8 @@ from __future__ import annotations
 import enum
 import re
 import unittest
-from typing import Callable, NamedTuple, Optional
+from collections.abc import Callable
+from typing import NamedTuple
 
 from lxml import etree
 from pydantic import BaseModel
@@ -25,7 +26,6 @@ from pydantic import BaseModel
 from opensiddur.exporter.tex.latex import XSLT_FILE, typography_parameters
 from opensiddur.exporter.typography import TextStyle, TypographyConfig
 from opensiddur.tests.exporter.test_typography_doc import DOC, _model_of
-
 
 # A minimal document of each shape the preamble depends on: one stream, two
 # aligned streams set by reledpar, two streams interleaved in one.
@@ -37,7 +37,7 @@ _PARALLEL = (
 _INTERLEAVED_SETTINGS = {"parallel": {"layout": "interleaved"}}
 
 
-def _parameters(document: str, settings: Optional[dict] = None) -> dict:
+def _parameters(document: str, settings: dict | None = None) -> dict:
     config = TypographyConfig.model_validate(settings or {})
     return typography_parameters(config, etree.fromstring(document))
 
@@ -151,7 +151,7 @@ class Expect(NamedTuple):
     text: Callable[[object], str]
     present: bool = True
     document: str = _SINGLE
-    settings: Optional[dict] = None
+    settings: dict | None = None
 
 
 def _v(value: object) -> str:
@@ -289,7 +289,7 @@ _EXPECTED: dict[str, list[Expect]] = {
 # Each role, the macro that renders it, and how its alignment is written there:
 # fill glue inside a numbered paragraph, a real paragraph on the title page.
 _INLINE, _BLOCK = r"\mbox{}\hfill", r"\centering"
-_ROLES: dict[str, tuple[str, Optional[str]]] = {
+_ROLES: dict[str, tuple[str, str | None]] = {
     "body": (r"\OSBodyStyle", None),
     "heading1": (r"\OSheadA", _INLINE),
     "heading2": (r"\OSheadB", _INLINE),
@@ -346,7 +346,7 @@ _SIZES = {
 }
 
 
-def _definition(preamble: str, macro: str) -> Optional[str]:
+def _definition(preamble: str, macro: str) -> str | None:
     """The line that defines ``macro``, and for a % continued one the lines after it."""
     lines = preamble.splitlines()
     for index, line in enumerate(lines):

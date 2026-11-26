@@ -3,19 +3,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from lxml import etree
 import yaml
+from lxml import etree
 
 from opensiddur.common.xslt import xslt_transform_string
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
+from opensiddur.exporter.html.css import xslt_parameters
+from opensiddur.exporter.html.html import XSLT_FILE as HTML_XSLT
+from opensiddur.exporter.html.markers import prepare
 from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
 from opensiddur.exporter.linear import LinearData
 from opensiddur.exporter.refdb import ReferenceDatabase
 from opensiddur.exporter.settings import load_settings
-from opensiddur.exporter.html.html import XSLT_FILE as HTML_XSLT
-from opensiddur.exporter.html.css import xslt_parameters
-from opensiddur.exporter.html.markers import prepare
 from opensiddur.exporter.typography import TypographyConfig
 from opensiddur.tests.exporter.stylesheet_helpers import transform
 

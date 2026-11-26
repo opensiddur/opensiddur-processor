@@ -10,15 +10,14 @@ from __future__ import annotations
 import calendar
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta, timezone, tzinfo
+from datetime import UTC, date, datetime, time, timedelta, tzinfo
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import hdate
 import tzfpy
 from pyluach import dates as pyluach_dates
-from pyluach import hebrewcal
-from pyluach import parshios
+from pyluach import hebrewcal, parshios
 
 from opensiddur.exporter.linear import NumericValue, TwilightValue, Undefined
 
@@ -224,7 +223,7 @@ class SettingSnapshot:
     def get(self, fs_type: str, feature_name: str) -> Any | None:
         return self.get_setting(fs_type, feature_name)
 
-    def on_day(self, day: int) -> "SettingSnapshot":
+    def on_day(self, day: int) -> SettingSnapshot:
         """The view from one of the two days of bein hashmashot.
 
         Each value that differs between the days reads as its value on this one, and the
@@ -345,7 +344,7 @@ class SettingSnapshot:
             zone = _zone_from_name(_timezone_name_at(lat, lon))
             if zone is not None:
                 return zone
-        return timezone.utc
+        return UTC
 
     def location(self) -> hdate.Location | None:
         lat = self.get_float(FS_LOCATION, "latitude")

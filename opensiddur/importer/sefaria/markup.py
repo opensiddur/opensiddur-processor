@@ -31,7 +31,7 @@ import logging
 import re
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cache
 
 from lxml import etree, html
 
@@ -49,7 +49,7 @@ class Styled:
     superscript."""
 
     style: str
-    children: tuple["Node", ...]
+    children: tuple[Node, ...]
 
 
 @dataclass(frozen=True)
@@ -69,7 +69,7 @@ class Correction:
 @dataclass(frozen=True)
 class Footnote:
     marker: str
-    children: tuple["Node", ...]
+    children: tuple[Node, ...]
 
 
 Node = Text | Styled | Break | Footnote | Correction
@@ -127,7 +127,7 @@ def _children(element: etree._Element) -> tuple[Node, ...]:
     return tuple(nodes)
 
 
-@lru_cache(maxsize=None)
+@cache
 def parse_segment(segment: str) -> tuple[Node, ...]:
     if not segment.strip():
         return ()

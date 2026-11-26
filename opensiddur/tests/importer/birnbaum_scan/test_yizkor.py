@@ -1,8 +1,11 @@
 """Memorial-service calendar, independent selections, and scan boundaries."""
 import unittest
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import yizkor as y
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestYizkor(unittest.TestCase):
     def test_calendar_boundaries(self):

@@ -16,12 +16,11 @@ from opensiddur.exporter.tex.running_heads import (
     RunningHeadSide,
     build_page_style_tex,
     default_page_header,
+    escape_with_hebrew_runs,
     expand_template,
     parse_template,
-    escape_with_hebrew_runs,
     render_position,
 )
-
 
 LTR = r"{\textdir TLT\foreignlanguage{english}{"
 

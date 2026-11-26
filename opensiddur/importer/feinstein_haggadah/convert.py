@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.exporter.validate_urn_references import validate_project_urn_references
 from opensiddur.importer.feinstein_haggadah.conditionals import (
     CONDITIONALS,
     ConditionalError,
@@ -37,13 +38,13 @@ from opensiddur.importer.feinstein_haggadah.tei_builder import (
     header_with_only_bibls,
     index_body,
     minimal_index_header,
-    read_front_stub,
     page_break_anchors,
     printed_verse_body,
+    project_citation_bibl,
+    read_front_stub,
     read_header_stub,
     require_project_source_bibl_id,
     tei_document,
-    project_citation_bibl,
     transcription_bibl,
     validate_and_write,
     validate_header_stub,
@@ -61,7 +62,6 @@ from opensiddur.importer.util.pages import (
     feinstein_haggadah_data_directory,
 )
 from opensiddur.importer.util.tei_project import prune_stale_files
-from opensiddur.exporter.validate_urn_references import validate_project_urn_references
 
 #: The Heidenheim haggadah and Feinstein's translation of it (specs/NAMING_SCHEME.md).
 HE_PROJECT = "haggadah_leleil_shimmurim-heidenheim-1822-he"

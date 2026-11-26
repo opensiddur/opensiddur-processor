@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Emit the English content modules for printed 20-48 from `scan_reading/english/*.txt`.
 
 Same reason as `generate_he_korbanot.py`: the text is long and typing it is how words go

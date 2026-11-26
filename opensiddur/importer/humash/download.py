@@ -14,7 +14,7 @@ import hashlib
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -91,7 +91,7 @@ def download(
     manifest = {
         "source": "hebcal",
         "license_url": LICENSE_URL,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "files": entries,
     }
     manifest_path = data_dir / "manifest.json"

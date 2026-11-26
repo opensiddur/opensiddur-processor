@@ -6,13 +6,11 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch, ANY
+from unittest.mock import ANY, MagicMock, Mock, patch
 
-from opensiddur.exporter.typography import PaperType, TypographyConfig
-from opensiddur.exporter.settings import DistributionSettings
 from opensiddur.exporter.pdf.pdf import (
-    _have_command,
     LOG_TAIL_LINES,
+    _have_command,
     _run_bibtex,
     _run_lualatex,
     _run_manual_loop,
@@ -20,6 +18,8 @@ from opensiddur.exporter.pdf.pdf import (
     export_to_pdf,
     generate_tex,
 )
+from opensiddur.exporter.settings import DistributionSettings
+from opensiddur.exporter.typography import PaperType, TypographyConfig
 
 
 class TestGenerateTex(unittest.TestCase):
@@ -350,6 +350,7 @@ class TestCompileTexToPdfRelativeTexFile(unittest.TestCase):
 class TestBibliographyLineBreaking(unittest.TestCase):
     def test_long_archive_url_and_eprint_fit_the_text_block(self):
         from pypdf import PdfReader
+
         from opensiddur.tests.exporter.stylesheet_helpers import transform
         identifier = "PhilipBirnbaumHaSiddurHaShalemTheDailyPrayerBook1949"
         url = "https://archive.org/details/" + identifier

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Corroborate every extracted note against the Internet Archive's own OCR of the scan.
 
 The notes are lifted from the English Wikisource transcription, which is a second reading of
@@ -48,7 +47,6 @@ two of them in front of a pair of eyes instead of sixteen page images.
 import importlib.util
 import pathlib
 import re
-import sys
 
 ST = pathlib.Path("/home/efeins/src/opensiddur-repos/sourcetexts/feat_birnbaum-birchot-hashachar/sources/birnbaum_siddur")
 SCAN_OFFSET = 25
@@ -78,7 +76,7 @@ def main() -> int:
         page_ocr = ocr(printed)
         if not page_ocr.strip():
             continue
-        for anchor, body in ex.anchors(printed):
+        for _anchor, body in ex.anchors(printed):
             if ex._is_citation(body):
                 continue
             words = [w.lower() for w in WORD.findall(re.sub(r"\{\{[^{}]*\}\}", " ", body))]

@@ -1,28 +1,28 @@
 import argparse
 import logging
 import re
-from pathlib import Path
-from typing import Any, Optional
 import urllib
+from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel
 
+from opensiddur.common.constants import PROJECT_DIRECTORY
+from opensiddur.common.versification import JPS_PROJECT
+from opensiddur.common.xslt import xslt_transform_string
+from opensiddur.importer.jps1917.canonical_verses import annotate_canonical_verses
+from opensiddur.importer.jps1917.mediawiki_processor import create_processor
+from opensiddur.importer.jps1917.wikisource import BOOK_NAME
 from opensiddur.importer.util.pages import (
     default_sourcetexts_root,
     get_credits,
     get_page,
     jps1917_data_directory,
 )
-from opensiddur.importer.util.wikisource_book import download_date
-from opensiddur.importer.jps1917.canonical_verses import annotate_canonical_verses
-from opensiddur.importer.jps1917.mediawiki_processor import create_processor
-from opensiddur.importer.jps1917.wikisource import BOOK_NAME
 from opensiddur.importer.util.parshiyot import skeleton_map_json
 from opensiddur.importer.util.prettify import prettify_xml
 from opensiddur.importer.util.validation import validate
-from opensiddur.common.xslt import xslt_transform_string
-from opensiddur.common.constants import PROJECT_DIRECTORY
-from opensiddur.common.versification import JPS_PROJECT
+from opensiddur.importer.util.wikisource_book import download_date
 
 logger = logging.getLogger(__name__)
 
@@ -59,21 +59,21 @@ class Book(BaseModel):
     file_name: str
     start_page: int
     end_page: int
-    is_section: Optional[bool] = False
+    is_section: bool | None = False
     # The parshah a book of the Torah opens with. The source marks parshiyot with a centered
     # running head, but the first one of each book has none — the book's title heading is
     # printed in its place — so it has to be declared here.
-    first_parsha: Optional[str] = None
+    first_parsha: str | None = None
 
 class Index(BaseModel):
     index_title_en: str
-    index_title_he: Optional[str] = None
-    index_sub_he: Optional[str] = None
-    index_sub_en: Optional[str] = None
+    index_title_he: str | None = None
+    index_sub_he: str | None = None
+    index_sub_en: str | None = None
     file_name: str
     transclusions: list #[Book | Index]
-    start_page: Optional[int] = None
-    end_page: Optional[int] = None
+    start_page: int | None = None
+    end_page: int | None = None
 
 PAGE_OFFSET = 22
 #: A page of the scan Wikisource transcribes, by its number in the scan: `@facs` of each page
@@ -429,16 +429,16 @@ def get_credits_pages(
 def header(
     book_name_he: str,
     book_name_en: str,
-    book_sub_he: Optional[str] = None,
-    book_sub_en: Optional[str] = None,
+    book_sub_he: str | None = None,
+    book_sub_en: str | None = None,
     namespace: str = "bible",
     entrypoint: str = "tanakh",
     qualifier: str = "",
     project_id: str = JPS_PROJECT,
     license_url: str = "http://www.creativecommons.org/publicdomain/zero/1.0/",
     license_name: str = "Creative Commons Public Domain Dedication 1.0",
-    transcription_credits: Optional[list[str]] = None,
-    source_download_date: Optional[str] = None,
+    transcription_credits: list[str] | None = None,
+    source_download_date: str | None = None,
 ):
     transcription_credits = transcription_credits or []
     source_download_date = source_download_date or FALLBACK_DOWNLOAD_DATE
@@ -566,7 +566,7 @@ def tei_file(
     """
 
 def mediawiki_xml_to_tei(xml_content: str, 
-    xslt_params: Optional[dict[str, Any]] = None,
+    xslt_params: dict[str, Any] | None = None,
     mediawiki_to_tei_xslt: Path = MEDIAWIKI_TO_TEI_XSLT,
 ):
     outputs = xslt_transform_string(mediawiki_to_tei_xslt, xml_content, multiple_results=True, xslt_params=xslt_params)

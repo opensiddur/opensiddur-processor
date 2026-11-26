@@ -9,7 +9,6 @@ from pypdf import PdfReader
 
 from opensiddur.tests.exporter.stylesheet_helpers import transform
 
-
 DOCUMENT = '''<tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
     xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="en">
   <tei:text><tei:front>

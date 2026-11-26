@@ -1,5 +1,5 @@
 """All commentary and citations before Ashrei on printed 119–128."""
-from .torah import ROOT, URNS, BIBLE, anchor
+from .torah import ROOT, URNS, anchor
 from .torah_data import PASSAGES
 
 NOTES = [

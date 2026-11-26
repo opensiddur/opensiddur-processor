@@ -6,7 +6,6 @@ section separators, conditional markers — into the emitted document.
 
 import re
 
-
 # Stands in for a literal backslash while the other specials are escaped, so
 # that the braces of its own replacement text are not escaped in turn. U+0000
 # cannot occur in a YAML scalar, so it can never collide with real input.

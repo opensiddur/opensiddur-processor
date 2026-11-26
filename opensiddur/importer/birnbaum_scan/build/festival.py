@@ -1,13 +1,14 @@
 """Eruv Tavshilin, festival candles, Amidah and Kiddush (IA n609–n624)."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, SERVICE, AGG, feature, cond, endcond, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
-from .shabbat_amidah import READER
-from .shabbat_arvit import SHABBAT, REGALIM
-from .tachanun_conditions import holiday, ISRAEL, DIASPORA
-from .shacharit_end import editorial_head
+
+from .common import AGG, PRAYER, PROJECT_HE, SERVICE, SIDDUR, cond, endcond, feature, pb
+from .conclusion import BIBLE, instruction, text_xml, transclude
+from .festival_data import PAGES, ROWS
 from .milestones import marked
-from .festival_data import ROWS, PAGES
+from .shabbat_amidah import READER
+from .shabbat_arvit import REGALIM, SHABBAT
+from .shacharit_end import editorial_head
+from .tachanun_conditions import DIASPORA, ISRAEL, holiday
 
 ROOT = SIDDUR+'regalim'
 AMIDAH = ROOT+'/amidah'

@@ -6,7 +6,13 @@ from opensiddur.importer.sefaria.align import (
     align_leaf,
     align_work,
 )
-from opensiddur.importer.sefaria.blocks import Heading, Rubric, TextBlock, divide, split_block
+from opensiddur.importer.sefaria.blocks import (
+    Heading,
+    Rubric,
+    TextBlock,
+    divide,
+    split_block,
+)
 from opensiddur.importer.sefaria.markup import plain_text
 from opensiddur.importer.sefaria.source import Leaf, segments_hash
 

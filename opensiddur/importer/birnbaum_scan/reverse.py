@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Check the authored text against the reading, page by page and word for word.
 
 `compare` runs in one direction only: it asks how far the Wikisource transcription stands

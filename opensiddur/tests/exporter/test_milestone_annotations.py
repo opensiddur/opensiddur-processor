@@ -1,7 +1,10 @@
 """Milestone apparatus follows the addressed words, in the same parallel row."""
 import unittest
+
 from lxml import etree
+
 from opensiddur.exporter.milestone_annotations import place_milestone_annotations
+
 NS = {"tei": "http://www.tei-c.org/ns/1.0"}
 URN = "urn:x-opensiddur:text:prayer:demo/"
 

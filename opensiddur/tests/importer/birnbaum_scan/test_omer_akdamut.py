@@ -1,10 +1,14 @@
 """Calendar selection, bounded references, and complete bilingual poems."""
 import unittest
+
 from lxml import etree as E
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build import omer_akdamut as o
 from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
+
 
 class TestOmerAkdamut(unittest.TestCase):
     def test_counting_selects_exactly_one_of_all_49_days(self):

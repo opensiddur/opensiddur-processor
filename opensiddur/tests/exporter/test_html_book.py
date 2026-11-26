@@ -13,13 +13,14 @@ from lxml import etree
 from pydantic import ValidationError
 
 from opensiddur.common.xslt import xslt_transform_string
-from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS
+from opensiddur.exporter import typography as typography_module
 from opensiddur.exporter.cli_common import SettingsError
-from opensiddur.exporter.html.css import typography_css, xslt_parameters
 from opensiddur.exporter.client_settings import is_reader_supplied
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
+from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS
 from opensiddur.exporter.derived_settings import STATIC_DEFAULTS
+from opensiddur.exporter.html.css import typography_css, xslt_parameters
 from opensiddur.exporter.html.html import (
     XSLT_FILE,
     always_basic,
@@ -30,14 +31,13 @@ from opensiddur.exporter.html.html import (
     feature_words,
     read_basic_settings,
     read_places,
-    settings_catalogue,
     scope_css,
+    settings_catalogue,
 )
 from opensiddur.exporter.html.markers import BookConditions, Feature, prepare
-from opensiddur.exporter.settings import ElectronicSettings, SettingsYaml
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.exporter.page_references import resolve_page_references
-from opensiddur.exporter import typography as typography_module
+from opensiddur.exporter.settings import ElectronicSettings, SettingsYaml
 from opensiddur.exporter.typography import TypographyConfig
 from opensiddur.tests.exporter.js_engine import require_node, run_js
 from opensiddur.tests.exporter.registry_helpers import unchecked_registry

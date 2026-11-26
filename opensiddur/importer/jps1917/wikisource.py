@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -96,7 +96,7 @@ def download_book(
         "source": wiki.server,
         "book_name": BOOK_NAME,
         "namespace": WIKI_NAMESPACE,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "pages": scans.pages,
     }
     # Written once, at the end. A crash mid-run then leaves the previous manifest

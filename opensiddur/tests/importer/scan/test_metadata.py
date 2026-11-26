@@ -1,5 +1,6 @@
 """Machine metadata is evidence to verify, not an authoritative page label."""
 import unittest
+
 from opensiddur.importer.scan.metadata import derive_pages
 
 

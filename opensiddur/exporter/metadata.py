@@ -9,7 +9,7 @@ the colophon once, in one order, and each output stage only serialises it: the T
 import re
 import sys
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from lxml import etree
 from pydantic import BaseModel
@@ -342,7 +342,7 @@ def _date_value(date: etree._Element) -> str:
     return _normalize(when) if when is not None else _text(date)
 
 
-def _published(bibl: etree._Element) -> Optional[etree._Element]:
+def _published(bibl: etree._Element) -> etree._Element | None:
     """The date of publication. The date of consultation belongs to the URL, not to the work,
     so it is never taken as the work's date."""
     return next((date for date in _children(bibl, "date") if date.get("type") != "accessed"),

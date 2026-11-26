@@ -4,9 +4,15 @@ from lxml import etree
 
 from opensiddur.importer.sefaria.align import align_leaf
 from opensiddur.importer.sefaria.blocks import TextBlock, divide
-from opensiddur.importer.sefaria.source import Leaf
-from opensiddur.importer.sefaria.tei_builder import Notes, VariantPrinting, file_stem, render, text_body
 from opensiddur.importer.sefaria.markup import parse_segment
+from opensiddur.importer.sefaria.source import Leaf
+from opensiddur.importer.sefaria.tei_builder import (
+    Notes,
+    VariantPrinting,
+    file_stem,
+    render,
+    text_body,
+)
 from opensiddur.importer.util.hebrew import to_nfkd
 
 from .support import AMIDAH, MORNING
@@ -194,6 +200,7 @@ class TestConditionScopes(unittest.TestCase):
 
     def test_a_passage_through_the_words_that_end_it(self):
         import re as _re
+
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         from opensiddur.importer.util.incipit import words
         table = Conditions(rubrics=(RubricCondition(_re.compile("^When the Chazzan repeats"),
@@ -224,9 +231,14 @@ TABLE = None
 
 
 def conditions():
-    from opensiddur.importer.sefaria.conditions import (
-        Conditions, LabelCondition, Replacement, RubricCondition)
     import re as _re
+
+    from opensiddur.importer.sefaria.conditions import (
+        Conditions,
+        LabelCondition,
+        Replacement,
+        RubricCondition,
+    )
     from opensiddur.importer.util.incipit import words
     aseret = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
     return Conditions(
@@ -417,6 +429,7 @@ class TestLeafGates(unittest.TestCase):
 
     def test_a_section_runs_until_the_rubric_it_names(self):
         import re as _re
+
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         table = Conditions(rubrics=(RubricCondition(_re.compile("^Tachanun is also omitted"),
                                                     {"override": {"omit-tahanun": False}}, section=True,
@@ -436,6 +449,7 @@ class TestLeafGates(unittest.TestCase):
 
     def test_a_woman_says_makes_the_text_before_the_alternative(self):
         import re as _re
+
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         female = {"person": {"gender": "female"}}
         table = Conditions(rubrics=(RubricCondition(_re.compile("^A woman says:"), female,
@@ -450,6 +464,7 @@ class TestLeafGates(unittest.TestCase):
 
     def test_the_text_before_the_alternative_may_be_gated_already(self):
         import re as _re
+
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         female = {"person": {"gender": "female"}}
         table = Conditions(rubrics=(RubricCondition(_re.compile("^On Sunday:"), {"day-of-week": {"hebrew-day": 1}}),
@@ -466,7 +481,6 @@ class TestLeafGates(unittest.TestCase):
                                       ("Who is like You", "<small>On Sunday:</small>", "And You are faithful"),
                                       conditions())
         # Make the leading rubric part of the block, as division does when a rubric opens it.
-        from dataclasses import replace
         blocks_ = [i for i in items if isinstance(i, TextBlock)]
         rubric = next(i for i in items if not isinstance(i, TextBlock)).pairs[0]
         from opensiddur.importer.sefaria.tei_builder import leaf_body
@@ -481,6 +495,7 @@ class TestLeafGates(unittest.TestCase):
         # One day's introduction and psalm, cut apart, the day's rubric inside the first
         # block; the next block opens with the rubric the day runs to, then the next day's.
         import re as _re
+
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         deliver = _re.compile("^\\(Deliver us")
         table = Conditions(rubrics=(
@@ -515,6 +530,7 @@ class TestLeafGates(unittest.TestCase):
         # Wednesday's psalm, then "(Deliver us...)" and Thursday's rubric between texts: the
         # Kaddish rubric is Wednesday's, inside its gate.
         import re as _re
+
         from opensiddur.importer.sefaria.conditions import Conditions, RubricCondition
         deliver = _re.compile("^\\(Deliver us")
         table = Conditions(rubrics=(
@@ -538,6 +554,7 @@ class TestNodeGates(unittest.TestCase):
     def test_a_gated_child_is_transcluded_conditionally(self):
         from opensiddur.importer.sefaria.conditions import LeafGate
         from opensiddur.importer.sefaria.tei_builder import index_body, node_body
+
         from .support import WORK
         gate = LeafGate("w", "Morning / Torah", {"day-of-week": {"hebrew-day": 2}}, "On Mondays:")
         children = [T + "siddur:a", T + "siddur:b"]
@@ -555,6 +572,7 @@ class TestNodeGates(unittest.TestCase):
 class TestSourceBibl(unittest.TestCase):
     def test_the_translator_is_the_bibl_author_not_a_respstmt(self):
         from opensiddur.importer.sefaria.tei_builder import SourceInfo, source_bibl
+
         from .support import WORK
         info = SourceInfo("2026-11-01T00:00:00", {"he": "https://x/he", "en": "https://x/en"},
                           {"he": "a", "en": "b"})

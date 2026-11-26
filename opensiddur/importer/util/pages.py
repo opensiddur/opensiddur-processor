@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from opensiddur.common.constants import SOURCETEXTS_ROOT
 from opensiddur.importer.util.constants import Page
@@ -208,53 +207,53 @@ def heidenheim_pdf_path(sourcetexts_root: Path | None = None) -> Path | None:
     return pdfs[0] if pdfs else None
 
 
-def _read_page(directory: Path, page_number: str | int, digits: int) -> Optional[Page]:
+def _read_page(directory: Path, page_number: str | int, digits: int) -> Page | None:
     """Return the wikitext of a page file in `directory`, or None if absent."""
     page_num = int(page_number)
     path = directory / f"{page_num:0{digits}d}.txt"
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return Page.model_validate(dict(number=page_num, content=f.read()))
     except FileNotFoundError:
         return None
 
 
-def _read_credits(directory: Path, page_number: str | int, digits: int) -> Optional[list[str]]:
+def _read_credits(directory: Path, page_number: str | int, digits: int) -> list[str] | None:
     """Return the contributor names in a credits file, or None if absent."""
     page_num = int(page_number)
     path = directory / f"{page_num:0{digits}d}.txt"
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return [line.strip() for line in f.read().split("\n") if line.strip()]
     except FileNotFoundError:
         return None
 
 
-def get_page(page_number: str | int, sourcetexts_root: Path | None = None) -> Optional[Page]:
+def get_page(page_number: str | int, sourcetexts_root: Path | None = None) -> Page | None:
     """Return the wikitext of the given Page, or None if it does not exist."""
     return _read_page(jps1917_text_directory(sourcetexts_root), page_number, 4)
 
 
-def get_credits(page_number: str | int, sourcetexts_root: Path | None = None) -> Optional[list[str]]:
+def get_credits(page_number: str | int, sourcetexts_root: Path | None = None) -> list[str] | None:
     """Return the credits of the given Page, or None if it does not exist."""
     return _read_credits(jps1917_credits_directory(sourcetexts_root), page_number, 4)
 
 
-def get_birnbaum_page(page_number: str | int, sourcetexts_root: Path | None = None) -> Optional[Page]:
+def get_birnbaum_page(page_number: str | int, sourcetexts_root: Path | None = None) -> Page | None:
     """Return the wikitext of the given Birnbaum page, or None if it does not exist."""
     return _read_page(birnbaum_siddur_text_directory(sourcetexts_root), page_number, 3)
 
 
 def get_birnbaum_credits(
     page_number: str | int, sourcetexts_root: Path | None = None
-) -> Optional[list[str]]:
+) -> list[str] | None:
     """Return the credits of the given Birnbaum page, or None if it does not exist."""
     return _read_credits(birnbaum_siddur_credits_directory(sourcetexts_root), page_number, 3)
 
 
 def get_birnbaum_en_page(
     page_number: str | int, sourcetexts_root: Path | None = None
-) -> Optional[Page]:
+) -> Page | None:
     """Return the English Wikisource wikitext of the given scan page, or None.
 
     Only about a third of the book's pages exist on en.wikisource, so None here is the
@@ -265,14 +264,14 @@ def get_birnbaum_en_page(
 
 def get_birnbaum_en_credits(
     page_number: str | int, sourcetexts_root: Path | None = None
-) -> Optional[list[str]]:
+) -> list[str] | None:
     """Return the English Wikisource credits of the given scan page, or None."""
     return _read_credits(birnbaum_siddur_en_credits_directory(sourcetexts_root), page_number, 3)
 
 
 def get_birnbaum_ia_ocr(
     page_number: str | int, sourcetexts_root: Path | None = None
-) -> Optional[Page]:
+) -> Page | None:
     """Return the Internet Archive OCR of the given scan page, or None.
 
     Takes a scan page number, not an IA leaf number. On a Hebrew page the OCR

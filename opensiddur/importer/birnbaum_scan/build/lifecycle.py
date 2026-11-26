@@ -1,13 +1,14 @@
 """Journey, illness, burial, circumcision and redemption, IA n755–n776."""
 import re
-from .common import PRAYER, POEM, SIDDUR, PROJECT_HE, feature, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml
+
+from .common import POEM, PRAYER, PROJECT_HE, SIDDUR, feature, pb
+from .conclusion import BIBLE, text_xml, transclude
 from .festival import conditional
-from .tachanun_conditions import COMMON_OMISSIONS, TISHREI, date, holiday
-from .shacharit_end import editorial_head
+from .lifecycle_data import ROWS, RUBRICS
 from .milestones import marked
 from .notes_motzaei_shabbat import xml as note_xml
-from .lifecycle_data import ROWS, RUBRICS
+from .shacharit_end import editorial_head
+from .tachanun_conditions import COMMON_OMISSIONS, TISHREI, date, holiday
 
 ROOT = SIDDUR+'lifecycle'
 JOURNEY = SIDDUR+'tefillat_haderekh'

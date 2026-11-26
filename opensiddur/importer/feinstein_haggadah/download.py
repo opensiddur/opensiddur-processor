@@ -8,7 +8,7 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -180,7 +180,7 @@ def download_osp_compilation(
         "permalink": OSP_PERMALINK,
         "json_url": OSP_JSON_URL,
         "xml_url": OSP_XML_URL if xml_downloaded else None,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "files": files,
     }
     _write_manifest(manifest_path, manifest)
@@ -204,7 +204,7 @@ def download_hebrewbooks_pdf(
             "source": "hebrewbooks.org",
             "sefer_id": HEBREWBOOKS_SEFER_ID,
             "page_url": HEBREWBOOKS_PAGE_URL,
-            "downloaded_at": datetime.now(timezone.utc).isoformat(),
+            "downloaded_at": datetime.now(UTC).isoformat(),
             "pdf_downloaded": True,
             "files": [
                 {
@@ -260,7 +260,7 @@ def download_hebrewbooks_pdf(
             "source": "hebrewbooks.org",
             "sefer_id": HEBREWBOOKS_SEFER_ID,
             "page_url": HEBREWBOOKS_PAGE_URL,
-            "downloaded_at": datetime.now(timezone.utc).isoformat(),
+            "downloaded_at": datetime.now(UTC).isoformat(),
             "pdf_downloaded": False,
             "warning": "PDF not available; tei:pb alignment requires manual page_breaks.json",
         }
@@ -273,7 +273,7 @@ def download_hebrewbooks_pdf(
         "sefer_id": HEBREWBOOKS_SEFER_ID,
         "page_url": HEBREWBOOKS_PAGE_URL,
         "pdf_url": pdf_url,
-        "downloaded_at": datetime.now(timezone.utc).isoformat(),
+        "downloaded_at": datetime.now(UTC).isoformat(),
         "pdf_downloaded": True,
         "files": [
             {

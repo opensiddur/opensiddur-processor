@@ -1,14 +1,34 @@
 """Weekday Arvit, printed 189–220: service callers and reusable readings."""
 import re
-from .common import PRAYER, SIDDUR, PROJECT_HE, RECITATION, feature, cond, endcond, pb
-from .conclusion import (transclude, instruction, text_xml, URNS as CONCLUSION,
-                         MINYAN, ELUL_SEASON, SEASON_RUBRIC, MOURNING, MOURNING_RUBRIC)
-from .tachanun_conditions import date, DIASPORA
+
+from .arvit_data import (
+    AHAVAT,
+    BARUKH,
+    BARUKH_VERSES,
+    CHONANTANU,
+    EMET,
+    HASHKIVENU,
+    MAARIV,
+    OPENING_VERSES,
+    PSALM134,
+    VEHU,
+)
 from .avinu_malkenu import TEN_DAYS
+from .common import PRAYER, PROJECT_HE, RECITATION, SIDDUR, cond, endcond, feature, pb
+from .conclusion import (
+    ELUL_SEASON,
+    MINYAN,
+    MOURNING,
+    MOURNING_RUBRIC,
+    SEASON_RUBRIC,
+    instruction,
+    text_xml,
+    transclude,
+)
+from .conclusion import URNS as CONCLUSION
 from .milestones import marked
 from .shared_passages import split_paragraph
-from .arvit_data import (PSALM134, OPENING_VERSES, VEHU, MAARIV, AHAVAT, EMET,
-                         HASHKIVENU, BARUKH_VERSES, BARUKH, CHONANTANU)
+from .tachanun_conditions import DIASPORA, date
 
 ROOT = SIDDUR+'chol/arvit'
 BIBLE = 'urn:x-opensiddur:text:bible:'

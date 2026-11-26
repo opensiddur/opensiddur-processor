@@ -33,6 +33,7 @@ from opensiddur.importer.util.occasion import (
     none_of,
 )
 
+
 class ConditionalError(Exception):
     """A conditional in the table could not be placed in the source text."""
 

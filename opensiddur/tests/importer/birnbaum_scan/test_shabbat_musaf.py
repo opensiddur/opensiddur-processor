@@ -1,11 +1,18 @@
 """Musaf's calendar selection differs from the Sabbath Shacharit Amidah."""
 import unittest
 from collections import defaultdict
+
 from opensiddur.exporter.condition_eval import TriState
 from opensiddur.importer.birnbaum_scan.build.shabbat_musaf import (
-    OCCASION, RC, LEAP, ROOT, PROJECT_HE, units,
+    LEAP,
+    OCCASION,
+    PROJECT_HE,
+    RC,
+    ROOT,
+    units,
 )
-from .test_tachanun_conditions import evaluate, fragment, NS
+
+from .test_tachanun_conditions import NS, evaluate, fragment
 
 
 class TestShabbatMusaf(unittest.TestCase):

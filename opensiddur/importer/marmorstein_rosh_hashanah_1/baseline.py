@@ -1,7 +1,7 @@
 """A fixed acceptance gate for pre-existing literal witnesses and source fragments."""
-from copy import deepcopy
 import hashlib
 import json
+from copy import deepcopy
 
 UNIT_MAPPING_FIELDS = {'canonical_home', 'page_context', 'wording_selection'}
 SEGMENT_MAPPING_FIELDS = {'corresp', 'reference_unit', 'source', 'source_reference',
@@ -49,8 +49,12 @@ def validate_baseline(readings, baseline):
 
 def validate_redirection(readings, stem, identities):
     """Before redirecting accepted parts, reject controls that a new pointer would lose."""
-    from .realizations import (PLAIN_FRAGMENT_KEYS, PLAIN_SEGMENT_KEYS,
-                               OCCURRENCE_CONTROL_KEYS, validate_occurrence_controls)
+    from .realizations import (
+        OCCURRENCE_CONTROL_KEYS,
+        PLAIN_FRAGMENT_KEYS,
+        PLAIN_SEGMENT_KEYS,
+        validate_occurrence_controls,
+    )
     units = [u for u in readings['units'] if u['stem'] == stem]
     if len(units) != 1:
         raise ValueError('Redirection needs one existing source unit')

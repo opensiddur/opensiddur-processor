@@ -1,8 +1,8 @@
 """Reader contexts omit Elohai Netzor, retain the Temple prayer, and restore settings."""
-from copy import deepcopy
-from pathlib import Path
 import tempfile
 import unittest
+from copy import deepcopy
+from pathlib import Path
 from unittest.mock import patch
 
 from lxml import etree as E
@@ -11,12 +11,27 @@ from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
 from opensiddur.importer.birnbaum_scan.build import (
-    build_he, build_en, minchah, shabbat_amidah, shabbat_minchah,
-    shabbat_musaf, festival, festival_musaf, rosh_hodesh_musaf, rosh_hashanah,
+    build_en,
+    build_he,
+    festival,
+    festival_musaf,
+    minchah,
+    rosh_hashanah,
+    rosh_hodesh_musaf,
+    shabbat_amidah,
+    shabbat_minchah,
+    shabbat_musaf,
 )
-from opensiddur.importer.birnbaum_scan.build.common import PROJECT_HE, PROJECT_EN
+from opensiddur.importer.birnbaum_scan.build.common import PROJECT_EN, PROJECT_HE
 from opensiddur.importer.siddur_expanded.xml import (
-    Author, T, J, NS, XID, feature, parse_fragment, serialize,
+    NS,
+    XID,
+    Author,
+    J,
+    T,
+    feature,
+    parse_fragment,
+    serialize,
 )
 
 

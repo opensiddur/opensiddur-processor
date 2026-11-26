@@ -1,15 +1,16 @@
 """Regression coverage for independently optional source additions."""
 import copy
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.importer.marmorstein_rosh_hashanah_1 import build as b, PROJECTS
 from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
 from opensiddur.exporter.linear import LinearData
 from opensiddur.exporter.refdb import ReferenceDatabase
+from opensiddur.importer.marmorstein_rosh_hashanah_1 import PROJECTS
+from opensiddur.importer.marmorstein_rosh_hashanah_1 import build as b
 
 ROOT = 'urn:x-opensiddur:text:poem:hymn_of_divine_unity_for_the_fourth_day_paytan'
 OUTER = ROOT.replace(':text:', ':condition:')+'/additional_couplet'
@@ -216,7 +217,9 @@ class SourceEncodingTests(unittest.TestCase):
         self.assertEqual(self.words(result), 'גַּד: סוֹף')
 
     def test_quotation_cannot_discard_existing_semantics(self):
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.source_encoding import apply_source_encoding
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.source_encoding import (
+            apply_source_encoding,
+        )
         for problem in ('chapter', 'span', 'prefix'):
             with self.subTest(problem=problem):
                 root, body = b.document('he', PROJECTS['he'], 'QA', ROOT, draft=True)

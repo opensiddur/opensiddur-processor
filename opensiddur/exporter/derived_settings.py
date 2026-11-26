@@ -9,7 +9,6 @@ from typing import Any
 
 from pyluach import dates as pyluach_dates
 
-from opensiddur.exporter.client_settings import is_reader_supplied
 from opensiddur.exporter.calendar.compute import (
     FS_GREGORIAN,
     FS_HEBREW_DATE,
@@ -19,8 +18,12 @@ from opensiddur.exporter.calendar.compute import (
     SettingSnapshot,
     _effective_gregorian_date,
 )
+from opensiddur.exporter.client_settings import is_reader_supplied
 from opensiddur.exporter.conditional_settings import INIT_DECLARE_ID
-from opensiddur.exporter.derivation_graph import DerivationSpec, topological_derivation_order
+from opensiddur.exporter.derivation_graph import (
+    DerivationSpec,
+    topological_derivation_order,
+)
 from opensiddur.exporter.linear import (
     ConditionalSettingEntry,
     LinearData,

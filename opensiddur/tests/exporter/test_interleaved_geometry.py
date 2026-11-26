@@ -23,11 +23,11 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 
-from opensiddur.tests.exporter.stylesheet_helpers import transform
 from opensiddur.exporter.typography import TypographyConfig
+from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 # Hebrew long enough for three lines a block, English for five; fourteen blocks run to
 # several pages, so "restarts on every page" is more than one claim.
@@ -99,7 +99,7 @@ class Page:
         return rows
 
 
-@lru_cache(maxsize=None)
+@cache
 def _typeset(line_numbers: str = "primary", macros: str = "",
              single: bool = False) -> tuple[Page, ...]:
     settings = TypographyConfig.model_validate({

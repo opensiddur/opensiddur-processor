@@ -1,11 +1,15 @@
 """A source typo in one printing must not alter the default shared wording."""
-from copy import deepcopy
 import json
 import unittest
-from opensiddur.tests.importer import test_marmorstein_canonical_printings as cases
+from copy import deepcopy
+
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import PROJECTS
 from opensiddur.importer.marmorstein_rosh_hashanah_1 import realizations as r
-from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_corrections import bind_corrections, apply_bound_corrections
+from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_corrections import (
+    apply_bound_corrections,
+    bind_corrections,
+)
+from opensiddur.tests.importer import test_marmorstein_canonical_printings as cases
 
 
 def fixture():
@@ -104,7 +108,9 @@ class PrintingCorrectionTest(unittest.TestCase):
     def test_following_context_is_preserved_in_bound_correction_projection(self):
         data,_=fixture();identity=cases.P+'/literal';host=dict(stem='mixed',urn='urn:x-opensiddur:text:siddur:example/mixed',title={'en':'Mixed'},languages={'en':[dict(paragraph=1,corresp=identity,fragments=[dict(scan='s8',printed_page='3',text='this day.')])]})
         data['units'].append(host);item=dict(id='quote',file=PROJECTS['en']+'/mixed.xml',literal_provider=True,identity=identity,sic='.',corr='!.',follows='this day',attestations=[dict(unit='mixed',scan='s8')])
-        from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_corrections import corrected_text
+        from opensiddur.importer.marmorstein_rosh_hashanah_1.canonical_corrections import (
+            corrected_text,
+        )
         bindings=bind_corrections(data,[item]);self.assertEqual(corrected_text('this day.',bindings),'this day!.')
 
     def test_explicit_provider_whole_text_alias_still_requires_witness_and_rejects_raw_transclusion(self):

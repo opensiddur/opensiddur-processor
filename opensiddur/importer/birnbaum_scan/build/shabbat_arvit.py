@@ -1,13 +1,35 @@
 """Shabbat and festival Arvit, printed 257–284, ending after Adon Olam."""
 import re
-from .common import PRAYER, POEM, SIDDUR, PROJECT_HE, AGG, SERVICE, RECITATION, feature, cond, endcond, pb
-from .conclusion import BIBLE, instruction, transclude, text_xml, MINYAN, ELUL_SEASON, SEASON_RUBRIC, URNS as CONCLUSION
+
+from . import shabbat_arvit_data as data
+from .arvit import URNS as ARVIT
 from .avinu_malkenu import TEN_DAYS
-from .tachanun_conditions import holiday
+from .common import (
+    AGG,
+    POEM,
+    PRAYER,
+    PROJECT_HE,
+    RECITATION,
+    SERVICE,
+    SIDDUR,
+    cond,
+    endcond,
+    feature,
+    pb,
+)
+from .conclusion import (
+    BIBLE,
+    ELUL_SEASON,
+    MINYAN,
+    SEASON_RUBRIC,
+    instruction,
+    text_xml,
+    transclude,
+)
+from .conclusion import URNS as CONCLUSION
 from .milestones import marked
 from .shacharit_end import editorial_head
-from .arvit import URNS as ARVIT
-from . import shabbat_arvit_data as data
+from .tachanun_conditions import holiday
 
 ROOT = SIDDUR+'shabbat/arvit'
 SIGIL = '1949 shabbat/arvit'

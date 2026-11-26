@@ -1,6 +1,7 @@
 """All commentary read from printed 237–250, joining continued paragraphs."""
-from .common import SIDDUR, POEM
+from .common import POEM, SIDDUR
 from .notes_minchah import note
+
 B = 'urn:x-opensiddur:text:bible:psalms/'
 ROOT = SIDDUR+'shabbat/qabbalat_shabbat'
 DODI = POEM+'lekhah_dodi'

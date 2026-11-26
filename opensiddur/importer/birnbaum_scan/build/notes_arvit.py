@@ -1,5 +1,5 @@
 """Commentary and citations printed with Arvit, pages 189–220."""
-from .arvit import ROOT, URNS, ANCHORS
+from .arvit import ANCHORS, ROOT, URNS
 from .notes_minchah import note
 
 NOTES = [

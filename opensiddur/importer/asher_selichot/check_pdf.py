@@ -9,7 +9,9 @@ import subprocess
 import tempfile
 import unicodedata
 from pathlib import Path
+
 from lxml import etree
+
 from opensiddur.importer.scan.pdf_direction import base
 
 HEBREW_FRAGMENT = re.compile(r'[\u0590-\u05ff\ufb1d-\ufb4f·∙\s,.;:!?()\-]*[\u05d0-\u05ea\ufb1d-\ufb4f][\u0590-\u05ff\ufb1d-\ufb4f·∙\s,.;:!?()\-]*')

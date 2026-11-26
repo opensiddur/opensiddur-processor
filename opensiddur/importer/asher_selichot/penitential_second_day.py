@@ -1,18 +1,36 @@
 """The complete image-read second penitential day service, printed 104–115 (n209–n232)."""
-from opensiddur.importer.scan.authoring import printed_text
-
-from opensiddur.importer.scan.authoring import wrap_hebrew
-
 import copy
 import hashlib
 import json
 import re
 import unicodedata
 from collections import defaultdict
+
 from lxml import etree
-from .build import TEI, XML, PRAYER, document, element, pb, marker, choice, spelled_name, spelled_urn
-from .first_day import poetic_lines, words_with_notes, mixed_words, expansion_scope, append_words, verify_half_kaddish
-from .erev_rosh_hashanah import printed as ordinary_printed, targets
+
+from opensiddur.importer.scan.authoring import printed_text, wrap_hebrew
+
+from .build import (
+    PRAYER,
+    TEI,
+    XML,
+    choice,
+    document,
+    element,
+    marker,
+    pb,
+    spelled_name,
+    spelled_urn,
+)
+from .erev_rosh_hashanah import printed as ordinary_printed
+from .erev_rosh_hashanah import targets
+from .first_day import (
+    append_words,
+    expansion_scope,
+    poetic_lines,
+    verify_half_kaddish,
+    words_with_notes,
+)
 from .identities import project_name
 from .printings import is_declaration, printing
 
@@ -191,7 +209,7 @@ def verify_evidence(source,units):
 
 
 def verify_readings(source,project_directory):
-    from opensiddur.importer.scan.reverse import streams,check
+    from opensiddur.importer.scan.reverse import check, streams
     normalize=lambda s:' '.join(unicodedata.normalize('NFKD',s).split())
     manifest,units=readings(source);verify_evidence(source,units)
     for lang in ['he','en']:

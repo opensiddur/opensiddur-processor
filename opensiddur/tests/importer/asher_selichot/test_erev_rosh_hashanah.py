@@ -1,10 +1,12 @@
 """Erev-specific differences must survive the shared service assembly."""
 import unittest
 import unittest.mock
+
 from lxml import etree
+
 from opensiddur.importer.asher_selichot import erev_rosh_hashanah as erev
+from opensiddur.importer.asher_selichot.build import TEI, XML
 from opensiddur.importer.asher_selichot.first_day import poetic_lines
-from opensiddur.importer.asher_selichot.build import TEI,XML
 
 
 class ErevAssemblyTests(unittest.TestCase):
@@ -102,7 +104,9 @@ class ErevAssemblyTests(unittest.TestCase):
         self.assertEqual([n.text for n in root.findall('.//{'+TEI+'}abbr')],['ושוב','והשב','זכור וכו׳'])
 
     def test_reading_edit_invalidates_earlier_proofreading(self):
-        import hashlib,json,tempfile
+        import hashlib
+        import json
+        import tempfile
         from pathlib import Path
         with tempfile.TemporaryDirectory() as temp:
             source=Path(temp)/'scan_reading';work=source/'erev-rosh-hashanah';(work/'initial').mkdir(parents=True)
@@ -115,7 +119,8 @@ class ErevAssemblyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'Stale Erev proofreading'):erev.verify_evidence(source,[{'id':'poem'}])
 
     def test_omitted_unit_invalidates_proofreading_scope(self):
-        import json,tempfile
+        import json
+        import tempfile
         from pathlib import Path
         with tempfile.TemporaryDirectory() as temp:
             source=Path(temp)/'scan_reading';source.mkdir()

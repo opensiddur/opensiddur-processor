@@ -1,9 +1,8 @@
 import unittest
-from unittest.mock import patch, MagicMock
 
 from opensiddur.importer.jps1917.template_finder import (
+    extract_tags_from_wikitext,
     extract_templates_from_wikitext,
-    extract_tags_from_wikitext
 )
 
 

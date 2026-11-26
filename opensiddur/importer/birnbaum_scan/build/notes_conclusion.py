@@ -1,6 +1,7 @@
 """Printed notes on pages 128–152, excluding the Decalogue."""
 from .conclusion import PSALMS, SHIR_SHEL_YOM, URNS
 
+
 def make_notes(anchors):
     """Attach printed notes to the correspondences selected by the passage builder."""
     NOTES = []

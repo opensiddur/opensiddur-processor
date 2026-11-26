@@ -1,12 +1,13 @@
 """Exercise authoring algorithms with invented text, never edition readings."""
 import copy
-from pathlib import Path
-from tempfile import TemporaryDirectory
 import unicodedata
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import Mock
 
 from lxml import etree
+
 from opensiddur.importer.scan import authoring as a
 
 

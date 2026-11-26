@@ -1,11 +1,13 @@
 """Reverse-check documentary streams without any edition-dependent fixtures."""
-from contextlib import redirect_stdout
 import io
 import json
+import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
+
 from lxml import etree
+
 from opensiddur.importer.scan import reverse
 
 

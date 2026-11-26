@@ -6,6 +6,8 @@ from pathlib import Path
 
 from lxml import etree
 
+from opensiddur.common.versification import WLC_PROJECT
+from opensiddur.importer.feinstein_haggadah.convert import EN_PROJECT, HE_PROJECT
 from opensiddur.importer.feinstein_haggadah.page_breaks import find_break_offset
 from opensiddur.importer.feinstein_haggadah.sections import document_order_slugs
 from opensiddur.importer.feinstein_haggadah.tei_builder import verse_anchors
@@ -17,8 +19,6 @@ from opensiddur.importer.feinstein_haggadah.versify import (
     read_wlc_chapter,
     verse_offsets,
 )
-from opensiddur.common.versification import WLC_PROJECT
-from opensiddur.importer.feinstein_haggadah.convert import EN_PROJECT, HE_PROJECT
 from opensiddur.importer.util.hebrew import normalize_hebrew
 from opensiddur.tests.importer.feinstein_haggadah import support
 

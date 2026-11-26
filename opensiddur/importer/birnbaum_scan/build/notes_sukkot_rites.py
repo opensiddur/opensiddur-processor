@@ -1,7 +1,7 @@
 """All printed notes,675–708, with cross-page continuations joined once."""
-from .sukkot_rites import URNS, USHPIZIN, LULAV, HOSHANOT, GESHEM, HAKAFOT
-from .sukkot_rites_data import NOTES as READINGS
 from .notes_motzaei_shabbat import xml
+from .sukkot_rites import GESHEM, HAKAFOT, HOSHANOT, LULAV, URNS, USHPIZIN
+from .sukkot_rites_data import NOTES as READINGS
 
 TARGETS = {'אושפיזין':USHPIZIN,'נטילת לולב':LULAV,'הושענות':HOSHANOT,'processions':HOSHANOT,
  'למען אמתך':'hoshanot_hoshana_a','אבן שתיה':'hoshanot_hoshana_b','אם אני חומה':'hoshanot_hoshana_c',

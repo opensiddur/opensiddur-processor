@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+
 from opensiddur.tests.exporter.stylesheet_helpers import transform
 
 CONTENT = ('Then the congregation says the prayer on page 89. On Sabbath the scroll '

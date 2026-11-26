@@ -2,7 +2,8 @@
 
 import unittest
 from pathlib import Path
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import MagicMock, patch
+
 from lxml import etree
 
 from opensiddur.exporter.cache import XMLCache

@@ -14,7 +14,11 @@ from lxml import etree
 
 from opensiddur.exporter.calendar.compute import SettingSnapshot
 from opensiddur.exporter.compiler import CompilerProcessor
-from opensiddur.exporter.condition_eval import TriState, evaluate_condition, parse_condition_element
+from opensiddur.exporter.condition_eval import (
+    TriState,
+    evaluate_condition,
+    parse_condition_element,
+)
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.derived_settings import get_active_setting_entry
 from opensiddur.exporter.linear import TwilightValue, get_linear_data, reset_linear_data

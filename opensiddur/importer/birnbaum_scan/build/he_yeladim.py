@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of Shaḥarith li-Yladim, read off printed page 1.
 
 The whole section is one opening -- Hebrew on page 1, Birnbaum's English facing it on
@@ -24,9 +23,9 @@ Different words, so a different text and its own URN -- ``prayer:yeladim/elohai_
 """
 import functools
 
-from .milestones import marked
-from .common import PRAYER
 from . import common
+from .common import PRAYER
+from .milestones import marked
 
 #: Every page break in this module belongs to the children's printing.
 pb = functools.partial(common.pb, sigil=common.SIGIL_YELADIM)

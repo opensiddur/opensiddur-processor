@@ -23,8 +23,12 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from opensiddur.importer.sefaria.align import Pair
-from opensiddur.importer.sefaria.markup import EnglishKind, HebrewKind, plain_text, wholly
-
+from opensiddur.importer.sefaria.markup import (
+    EnglishKind,
+    HebrewKind,
+    plain_text,
+    wholly,
+)
 
 #: Responses the book prints as an unpointed label beside their English ("Amein."): words the
 #: congregation says inside the text, not a heading.

@@ -10,9 +10,13 @@ from __future__ import annotations
 import re
 from enum import StrEnum
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
-from opensiddur.exporter.settings import DEFAULT_LOGO, DistributionNotice, DistributionSettings
+from opensiddur.exporter.settings import (
+    DEFAULT_LOGO,
+    DistributionNotice,
+    DistributionSettings,
+)
 
 #: The Open Siddur Project's logo, carried with the exporter.
 OPEN_SIDDUR_LOGO = Path(__file__).parent / "assets" / "open-siddur-logo.png"
@@ -75,13 +79,13 @@ def notice_runs(text: str) -> list[tuple[RunKind, str]]:
     return merged
 
 
-def distribution_notice(distribution: DistributionSettings) -> Optional[DistributionNotice]:
+def distribution_notice(distribution: DistributionSettings) -> DistributionNotice | None:
     """The notice the book carries, or None if it carries none."""
     notice = distribution.notice
     return None if notice == "none" else notice
 
 
-def resolve_logo(notice: DistributionNotice, settings_file: Optional[Path]) -> Optional[Path]:
+def resolve_logo(notice: DistributionNotice, settings_file: Path | None) -> Path | None:
     """The notice's logo, as an absolute path; None if it has none.
 
     A path is relative to the settings file that names it (to the working directory when

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from opensiddur.exporter.calendar.avot import FS_AVOT, compute_avot
 from opensiddur.exporter.calendar.compute import (
     FS_DAY_OF_WEEK,
     FS_GREGORIAN,
@@ -16,8 +17,8 @@ from opensiddur.exporter.calendar.compute import (
     FS_LOCATION,
     FS_PURIM_OBSERVANCE,
     FS_QUORUM,
-    FS_RECITATION,
     FS_READING_CYCLE,
+    FS_RECITATION,
     FS_SERVICE_TIME,
     FS_TIME,
     FS_TORAH,
@@ -32,15 +33,16 @@ from opensiddur.exporter.calendar.compute import (
     compute_israel,
     compute_location,
     compute_quorum,
-    compute_recitation,
     compute_reading_cycle,
+    compute_recitation,
     compute_service_time,
     compute_torah_reading,
 )
-
-from opensiddur.exporter.calendar.avot import FS_AVOT, compute_avot
 from opensiddur.exporter.calendar.hallel import FS_HALLEL, compute_hallel
-from opensiddur.exporter.calendar.motzaei_shabbat import FS_MOTZAEI_SHABBAT, compute_motzaei_shabbat
+from opensiddur.exporter.calendar.motzaei_shabbat import (
+    FS_MOTZAEI_SHABBAT,
+    compute_motzaei_shabbat,
+)
 
 ComputeFn = Callable[[SettingSnapshot], dict[str, object] | None]
 

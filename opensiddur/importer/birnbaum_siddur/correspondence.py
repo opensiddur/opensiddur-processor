@@ -34,9 +34,10 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from opensiddur.importer.birnbaum_siddur.en_wikisource import (
     is_usable,
@@ -435,7 +436,7 @@ def build_correspondence(sourcetexts_root: Path | None = None) -> dict[str, Any]
             "text/, en/text/, ia/ocr/ and ia/derivatives/*_page_numbers.json. "
             "Derived: regenerate with birnbaum_siddur.correspondence rather than editing."
         ),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "ia_identifier": IA_IDENTIFIER,
         "leaf_offset": LEAF_OFFSET,
         "counts": counts,

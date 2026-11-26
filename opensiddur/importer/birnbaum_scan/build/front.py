@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The front matter of the 1949 print, leaves 1-25 of the scan.
 
 The words are not here. They are in ``sourcetexts``, under

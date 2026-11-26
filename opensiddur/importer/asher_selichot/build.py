@@ -4,18 +4,34 @@ Reads the committed scan reading, not OCR. Dependency ranges are authored from
 this edition, never substituted from another project's prayer text.
 """
 
-from opensiddur.importer.scan.authoring import element, marker, choice, italicize, conditional_scope, write_documents, apply_corrections, apply_editorial_notes
-
 import argparse
 import functools
 import json
 from pathlib import Path
-from lxml import etree
-from opensiddur.common.constants import SOURCETEXTS_ROOT, PROJECT_DIRECTORY
-from opensiddur.common.urn_registry import SCHEME
+
 import yaml
-from opensiddur.common.validate_names import URN_PATH, Spellings, load_spellings, respell
+from lxml import etree
+
+from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
+from opensiddur.common.urn_registry import SCHEME
+from opensiddur.common.validate_names import (
+    URN_PATH,
+    Spellings,
+    load_spellings,
+    respell,
+)
+from opensiddur.importer.scan.authoring import (
+    apply_corrections,
+    apply_editorial_notes,
+    choice,
+    conditional_scope,
+    element,
+    italicize,
+    marker,
+    write_documents,
+)
 from opensiddur.importer.util.validation import validate
+
 from .identities import project_name
 from .printings import unify
 
@@ -150,7 +166,8 @@ def build(source_root,project_directory):
             docs[name+'.xml']=dependency(lang,project,name,pages)
         for name,root in docs.items():
             documents.append((out/name, root))
-    from .first_day import documents as first_day_documents, OBSOLETE_ASSEMBLIES
+    from .first_day import OBSOLETE_ASSEMBLIES
+    from .first_day import documents as first_day_documents
     readings = Path(source_root)/'asher_selichot/scan_reading'
     authored = list(first_day_documents(readings))
     if (readings/'second-day.json').exists():
@@ -172,7 +189,8 @@ def build(source_root,project_directory):
     if (readings/'penitential-second-day.json').exists():
         from .penitential_second_day import documents as penitential_documents
         authored.extend(penitential_documents(readings))
-    from .penitential_days import SERVICES, manifest_name, documents as later_penitential_documents
+    from .penitential_days import SERVICES, manifest_name
+    from .penitential_days import documents as later_penitential_documents
     for day in SERVICES:
         if (readings/(manifest_name(day)+'.json')).exists():
             authored.extend(later_penitential_documents(readings,day))

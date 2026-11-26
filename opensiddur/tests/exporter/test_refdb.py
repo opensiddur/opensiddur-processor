@@ -1,19 +1,20 @@
 """Tests for the ReferenceDatabase class."""
 
-import unittest
+import os
 import sqlite3
 import tempfile
-from pathlib import Path
 import time
-import os
+import unittest
+from pathlib import Path
 from unittest import mock
+
 from lxml import etree
 from lxml.etree import ElementBase
+
 from opensiddur.exporter import refdb
 from opensiddur.exporter.refdb import (
-    ReferenceDatabase,
-    UrnMapping,
     Reference,
+    ReferenceDatabase,
     find_end_of_mapping,
 )
 

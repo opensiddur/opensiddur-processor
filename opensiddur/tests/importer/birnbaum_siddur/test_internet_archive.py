@@ -61,7 +61,7 @@ def build_searchtext():
 
 def build_scandata(leaves):
     pages = "".join(f'<page leafNum="{n}"/>' for n in range(leaves))
-    return f"<book><pageData>{pages}</pageData></book>".encode("utf-8")
+    return f"<book><pageData>{pages}</pageData></book>".encode()
 
 
 def build_page_numbers():

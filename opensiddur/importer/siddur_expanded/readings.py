@@ -5,14 +5,25 @@ weekly readings and supplemental scrolls occupy distinct slots; no runtime URN
 interpolation or copied Bible text is needed.
 """
 from dataclasses import dataclass, field
-from pathlib import Path
+
 from pyluach import parshios
+
 from opensiddur.importer.humash.aliyot import parse_readings
-from opensiddur.importer.humash.readings import festival_readings, haftarot, triennial, triennial_patterns
-from opensiddur.importer.humash.names import PARSHA_NAMES, PAIR_MEMBERS, PAIR_FOR_MEMBER, vocalized_name
-from opensiddur.importer.humash.refs import UNIT_ALIYAH, UNIT_WEEKDAY, UNIT_MAFTIR
-from opensiddur.importer.humash.festival_names import hebrew_name
 from opensiddur.importer.humash.build import DAY_MAFTIR_SUKKOT_DAY
+from opensiddur.importer.humash.festival_names import hebrew_name
+from opensiddur.importer.humash.names import (
+    PAIR_FOR_MEMBER,
+    PAIR_MEMBERS,
+    PARSHA_NAMES,
+)
+from opensiddur.importer.humash.readings import (
+    festival_readings,
+    haftarot,
+    triennial,
+    triennial_patterns,
+)
+from opensiddur.importer.humash.refs import UNIT_ALIYAH, UNIT_MAFTIR, UNIT_WEEKDAY
+
 from .xml import *
 
 SHABBAT=aggregate('shabbat'); YT=aggregate('yom-tov'); CH=aggregate('chol-hamoed')

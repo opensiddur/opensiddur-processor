@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Hebrew of Mah Tovu and Seder Atifath Tallith, read off printed pages 3 and 5.
 
 The first sub-unit of Birkhoth ha-Shaḥar. Printed page 3 opens the section under its own
@@ -19,9 +18,9 @@ ran several texts together on both sides, here it runs them together on one side
 """
 import functools
 
-from .milestones import marked
-from .common import PRAYER
 from . import common
+from .common import PRAYER
+from .milestones import marked
 
 #: Every page break in this module belongs to Birkhoth ha-Shaḥar.
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)

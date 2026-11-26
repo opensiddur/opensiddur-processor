@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the envelope the hand-authored Birnbaum TEI is written into.
 
 What is checked here is the scaffolding: that a header is well-formed, that a
@@ -12,8 +11,8 @@ list is used at all, it is a synthetic one.
 import re
 import unittest
 from pathlib import Path
-from unittest import mock
 from tempfile import TemporaryDirectory
+from unittest import mock
 
 from lxml import etree
 
@@ -82,7 +81,9 @@ class TestLeafMappingAgainstTheData(unittest.TestCase):
                 if str(printed) not in self.table:
                     # Older pinned sourcetexts lacks these three metadata entries;
                     # the correspondence importer now fills them from the scan.
-                    from opensiddur.importer.birnbaum_siddur.correspondence import DIRECT_SCAN_NUMBERS
+                    from opensiddur.importer.birnbaum_siddur.correspondence import (
+                        DIRECT_SCAN_NUMBERS,
+                    )
                     self.assertEqual(DIRECT_SCAN_NUMBERS.get(scan_page), str(printed))
                     self.assertEqual(common.leaf(printed), scan_page - 1)
                     continue
@@ -332,7 +333,7 @@ class TestTheTallithSubUnit(unittest.TestCase):
     """
 
     def setUp(self):
-        from opensiddur.importer.birnbaum_scan.build import he_tallith, en_tallith
+        from opensiddur.importer.birnbaum_scan.build import en_tallith, he_tallith
         self.he = {p["name"]: p for p in he_tallith.PRAYERS}
         self.en = {p["name"]: p for p in en_tallith.PRAYERS}
 
@@ -375,7 +376,7 @@ class TestThePoems(unittest.TestCase):
     """
 
     def setUp(self):
-        from opensiddur.importer.birnbaum_scan.build import he_poems, en_poems
+        from opensiddur.importer.birnbaum_scan.build import en_poems, he_poems
         self.he = {p["name"]: p for p in he_poems.PRAYERS}
         self.en = {p["name"]: p for p in en_poems.PRAYERS}
 
@@ -424,7 +425,7 @@ class TestUnitsHoldOnlyTheirOwnTexts(unittest.TestCase):
     """
 
     def setUp(self):
-        from opensiddur.importer.birnbaum_scan.build import build_he, build_en
+        from opensiddur.importer.birnbaum_scan.build import build_en, build_he
         self.build_he, self.build_en = build_he, build_en
 
     def _unit_targets(self, build, project, pages):

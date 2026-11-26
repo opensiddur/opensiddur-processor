@@ -4,7 +4,11 @@ from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.importer.sefaria.conditions import ConditionsError, condition_xml, load_conditions
+from opensiddur.importer.sefaria.conditions import (
+    ConditionsError,
+    condition_xml,
+    load_conditions,
+)
 from opensiddur.importer.util.incipit import words
 
 NS = {"tei": "http://www.tei-c.org/ns/1.0", "j": "http://jewishliturgy.org/ns/jlptei/2"}

@@ -5,10 +5,10 @@ from pathlib import Path
 
 from lxml import etree
 
-from opensiddur.importer.birnbaum_scan.build.milestones import Correspondences, marked
 from opensiddur.exporter.inline_compiler import InlineCompilerProcessor
 from opensiddur.exporter.linear import LinearData
 from opensiddur.exporter.refdb import ReferenceDatabase, find_end_of_mapping
+from opensiddur.importer.birnbaum_scan.build.milestones import Correspondences, marked
 
 BIBLE = 'urn:x-opensiddur:text:bible:psalms/1/'
 PRAYER = 'urn:x-opensiddur:text:siddur:test/'

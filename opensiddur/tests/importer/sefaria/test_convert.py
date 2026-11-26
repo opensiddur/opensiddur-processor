@@ -6,10 +6,22 @@ from pathlib import Path
 from lxml import etree
 
 from opensiddur.common.validate_names import Spellings
-from opensiddur.importer.sefaria.convert import ConvertError, convert_work, load_structure
+from opensiddur.importer.sefaria.convert import (
+    ConvertError,
+    convert_work,
+    load_structure,
+)
 from opensiddur.importer.util.incipit import IncipitIndex, words
 
-from .support import BLESSINGS, MORNING, STRUCTURE, WORK, make_source, write_structure, write_work_dir
+from .support import (
+    BLESSINGS,
+    MORNING,
+    STRUCTURE,
+    WORK,
+    make_source,
+    write_structure,
+    write_work_dir,
+)
 
 T = "urn:x-opensiddur:text:"
 NS = {"tei": "http://www.tei-c.org/ns/1.0", "j": "http://jewishliturgy.org/ns/jlptei/2"}

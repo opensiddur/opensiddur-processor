@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Birnbaum's English for Mah Tovu and the tallith order, from printed pages 4 and 6.
 
 Same URNs as the Hebrew, which is what aligns them. The one place the two sides are
@@ -11,8 +10,8 @@ milestone ranges inside one; both sides use the same milestone units.
 """
 import functools
 
-from .common import PRAYER
 from . import common
+from .common import PRAYER
 
 pb = functools.partial(common.pb, sigil=common.SIGIL_BIRCHOT)
 

@@ -40,8 +40,16 @@ from opensiddur.importer.opensiddur_org.contributors import (
     unregistered,
 )
 from opensiddur.importer.opensiddur_org.download import MANIFEST_NAME, load_manifest
-from opensiddur.importer.opensiddur_org.licences import LicenceDecision, LicenceDecisions, load_decisions
-from opensiddur.importer.opensiddur_org.naming import Candidate, assign_project_ids, imported_projects
+from opensiddur.importer.opensiddur_org.licences import (
+    LicenceDecision,
+    LicenceDecisions,
+    load_decisions,
+)
+from opensiddur.importer.opensiddur_org.naming import (
+    Candidate,
+    assign_project_ids,
+    imported_projects,
+)
 from opensiddur.importer.opensiddur_org.parse_post import Column, Post, load_post
 from opensiddur.importer.opensiddur_org.scope import (
     content_scope,

@@ -2,12 +2,22 @@
 import re
 from html import escape
 
-from .common import (PRAYER, SIDDUR, PROJECT_HE, QUORUM, PERSON, AGG,
-                     cond, endcond, feature, pb)
-from .tachanun_conditions import MON_THU, holiday, occasion
 from .avinu_malkenu import FAST
-from .torah_data import PASSAGES
+from .common import (
+    AGG,
+    PERSON,
+    PRAYER,
+    PROJECT_HE,
+    QUORUM,
+    SIDDUR,
+    cond,
+    endcond,
+    feature,
+    pb,
+)
 from .milestones import Correspondences
+from .tachanun_conditions import MON_THU, holiday, occasion
+from .torah_data import PASSAGES
 
 ROOT = SIDDUR + 'chol/shacharit/torah'
 BIBLE = 'urn:x-opensiddur:text:bible:'

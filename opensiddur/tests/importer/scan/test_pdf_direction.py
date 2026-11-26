@@ -1,11 +1,13 @@
 """Direction must follow glyph coordinates, not extractor ordering."""
-from contextlib import redirect_stdout
 import io
+import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
 from unittest.mock import patch
+
 from lxml import etree
+
 from opensiddur.importer.scan import pdf_direction as d
 
 

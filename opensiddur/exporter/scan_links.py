@@ -49,7 +49,12 @@ from dataclasses import dataclass
 
 from lxml import etree
 
-from opensiddur.exporter.constants import JLPTEI_NAMESPACE, PROCESSING_NAMESPACE, TEI_NS, XML_NS
+from opensiddur.exporter.constants import (
+    JLPTEI_NAMESPACE,
+    PROCESSING_NAMESPACE,
+    TEI_NS,
+    XML_NS,
+)
 
 #: Set on each page break that links to its scan.
 SCAN_LINK = f"{{{PROCESSING_NAMESPACE}}}scan-link"

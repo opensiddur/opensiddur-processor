@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
 """Weekday opening and verses of praise, printed 50–58, ending before Ashrei.
 The new biblical passages are built by pesukei_passages; the preceding opening
 remains separate from the wrapper that begins at Hareni mezamen.
 """
 import functools
+
 from . import common
 from .common import PRAYER
 from .he_prayers import d
+
 pb = functools.partial(common.pb, sigil=common.SIGIL_PESUKEI)
 U = PRAYER
 PRAYERS = []
@@ -77,7 +78,9 @@ prayer('barukh_sheamar', 'Blessed be he who spoke', 'pesuqei_dezimrah/barukh_she
 
 # Continuing the scan through the paragraph before Ashrei.
 from .pesukei_passages import prayers
+
 PRAYERS += prayers("en")
 
 from .pesukei_completion import prayers as completion_prayers
+
 PRAYERS += completion_prayers("en")

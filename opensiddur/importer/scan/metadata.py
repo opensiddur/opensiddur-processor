@@ -1,5 +1,6 @@
 """Derive scan identities, retaining machine labels separately from image evidence."""
 from lxml import etree
+
 from opensiddur.importer.util.internet_archive import page_image_url
 
 

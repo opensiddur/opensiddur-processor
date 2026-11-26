@@ -1,7 +1,5 @@
 """Measure the bilingual fast services against their independently recorded scan readings."""
 
-from opensiddur.importer.scan import pdf as measurements
-
 import argparse
 import copy
 import json
@@ -9,10 +7,13 @@ import re
 import subprocess
 import tempfile
 from pathlib import Path
-from .check_pdf import MAX_BASELINE_DIFFERENCE, plain, load_glyphs
-from .check_first_day_pdf import latin_note_runs
-from opensiddur.importer.scan.pdf_direction import base
+
 from opensiddur.common.constants import SOURCETEXTS_ROOT
+from opensiddur.importer.scan import pdf as measurements
+from opensiddur.importer.scan.pdf_direction import base
+
+from .check_first_day_pdf import latin_note_runs
+from .check_pdf import MAX_BASELINE_DIFFERENCE, load_glyphs, plain
 
 
 def check(tree, day, source_root=SOURCETEXTS_ROOT, expanded=False):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Emit `build/he_korbanot.py`, lifting its text from the readings rather than retyping it.
 
 This is kept because the module it writes is 340 lines of pointed Hebrew and **typing that
@@ -19,7 +18,8 @@ then check it with `reverse`, which is the thing that actually proves it:
     uv run python -m opensiddur.importer.birnbaum_scan.reverse 27 29 31 33 35 37 39 \\
         --readings <sourcetexts>/.../scan_reading/hebrew --module he_qorbanot
 """
-import pathlib, textwrap
+import pathlib
+import textwrap
 
 ST = pathlib.Path("/home/efeins/src/opensiddur-repos/sourcetexts/feat_birnbaum-birchot-hashachar/sources/birnbaum_siddur/scan_reading")
 PAGES = {p: (ST / "hebrew" / f"{p}.txt").read_text(encoding="utf-8").strip().split("\n\n")
@@ -52,7 +52,7 @@ def literal(text, first_prefix="", indent=9):
 def spanning(pieces, indent=9):
     """One paragraph assembled across page turns: [(text, pb_or_None), ...]."""
     out = []
-    for n, (text, brk) in enumerate(pieces):
+    for _n, (text, brk) in enumerate(pieces):
         out.append(literal(text, first_prefix=brk or "", indent=indent))
     return "\n".join(out)
 

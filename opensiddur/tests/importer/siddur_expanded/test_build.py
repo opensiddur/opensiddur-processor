@@ -1,8 +1,8 @@
 """Exercise the generated service spine against small synthetic source editions."""
-from pathlib import Path
-from itertools import count
 import tempfile
 import unittest
+from itertools import count
+from pathlib import Path
 from unittest.mock import patch
 
 from lxml import etree as E
@@ -10,11 +10,21 @@ from lxml import etree as E
 from opensiddur.exporter.compiler import CompilerProcessor
 from opensiddur.exporter.conditional_settings import yaml_to_declaration_entries
 from opensiddur.exporter.linear import get_linear_data, reset_linear_data
-from opensiddur.importer.humash.refs import ReadingSpan, VerseRef, UNIT_ALIYAH
+from opensiddur.importer.humash.refs import UNIT_ALIYAH, ReadingSpan, VerseRef
 from opensiddur.importer.siddur_expanded import build as edition
-from opensiddur.importer.siddur_expanded.readings import Entry, SHABBAT, FAST
+from opensiddur.importer.siddur_expanded.readings import FAST, SHABBAT, Entry
 from opensiddur.importer.siddur_expanded.xml import (
-    T, J, NS, TEXT, ROOT, XID, PROJECT, Author, feature, transclude, parse_fragment,
+    NS,
+    PROJECT,
+    ROOT,
+    TEXT,
+    XID,
+    Author,
+    J,
+    T,
+    feature,
+    parse_fragment,
+    transclude,
 )
 
 

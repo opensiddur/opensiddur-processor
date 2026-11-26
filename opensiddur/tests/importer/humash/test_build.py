@@ -11,7 +11,6 @@ from pathlib import Path
 from lxml import etree
 
 from opensiddur.importer.humash import build, names
-from opensiddur.importer.util.hebrew import normalize_hebrew
 from opensiddur.importer.humash.aliyot import CombinedParsha, Parsha
 from opensiddur.importer.humash.readings import Passage
 from opensiddur.importer.humash.refs import (
@@ -19,12 +18,12 @@ from opensiddur.importer.humash.refs import (
     UNIT_ALIYAH_COMBINED,
     UNIT_MAFTIR,
     UNIT_PARSHA,
-    UNIT_PARSHA_COMBINED,
     VARIATION_COMBINED,
     ReadingSpan,
     VerseRef,
     triennial_unit,
 )
+from opensiddur.importer.util.hebrew import normalize_hebrew
 
 TEI = "{http://www.tei-c.org/ns/1.0}"
 J = "{http://jewishliturgy.org/ns/jlptei/2}"
@@ -668,7 +667,9 @@ class TestDayMaftirCondition(unittest.TestCase):
 
     def _kept(self, israel: bool | None, sukkot: int | None) -> list[int]:
         from opensiddur.exporter.condition_eval import (
-            TriState, evaluate_condition, parse_condition_element,
+            TriState,
+            evaluate_condition,
+            parse_condition_element,
         )
 
         kept = []
@@ -713,7 +714,11 @@ class TestDayMaftirCondition(unittest.TestCase):
     def _kept_on(self, year: int, month: int, day: int, place: tuple | None) -> list[int]:
         """The maftirs kept for a declared date and place, through the calendar derivation."""
         from opensiddur.exporter.calendar.compute import (
-            FS_GREGORIAN, FS_LOCATION, SettingSnapshot, compute_holiday, compute_israel,
+            FS_GREGORIAN,
+            FS_LOCATION,
+            SettingSnapshot,
+            compute_holiday,
+            compute_israel,
         )
 
         declared = {(FS_GREGORIAN, "year"): year, (FS_GREGORIAN, "month"): month,
@@ -988,7 +993,8 @@ class TestVocalizedNames(unittest.TestCase):
 
     def test_every_pointed_book_name_has_the_same_consonants_as_the_table(self):
         from opensiddur.importer.humash.refs import (
-            SLUG_TO_HEBREW_BOOK, SLUG_TO_VOCALIZED_BOOK,
+            SLUG_TO_HEBREW_BOOK,
+            SLUG_TO_VOCALIZED_BOOK,
         )
         for slug, pointed in SLUG_TO_VOCALIZED_BOOK.items():
             with self.subTest(slug=slug):
@@ -998,7 +1004,8 @@ class TestVocalizedNames(unittest.TestCase):
 
     def test_every_book_is_pointed(self):
         from opensiddur.importer.humash.refs import (
-            SLUG_TO_HEBREW_BOOK, SLUG_TO_VOCALIZED_BOOK,
+            SLUG_TO_HEBREW_BOOK,
+            SLUG_TO_VOCALIZED_BOOK,
         )
         self.assertEqual(set(SLUG_TO_VOCALIZED_BOOK), set(SLUG_TO_HEBREW_BOOK))
 

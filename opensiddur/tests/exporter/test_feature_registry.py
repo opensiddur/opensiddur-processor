@@ -12,7 +12,6 @@ import unittest.mock
 from datetime import date, timedelta
 from pathlib import Path
 
-import yaml
 from lxml import etree
 from pydantic import ValidationError
 
@@ -38,8 +37,15 @@ from opensiddur.exporter.calendar.compute import (
 from opensiddur.exporter.client_settings import CALENDAR_FS_TYPES
 from opensiddur.exporter.condition_eval import parse_condition_element
 from opensiddur.exporter.conditional_settings import parse_declare_element
-from opensiddur.exporter.derivation_graph import DERIVED_FS_TYPES, topological_derivation_order
-from opensiddur.exporter.derived_settings import FS_OVERRIDE, OVERRIDE_FEATURES, STATIC_DEFAULTS
+from opensiddur.exporter.derivation_graph import (
+    DERIVED_FS_TYPES,
+    topological_derivation_order,
+)
+from opensiddur.exporter.derived_settings import (
+    FS_OVERRIDE,
+    OVERRIDE_FEATURES,
+    STATIC_DEFAULTS,
+)
 from opensiddur.exporter.feature_registry import (
     check_fs_element,
     check_yaml_value,

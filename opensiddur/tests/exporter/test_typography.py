@@ -15,7 +15,9 @@ from unittest.mock import patch
 from pydantic import ValidationError
 
 from opensiddur.exporter import typography as typography_module
+from opensiddur.exporter.tex.running_heads import default_page_header
 from opensiddur.exporter.typography import (
+    RESOLVE_FONTS,
     Alignment,
     BaseFontSize,
     ConditionalBlock,
@@ -29,14 +31,12 @@ from opensiddur.exporter.typography import (
     NotePlacement,
     PaperType,
     ParallelLayout,
-    RESOLVE_FONTS,
     Sides,
     TextStyle,
     TypographyConfig,
     Visibility,
     resolve_font,
 )
-from opensiddur.exporter.tex.running_heads import default_page_header
 
 
 def _validate(data: dict) -> TypographyConfig:

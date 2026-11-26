@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The project index: the book's running order, and its front matter.
 
 One function for both projects. The English index used to be derived from the Hebrew one
