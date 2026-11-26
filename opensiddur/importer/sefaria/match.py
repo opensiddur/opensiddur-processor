@@ -1762,10 +1762,12 @@ class _Decider:
 
 
 def verse_length(urn: str, index: IncipitIndex) -> int | None:
-    """A verse's length in words, when the index holds it whole (shorter than its collected
-    opening)."""
+    """A verse's length in words: as a Bible holds it, or when the index holds it whole (shorter
+    than its collected opening)."""
     if urn not in index.incipit_of:
         return None
+    if urn in index.verse_length_of:
+        return index.verse_length_of[urn]
     opening = index.own_opening(urn)
     return len(opening) if len(opening) < COLLECTED_WORDS else None
 

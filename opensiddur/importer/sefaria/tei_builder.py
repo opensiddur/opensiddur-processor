@@ -259,7 +259,7 @@ VERSE_END = '<tei:milestone unit="verse"/>'
 _XML_PIECE = re.compile(r"<[^>]*>|&[^;]*;|[^<&]", re.DOTALL)
 #: The punctuation an English verse milestone is set after, strongest first: a sentence's end,
 #: then a clause's.
-_SENTENCE_ENDS, _CLAUSE_ENDS = ".;:!?", ","
+_SENTENCE_ENDS, _CLAUSE_ENDS = ".;:!?", ",—"
 #: How far (as a share of the phrase) an English cut moves to stand after a sentence's end rather
 #: than a clause's, or after a clause's rather than between two words.
 _CLAUSE_PENALTY, _WORD_PENALTY = 0.05, 0.15
@@ -383,7 +383,7 @@ def _insert_cuts(xml: str, cuts: list[tuple[int, int, str]], lang: str,
             target = en_start + (before - he_start) / max(1, he_end - he_start) * (en_end - en_start)
             inside = [i for i in candidates if en_start <= starts[i][0] <= en_end] or candidates
             best = min(inside, key=lambda i: abs(starts[i][0] - target) / max(1, en_end - en_start)
-                       + (0.0 if starts[i][0] == en_start else penalty[starts[i][2]]))
+                       + penalty[starts[i][2]])
         else:
             share = before / max(1, total)
             best = min(candidates, key=lambda i: abs(starts[i][0] / max(1, length) - share) + penalty[starts[i][2]])
@@ -489,6 +489,9 @@ class _TextWriter:
         #: an inline alternative that ended the last phrase, and replaces words the next opens
         #: with: (its condition's XML, the replacement)
         self.pending: tuple[str, Any] | None = None
+        #: where in ``parts`` the last phrase's words begin
+        self.last_phrase_at: int | None = None
+        self.last_phrase_words: list[str] = []  # the Hebrew words of that phrase, in either language
 
     def next_id(self, kind: str) -> str:
         if kind == "inline":
@@ -504,16 +507,19 @@ class _TextWriter:
             return self.calendars[-1]
         return None
 
-    def open_calendar(self, pair: Pair, when, through: tuple[str, ...] = ()) -> None:
+    def open_calendar(self, pair: Pair, when, through: tuple[str, ...] = (),
+                      otherwise: tuple[int, int, str, Any, str] | None = None, source: str = "") -> None:
         self.close_calendar()
         xml_id = self.next_id("when")
         # The rubric is the conditional's note: in Hebrew, its label (<small>בשבועות:</small>).
         note = rubric_note(pair, self.lang, self.notes)
         self.parts.append(conditional_open(xml_id, note, condition_xml(when)))
         # [id, depth, parenthesized, to close, the words that end it, the words so far,
-        #  the paragraph a paragraph's label governs: the first after it, "next" until known]
+        #  the paragraph a paragraph's label governs: the first after it, "next" until known,
+        #  the phrase before said instead of the passage, if it ends alike (``_said_otherwise``),
+        #  where the passage begins and the editorial note of its source]
         self.calendars.append([xml_id, len(self.open_variants), None, False, through, [],
-                               "next" if pair.paragraph_label else None])
+                               "next" if pair.paragraph_label else None, otherwise, (len(self.parts), source)])
 
     def close_calendar(self, *, everything: bool = False) -> None:
         """Close the condition rubric's conditional opened at this level (or, with
@@ -523,7 +529,7 @@ class _TextWriter:
         while self.calendars and (everything or self.calendars[-1][1] >= depth):
             self.end_phrase()
             self.verse(None)
-            self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
+            self._end_calendar()
         if self.calendars and not everything:
             self.calendars[-1][3] = True  # an outer one: to close when its level is reached
 
@@ -541,7 +547,8 @@ class _TextWriter:
             self.parts.append(VERSE_END)
             self.verse_open = False
 
-    def phrase(self, pair: Pair, number: int, cuts: list[tuple[int, int, str]] | None = None) -> None:
+    def phrase(self, pair: Pair, number: int, cuts: list[tuple[int, int, str]] | None = None,
+               verse_open: bool | None = None) -> None:
         # The Hebrew makes the phrase, so both languages mark it, the English even where it
         # leaves the phrase untranslated: the row is then set with an empty English cell,
         # rather than the Hebrew running on into the row before.
@@ -586,15 +593,20 @@ class _TextWriter:
                          cuts=cuts)
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
+        self.last_phrase_at = len(self.parts)
+        self.last_phrase_words = words(hebrew)
         self.parts.append(xml)
+        if verse_open is not None:
+            # the verse state after the phrase's own cuts, before anything after it closes a verse
+            self.verse_open = verse_open
         self.phrase_open = True
         if xml_id is not None:
             self.end_phrase()
             self.parts.append(f'<j:endConditional target="#{xml_id}"/>')
-        if current is not None and current[4]:
+        if current is not None:
             current[5].extend(words(hebrew))
-            if tuple(current[5][-len(current[4]):]) == current[4]:
-                self.close_calendar()
+        if current is not None and current[4] and tuple(current[5][-len(current[4]):]) == current[4]:
+            self.close_calendar()
         elif current is not None and current[2] and ")" in hebrew:
             self.close_calendar()
         elif self.calendars and self.calendars[-1][2] and ")" in hebrew:
@@ -602,14 +614,21 @@ class _TextWriter:
 
     def inline_conditions(self, xml: str) -> str:
         """A phrase's parenthesized alternatives that open with an abbreviation the table knows
-        (``(בעשי"ת הַשָּׁלוֹם)``): each a marked conditional, its abbreviation the note, and the
-        words it replaces, where it replaces some, conditional on the opposite."""
+        (``(בעשי"ת הַשָּׁלוֹם)``), or that the table's replacements give a condition for: each a marked
+        conditional, its abbreviation (if any) the note, and the words it replaces, where it replaces
+        some, conditional on the opposite."""
         def wrap(match: re.Match[str]) -> str:
             inner_xml = match.group(1)
             inner = html.unescape(re.sub(r"<[^>]*>", "", inner_xml))
             found = self.table.for_inline(inner)
             if found is None:
-                return match.group(0)
+                # An alternative in parentheses with no abbreviation, whose condition the table gives.
+                replacement = self.table.replaced(inner)
+                if replacement is None or replacement.when is None:
+                    return match.group(0)
+                xml_id = self.next_id("inline")
+                return (f'<j:conditional xml:id="{xml_id}" type="marked">{condition_xml(replacement.when)}'
+                        f'</j:conditional>{inner_xml}<j:endConditional target="#{xml_id}"/>')
             tokens = inner.split()
             label = " ".join(tokens[:len(found.label)]).rstrip(":")
             # The alternative's own markup, without the label (which may be set in small type).
@@ -623,7 +642,13 @@ class _TextWriter:
                     f'{alternative}<j:endConditional target="#{xml_id}"/>')
 
         saved = self.inline
-        out = re.sub(r"\(((?:[^()<]|<[^>]*>)*)\)", wrap, xml)
+        # (a parenthesis set wholly in small type is read as one in parentheses)
+        xml_in = re.sub(r'<tei:hi rend="small">\(([^()<]*)\)</tei:hi>',
+                        lambda m: m.group(0) if getattr(self.table.replaced(html.unescape(m.group(1))), "when", None) is None
+                        else f'(<tei:hi rend="small">{m.group(1)}</tei:hi>)', xml)
+        out = re.sub(r"\(((?:[^()<]|<[^>]*>)*)\)", wrap, xml_in)
+        if out == xml_in:
+            out = xml
         for replacement in self.table.replacements:
             while True:
                 again = self._replace(out, replacement)
@@ -635,7 +660,27 @@ class _TextWriter:
             self.inline = saved
             return xml
         self.pending = self._unreplaced_at_end(out)
-        return out
+        return self._sources(out)
+
+    def _sources(self, xml: str) -> str:
+        """An editorial note of the source of each inline alternative whose replacement names one,
+        inside its conditional, and of the words it replaces, inside theirs (the negated
+        conditional nearest it)."""
+        inserts: list[tuple[int, str]] = []
+        negated = [m for m in re.finditer(r'<j:conditional xml:id="inline_\d+"><j:none>.*?</j:none></j:conditional>', xml)]
+        for match in _INLINE.finditer(xml):
+            alternative = tuple(words(html.unescape(re.sub(r"<[^>]*>", "", match.group(3)))))
+            replacement = next((r for r in self.table.replacements if r.alternative == alternative), None)
+            if replacement is None:
+                continue
+            if replacement.source:
+                inserts.append((match.end(1), editorial_note(replacement.source)))
+            if replacement.replaces_source and negated:
+                nearest = min(negated, key=lambda m: min(abs(m.start() - match.end()), abs(match.start() - m.end())))
+                inserts.append((nearest.end(), editorial_note(replacement.replaces_source)))
+        for at, note in sorted(inserts, reverse=True):
+            xml = xml[:at] + note + xml[at:]
+        return xml
 
     def _unreplaced_at_end(self, xml: str) -> tuple[str, Any] | None:
         """The inline alternative the phrase ends with, when it replaces words and none beside it
@@ -651,7 +696,7 @@ class _TextWriter:
         replacement = self.table.replaced(html.unescape(re.sub(r"<[^>]*>", "", last.group(3))))
         if replacement is None:
             return None
-        when = re.search(r"</tei:note>(.*)</j:conditional>$", last.group(1)).group(1)
+        when = _inline_when(last.group(1))
         return when, replacement
 
     def _carried(self, xml: str) -> str:
@@ -680,7 +725,7 @@ class _TextWriter:
             alternative = html.unescape(re.sub(r"<[^>]*>", "", match.group(3)))
             if tuple(words(alternative)) != replacement.alternative:
                 continue
-            when = re.search(r"</tei:note>(.*)</j:conditional>$", match.group(1)).group(1)
+            when = _inline_when(match.group(1))
             after = re.match(r"\s*([^<]*)", xml[match.end():])
             taken = _leading_words(after.group(1), replacement.replaces)
             if taken is not None:
@@ -699,10 +744,11 @@ class _TextWriter:
                 f'{words_xml}<j:endConditional target="#{xml_id}"/>')
 
     def rubric(self, pair: Pair) -> None:
-        # A rubric is not the phrase before it, nor scripture. The scopes are closed in both
-        # languages, whichever the rubric is printed in, so that the two divide alike.
+        # A rubric is not the phrase before it. The phrase is closed in both languages, whichever
+        # the rubric is printed in, so that the two divide alike; a verse is not: the verses and
+        # the book's directions are hierarchies of their own (Psalm 148:13 runs on through the
+        # congregation's הודו על ארץ ושמים), and a verse ends by its length or sof pasuq.
         self.end_phrase()
-        self.verse(None)
         found = rubric_condition(self.table, pair)
         current = self.calendar
         if found is None and current is not None and current[2] is None:
@@ -715,11 +761,44 @@ class _TextWriter:
         self.close_calendar()
         self.pending = None
         if found is not None:
-            self.open_calendar(pair, found.when, getattr(found, "through", ()))
+            otherwise = None
+            at = self.last_phrase_at
+            if getattr(found, "instead_of_previous", False) and at is not None and all(
+                    part in (PHRASE_END, VERSE_END) for part in self.parts[at + 1:]):
+                # (the Hebrew phrase's words: an English phrase is compared by the Hebrew it translates)
+                if last := self.last_phrase_words:
+                    otherwise = (at, len(self.parts), last[-1], found.when, getattr(found, "otherwise_source", ""))
+            self.open_calendar(pair, found.when, getattr(found, "through", ()), otherwise,
+                               getattr(found, "source", ""))
             return
         xml = rubric_xml(pair, self.lang, self.notes)
         if xml:
             self.parts.append(xml)
+
+    def _end_calendar(self) -> None:
+        entry = self.calendars.pop()
+        self.parts.append(f'<j:endConditional target="#{entry[0]}"/>')
+        # (the sources are noted only where the passage is the one named, ending with its words:
+        # the Haftarah's closing follows the same rubric as Grace's מִגְדּוֹל)
+        named = bool(entry[4]) and tuple(entry[5][-len(entry[4]):]) == entry[4]
+        at, source = entry[8]
+        if named and source:
+            self.parts.insert(at, editorial_note(source))
+        self._said_otherwise(entry, named)
+
+    def _said_otherwise(self, entry: list, named: bool = False) -> None:
+        """The phrase before a rubric whose passage is said instead of it (Grace's מַגְדִּיל, before
+        "On Shabbos and Yom Tov say: מִגְדּוֹל ... מַלְכּוֹ"; the Haftarah's מְקַדֵּשׁ יִשְׂרָאֵל וְהַזְּמַנִּים):
+        conditional on the opposite, where the two end alike -- else the phrase is not the one the
+        passage replaces (the Shabbos volume prints מַגְדִּיל after it, under its own rubric)."""
+        otherwise = entry[7]
+        if otherwise is None or not entry[5] or entry[5][-1] != otherwise[2]:
+            return
+        start, end, _, when, source = otherwise
+        xml_id = self.next_id("when")
+        self.parts.insert(end, f'<j:endConditional target="#{xml_id}"/>')
+        self.parts.insert(start, conditional_open(xml_id, "", negated_xml(when))
+                          + (editorial_note(source) if source and named else ""))
 
     def open_condition(self, features: list[tuple[str, bool]]) -> str:
         self.end_phrase()
@@ -735,7 +814,7 @@ class _TextWriter:
         while self.calendars and self.calendars[-1][1] >= depth:
             self.end_phrase()
             self.verse(None)
-            self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
+            self._end_calendar()
         self.end_phrase()
         self.parts.append(f'<j:endConditional target="#{xml_id}"/>')
         if self.open_variants and self.open_variants[-1] == xml_id:
@@ -744,10 +823,20 @@ class _TextWriter:
         if self.calendars and self.calendars[-1][3] and self.calendars[-1][1] == len(self.open_variants):
             self.end_phrase()
             self.verse(None)
-            self.parts.append(f'<j:endConditional target="#{self.calendars.pop()[0]}"/>')
+            self._end_calendar()
 
 
 #: an inline alternative: its conditional (1), id (2), words (3) and end (4)
+def editorial_note(text: str) -> str:
+    """The editors' note (not the book's) of where words come from."""
+    return f'<tei:note type="editorial" xml:lang="en">{esc(text)}</tei:note>'
+
+
+def _inline_when(conditional: str) -> str:
+    """The condition of an inline conditional, after its note if it has one."""
+    return re.search(r'(?:</tei:note>|type="marked">)((?:(?!</tei:note>).)*)</j:conditional>$', conditional).group(1)
+
+
 _INLINE = re.compile(r'(<j:conditional xml:id="(inline_\d+)" type="marked">.*?</j:conditional>)'
                      r'(.*?)(<j:endConditional target="#\2"/>)')
 
@@ -846,8 +935,8 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     ``verses`` (``match.scripture_verses``) gives the verse of scripture each place that opens
     one opens -- (phrase position, ``verse_segments`` segment): its ``bible:`` URN is set there,
     in both languages, and its scope closed where it ends -- at a sof pasuq, or by its length in
-    words where ``verse_lengths`` knows it -- or before a rubric, unless another verse follows at
-    once. A verse that opens or ends inside a phrase is marked inside it: in Hebrew at the sof
+    words where ``verse_lengths`` knows it -- across any rubric in between (one of unknown length,
+    no further than a rubric), and at the latest where the text ends. A verse that opens or ends inside a phrase is marked inside it: in Hebrew at the sof
     pasuq, in English at the punctuation nearest the same place.
 
     With ``opening`` -- a text's URN and a number of phrases -- the text opens with that text,
@@ -901,6 +990,10 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     for pair in block.pairs:
         if not is_phrase(pair):
             if position + 1 >= skip:
+                if writer.verse_open and verse_length is None:
+                    # (a verse of unknown length, which no sof pasuq ended: the rubric ends it)
+                    writer.end_phrase()
+                    writer.verse(None)
                 writer.rubric(pair)
             continue
         number = next(numbers)
@@ -924,7 +1017,8 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
             boundary += len(text.split())
         cuts: list[tuple[int, int, str]] = []
         # (the writer's state changes only once the phrase is written: writing it may first close
-        # a condition, and with it a verse open before the phrase)
+        # a condition, and with it a verse open before the phrase; and it changes before anything
+        # after the phrase closes a condition, and with it a verse open after the phrase)
         verse_open = writer.verse_open
         for index, token in enumerate(tokens):
             if index and index in opens:
@@ -938,18 +1032,19 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
             verse_words += len(words(token))
         if absent.get(number):
             xml_id = writer.open_condition([(variant_urn(urn, name), False) for name in absent[number]])
-            writer.phrase(pair, number, cuts)
+            writer.phrase(pair, number, cuts, verse_open if cuts else None)
             writer.close_condition(xml_id)
         else:
-            writer.phrase(pair, number, cuts)
-        if cuts:
-            writer.verse_open = cuts[-1][2] != VERSE_END
+            writer.phrase(pair, number, cuts, verse_open if cuts else None)
         ended = _verse_ended(plain_text(pair.he).rstrip(), verse_words, verse_length)
         if writer.verse_open and ended and (position + 1, 0) not in verses:
             writer.end_phrase()
             writer.verse(None)
         insert(number)
     writer.close_calendar(everything=True)
+    if writer.verse_open:
+        writer.end_phrase()
+        writer.verse(None)  # (a verse the text ends inside)
     content = "\n".join(writer.parts)
     paragraph = f"<tei:p>{content}</tei:p>" if content else ""
     transclusion = f'<j:transclude type="external" target="{attr(opening[0])}"/>' if opening else ""

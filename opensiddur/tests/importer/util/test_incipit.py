@@ -104,6 +104,17 @@ class TestLengths(unittest.TestCase):
         index = self.projects(a_prayer=prayer, tanakh_wlc=bible)
         self.assertNotIn(verse, index.length_of)
         self.assertEqual(index.own_opening(verse), tuple(words(LONG))[:16])
+        # ... though the Bible's length of it is counted, however long
+        self.assertEqual(index.verse_length_of[verse], len(words(LONG)))
+        self.assertEqual(IncipitIndex.from_json(index.to_json()).verse_length_of, index.verse_length_of)
+
+    def test_a_long_verse_is_counted_to_the_next_verse(self):
+        first, second = f"{T}bible:ps/1/1", f"{T}bible:ps/1/2"
+        bible = (f'<tei:div corresp="{T}bible:ps/1"><tei:p><tei:milestone unit="verse" corresp="{first}"/>{LONG} {SHORT} '
+                 f'<tei:milestone unit="verse" corresp="{second}"/>{SHORT}</tei:p></tei:div>')
+        index = self.projects(tanakh_wlc=bible)
+        self.assertEqual(index.verse_length_of[first], len(words(f"{LONG} {SHORT}")))
+        self.assertEqual(index.verse_length_of[second], len(words(SHORT)))
 
 
 class TestTransclusions(unittest.TestCase):

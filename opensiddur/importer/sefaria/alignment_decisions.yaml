@@ -166,6 +166,14 @@ selichot_nusach_lita_linear:
     he_only: [68, 69, 70, 71, 72, 73, 74, 75, 76]
     note: "the rest of the service, printed in Hebrew paragraphs without a translation"
 siddur_ashkenaz:
+  "Weekday / Shacharit / Preparatory Prayers / Morning Blessings":
+    as_of: {he: b5be6c78a02fa410690ef4776f69b84db5db5a2b1869a59ab57dc4a9f22d009e, en: 3afc0d5afcdaf0693528a0ac82be92662bd22b6118414a82ccfaf330065d0aab}
+    opens: [5]
+    note: "שעשני כרצונו, which a woman says (in parentheses, after its label), not in bold"
+  "Weekday / Maariv / Bircat Levana":
+    as_of: {he: fa39e1819301db92f858936de93c8b04d71ada4e691bee6e54f4e921ac843739, en: 65d7d3bc9dc9463c67513d39ebfaa6a4cb3ff10267cf0741e6e6783292cf4ed6}
+    opens: [3]
+    note: "the preparation for the mitzvah (הנני מוכן), after Psalm 148, not in bold"
   "Weekday / Minchah / Amida / Response to Prayer":
     as_of: {he: 4041cc672d0f205de4ee20ca1ba8046a068d851c0b2dfef4f086aeb0e71f27c6, en: 2b5843cb6086dbeddccd6e3f9839630129c46f83d1859a8715a0e16ab9eacd60}
     opens: [4]

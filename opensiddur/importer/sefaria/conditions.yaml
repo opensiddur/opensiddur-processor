@@ -133,13 +133,24 @@ rubrics:
     when: {holiday: {purim-observed: true}}
   - match: "^\\(?On Shabbos and Yom Tov say:"
     when: {any: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]}
+    # Grace's מִגְדּוֹל, and the Haftarah's closing (to its parenthesis): the phrase before, where
+    # it ends alike (מַגְדִּיל ... מַלְכּוֹ; ... וְהַזְּמַנִּים), is said otherwise
+    through: "מִגְדּוֹל יְשׁוּעוֹת מַלְכּוֹ"
+    instead_of_previous: true
+    # no verse is marked: neither is quoted exactly (the user's decision); the editors note both
+    source: "II Samuel 22:51."
+    otherwise_source: "Psalm 18:51."
   - match: "^\\(?On Shabbos,? (add|say):|^On Shabbos conclude with this berachah|^On Shabbos, the Chazzan begins here|^On Shabbos, before Borechu, the following selection from the Zohar is said|^The following three prayers are said only on Sabbath"
     when: {holiday-aggregate: {shabbat: true}}
   - match: "^On (the )?Yom Tov say:|^On Yom Tov conclude with this berachah|^On Yom Tov, the Chazzan begins here"
     when: {holiday-aggregate: {yom-tov: true}}
   - match: "^On Rosh Hash(o|a)n(ah?|o) say:"
     when: {holiday: {rosh-hashana: true}}
-  - match: "^On Sukkos( say)?:"
+  - match: "^On Sukkos say:"
+    # Grace's הרחמן for Sukkot, one sentence: the הרחמן after it is said every day
+    when: {holiday: {sukkot: true}}
+    through: "אֶת סֻכַּת דָּוִד הַנּוֹפָֽלֶת"
+  - match: "^On Sukkos:"
     when: {holiday: {sukkot: true}}
   - match: "^On Pesach:"
     when: {holiday: {pesah: true}}
@@ -167,6 +178,8 @@ rubrics:
     when: {none: [{holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {chol-hamoed: true}}]}
   - match: "^On weekdays say:"
     when: {none: [*shabbat_or_yom_tov]}
+    through: "מַגְדִּיל יְשׁוּעוֹת מַלְכּוֹ"  # (Grace: what follows is said every day)
+    source: "Psalm 18:51."
   - match: "^On a regular Shabbos the Chazzan recites the following Kaddish"
     when: {all: [{holiday-aggregate: {shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {chol-hamoed: true}}, {holiday: {rosh-hodesh: true}}]}]}
   - match: "^The following paragraph is omitted on occasions when the Tachanun prayer would be omitted on weekdays"
@@ -372,6 +385,10 @@ labels:
   - label: 'בעשי"ת מסיים'
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
     ending: true
+  - label: 'נשים אומרות'
+    # שעשני כרצונו, said by a woman instead of שלא עשני אשה (in parentheses)
+    when: {person: {gender: female}}
+    instead_of_previous: true
   - label: 'לתענית ציבור'
     # Sim Shalom at Minchah, which the fast days' Minchah says instead of Shalom Rav
     instead_of_previous: true
@@ -420,12 +437,31 @@ inline:
     when: {quorum: {minyan: true}}
   - label: 'בשנת העיבור עד חדש ניסן'
     when: {hebrew-date: {leap-year: true, month: [7, 13]}}
+  - label: 'בשבת וביו"ט אומר'
+    when: *shabbat_or_yom_tov
 
 replacements:
   - alternative: 'הַשָּׁלוֹם'
     replaces: 'שָׁלוֹם'
   - alternative: 'וּלְעֵֽלָּא מִכָּל'
     replaces: 'מִן כָּל'
+  - alternative: 'לְעֵֽלָּא לְעֵֽלָּא מִכָּל'
+    # Siddur Ashkenaz prints the first לעלא inside the alternative too
+    replaces: 'לְעֵֽלָּא מִן כָּל'
+  - alternative: 'מִגְדּוֹל יְשׁוּעוֹת מַלְכּוֹ'
+    replaces: 'מַגְדִּיל יְשׁוּעוֹת מַלְכּוֹ'
+    source: "II Samuel 22:51."
+    replaces_source: "Psalm 18:51."
+  - alternative: 'הַמֶּלֶךְ הַקָּדוֹשׁ'
+    # Siddur Ashkenaz's Magen Avot prints it after הָאֵל הַקָּדוֹשׁ in small type, unlabelled
+    replaces: 'הָאֵל הַקָּדוֹשׁ'
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+  - alternative: 'בָּרוּךְ אַתָּה יְהֹוָה עֹשֶׂה הַשָּׁלוֹם'
+    # Siddur Ashkenaz's Maariv Besefer Chayyim, in parentheses and untranslated: the closing of
+    # those whose custom it is, said in the Ten Days instead of המברך (gated in `texts`). Birnbaum
+    # says it as the Ten Days' closing (prayer:amidah/shalom/besefer_chayyim); Metsudah, only by
+    # that custom.
+    when: {all: [{practice: {oseh-hashalom-aseret-ymei-tshuva: true}}, {holiday-aggregate: {aseret-ymei-tshuva: true}}]}
 
 # Leaves the book says when to say only in a rubric at the end of the leaf before.
 leaves:
@@ -548,6 +584,12 @@ leaves:
 # Texts said only on some days where the book marks them only by type: each transclusion of the
 # text in the work's structure files is gated.
 texts:
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:amidah/shalom/hamevarekh
+    # where the Besefer Chayyim before it prints the custom's closing (עושה השלום) in parentheses:
+    # said unless that closing was
+    places: [urn:x-opensiddur:text:siddur:chol/arvit/shemoneh_esreh/shalom, urn:x-opensiddur:text:siddur:shabbat/arvit/shemoneh_esreh/shalom]
+    when: {none: [{all: [{practice: {oseh-hashalom-aseret-ymei-tshuva: true}}, {holiday-aggregate: {aseret-ymei-tshuva: true}}]}]}
   - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:amidah/attah_chonantanu
     # in small type; the night after Shabbat or a festival (Birnbaum's arvit_chonantanu)

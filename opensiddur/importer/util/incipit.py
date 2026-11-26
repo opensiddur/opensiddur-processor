@@ -148,6 +148,9 @@ class IncipitIndex:
     #: (Tachanun's אל תפן אל קשינו for Deuteronomy 9:27's אל קשי העם הזה) was read first.
     #: Texts are still found by their first holding's opening.
     bible_words: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    #: A verse's length in words as a Bible holds it, however long: :attr:`length_of` records
+    #: only scopes shorter than their collected opening.
+    verse_length_of: dict[str, int] = field(default_factory=dict)
 
     def included(self, urn: str) -> set[str]:
         """Every text ``urn`` transcludes, and every text those transclude."""
@@ -262,7 +265,8 @@ class IncipitIndex:
                 "ends_with": dict(sorted(self.ends_with.items())),
                 "includes": {urn: sorted(targets) for urn, targets in sorted(self.includes.items())},
                 "milestone_scoped": sorted(self.milestone_scoped),
-                "bible_words": {urn: list(words) for urn, words in sorted(self.bible_words.items())}}
+                "bible_words": {urn: list(words) for urn, words in sorted(self.bible_words.items())},
+                "verse_length_of": dict(sorted(self.verse_length_of.items()))}
 
     @classmethod
     def from_json(cls, data: dict) -> "IncipitIndex":
@@ -280,6 +284,7 @@ class IncipitIndex:
                           if "incipits" in data else {})
         index.milestone_scoped = set(data.get("milestone_scoped", ())) if "incipits" in data else set()
         index.bible_words = {urn: tuple(words) for urn, words in data.get("bible_words", {}).items()}
+        index.verse_length_of = dict(data.get("verse_length_of", {}))
         index.open_with_parts()
         return index
 
@@ -297,6 +302,8 @@ def index_document(index: IncipitIndex, root: etree._Element, bible: bool = Fals
     # Each scope being collected: its URN, the words so far, how many of them are its own
     # (None while it is open), and what ends it: an element, or a milestone unit.
     pending: list[list] = []
+    # A Bible's verses still being counted past their collected opening: URN, words so far, end.
+    counting: list[list] = []
 
     def finish(entry: list) -> None:
         urn, collected, own = entry[0], entry[1], entry[2]
@@ -304,6 +311,11 @@ def index_document(index: IncipitIndex, root: etree._Element, bible: bool = Fals
         # first holding's opening. Of two Bibles that differ, the last read decides (by name, the
         # WLC after Miqra al pi ha-Masorah).
         verse = bible and urn.startswith(TEXT_PREFIX + "bible:")
+        if verse:
+            if own is None:
+                counting.append([urn, len(collected), entry[3]])
+            else:
+                index.verse_length_of[urn] = own
         if urn in index.incipit_of:
             # The first holding of a text decides its length, long or short: a later document
             # that quotes part of it (Kiddush Levana's half of Exodus 15:16, after Birnbaum's Az
@@ -369,6 +381,8 @@ def index_document(index: IncipitIndex, root: etree._Element, bible: bool = Fals
         words = _words(text)
         if not words:
             return
+        for entry in counting:
+            entry[1] += len(words)
         for scope in open_scopes:
             scope[1].extend(words)
             del scope[1][:-CLOSING_WORDS]
@@ -386,6 +400,9 @@ def index_document(index: IncipitIndex, root: etree._Element, bible: bool = Fals
         for entry in pending:
             if entry[2] is None and test(entry[3]):
                 entry[2] = len(entry[1])
+        for entry in [entry for entry in counting if test(entry[2])]:
+            index.verse_length_of[entry[0]] = entry[1]
+            counting.remove(entry)
         end_scopes(test)
 
     def flush() -> None:
@@ -535,9 +552,11 @@ def build_incipit_index(project_directory: Path = PROJECT_DIRECTORY,
 #:    paseq separates words.
 #: 9: a text's first holding decides its length, though a later one holds it shorter.
 #: 10: (not released)
-#: 11: a verse's own words and length are the Bible's; a ketiv is not indexed; a Bible's note
-#:     anchors do not end words, and only the first of its options is read.
-INDEX_VERSION = 11
+#: 11: (not released)
+#: 12: a verse's own words and length are the Bible's, its length counted however long; a ketiv
+#:     is not indexed; a Bible's note anchors do not end words, and only the first of its
+#:     options is read.
+INDEX_VERSION = 12
 
 
 def index_signature(project_directory: Path, exclude: Collection[Path] = ()) -> str:

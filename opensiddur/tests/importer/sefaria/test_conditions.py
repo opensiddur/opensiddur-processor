@@ -140,6 +140,23 @@ class TestDirectivesAndLeaves(unittest.TestCase):
         self.assertEqual(gates["urn:x-opensiddur:text:prayer:attah_chonantanu"].when, {"day-of-week": {"hebrew-day": 1}})
         self.assertEqual(table().text_gates("other"), {})
 
+    def test_a_text_gate_may_hold_only_in_some_places(self):
+        conditions = table(TABLE + """  - work: w
+    urn: urn:x-opensiddur:text:prayer:hamevarekh
+    places: [urn:x-opensiddur:text:siddur:arvit/shalom]
+    when: {holiday-aggregate: {aseret-ymei-tshuva: false}}
+""")
+        self.assertNotIn("urn:x-opensiddur:text:prayer:hamevarekh", conditions.text_gates("w"))
+        here = conditions.text_gates("w", "urn:x-opensiddur:text:siddur:arvit/shalom")
+        self.assertEqual(here["urn:x-opensiddur:text:prayer:hamevarekh"].when,
+                         {"holiday-aggregate": {"aseret-ymei-tshuva": False}})
+        self.assertIn("urn:x-opensiddur:text:prayer:attah_chonantanu", here)
+
+    def test_a_replacement_with_a_condition_may_replace_nothing(self):
+        (found,) = table("replacements:\n  - alternative: 'עֹשֶׂה הַשָּׁלוֹם'\n"
+                         "    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}\n").replacements
+        self.assertEqual((found.replaces, found.when), ((), {"holiday-aggregate": {"aseret-ymei-tshuva": True}}))
+
     def test_a_label_may_stay_an_instruction(self):
         found = table("labels:\n  - label: 'מדלגין'\n    when: {hallel: {full: true}}\n    instruction: true\n"
                       ).for_label("מדלגין")

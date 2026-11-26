@@ -132,6 +132,24 @@ texts:
     ends: וביום השביעי שבת וינפש
     urn: urn:x-opensiddur:text:bible:exodus/31/16-17
     note: "the two verses, as Birnbaum encodes them; the festivals' verse after them is another text"
+  - opens: וידבר יהוה אל משה לאמר צו את בני ישראל
+    leaf: "Weekday / Shacharit / Preparatory Prayers / Korbanot / Korban HaTamid"
+    urn: urn:x-opensiddur:text:bible:numbers/28/1-8
+    note: "the Tamid, Numbers 28:1–8, as the Sefard volumes name it; not the whole chapter"
+  - opens: ברוך אתה יהוה אלהינו מלך העולם שעשני כרצונו
+    leaf: "Weekday / Shacharit / Preparatory Prayers / Morning Blessings"
+    urn: urn:x-opensiddur:text:prayer:birkhot_hashachar/sheasani_kirtzono
+    note: "the blessing a woman says instead of שלא עשני אשה, as Birnbaum names it"
+  - opens: בספר חיים ברכה ושלום ופרנסה טובה
+    leaf: ["Weekday / Maariv / Amidah / Peace", "Shabbat / Maariv / Amidah / Peace"]
+    ends: ברוך אתה יהוה עשה השלום
+    urn: urn:x-opensiddur:text:prayer:amidah/shalom/besefer_chayyim_hamevarekh
+    note: "the Ten Days' words said before המברך, which Siddur Ashkenaz keeps (its Maariv prints עושה השלום after them only as a custom, in the same paragraph); Birnbaum's besefer_chayyim closes עושה השלום. המברך is a text of its own, gated on the custom"
+  - opens: בספר חיים ברכה ושלום ופרנסה טובה
+    leaf: "Weekday / Minchah / Amida / Peace"
+    ends: לחיים טובים ולשלום
+    urn: urn:x-opensiddur:text:prayer:amidah/shalom/besefer_chayyim_hamevarekh
+    note: "the same words at Minchah, where the custom's closing is not printed"
   - opens: שים שלום טובה וברכה
     leaf: "Weekday / Minchah / Amida / Peace"
     ends: לברך את עמך ישראל בכל עת ובכל שעה בשלומך

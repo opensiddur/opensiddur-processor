@@ -339,6 +339,9 @@ opensiddur:practice:
         values: [omit_both, hayom_only, both_no_cantor_repeat, both_cantor_hayom, both_cantor_repeat]
     musaf-hayom-only-cantor-repeat: binary
     musaf-areshet-cantor-repeat: binary
+    # the Amidah's last blessing closes עושה השלום in the Ten Days, not המברך את עמו ישראל בשלום
+    # (Siddur Ashkenaz prints it in parentheses as a custom; Birnbaum says it always)
+    oseh-hashalom-aseret-ymei-tshuva: binary
 
 opensiddur:service-context:
   common: false

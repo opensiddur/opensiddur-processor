@@ -183,9 +183,9 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                             clashes=clashes, numbered_namespace=work.numbered_texts)
     items = {leaf: placed_rubrics(leaf_items, conditions) for leaf, leaf_items in items.items()}
     # The verses each text the project writes quotes. A project carries a URN once, so a verse
-    # quoted by two texts is marked in the first.
-    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = {}
-    marked: set[str] = set()
+    # quoted by two texts is marked in the first -- the first with English there, if any has, so
+    # that the English project does not mark it in a phrase the source leaves untranslated.
+    quoted: dict[str, list[tuple[bool, str, int, tuple[int, int]]]] = {}
     for leaf, leaf_items in items.items():
         for block in leaf_items:
             if not isinstance(block, TextBlock):
@@ -193,15 +193,16 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             record = decisions.records[(work.key, leaf, block.first_index)]
             if record.kind not in ("existing", "new"):
                 continue
-            found: dict[tuple[int, int], str] = {}
             for place, urn in sorted(scripture_verses(block, index, record.urn).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
-                if urn not in marked:  # a verse repeated, even within one text, is marked once
-                    marked.add(urn)
-                    found[place] = urn
-            if found:
-                verses[(leaf, block.first_index)] = found
+                english = bool(plain_text(block.phrases[place[0]].en).strip())
+                quoted.setdefault(urn, []).append((english, leaf, block.first_index, place))
+    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = {}
+    for urn, places in quoted.items():
+        # (a verse repeated, even within one text, is marked once)
+        _, leaf, first, place = next((p for p in places if p[0]), places[0])
+        verses.setdefault((leaf, first), {})[place] = urn
     lengths = {urn: n for found in verses.values() for urn in found.values()
                if (n := verse_length(urn, index)) is not None}
     for (leaf, first), found in verses.items():
@@ -463,7 +464,7 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
         body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions,
-                         leading, plan.conditions.text_gates(work.key))
+                         leading, plan.conditions.text_gates(work.key, urn))
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
     out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang, gates), lang))

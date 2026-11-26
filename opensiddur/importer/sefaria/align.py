@@ -340,6 +340,25 @@ def _unfold_labels(nodes: tuple[Node, ...], is_label: Callable[[str], bool]) -> 
     return tuple(unfolded)
 
 
+def _unparenthesize_label(nodes: tuple[Node, ...], is_label: Callable[[str], bool]) -> tuple[Node, ...]:
+    """A known condition label and the words it governs printed together in parentheses
+    (``(<small>נשים אומרות:</small> בָּרוּךְ ... שֶׁעָשַֽׂנִי כִּרְצוֹנוֹ:)``), as the label printed
+    before its words: the parentheses only set the alternative apart, which the label then does."""
+    content = [k for k, n in enumerate(nodes) if not (isinstance(n, Text) and not n.text.strip())]
+    if len(content) < 3:
+        return nodes
+    first, label, last = nodes[content[0]], nodes[content[1]], nodes[content[-1]]
+    if not (isinstance(first, Text) and first.text.strip() == "(" and isinstance(label, Styled)
+            and label.style == "small" and isinstance(last, Text) and last.text.rstrip().endswith(")")):
+        return nodes
+    text = plain_text(label.children)
+    if not text.rstrip().endswith(":") or is_pointed(text) or not is_label(text):
+        return nodes
+    closed = last.text.rstrip()[:-1]
+    return (nodes[:content[0]] + nodes[content[1]:content[-1]]
+            + ((Text(closed),) if closed.strip() else ()) + nodes[content[-1] + 1:])
+
+
 #: the words a blessing's ending opens with
 BLESSING_OPENING = tuple(words("בָּרוּךְ אַתָּה יְהֹוָה"))
 _ENGLISH_BLESSING = re.compile(r"Blessed are You,? Adonoy,?\s*")
@@ -428,7 +447,7 @@ def split_leading_labels(alignment: Alignment, is_label: Callable[[str], bool] =
     the ending it replaces is set apart (``_replaced_endings``)."""
     pairs: list[Pair] = []
     for pair in alignment.pairs:
-        unfolded = _unfold_labels(pair.he, is_label)
+        unfolded = _unfold_labels(_unparenthesize_label(pair.he, is_label), is_label)
         if unfolded != pair.he:
             pair = dataclasses.replace(pair, he=unfolded)
         he = split_leading(pair.he, {"small"}, hebrew=True)

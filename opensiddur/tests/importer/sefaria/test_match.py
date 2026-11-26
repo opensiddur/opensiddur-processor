@@ -8,6 +8,7 @@ from opensiddur.importer.sefaria.blocks import TextBlock, divide
 from opensiddur.importer.sefaria.match import (
     later_text,
     quoted_words,
+    verse_length,
     verse_run,
     TextRecord,
     decide_work,
@@ -97,6 +98,11 @@ class TestQuotedPhrases(unittest.TestCase):
         index = IncipitIndex()
         index.add(self.URN, words(self.LONG))
         return index
+
+    def test_a_long_verse_has_the_bibles_length(self):
+        index = self.index()
+        index.verse_length_of[self.URN] = 29
+        self.assertEqual(verse_length(self.URN, index), 29)
 
     def test_a_quotation_that_leaves_the_verse_ends_where_it_leaves(self):
         phrases = [words("לְךָ אֲדֹנָי הַצְּדָקָה"), words("וְלָנוּ בֹּשֶׁת הַפָּנִים"), words("מַה נִּתְאוֹנֵן"),
@@ -585,7 +591,6 @@ class TestScriptureVerses(unittest.TestCase):
                     if isinstance(i, TextBlock)]
         self.assertEqual(scripture_verses(after, index, T + "bible:exodus/20/8-11"),
                          {(0, 0): T + "bible:psalms/1/1", (1, 0): T + "bible:exodus/20/9"})
-
 
 class TestMint(unittest.TestCase):
     def test_a_blessing_is_named_after_its_formulas(self):
