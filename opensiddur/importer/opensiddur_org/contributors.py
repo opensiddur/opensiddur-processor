@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from opensiddur.common.bidi import strip_bidi_formatting
 from opensiddur.common.urn_registry import REGISTRY_DIRECTORY
 from opensiddur.importer.opensiddur_org.parse_post import Post
 
@@ -183,7 +184,7 @@ def registered_contributors(registry_directory: Path = REGISTRY_DIRECTORY) -> se
 def candidate_line(credit: Credit) -> str:
     """A ``contributor.jsonl`` line for a person not yet registered, for review. Directional
     marks the site leaves after a name in another script are dropped from the label."""
-    label = re.sub("[\u200e\u200f\u202a-\u202e]", "", credit.name).strip()
+    label = strip_bidi_formatting(credit.name).strip()
     return json.dumps({"urn": credit.urn, "status": "canonical", "label_en": label}, ensure_ascii=False)
 
 

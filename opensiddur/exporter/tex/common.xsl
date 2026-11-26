@@ -8,13 +8,21 @@
     xmlns:f="urn:opensiddur:reledmac"
     exclude-result-prefixes="xs f">
 
+    <!-- The string without its bidi formatting characters, as escape_tex drops them
+         (opensiddur/common/bidi.py): \textdir ignores them, and a font without a glyph for
+         them prints a box. LRM, RLM, ALM, the embeddings and overrides, the isolates. -->
+    <xsl:function name="f:strip-bidi" as="xs:string">
+        <xsl:param name="s" as="xs:string"/>
+        <xsl:sequence select="replace($s, '[&#x200E;&#x200F;&#x061C;&#x202A;-&#x202E;&#x2066;-&#x2069;]', '')"/>
+    </xsl:function>
+
     <!-- Escape the characters that have special meaning in LaTeX. A sentinel (a private-use
          character) stands in for the backslash while the others are escaped, so that the braces
          of its own \textbackslash{} are not escaped in turn. opensiddur/exporter/tex/escape.py
          does the same for strings that reach TeX from Python. -->
     <xsl:function name="f:escape-tex" as="xs:string">
         <xsl:param name="s" as="xs:string"/>
-        <xsl:variable name="t1" select="replace($s, '\\', '&#xE000;')"/>
+        <xsl:variable name="t1" select="replace(f:strip-bidi($s), '\\', '&#xE000;')"/>
         <xsl:variable name="t2" select="replace($t1, '([&amp;%$#_{}])', '\\$1')"/>
         <xsl:variable name="t3" select="replace($t2, '~', '\\textasciitilde{}')"/>
         <xsl:variable name="t4" select="replace($t3, '\^', '\\textasciicircum{}')"/>
