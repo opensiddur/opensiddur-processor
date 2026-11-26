@@ -32,6 +32,7 @@ from urllib.parse import quote
 import lxml.html
 from lxml.html import HtmlElement
 
+from opensiddur.common.bidi import strip_bidi_formatting
 from opensiddur.importer.opensiddur_org.languages import (
     NOT_TEXT_ROLES,
     UNKNOWN_LANGUAGE,
@@ -240,14 +241,19 @@ _WS_RE = re.compile(r"[ \t\r\n\f\v]+")
 
 
 def clean_text(text: str, *, unescape: bool = False) -> str:
-    """Drop emoji and normalize to the storage form (NFKD). ``unescape`` decodes entities, for
-    the export's raw JSON strings; text that lxml parsed is decoded already, and decoding it
-    again would turn a literal ``&lt;`` into ``<``."""
+    """Drop emoji and bidi formatting characters, and normalize to the storage form (NFKD).
+    ``unescape`` decodes entities, for the export's raw JSON strings; text that lxml parsed
+    is decoded already, and decoding it again would turn a literal ``&lt;`` into ``<``.
+
+    The site leaves right-to-left marks after Hebrew titles and names for the browser's
+    benefit. Stored text carries its language on ``xml:lang``, so they mean nothing there
+    (``opensiddur.common.bidi``)."""
     if unescape:
         text = html.unescape(text)
     # A typo for the entity, which the site renders as written (post 66797).
     text = text.replace("^nbsp;", NBSP)
     text = _EMOJI_RE.sub("", text)
+    text = strip_bidi_formatting(text)
     return to_nfkd(text)
 
 

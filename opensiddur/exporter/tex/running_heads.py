@@ -19,10 +19,12 @@ and it is directly testable.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from opensiddur.common.bidi import strip_bidi_formatting
 from opensiddur.exporter.tex.escape import escape_tex
 
 # ---------------------------------------------------------------------------
@@ -67,15 +69,69 @@ RUNNING_HEAD_CODES: dict[str, str] = {
 
 
 # Hebrew block plus the Hebrew presentation forms, matching the range
-# f:emit-bidi-mark uses in reledmac.xslt. Hebrew segments joined by whitespace
-# or connecting punctuation are one run: a paired parsha name is written with
-# an en-dash — תַזְרִיעַ–מְצֹרָע — which is outside the Hebrew block, and splitting on
-# it would make the dash its own LTR embedding and let a neighbouring chapter
-# number reorder into the middle of the name. (The maqaf of לֶךְ־לְךָ is inside
-# the block and was never at risk.)
-_HEBREW = "֐-׿יִ-ﭏ"
-_HEBREW_JOINER = r"[\s‐-―/,.:;-]"
-_HEBREW_RUN = re.compile(f"[{_HEBREW}]+(?:{_HEBREW_JOINER}*[{_HEBREW}]+)*")
+# f:emit-bidi-mark uses in reledmac.xslt.
+_HEBREW_SEGMENT = re.compile("[֐-׿יִ-ﭏ]+")
+
+
+def _is_space(c: str) -> bool:
+    """XPath's ``\\s`` (space, tab, CR, LF) or a Unicode separator (``\\p{Z}``: the
+    no-break and thin spaces among them). Spelled out rather than ``str.isspace``, which
+    the stylesheet's regex dialect has no equivalent of."""
+    return c in " \t\n\r" or unicodedata.category(c).startswith("Z")
+
+
+def _is_joiner(c: str) -> bool:
+    return _is_space(c) or unicodedata.category(c).startswith("P")
+
+
+# A straight quotation mark between two Hebrew characters is a gershayim (רש"י, תשפ"ו),
+# not a quotation mark, and does not count toward pairing.
+_GERSHAYIM = re.compile('([\u0590-\u05ff\ufb1d-\ufb4f])"([\u0590-\u05ff\ufb1d-\ufb4f])')
+
+
+def hebrew_runs(s: str) -> list[tuple[int, int]]:
+    """The spans of ``s`` to set as Hebrew, each as ``(start, end)``.
+
+    Hebrew segments separated only by whitespace and punctuation are one run. A paired
+    parsha name is written with an en dash (תַזְרִיעַ–מְצֹרָע), a title with parentheses
+    (לכה דודי (נוסח אחר)), a book title with quotation marks; split at any of them, the
+    punctuation becomes its own left-to-right embedding, is laid out on the wrong side
+    and is never mirrored. Digits and Latin letters still end a run, so they keep their
+    own left-to-right wrap.
+
+    A run then takes in the brackets it opened: one with more opening than closing
+    brackets extends over the closing brackets right after it, and the other way round.
+    So the parenthesis that ends לכה דודי (נוסח אחר) is part of the Hebrew, while in
+    "(RUTH רות)" it stays with the English that opened it. A straight quotation mark is
+    its own pair: a run holding an odd number of them takes the one beside it. One
+    between two Hebrew characters is a gershayim (רש"י) and is not counted.
+
+    ``f:emit-bidi-mark`` in reledmac.xslt follows the same rule.
+    """
+    runs: list[list[int]] = []
+    for match in _HEBREW_SEGMENT.finditer(s):
+        if runs and all(_is_joiner(c) for c in s[runs[-1][1]:match.start()]):
+            runs[-1][1] = match.end()
+        else:
+            runs.append([match.start(), match.end()])
+    for run in runs:
+        text = s[run[0]:run[1]]
+        unmatched = (sum(unicodedata.category(c) == "Ps" for c in text)
+                     - sum(unicodedata.category(c) == "Pe" for c in text))
+        while unmatched > 0 and run[1] < len(s) and unicodedata.category(s[run[1]]) == "Pe":
+            run[1] += 1
+            unmatched -= 1
+        while unmatched < 0 and run[0] > 0 and unicodedata.category(s[run[0] - 1]) == "Ps":
+            run[0] -= 1
+            unmatched += 1
+        if _GERSHAYIM.sub(r"\1\2", s[run[0]:run[1]]).count('"') % 2:
+            # A straight quotation mark is its own pair: an odd one closes after the run
+            # or opens before it.
+            if s[run[1]:run[1] + 1] == '"':
+                run[1] += 1
+            elif run[0] > 0 and s[run[0] - 1] == '"':
+                run[0] -= 1
+    return [(start, end) for start, end in runs]
 
 
 def _emit_bidi_literal(s: str) -> str:
@@ -88,12 +144,13 @@ def _emit_bidi_literal(s: str) -> str:
     ``"p{page}"`` in a Hebrew slot reads "1p". Hebrew runs take ``\\texthebrew``,
     which also selects the Hebrew font a Latin-font slot has no glyphs from.
     """
+    s = strip_bidi_formatting(s)
     parts: list[str] = []
     position = 0
-    for match in _HEBREW_RUN.finditer(s):
-        _append_ltr(parts, s[position:match.start()])
-        parts.append(r"\texthebrew{" + escape_tex(match.group()) + "}")
-        position = match.end()
+    for start, end in hebrew_runs(s):
+        _append_ltr(parts, s[position:start])
+        parts.append(r"\texthebrew{" + escape_tex(s[start:end]) + "}")
+        position = end
     _append_ltr(parts, s[position:])
     return "".join(parts)
 
@@ -105,12 +162,13 @@ def escape_with_hebrew_runs(s: str) -> str:
     surrounding text is already left to right, so only the Hebrew needs a wrapper —
     for its direction and for the font a Latin face has no glyphs in.
     """
+    s = strip_bidi_formatting(s)
     parts: list[str] = []
     position = 0
-    for match in _HEBREW_RUN.finditer(s):
-        parts.append(escape_tex(s[position:match.start()]))
-        parts.append(r"\texthebrew{" + escape_tex(match.group()) + "}")
-        position = match.end()
+    for start, end in hebrew_runs(s):
+        parts.append(escape_tex(s[position:start]))
+        parts.append(r"\texthebrew{" + escape_tex(s[start:end]) + "}")
+        position = end
     parts.append(escape_tex(s[position:]))
     return "".join(parts)
 
@@ -118,7 +176,7 @@ def escape_with_hebrew_runs(s: str) -> str:
 def _append_ltr(parts: list[str], text: str) -> None:
     if not text:
         return
-    if not text.strip():
+    if all(_is_space(c) for c in text):
         # Whitespace between two runs carries no direction of its own; wrapping
         # it would only add empty groups.
         parts.append(text)

@@ -4,11 +4,16 @@ Template parsing, code expansion and the fancyhdr block are all pure functions
 of the settings, so they are tested directly rather than through the XSLT.
 """
 
+import tempfile
 import unittest
+from pathlib import Path
+from xml.sax.saxutils import escape
 
 from pydantic import ValidationError
 
+from opensiddur.common.xslt import xslt_transform_string
 from opensiddur.exporter.settings import TypographyConfig
+from opensiddur.exporter.tex.escape import escape_tex
 from opensiddur.exporter.tex.running_heads import (
     RUNNING_HEAD_CODES,
     RunningHeadConfig,
@@ -18,9 +23,11 @@ from opensiddur.exporter.tex.running_heads import (
     default_page_header,
     escape_with_hebrew_runs,
     expand_template,
+    hebrew_runs,
     parse_template,
     render_position,
 )
+from opensiddur.tests.exporter.stylesheet_helpers import stylesheet_parameters
 
 LTR = r"{\textdir TLT\foreignlanguage{english}{"
 
@@ -451,6 +458,124 @@ class TestEscapeWithHebrewRuns(unittest.TestCase):
 
     def test_latin_text_is_only_escaped(self):
         self.assertEqual(r"A \& B\_C", escape_with_hebrew_runs("A & B_C"))
+
+
+class TestHebrewRuns(unittest.TestCase):
+    """Which spans are set as Hebrew (#338)."""
+
+    def runs(self, s: str) -> list[str]:
+        return [s[start:end] for start, end in hebrew_runs(s)]
+
+    def test_a_parenthesized_hebrew_title_is_one_run_with_its_parentheses(self):
+        """Split at the parentheses, each became an LTR embedding that is never
+        mirrored, and the running head read לכה דודי)נוסח אחר(."""
+        self.assertEqual(["לכה דודי (נוסח אחר)"], self.runs("לכה דודי (נוסח אחר)"))
+
+    def test_a_bracket_opened_outside_the_hebrew_stays_outside(self):
+        self.assertEqual(["רות"], self.runs("(RUTH רות)"))
+
+    def test_an_opening_bracket_before_the_run_joins_it_when_the_run_closes_it(self):
+        self.assertEqual(["(נוסח) אחר"], self.runs("(נוסח) אחר"))
+
+    def test_digits_end_a_run(self):
+        self.assertEqual(["תהלים"], self.runs("תהלים 92"))
+
+    def test_an_odd_quotation_mark_is_taken_from_beside_the_run(self):
+        self.assertEqual(['ספר "החינוך"'], self.runs('ספר "החינוך"'))
+
+    def test_quotation_marks_around_the_whole_run_stay_outside(self):
+        self.assertEqual(["שלום"], self.runs('"שלום" said'))
+
+    def test_a_no_break_space_joins_hebrew_words(self):
+        self.assertEqual(["שלום\u00a0עולם"], self.runs("שלום\u00a0עולם"))
+
+    def test_a_gershayim_does_not_count_as_a_quotation_mark(self):
+        """Counted, it made the closing quotation mark part of the Hebrew run."""
+        self.assertEqual(['רש"י'], self.runs('"רש"י" said'))
+
+    def test_hebrew_separated_by_latin_is_two_runs(self):
+        self.assertEqual(["שלום", "עולם"], self.runs("שלום Hello עולם"))
+
+
+class TestBidiFormattingCharacters(unittest.TestCase):
+    """Invisible direction marks reach TeX from web-imported text. \\textdir ignores them
+    and a Latin font has no glyph for them: the running head printed a box (#338)."""
+
+    RLM_TITLE = "לכה דודי (נוסח אחר)\u200f"
+
+    def test_escape_tex_drops_them(self):
+        self.assertEqual("ab", escape_tex("a\u200e\u202bb\u202c\u2067\u2069\u061c\u200f"))
+
+    def test_escape_tex_keeps_the_zero_width_joiners(self):
+        self.assertEqual("a‌b‍", escape_tex("a‌b‍"))
+
+    def test_a_title_ending_in_an_rlm_is_one_hebrew_run_in_a_running_head(self):
+        self.assertEqual(r"\texthebrew{לכה דודי (נוסח אחר)}", expand_template(self.RLM_TITLE))
+
+    def test_a_title_ending_in_an_rlm_is_one_hebrew_run_in_the_colophon(self):
+        self.assertEqual(r"\texthebrew{לכה דודי (נוסח אחר)}",
+                         escape_with_hebrew_runs(self.RLM_TITLE))
+
+
+_RELEDMAC_XSLT = (Path(__file__).resolve().parents[2]
+                  / "exporter" / "tex" / "reledmac.xslt")
+
+_CALLER = """<xsl:stylesheet version="3.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:f="urn:opensiddur:reledmac">
+  <xsl:import href="{href}"/>
+  <xsl:output method="text"/>
+  <xsl:template match="/" priority="10">
+    <xsl:for-each select="/samples/s">
+      <xsl:value-of select="f:emit-bidi-mark(string(.)), f:escape-tex(string(.))"
+                    separator="&#9;"/>
+      <xsl:text>&#10;</xsl:text>
+    </xsl:for-each>
+  </xsl:template>
+</xsl:stylesheet>
+"""
+
+
+class TestStylesheetAgreement(unittest.TestCase):
+    """f:emit-bidi-mark and f:escape-tex in the stylesheet, and the Python that sets the
+    same kinds of text (_emit_bidi_literal via expand_template, escape_tex), must agree:
+    a heading's title reaches a running head through the one and a template's literal
+    text through the other."""
+
+    SAMPLES = [
+        "לכה דודי (נוסח אחר)\u200f",
+        "(RUTH רות)",
+        "(נוסח) אחר",
+        "תהלים 92",
+        'ספר "החינוך"',
+        '"שלום" said',
+        "רות RUTH",
+        "תַזְרִיעַ–מְצֹרָע",
+        "A [שלום (עולם] B",
+        "a\u202bb\u202c & 100%",
+        "שלום\u00a0עולם",
+        "שלום\u2009(עולם)",
+        '"רש"י" said',
+        'Rashi ("רש"י") said',
+        " שלום ",
+        "\u00a0",
+        "A\u00a0B",
+    ]
+
+    def test_stylesheet_and_python_agree(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            caller = Path(tmp) / "caller.xslt"
+            caller.write_text(_CALLER.format(href=_RELEDMAC_XSLT.as_uri()), encoding="utf-8")
+            document = "<samples>" + "".join(
+                f"<s>{escape(sample)}</s>" for sample in self.SAMPLES) + "</samples>"
+            out = xslt_transform_string(caller, document,
+                                        xslt_params=stylesheet_parameters(document))
+        rows = [line.split("\t") for line in out.split("\n") if line]
+        self.assertEqual(len(self.SAMPLES), len(rows))
+        for sample, (mark, escaped) in zip(self.SAMPLES, rows):
+            with self.subTest(sample=sample):
+                self.assertEqual(expand_template(sample), mark)
+                self.assertEqual(escape_tex(sample), escaped)
 
 
 if __name__ == "__main__":

@@ -2074,6 +2074,20 @@ class TestStructuralElements(unittest.TestCase):
         # the {section-title} code.
         self.assertIn(r"\InsertMark{OSheadAny}{{\textdir TLT\foreignlanguage{english}{Inner}}}", out)
 
+    def test_parenthesized_hebrew_heading_mark_is_one_run_without_the_rlm(self):
+        """Split at its parentheses, the title set each parenthesis in its own LTR wrap,
+        never mirrored, and the trailing right-to-left mark printed as a box in the
+        running head: לכה דודי)נוסח אחר⌧( (#338)."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0" xml:lang="he">
+          <tei:text><tei:body>
+            <tei:div><tei:head>לכה דודי (נוסח אחר)&#x200F;</tei:head><tei:p>טקסט</tei:p></tei:div>
+          </tei:body></tei:text>
+        </tei:TEI>"""
+        out = _transform(xml)
+        self.assertIn(r"\InsertMark{OSheadAny}{\texthebrew{לכה דודי (נוסח אחר)}}", out)
+        self.assertNotIn("\u200f", out)
+
     def test_mixed_script_heading_mark_carries_per_run_direction(self):
         """A running head can be placed in a slot of either direction, so the
         mark cannot assume one: Hebrew runs need \\texthebrew (direction *and*
