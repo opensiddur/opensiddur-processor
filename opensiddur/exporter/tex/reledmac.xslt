@@ -4267,24 +4267,25 @@ end
         <xsl:param name="separate" as="xs:boolean"/>
         <xsl:variable name="pair" select="(following::p:parallel[1], preceding::p:parallel[1], $first-parallel)[1]"/>
         <xsl:variable name="primary-lang" select="string($pair/p:parallelItem[@role='primary']/@xml:lang)"/>
-        <xsl:variable name="primary" select="tei:foreign[@xml:lang=$primary-lang]"/>
-        <xsl:variable name="secondary" select="tei:foreign[@xml:lang ne $primary-lang]"/>
+        <xsl:variable name="primary" select="tei:foreign[f:is-rtl-lang(string(@xml:lang)) = f:is-rtl-lang($primary-lang)]"/>
+        <xsl:variable name="secondary" select="tei:foreign[f:is-rtl-lang(string(@xml:lang)) ne f:is-rtl-lang($primary-lang)]"/>
         <xsl:choose>
             <xsl:when test="$separate and $layout='pairs' and exists($pair)
                             and not(ancestor::p:parallelItem)
+                            and not(@f:parallel-block='true' or @f:note-lang)
                             and empty(text()[normalize-space()])
                             and count(tei:foreign)=2
                             and empty(*[not(self::tei:foreign)])
                             and count($primary)=1 and count($secondary)=1">
                 <!-- A shared bilingual rubric follows the actual column order,
                      rather than putting each language above the opposite column. -->
-                <xsl:text>\leavevmode\hbox dir TLT to \linewidth{\parbox[t]{\Lcolwidth}{</xsl:text>
+                <xsl:text>\OSBilingualRubric{</xsl:text>
                 <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $secondary else $primary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
                 <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $secondary else $primary" mode="emit"/>
-                <xsl:text>}\hfil\parbox[t]{\Rcolwidth}{</xsl:text>
+                <xsl:text>}{</xsl:text>
                 <xsl:value-of select="if (f:is-rtl-lang(string((if ($pair/@column-order='primary_last') then $primary else $secondary)/@xml:lang))) then '\raggedleft ' else '\raggedright '"/>
                 <xsl:apply-templates select="if ($pair/@column-order='primary_last') then $primary else $secondary" mode="emit"/>
-                <xsl:text>}}</xsl:text>
+                <xsl:text>}</xsl:text>
             </xsl:when>
             <xsl:when test="$separate and empty(text()[normalize-space()])
                             and exists(tei:foreign[@xml:lang])

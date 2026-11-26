@@ -84,6 +84,8 @@ class TestScanLinkGeometry(unittest.TestCase):
             self.assertTrue((work / "t.pdf").exists(),
                             f"lualatex produced no PDF:\n{done.stdout[-2000:]}")
             log = (work / "t.log").read_text(encoding="utf-8", errors="replace")
+            self.assertNotIn("undefined references", log)
+            self.assertNotIn("Label(s) may have changed", log)
             results = []
             for number, page in enumerate(PdfReader(work / "t.pdf").pages, 1):
                 height = float(page.mediabox.height)
@@ -115,8 +117,16 @@ class TestScanLinkGeometry(unittest.TestCase):
         }, all_pages=True)
         self.assertGreaterEqual(len(pages), 3)
         self.assertEqual(sum(len(links) for links, _, _ in pages), 40)
-        for links, words, _ in pages:
+        for number, (links, words, _) in enumerate(pages, 1):
             self.assertOutsideTheText(links, words)
+            text = self._text(words)
+            left, right = min(w.x0 for w in text), max(w.x1 for w in text)
+            arrows = [w for w in words if w.text == "↗"]
+            for link in links:
+                self.assertTrue(any(link.overlaps(arrow) for arrow in arrows), repr(link))
+                gap = left - link.x1 if number % 2 else link.x0 - right
+                self.assertGreater(gap, 3, repr(link))
+                self.assertLess(gap, 20, repr(link))
 
     @staticmethod
     def _text(words):
@@ -144,14 +154,18 @@ class TestScanLinkGeometry(unittest.TestCase):
     def test_shared_bilingual_rubric_typesets_above_matching_columns(self):
         note = ('<tei:note type="description"><tei:foreign xml:lang="he">חזן</tei:foreign>'
                 '<tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>')
-        xml = _PARALLEL.replace('<tei:body>', '<tei:body><tei:div>' + note).replace(
-            '</tei:body>', '</tei:div></tei:body>')
-        links, words, log = self._margin(xml, parallel={"layout": "pairs"})
-        self.assertNotIn('! LaTeX Error:', log)
-        self.assertEqual(len(links), 2)
-        reader = next(w for w in words if w.text == 'Reader')
-        hebrew = next(w for w in words if any('א' <= c <= 'ת' for c in w.text))
-        self.assertLess(hebrew.x1, reader.x0)
+        xml = _PARALLEL.replace('<tei:body>', '<tei:body>' + note)
+        for position in ['left', 'center', 'right']:
+            with self.subTest(position=position):
+                links, words, log = self._margin(
+                    xml, parallel={"layout": "pairs", "column_position": position})
+                self.assertNotIn('! LaTeX Error:', log)
+                self.assertEqual(len(links), 2)
+                reader = next(w for w in words if w.text == 'Reader')
+                hebrew = next(w for w in words if any('א' <= c <= 'ת' for c in w.text))
+                first_english = next(w for w in words if w.text.startswith('word'))
+                self.assertLess(hebrew.x1, reader.x0)
+                self.assertAlmostEqual(reader.x0, first_english.x0, delta=1)
 
     def test_a_hebrew_text_has_its_links_in_the_margin(self):
         links, words, log = self._margin(_SINGLE)
@@ -190,6 +204,14 @@ class TestScanLinkGeometry(unittest.TestCase):
             gap = min(max(w.x0 - link.x1, link.x0 - w.x1)
                       for w in self._text(self._line(link, words)))
             self.assertLess(gap, 6, f"{link} is not in its line")
+
+    def test_inline_hebrew_link_hitboxes_cover_the_visible_arrows(self):
+        links, words, _ = self._typeset(
+            _SINGLE, {"markers": {"scan_links": {"placement": "inline"}}})
+        arrows = [w for w in words if w.text == "↗"]
+        self.assertEqual(len(arrows), len(links))
+        for link in links:
+            self.assertTrue(any(link.overlaps(arrow) for arrow in arrows), repr(link))
 
     def test_the_symbol_is_in_the_font(self):
         _, _, log = self._margin(_SINGLE)
