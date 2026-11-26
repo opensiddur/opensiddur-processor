@@ -80,6 +80,8 @@ to other editions; apply the edition-specific decisions below only to this book.
   omissions so neighboring translations cannot drift into untranslated text.
 - Leave missing English absent. Do not supply another translator, placeholder
   prayer text or empty counterpart merely to make parallel output symmetrical.
+  When a later batch adds a translation of the same canonical text, recheck earlier
+  untranslated occurrences: global URN reuse must not fill their documented gaps.
 - Put biblical citations in anchored citation notes, without enclosing
   parentheses in the generated links. Preserve their documentary forms in
   reading evidence. Citation notes are not recited prayer words.
