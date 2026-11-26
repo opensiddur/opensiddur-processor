@@ -151,3 +151,37 @@ class TestComposition(unittest.TestCase):
         original=parse_fragment(self.composer.source(TEXT+'section'))
         self.assertTrue(original.xpath('.//j:conditional/tei:fs[@type="opensiddur:recitation"]',namespaces=NS))
         self.assertFalse(tree.xpath('.//j:declare',namespaces=NS))
+
+
+class TestBirnbaumPinsAreDropped(unittest.TestCase):
+    """Birnbaum pins some transclusions to itself. The expanded siddur leaves the edition to
+    the volume's priorities, so it copies none of those pins."""
+
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        root=Path(self.temp.name)
+        pin='@hasiddur_hashalem-birnbaum-1949-he'
+        for lang in ['he','en']:
+            p=root/f'hasiddur_hashalem-birnbaum-1949-{lang}';p.mkdir()
+            p.joinpath('index.xml').write_text(f'''<tei:TEI xmlns:tei="{T}" xmlns:j="{J}"><tei:text><tei:body>
+            <tei:div corresp="{TEXT}service"><j:transclude target="{TEXT}prayer:kaddish/yitgaddal{pin}"/>
+            <j:transclude target="{TEXT}structure{pin}"/>
+            <j:transclude target="{TEXT}bible:psalms/1/1{pin}" targetEnd="{TEXT}bible:psalms/1/3{pin}"/></tei:div>
+            <tei:div corresp="{TEXT}structure"><j:transclude target="{TEXT}prayer:kaddish/yehe_shemeh{pin}"/></tei:div>
+            <tei:div corresp="{TEXT}prayer:kaddish/yitgaddal"><tei:p>Words</tei:p></tei:div>
+            <tei:div corresp="{TEXT}prayer:kaddish/yehe_shemeh"><tei:p>Words</tei:p></tei:div>
+            </tei:body></tei:text></tei:TEI>''',encoding='utf-8')
+        self.composer=Composer(root)
+
+    def test_no_transclusion_keeps_a_pin(self):
+        tree=parse_fragment(self.composer.source(TEXT+'service'))
+        targets=tree.xpath('.//j:transclude/@target|.//j:transclude/@targetEnd',namespaces=NS)
+        self.assertEqual(sorted(targets),sorted([
+            TEXT+'prayer:kaddish/yitgaddal',TEXT+'prayer:kaddish/yehe_shemeh',
+            TEXT+'bible:psalms/1/1',TEXT+'bible:psalms/1/3']))
+
+    def test_a_pinned_structural_unit_is_expanded_like_an_unpinned_one(self):
+        targets=parse_fragment(self.composer.source(TEXT+'service')).xpath(
+            './/j:transclude/@target',namespaces=NS)
+        self.assertFalse([t for t in targets if t.startswith(TEXT+'structure')])
+        self.assertIn(TEXT+'prayer:kaddish/yehe_shemeh',targets)

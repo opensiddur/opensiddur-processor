@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- The expanded siddur no longer pins prayers to Birnbaum. Birnbaum pins some of its own
+  transclusions to itself (the Kaddish's parts among them), and the expanded siddur copied
+  them with the rest of Birnbaum's structure, so a volume could not take those prayers from
+  another edition by its priorities. The pins are now dropped, and a pinned structural unit
+  is expanded like any other.
 - The expanded siddur reads the right maftir on Shabbat Chol HaMoed Sukkot in Israel. It
   chose the day's maftir by the Diaspora's count alone, so in Israel, where Chol HaMoed begins
   a day earlier, it read the maftir of the day before: the first instead of the second when
