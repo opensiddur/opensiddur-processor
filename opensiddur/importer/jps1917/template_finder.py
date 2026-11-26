@@ -308,7 +308,7 @@ def print_tag_summary(tag_data: Dict) -> None: # pragma: no cover
     tags = tag_data['tags']
     tag_details = tag_data['tag_details']
     
-    print(f"\n=== MediaWiki Tag Analysis ===")
+    print("\n=== MediaWiki Tag Analysis ===")
     print(f"Pages processed: {tag_data['pages_processed']}")
     print(f"Total unique tags found: {len(tags)}")
     print(f"Total tag instances: {sum(tags.values())}")
@@ -316,7 +316,7 @@ def print_tag_summary(tag_data: Dict) -> None: # pragma: no cover
     if tag_data['errors']:
         print(f"Errors encountered: {len(tag_data['errors'])}")
     
-    print(f"\n=== Top 20 Most Used Tags ===")
+    print("\n=== Top 20 Most Used Tags ===")
     # Sort tags by usage count
     sorted_tags = sorted(tags.items(), key=lambda x: x[1], reverse=True)
     for tag_name, count in sorted_tags[:20]:
@@ -325,7 +325,7 @@ def print_tag_summary(tag_data: Dict) -> None: # pragma: no cover
         if details['attributes']:
             print(f"  Attributes: {', '.join(list(details['attributes'])[:5])}{'...' if len(details['attributes']) > 5 else ''}")
     
-    print(f"\n=== All Tags (sorted by name) ===")
+    print("\n=== All Tags (sorted by name) ===")
     for tag_name in sorted(tags.keys()):
         count = tags[tag_name]
         details = tag_details[tag_name]
@@ -342,7 +342,7 @@ def print_template_summary(template_data: Dict) -> None: # pragma: no cover
     templates = template_data['templates']
     template_details = template_data['template_details']
     
-    print(f"\n=== MediaWiki Template Analysis ===")
+    print("\n=== MediaWiki Template Analysis ===")
     print(f"Pages processed: {template_data['pages_processed']}")
     print(f"Total unique templates found: {len(templates)}")
     print(f"Total template instances: {sum(templates.values())}")
@@ -350,7 +350,7 @@ def print_template_summary(template_data: Dict) -> None: # pragma: no cover
     if template_data['errors']:
         print(f"Errors encountered: {len(template_data['errors'])}")
     
-    print(f"\n=== Top 20 Most Used Templates ===")
+    print("\n=== Top 20 Most Used Templates ===")
     # Sort templates by usage count
     sorted_templates = sorted(templates.items(), key=lambda x: x[1], reverse=True)
     for template_name, count in sorted_templates[:20]:
@@ -359,7 +359,7 @@ def print_template_summary(template_data: Dict) -> None: # pragma: no cover
         if details['parameters']:
             print(f"  Parameters: {', '.join(list(details['parameters'])[:5])}{'...' if len(details['parameters']) > 5 else ''}")
     
-    print(f"\n=== All Templates (sorted by name) ===")
+    print("\n=== All Templates (sorted by name) ===")
     for template_name in sorted(templates.keys()):
         count = templates[template_name]
         details = template_details[template_name]

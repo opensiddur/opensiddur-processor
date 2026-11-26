@@ -774,7 +774,7 @@ class TestProcessMediawiki(unittest.TestCase):
         }
         
         # Call function
-        result = process_mediawiki(1, 3, "body")
+        process_mediawiki(1, 3, "body")
         
         # Verify get_page was called for each page
         self.assertEqual(mock_get_page.call_count, 3)
@@ -813,7 +813,7 @@ class TestProcessMediawiki(unittest.TestCase):
         }
         
         # Call function with front wrapper
-        result = process_mediawiki(1, 1, "front", wrapper_div_type="preface")
+        process_mediawiki(1, 1, "front", wrapper_div_type="preface")
         
         # Check the XML content passed to mediawiki_xml_to_tei
         call_args = mock_mediawiki_xml_to_tei.call_args
@@ -846,7 +846,7 @@ class TestProcessMediawiki(unittest.TestCase):
         }
         
         # Call function with various kwargs
-        result = process_mediawiki(
+        process_mediawiki(
             1, 1, "body",
             book_name="genesis",
             is_section=True,
@@ -1576,7 +1576,7 @@ class TestIndexFile(unittest.TestCase):
         mock_tei_file.return_value = "<tei:TEI>Test TEI</tei:TEI>"
         
         # Call function
-        result = index_file(test_index)
+        index_file(test_index)
         
         # Get the body content passed to tei_file for the index
         # Find the call for the index (not the recursive calls for books)

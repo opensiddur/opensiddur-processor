@@ -191,7 +191,7 @@ def bind_corrections(readings, items):
                     for key in ('repeat', 'transclude'):
                         if segment.get(key) and touches(segment[key], None, binding):
                             raise ValueError('Corrected shared words require attested canonical pointers')
-        def check_spine(order):
+        def check_spine(order, binding=binding):
             for occurrence in order:
                 reference = occurrence.get('reference')
                 if reference and touches(reference['target'], reference.get('targetEnd'), binding):

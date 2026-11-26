@@ -72,7 +72,7 @@ def pizmon(parent, reading, lang, context):
         if lang=='he' and not stanza.get('prose'):
             # One call retains an unfinished verse across the printed page break.
             prepared=copy.deepcopy(fragments);cues=[]
-            def cue_token(match):
+            def cue_token(match, cues=cues):
                 cues.append((match.group(0),opening if opening_cue and match.group(0)==opening_cue else reading.get('refrain_expansions',{}).get(lang,{}).get(match.group(0),reading['refrain'][lang])))
                 return '__CUE_'+str(len(cues)-1)+'__|'
             for fragment in prepared:

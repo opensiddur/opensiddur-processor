@@ -3597,7 +3597,7 @@ class TestParallelHeadings(unittest.TestCase):
         English title in a Hebrew book Hebrew, so it was set \texthebrew and its words,
         each separately wrapped against the Hebrew around them, were laid out right to
         left: "Blessing After Meals" printed as "Meals After Blessing"."""
-        out = _transform(f"""<?xml version="1.0" encoding="UTF-8"?>
+        out = _transform("""<?xml version="1.0" encoding="UTF-8"?>
         <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
                  xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
           <tei:text><tei:body>

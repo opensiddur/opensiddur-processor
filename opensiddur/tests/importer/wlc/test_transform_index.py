@@ -340,28 +340,7 @@ class TestTransformIndexXSLT(unittest.TestCase):
         # So we skip this test as it would require actual file structure
         # The tanach template exists but is for a different context
         self.skipTest("tanach notes transformation requires proper XML structure - test in integration")
-        
-        input_file = self.test_dir / "input.xml"
-        output_file = self.test_dir / "output.xml"
-        input_file.write_text(input_xml)
-        
-        xslt_transform(self.xslt_path, input_file, output_file, xslt_params=PARAMS)
-        
-        result = output_file.read_text()
-        
-        # Should have standOff (with tei: prefix)
-        self.assertIn('<tei:standOff type="notes">', result)
-        
-        # Notes should have IDs and corresp
-        self.assertIn('xml:id="note_a"', result)
-        self.assertIn('corresp="urn:cite:opensiddur:bible.tanakh.notes.wlc.a"', result)
-        self.assertIn('xml:id="note_b"', result)
-        self.assertIn('corresp="urn:cite:opensiddur:bible.tanakh.notes.wlc.b"', result)
-        
-        # Content should be present
-        self.assertIn('Test note content here', result)
-        self.assertIn('Another note', result)
-    
+
     def test_skipped_elements_not_in_output(self):
         """Test that coding, encodingDesc, editor, respStmt, notesStmt, profileDesc are skipped"""
         input_xml = '''<?xml version="1.0" encoding="UTF-8"?>

@@ -47,10 +47,10 @@ def prettify_xml(xml_string: str,
             pretty_xml = pretty_xml.decode(encoding)
      
         return pretty_xml.rstrip()
-    except lxml_etree.XMLSyntaxError as e:
+    except lxml_etree.XMLSyntaxError:
         # Re-raise XMLSyntaxError (which is a subclass of ParseError) with original error
         raise
-    except lxml_etree.ParseError as e:
+    except lxml_etree.ParseError:
         # Re-raise ParseError with original error
         raise
 

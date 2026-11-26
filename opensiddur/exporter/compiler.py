@@ -1363,8 +1363,6 @@ class CompilerProcessor:
         return copied
 
 
-TEI_NS = "http://www.tei-c.org/ns/1.0"
-
 
 def gather_credits(element, linear_data) -> None:
     """Record every contributor credit in a document, before its header is dropped.

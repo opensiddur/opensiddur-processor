@@ -671,7 +671,7 @@ def validate_generated(documents, readings):
                             fragments.append(fragment)
                             previous_scan = fragment['scan']
                     actual_pbs, prefix = [], []
-                    def walk(node):
+                    def walk(node, actual_pbs=actual_pbs, prefix=prefix):
                         # Rubrics are preserved in the documentary context,
                         # but are absent from the literal prayer fragments.
                         if node.tag == T+'note':

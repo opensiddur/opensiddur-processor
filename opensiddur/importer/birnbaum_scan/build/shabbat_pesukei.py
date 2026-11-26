@@ -51,7 +51,7 @@ def shared(lang,prayers):
         for ref in OLD_REFERENCES.get(p['name'],()):
             source=BIBLE+ref; local=p['urn']+'/'+ref.replace('/','_')
             pattern=r'(<tei:milestone\b[^>]*corresp="'+re.escape(source)+r'"[^>]*/>)(.*?)(?=<tei:milestone\b)'
-            def move(m):
+            def move(m, source=source, local=local):
                 return m[1].replace(source,local)+f'<tei:seg source="{source}">'+m[2]+'</tei:seg>'
             p['body'],count=re.subn(pattern,move,p['body'],flags=re.S)
             if count!=1:raise ValueError(f'Expected one earlier {source} in {p["name"]}')

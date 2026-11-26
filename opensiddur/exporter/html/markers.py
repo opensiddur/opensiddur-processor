@@ -318,7 +318,7 @@ def _rows(root: etree.ElementBase, measured, book: BookConditions) -> None:
         sets: set[frozenset[int]] = set()
         unconditional = False
 
-        def record(text, active):
+        def record(text, active, sets=sets):
             nonlocal unconditional
             if not (text and text.strip()):
                 return
