@@ -126,8 +126,9 @@ The blind survey of scans5–12 does not make those pages part of this acceptanc
 - [x] Close independent encoding review of the three scan12–13 scripture modules,
       including single-verse identity/provenance and earlier Shema provenance equivalence.
 - [ ] Inspect and independently review the three scripture modules’ exports.
-- [ ] Encode and review Hashkivenu and half Kaddish, with role/variant context
-      in the service spine, then complete the remaining scans5–24 batch gates.
+- [x] Encode and independently review Hashkivenu and half Kaddish text modules.
+- [ ] Close their contextual service and complete-export gates with the rest of
+      scans5–24.
 
 Complete accepted scans remain **4/385**. Excerpt approval and complete source
 readings do not change that count while service, encoding or presentation gates
@@ -138,3 +139,14 @@ are approved with no unresolved reading questions. User977 confirmed patah under
 alef in the small scan16 rubric. The source ledger now records24 approved source
 readings among scans1–24, separately from4/385 complete accepted scans. Remaining
 encoding, service/conditional/expanded order and export gates remain open.
+
+The complete evening draft now contains47 prayer modules (87 Hebrew/English
+witnesses), documentary service spines and one shared expanded sequence. All
+source inputs are hash-checked and every witness regenerates byte-identically
+with schema validation.59 focused tests and19 subtests pass. Initial independent
+reviews and closure records remain separate from final batch acceptance.
+
+The compiled matrix passes communal/individual recitation, mourner presence,
+optional Malkenu, Motzaei Shabbat true/false, two real evening dates and first-/
+second-day selection. Final rubric/dependency closure and complete PDF/HTML
+presentation review are still required; accepted coverage remains4/385.

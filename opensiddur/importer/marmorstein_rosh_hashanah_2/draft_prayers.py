@@ -10,7 +10,9 @@ from pathlib import Path
 import re
 
 from opensiddur.common.constants import PROJECT_DIRECTORY, SOURCETEXTS_ROOT
-from opensiddur.importer.scan.authoring import TEI, XML, append_words, element, write_documents
+from opensiddur.importer.scan.authoring import (
+    TEI, XML, append_words, apply_corrections, conditional_scope, element, write_documents,
+)
 from opensiddur.importer.util.internet_archive import page_image_url
 from opensiddur.importer.util.validation import validate
 from . import BOOK, IDENTIFIER, PROJECTS
@@ -45,8 +47,8 @@ def excerpt_header(unit, lang, witness):
     desc = root.find(f'{{{TEI}}}teiHeader/{{{TEI}}}fileDesc')
     desc.find(f'{{{TEI}}}titleStmt/{{{TEI}}}title').text = unit['titles'][lang]
     desc.find(f'{{{TEI}}}editionStmt/{{{TEI}}}edition').text = (
-        'DRAFT excerpt: batch transcription, encoding and presentation acceptance '
-        'pending. Evidence: sources/marmorstein_rosh_hashanah_2/batches/.')
+        'JLPTEI witness of this edition. Batch scope, review status and acceptance '
+        'evidence are recorded in sources/marmorstein_rosh_hashanah_2/batches/.')
     desc.find(f'{{{TEI}}}publicationStmt/{{{TEI}}}idno').text = unit['urn']+'@'+PROJECTS[lang]
     source = desc.find(f'{{{TEI}}}sourceDesc')
     source.clear()
@@ -58,32 +60,74 @@ def excerpt_header(unit, lang, witness):
     return root
 
 
+def content_start_page(content, current):
+    """Locate the first visible words after any leading physical-page markers."""
+    def pieces(items):
+        for item in items:
+            if isinstance(item, dict) and any(key in item for key in
+                                              ('quotation', 'source_span', 'marked_variant')):
+                yield from pieces(next(iter(item.values()))['content'])
+            else:
+                yield item
+    for item in pieces(content):
+        if isinstance(item, str) and not item.strip():
+            continue
+        if isinstance(item, dict) and set(item) == {'page_break'}:
+            current = item['page_break']['scan_page']
+            continue
+        break
+    return current
+
+
 def append_prayer_content(parent, content, scan_page):
     """Keep Biblical scopes bounded independently of a prayer's alignment parts."""
     for item in content:
-        if isinstance(item, dict) and set(item) == {'quotation'}:
+        if isinstance(item, dict) and set(item) == {'marked_variant'}:
+            variant = item['marked_variant']
+            if set(variant) != {'id', 'feature', 'content'}:
+                raise ValueError('Unsupported marked variant')
+            scope = conditional_scope(parent, variant['id'], True,
+                                      fs_type='opensiddur:variant', feature=variant['feature'])
+            scope.set('type', 'marked')
+            scan_page = append_prayer_content(parent, variant['content'], scan_page)
+            element(parent, 'j:endConditional', target='#'+variant['id'])
+        elif isinstance(item, dict) and set(item) == {'source_span'}:
+            source = item['source_span']
+            if set(source) - {'urn', 'content', 'type'} or not {'urn', 'content'} <= set(source):
+                raise ValueError('Unsupported source span')
+            attributes = {'source': source['urn'],
+                          'facs': page_image_url(IDENTIFIER,
+                                                 content_start_page(source['content'], scan_page)-1)}
+            if source.get('type'):
+                attributes['type'] = source['type']
+            span = element(parent, 'seg', **attributes)
+            scan_page = append_prayer_content(span, source['content'], scan_page)
+        elif isinstance(item, dict) and set(item) == {'quotation'}:
             quote = item['quotation']
-            if set(quote) != {'urn', 'chapter', 'verse', 'content'}:
+            if set(quote) - {'urn', 'chapter', 'verse', 'content', 'subverse'} or not {
+                    'urn', 'chapter', 'verse', 'content'} <= set(quote):
                 raise ValueError('Unsupported prayer quotation')
-            if not quote['urn'].endswith('/'+str(quote['chapter'])+'/'+str(quote['verse'])):
+            subverse = quote.get('subverse')
+            unit, number = 'verse', quote['verse']
+            suffix = '/'+str(quote['chapter'])+'/'+str(quote['verse'])
+            if subverse:
+                if (set(subverse) != {'unit', 'n'} or subverse['unit'] not in
+                        {'half-verse', 'verse-part'} or
+                        (subverse['unit'] == 'half-verse' and subverse['n'] not in {'a', 'b'})):
+                    raise ValueError('Unsupported subverse scope')
+                unit, number = subverse['unit'], subverse['n']
+                suffix += '/'+number
+            if not quote['urn'].endswith(suffix):
                 raise ValueError('Quotation chapter/verse disagrees with its URN')
-            start_page = scan_page
-            for piece in quote['content']:
-                if isinstance(piece, str) and not piece.strip():
-                    continue
-                if isinstance(piece, dict) and set(piece) == {'page_break'}:
-                    start_page = piece['page_break']['scan_page']
-                    continue
-                break
+            start_page = content_start_page(quote['content'], scan_page)
             element(parent, 'milestone', unit='chapter', n=quote['chapter'])
-            element(parent, 'milestone', unit='verse', n=quote['verse'],
-                    corresp=quote['urn'])
+            element(parent, 'milestone', unit=unit, n=number, corresp=quote['urn'])
             span = element(parent, 'seg', source=quote['urn'],
                            facs=page_image_url(IDENTIFIER, start_page-1))
             last_page = append_content(span, quote['content'])
             if last_page is not None:
                 scan_page = last_page
-            element(parent, 'milestone', unit='verse')
+            element(parent, 'milestone', unit=unit)
             element(parent, 'milestone', unit='chapter')
         else:
             last_page = append_content(parent, [item])
@@ -92,11 +136,31 @@ def append_prayer_content(parent, content, scan_page):
     return scan_page
 
 
+def ending_printed_page(content, current):
+    """Follow page breaks through the same nested spans as the content writer."""
+    for item in content:
+        if not isinstance(item, dict):
+            continue
+        if 'page_break' in item:
+            current = item['page_break']['printed_page']
+        else:
+            for key in ('quotation', 'marked_variant', 'source_span'):
+                if key in item:
+                    current = ending_printed_page(item[key]['content'], current)
+    return current
+
+
 def prayer_document(unit, lang, witness):
     """Preserve source paragraphs while aligning reusable canonical prayer parts."""
     parts = witness['parts']
     if not parts:
         raise ValueError('A prayer needs at least one part')
+    end_page = witness['printed_page']
+    for part in parts:
+        end_page = ending_printed_page(part['content'], end_page)
+    if witness.get('printed_page_end', end_page) != end_page:
+        raise ValueError('Prayer-part end page disagrees with its page breaks')
+    witness = dict(witness, printed_page_end=end_page)
     root = excerpt_header(unit, lang, witness)
     text = root.find(f'{{{TEI}}}text')
     text.clear()
@@ -127,6 +191,35 @@ def prayer_document(unit, lang, witness):
 
 def excerpt_document(unit, lang, witness):
     """Use this volume's credits; put contextual rubrics in the later service spine."""
+    if 'paragraphs' in witness:
+        if not witness['paragraphs']:
+            raise ValueError('A prayer needs at least one paragraph')
+        if 'parts' in witness or 'verses' in witness:
+            raise ValueError('Paragraphs cannot also define parts or verses')
+        if set(witness) - {'paragraphs', 'scan_page', 'printed_page',
+                           'printed_page_end', 'text_language'}:
+            raise ValueError('Unsupported whole-prayer witness fields')
+        if any(not paragraph for paragraph in witness['paragraphs']):
+            raise ValueError('A prayer paragraph cannot be empty')
+        end_page = witness['printed_page']
+        for content in witness['paragraphs']:
+            end_page = ending_printed_page(content, end_page)
+        if witness.get('printed_page_end', end_page) != end_page:
+            raise ValueError('Whole-prayer end page disagrees with its page breaks')
+        witness = dict(witness, printed_page_end=end_page)
+        root = excerpt_header(unit, lang, witness)
+        text = root.find(f'{{{TEI}}}text')
+        text.clear()
+        div = element(element(text, 'body'), 'div', corresp=unit['urn'])
+        element(div, 'pb', ed='1965', n=witness['printed_page'],
+                facs=page_image_url(IDENTIFIER, witness['scan_page']-1))
+        current_page = witness['scan_page']
+        for content in witness['paragraphs']:
+            paragraph = element(div, 'p')
+            if witness.get('text_language'):
+                paragraph.set(XML+'lang', witness['text_language'])
+            current_page = append_prayer_content(paragraph, content, current_page)
+        return root
     if 'parts' in witness:
         return prayer_document(unit, lang, witness)
     is_range = 'verses' in witness
@@ -215,6 +308,8 @@ def main(argv=None):
             else:
                 targets.append((path,
                                 excerpt_document(unit, lang, witness)))
+    apply_corrections({str(path.relative_to(args.project_directory)): root
+                       for path, root in targets}, recipe.get('corrections', []))
     for path in write_documents(targets, validator=validate, obsolete_paths=obsolete):
         print(path)
     return 0

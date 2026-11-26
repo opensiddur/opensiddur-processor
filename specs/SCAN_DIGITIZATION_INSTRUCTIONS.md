@@ -89,6 +89,22 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Keep place-specific role directions, variants and settings in the service or
   structural occurrence, rather than embedding them in reusable prayer words.
   Review both an abbreviation and its expansion, including combined speakers.
+- Use edition-qualified URNs for transclusions; project/file pointers used in
+  bibliography are not transclusion targets. Check actual resolved ranges,
+  including the path-depth fallback for units outside the containment table;
+  do not infer a prayer-part's endpoint solely from its next same-unit marker.
+- Use `half-verse` and `verse-part` for registered subverses, with their own
+  terminators. Repeated or adapted quotations may retain bounded `seg/@source`
+  attribution without advertising another canonical verse witness. A prayer-part
+  identity must retain its established introduction as well as the quoted words.
+- Derive or verify bibliographic end pages through nested quotations and optional
+  spans. A span beginning with a page marker needs the following page's `facs`,
+  even when selected without its preceding source paragraph.
+- Put a condition's printed label inside its `j:conditional` note, so a decided
+  condition suppresses the label. Combine bilingual labels in that one note.
+  Keep speaker/how descriptions distinct from directives. In a shared expanded
+  sequence, deduplicate identical same-language facing-page rubrics; preserve
+  differing source roles. Omit scopes that have no counterpart content.
 
 ## Page directions and expanded recitation
 

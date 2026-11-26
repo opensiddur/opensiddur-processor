@@ -87,3 +87,28 @@ whole prayer; this witness does not supply the deeper `/text` identity.
 Kaddish uses `text_language: arc` on its witness, which annotates only its
 paragraphs and preserves the Hebrew publication language. Contextual role,
 calendar and quorum selection remain separate service-review gates.
+
+The complete evening recipe is `batches/maariv_s5_s24/evening_sequence.json`.
+Its `prayer_recipes` list is the ownership manifest for all47 modules. Generate
+each listed recipe with `draft_prayers`, then assemble the documentary indexes
+and shared expanded entry:
+
+```bash
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.evening \
+  --draft --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project
+```
+
+`paragraphs` witnesses expose a whole prayer without inventing child identities.
+`quotation.subverse` selects a registered `half-verse` or `verse-part` unit;
+repeated/adapted `source_span` content keeps attribution without duplicating the
+canonical verse. `marked_variant` uses an existing named optional wording.
+Recipe-level `corrections` reuse the shared exact-locator sic/corr helper.
+
+The service recipe owns roles, condition labels, directives and local settings.
+Missing counterparts produce neither empty prayer files nor empty scopes. The
+expanded entry supplies the unprinted Hebrew Kaddish/Yigdal dependencies and
+records their first-day bibliography. A hash-bound, exact Titqabbal source span
+is exposed in the expanded project without editing the accepted first-day file.
+The three settings files select documentary Hebrew, documentary parallel and
+expanded second-night output. Generation alone does not accept the batch.

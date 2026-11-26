@@ -66,6 +66,122 @@ class ExcerptTests(unittest.TestCase):
         self.assertEqual(paragraphs[-1][-1].get('unit'), 'prayer-part')
         self.assertIsNone(paragraphs[-1][-1].get('corresp'))
 
+    def test_recorded_misprint_preserves_source_and_fails_if_locator_is_stale(self):
+        from opensiddur.importer.scan.authoring import printed_text
+        unit = self.recipe['units'][0]
+        unit['he'] = {'scan_page': 23, 'printed_page': '9',
+                      'paragraphs': [['An invented misprit.']]}
+        self.recipe['corrections'] = [{
+            'id': 'invented_typo', 'file': PROJECTS['he']+'/invented_prayer.xml',
+            'sic': 'misprit', 'corr': 'misprint', 'before': 'An invented ', 'after': '.'}]
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        path = self.base/'projects'/PROJECTS['he']/'invented_prayer.xml'
+        root = etree.parse(str(path))
+        self.assertEqual(printed_text(root.xpath('//t:body//t:p', namespaces=NS)[0]),
+                         'An invented misprit.')
+        self.assertEqual(root.xpath('string(//t:choice/t:corr)', namespaces=NS), 'misprint')
+        previous = path.read_bytes()
+        self.recipe['corrections'][0]['sic'] = 'not present'
+        with self.assertRaisesRegex(ValueError, 'places match'):
+            self.run_builder()
+        self.assertEqual(path.read_bytes(), previous)
+
+    def test_optional_word_has_registered_variant_condition_not_literal_brackets(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        unit = self.recipe['units'][0]
+        feature = 'urn:x-opensiddur:condition:prayer:amidah/melokh_al_kol_haolam/malkenu'
+        witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [
+            ['Before ', {'marked_variant': {'id': 'optional_word', 'feature': feature,
+                                           'content': ['word ']}}, 'after.']]}
+        root = excerpt_document(unit, 'he', witness)
+        self.assertEqual(root.xpath('string(//t:body//t:p)', namespaces=NS),
+                         'Before word after.')
+        self.assertEqual(root.xpath('string(//j:conditional/@type)', namespaces=NS), 'marked')
+        self.assertEqual(root.xpath('string(//j:conditional/t:fs/t:f/@name)', namespaces=NS),
+                         feature)
+        self.assertEqual(root.xpath('string(//j:endConditional/@target)', namespaces=NS),
+                         '#optional_word')
+
+    def test_repeated_quotation_keeps_source_attribution_without_a_second_verse_identity(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        unit = self.recipe['units'][0]
+        source = 'urn:x-opensiddur:text:bible:exodus/15/18'
+        witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [[
+            {'source_span': {'urn': source, 'content': ['Repeated printing.']}}]]}
+        root = excerpt_document(unit, 'he', witness)
+        self.assertEqual(root.xpath('//t:seg/@source', namespaces=NS), [source])
+        self.assertEqual(root.xpath('//t:milestone[@unit="verse"]/@corresp', namespaces=NS), [])
+
+    def test_subverse_has_its_own_number_and_matching_scope_terminator(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        unit = self.recipe['units'][0]
+        source = 'urn:x-opensiddur:text:bible:psalms/55/15/b'
+        witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [[
+            {'quotation': {'urn': source, 'chapter': '55', 'verse': '15',
+                           'subverse': {'unit': 'half-verse', 'n': 'b'},
+                           'content': ['Only the second half.']}}, ' Following prose.']]}
+        root = excerpt_document(unit, 'he', witness)
+        marks = root.xpath('//t:milestone[@unit="half-verse"]', namespaces=NS)
+        self.assertEqual([m.get('corresp') for m in marks], [source, None])
+        self.assertEqual(marks[0].get('n'), 'b')
+        self.assertFalse(root.xpath('//t:milestone[@unit="verse"][@corresp]', namespaces=NS))
+
+    def test_page_inside_optional_span_updates_the_bibliography(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        unit = self.recipe['units'][0]
+        witness = {'scan_page': 23, 'printed_page': '9', 'paragraphs': [[
+            {'marked_variant': {'id': 'nested', 'feature': 'invented', 'content': [
+                {'source_span': {'urn': 'urn:x-opensiddur:text:bible:psalms/7/2',
+                                 'content': [{'page_break': {'scan_page': 25,
+                                                            'printed_page': '10'}}, 'Words']}}]}}]]}
+        root = excerpt_document(unit, 'he', witness)
+        self.assertEqual(root.xpath('string(//t:biblScope/@to)', namespaces=NS), '10')
+        self.assertIn('/page/n24', root.xpath('string(//t:seg/@facs)', namespaces=NS))
+
+    def test_prayer_parts_derive_and_check_bibliographic_end_page(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import prayer_document
+        unit = self.recipe['units'][0]
+        witness = {'scan_page': 23, 'printed_page': '9', 'parts': [
+            {'urn': unit['urn']+'/opening', 'content': ['Before ',
+             {'page_break': {'scan_page': 25, 'printed_page': '10'}}, 'after.']}]}
+        root = prayer_document(unit, 'he', witness)
+        self.assertEqual(root.xpath('string(//t:biblScope/@to)', namespaces=NS), '10')
+        witness['printed_page_end'] = '9'
+        with self.assertRaisesRegex(ValueError, 'end page disagrees'):
+            prayer_document(unit, 'he', witness)
+
+
+    def test_whole_prayer_needs_no_invented_part_and_keeps_page_continuations(self):
+        from opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers import excerpt_document
+        unit = self.recipe['units'][0]
+        witness = {'scan_page': 23, 'printed_page': '9', 'text_language': 'arc', 'paragraphs': [
+            ['First ', {'page_break': {'scan_page': 25, 'printed_page': '10'}},
+             'continued.'], ['Second paragraph.']]}
+        root = excerpt_document(unit, 'he', witness)
+        self.assertEqual(root.xpath('//t:body//*[@corresp]/@corresp', namespaces=NS),
+                         [unit['urn']])
+        self.assertEqual(root.xpath('//t:body//t:pb/@n', namespaces=NS), ['9', '10'])
+        self.assertEqual([''.join(p.itertext()) for p in
+                          root.xpath('//t:body//t:p', namespaces=NS)],
+                         ['First continued.', 'Second paragraph.'])
+        self.assertEqual(root.get('{http://www.w3.org/XML/1998/namespace}lang'), 'he')
+        self.assertEqual(root.xpath('//t:body//t:p/@xml:lang', namespaces=NS), ['arc', 'arc'])
+        self.assertEqual(root.xpath('string(//t:biblScope/@to)', namespaces=NS), '10')
+        self.assertIn('/page/n24', root.xpath('string(//t:p/t:pb/@facs)', namespaces=NS))
+        witness['printed_page_end'] = '9'
+        with self.assertRaisesRegex(ValueError, 'end page disagrees'):
+            excerpt_document(unit, 'he', witness)
+        del witness['printed_page_end']
+        witness['citation'] = 'Must not be silently discarded'
+        with self.assertRaisesRegex(ValueError, 'Unsupported whole-prayer'):
+            excerpt_document(unit, 'he', witness)
+        del witness['citation']
+        witness['parts'] = []
+        with self.assertRaisesRegex(ValueError, 'cannot also'):
+            excerpt_document(unit, 'he', witness)
+
     def test_paragraph_continuation_keeps_the_existing_prayer_part_scope(self):
         unit = self.recipe['units'][0]
         unit['he'] = {'scan_page': 23, 'printed_page': '9', 'parts': [

@@ -63,6 +63,27 @@ second-day settings. Preserve the first-day settings and recitation paths. Sourc
 selection must distinguish printed witnesses and day-specific structural occurrences
 without inventing new canonical identities for repeated prayers.
 
+Second-night decisions: preserve the printed doubled leela and omit English
+where absent. Malkenu is the existing named optional wording, independent of the
+calendar. Vattodienu and the fire/Havdalah pair depend on Motzaei Shabbat; close
+their scopes before Vattitten Lanu and Shehecheyanu respectively. Keep Yigdal
+outside the minyan/mourner gate. The existing user723 holam-supply convention for
+the literal Tetragrammaton applies here too: record supplied marks separately from
+the unchanged scan readings and leave the two-yod abbreviation as printed.
+
+The shared expanded index excludes its original first-volume sequence on the
+second day; it must retain the original Erev Rosh ha-Shanah services, so do not
+restrict that entire sequence to holiday day1. The second-night entry has its own
+day2/ Maariv selection. Compatible unprinted Hebrew dependencies keep explicit
+first-day bibliography and licences; they introduce no first-day English notes
+or translations into the new documentary projects.
+
+Day-two Yitbarakh ends before its untranslated Psalm113:2 tail, which the new
+spine transcludes once separately. The older first-day Hebrew Yitbarakh range
+includes that tail. Record this cross-witness extent divergence and keep a
+separately reviewed first-day terminator correction as maintenance work; do not
+silently fall back between those two ranges in the new sequence.
+
 ## Inventory, opening batch and review
 
 1. Inventory every Archive leaf, including blanks, cover, title, other front matter
