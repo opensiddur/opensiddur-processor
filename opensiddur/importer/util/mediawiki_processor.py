@@ -169,7 +169,7 @@ class MediaWikiProcessor:
                         processed_node = self._process_template_with_nesting(node, depth + 1)
                         replacement = self.template_handlers[template_name](processed_node)
                         nodes_to_replace.append((node, replacement))
-                    except Exception as e:
+                    except Exception:
                         # If nested processing fails, try without nesting
                         replacement = self.template_handlers[template_name](node)
                         nodes_to_replace.append((node, replacement))
@@ -186,7 +186,7 @@ class MediaWikiProcessor:
                         processed_node = self._process_tag_with_nesting(node, depth + 1)
                         replacement = self.tag_handlers[tag_name](processed_node)
                         nodes_to_replace.append((node, replacement))
-                    except Exception as e:
+                    except Exception:
                         # If nested processing fails, try without nesting
                         replacement = self.tag_handlers[tag_name](node)
                         nodes_to_replace.append((node, replacement))
@@ -199,7 +199,7 @@ class MediaWikiProcessor:
                 try:
                     replacement = self._handle_wikilink(node)
                     nodes_to_replace.append((node, replacement))
-                except Exception as e:
+                except Exception:
                     # If wikilink processing fails, keep original
                     nodes_to_replace.append((node, str(node)))
         

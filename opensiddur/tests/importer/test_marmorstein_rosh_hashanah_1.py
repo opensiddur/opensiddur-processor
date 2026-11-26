@@ -1307,7 +1307,7 @@ class EditionWiringTest(unittest.TestCase):
                 settings = {('opensiddur:recitation', 'repetition'): repetition,
                             ('opensiddur:quorum', 'minyan'): minyan}
                 processor = Mock()
-                processor.get_active_setting.side_effect = lambda kind, feature: settings.get((kind, feature))
+                processor.get_active_setting.side_effect = lambda kind, feature, settings=settings: settings.get((kind, feature))
                 self.assertEqual(evaluate_condition(condition, processor), expected)
 
     def test_person_gender_uses_registered_symbol_and_selects_one_alternative(self):

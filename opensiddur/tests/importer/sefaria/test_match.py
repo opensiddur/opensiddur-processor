@@ -571,7 +571,7 @@ class TestStageTwo(unittest.TestCase):
                           f'<tei:milestone unit="verse" corresp="{T}bible:malachi/3/4"/>{verse} '
                           f'<tei:milestone unit="verse" corresp="{T}bible:malachi/3/5"/>{" ".join(UNKNOWN)}'
                           f'</tei:p></tei:div><tei:div corresp="{T}prayer:qorbanot/vearvah"><tei:p>{verse}</tei:p></tei:div>')
-        outcome = decide([("L", items(f"<b>וְעָרְבָה</b> לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם",
+        outcome = decide([("L", items("<b>וְעָרְבָה</b> לַיהוָה מִנְחַת יְהוּדָה וִירוּשָׁלָם",
                                       "כִּימֵי עוֹלָם וּכְשָׁנִים קַדְמֹנִיּוֹת"))], index)
         self.assertEqual(outcome.decided[0].urn, T + "bible:malachi/3/4")
 

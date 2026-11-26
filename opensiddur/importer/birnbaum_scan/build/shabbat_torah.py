@@ -137,7 +137,7 @@ def units(project,by_name):
     add('opening','הוצאת ספר תורה','Taking out the Torah',361,367,conditional('public_opening','When a minyan holds service:',MINYAN,opening))
     reading=instruction('Congregation and Reader:')+local('reading/veattem',old('veattem'))+instruction('The person called to the Torah recites:')+old('barekhu')
     reading+=instruction('He repeats the response and continues:')+local('reading/blessings',old('asher_bachar'))+instruction('The Torah is read. Then he recites:')+old('asher_natan')
-    reading+=conditional('hagomel',GOMEL_RUBRIC,feature(PERSON,'birkat-hagomel'),f'<tei:div>'+editorial_head(lang,'בִּרְכַת הַגּוֹמֵל','THANKSGIVING')+local('reading/hagomel',old('hagomel'))+'</tei:div>')
+    reading+=conditional('hagomel',GOMEL_RUBRIC,feature(PERSON,'birkat-hagomel'),'<tei:div>'+editorial_head(lang,'בִּרְכַת הַגּוֹמֵל','THANKSGIVING')+local('reading/hagomel',old('hagomel'))+'</tei:div>')
     reading+=conditional('bar_mitzvah','The father of a Bar-Mitzvah pronounces the following blessing:',feature(PERSON,'bar-mitzvah-father'),new('bar_mitzvah'))
     reading+=instruction('On behalf of each person called to the Torah:')+new('mi_aliyah')
     for key,label in [('mi_daughter','On the occasion of naming a new-born daughter:'),('mi_sick_man','On behalf of a sick man:'),('mi_sick_woman','On behalf of a sick woman:')]:
