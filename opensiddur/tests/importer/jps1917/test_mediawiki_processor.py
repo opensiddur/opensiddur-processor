@@ -606,7 +606,7 @@ class TestEdgeCases(unittest.TestCase):
     
     def test_wikilink_capture_and_retrieval(self):
         """Test that wikilinks can be retrieved and cleared"""
-        result = self.processor.process_wikitext('[[Page1]] and [[Page2]]')
+        self.processor.process_wikitext('[[Page1]] and [[Page2]]')
         
         # Get wikilinks
         wikilinks = self.processor.get_wikilinks()

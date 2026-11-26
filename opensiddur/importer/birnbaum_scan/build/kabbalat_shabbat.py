@@ -42,7 +42,7 @@ def shared(lang, prayers):
             local=p['urn']+'/'+source.replace('/','_')
             pattern=(r'(<tei:milestone\b[^>]*corresp="'+re.escape(biblical)
                      +r'"[^>]*/>)(.*?)(?=<tei:milestone\b)')
-            def move(m):
+            def move(m, biblical=biblical, local=local):
                 return m[1].replace(biblical,local)+f'<tei:seg source="{biblical}">'+m[2]+'</tei:seg>'
             p['body'], count=re.subn(pattern,move,p['body'],flags=re.S)
             if count!=1: raise ValueError(f'Expected one earlier occurrence of {biblical}')

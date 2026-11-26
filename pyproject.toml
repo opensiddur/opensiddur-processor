@@ -52,6 +52,7 @@ Issues = "https://github.com/opensiddur/opensiddur-processor/issues"
 dev = [
     "ipykernel>=6.30.1",
     "coverage>=7.0.0",
+    "ruff>=0.17.6,<1",
 ]
 test = [
     "pytest>=8.4.2",
@@ -63,3 +64,21 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["opensiddur"]
+
+[tool.ruff]
+target-version = "py312"
+# The submodules hold data, not code.
+extend-exclude = ["sourcetexts", "opensiddur-projects"]
+
+[tool.ruff.lint]
+# Listed explicitly: ruff's default rule set changes between releases. This first set is
+# the checks that find bugs: syntax errors, pyflakes, closures over loop variables and
+# pylint's errors.
+select = ["E9", "F", "B023", "PLE"]
+# Unused imports are removed together with import sorting.
+ignore = ["F401"]
+
+[tool.ruff.lint.per-file-ignores]
+# These build on everything siddur_expanded.xml defines.
+"opensiddur/importer/siddur_expanded/build.py" = ["F403", "F405"]
+"opensiddur/importer/siddur_expanded/readings.py" = ["F403", "F405"]

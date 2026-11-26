@@ -331,7 +331,7 @@ class TestColours(unittest.TestCase):
 
     def test_a_whole_coloured_cell(self) -> None:
         rows = [[cell("eng-Latn", "english", "One line")],
-                [f'<td><div class="english" lang="eng-Latn" style="color:green;">Added<br />lines</div></td>']]
+                ['<td><div class="english" lang="eng-Latn" style="color:green;">Added<br />lines</div></td>']]
         _, projects = build(make_post(content=table(["Source (English)"], rows)),
                             decisions=PostDecisions(colours={101: {"green": "amendment"}}))
         assert_valid(self, projects)

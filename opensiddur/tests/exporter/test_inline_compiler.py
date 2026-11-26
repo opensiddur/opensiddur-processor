@@ -1198,7 +1198,6 @@ class TestInlineCompilerProcessorAnnotations(unittest.TestCase):
         note_path = note_element.getroottree().getpath(note_element)
 
         # Mock the reference database to return the note
-        from opensiddur.exporter.refdb import Reference
         mock_reference = Reference(
             project=note_project,
             file_name=note_file,
@@ -1249,7 +1248,7 @@ class TestInlineCompilerProcessorAnnotations(unittest.TestCase):
         # Create main file with element that has a corresp and falls within range
         project, file_name, _ = self._create_file_with_element_for_annotation(
             "test_project", "main.xml", start_urn, end_urn,
-            f'<tei:note type="instruction">Inline instruction note</tei:note>'
+            '<tei:note type="instruction">Inline instruction note</tei:note>'
         )
 
         self.refdb.get_references_to.return_value = []
