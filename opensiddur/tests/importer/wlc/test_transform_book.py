@@ -43,7 +43,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -69,7 +69,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     <tanach><book><names><name>Genesis</name></names></book></tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -97,7 +97,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     <tanach><book><names><name>Genesis</name></names></book></tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -127,7 +127,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     <tanach><book><names><name>Genesis</name></names></book></tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -157,7 +157,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     <tanach><book><names><name>Test Book</name></names></book></tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -189,7 +189,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     <tanach><book><names><name>Genesis</name></names></book></tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -219,7 +219,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -252,7 +252,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -290,7 +290,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -324,7 +324,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -367,7 +367,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
 
@@ -403,7 +403,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -435,7 +435,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -468,7 +468,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -504,7 +504,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -538,7 +538,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -572,7 +572,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -605,7 +605,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -641,7 +641,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </notes>
 </Tanach>'''
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
 
@@ -672,7 +672,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -705,7 +705,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -751,7 +751,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -791,7 +791,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     <tanach><book><names><name>Genesis</name></names></book></tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -835,7 +835,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -874,7 +874,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -911,7 +911,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -944,7 +944,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -981,7 +981,7 @@ class TestTransformBookXSLT(unittest.TestCase):
     </tanach>
 </Tanach>'''
         
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             
@@ -1027,7 +1027,7 @@ class TestBookUrnName(unittest.TestCase):
         </book>
     </tanach>
 </Tanach>'''
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt') as f:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xslt', delete_on_close=False) as f:
             f.write(self.xslt_content)
             f.flush()
             result = xslt_transform_string(Path(f.name), input_xml, xslt_params=PARAMS)

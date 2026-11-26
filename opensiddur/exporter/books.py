@@ -149,7 +149,7 @@ def check(settings_file: Path, settings_directory: Path, project_directory: Path
 def read_raw(settings_file: Path) -> dict:
     """ A settings file's YAML, unvalidated. Raises OSError or yaml.YAMLError if it cannot be
     read, and TypeError if it is not a mapping. """
-    with open(settings_file, "r") as f:
+    with open(settings_file, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
     if not isinstance(data, dict):
         raise TypeError(f"{settings_file} is not a mapping")
@@ -223,7 +223,7 @@ def build(
         "pdf": ([], "opensiddur.exporter.pdf.pdf", "typesetting"),
         "html": (["--destination", "electronic"], "opensiddur.exporter.html.html", "rendering"),
     }
-    with tempfile.TemporaryDirectory() as temp, open(log_file, "w") as log:
+    with tempfile.TemporaryDirectory() as temp, open(log_file, "w", encoding="utf-8") as log:
         for extension in (f for f in requested if f in result.formats):
             compile_options, stage, doing = stages[extension]
             compiled = Path(temp) / f"compiled-{extension}.xml"

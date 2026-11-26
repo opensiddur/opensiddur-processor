@@ -1,7 +1,7 @@
 """Tests for splitting MAM's verses onto the canonical verse division.
 
 The fixtures are synthetic: a miniature ``miqra:book`` carrying just enough structure to
-exercise each case. They deliberately do not read MAM's TSV, so a change to the source
+exercise each case. They deliberately do not read MAM's files, so a change to the source
 cannot turn these into failures.
 """
 
@@ -40,8 +40,7 @@ def book(*rows: str, file_name: str = "exodus") -> str:
 
 def row(chapter: int, verse: int, text: str) -> str:
     return (
-        f'<miqra:row source="torah" pageKey="p" rowId="r" '
-        f'chapter="{chapter}" verse="{verse}">'
+        f'<miqra:row chapter="{chapter}" verse="{verse}">'
         f"<miqra:nav/><miqra:scaffold/><miqra:text>{text}</miqra:text>"
         f"</miqra:row>"
     )

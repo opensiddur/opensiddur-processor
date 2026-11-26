@@ -27,7 +27,7 @@ class TestMorningTorahOpening(unittest.TestCase):
             base = Path(temp)
             (base/'synthetic').mkdir()
             (base/'synthetic/index.xml').write_text(
-                f'<root xmlns:tei="{T}" xmlns:j="{J}">'+body+'</root>')
+                f'<root xmlns:tei="{T}" xmlns:j="{J}">'+body+'</root>', encoding='utf-8')
             data = get_linear_data()
             data.xml_cache.base_path = base
             CompilerProcessor.load_init_settings(data, yaml_to_declaration_entries(declarations))

@@ -220,14 +220,14 @@ class TestMissingSpanCli(unittest.TestCase):
         with TemporaryDirectory() as d:
             root=Path(d);book=root/'sources/birnbaum_siddur'
             foundation=book/'source/text/אשכנז/דפי יסוד';foundation.mkdir(parents=True)
-            (foundation/'דף.txt').write_text('<קטע התחלה=א/>אַלֶף<קטע סוף=א/>')
+            (foundation/'דף.txt').write_text('<קטע התחלה=א/>אַלֶף<קטע סוף=א/>',encoding='utf-8')
             (book/'text').mkdir();out=book/'scan_reading/transcription';out.mkdir(parents=True)
             for page,span in [(26,'חסר'),(27,'א')]:
-                (book/'text'/f'{page:03d}.txt').write_text('{{#קטע:ספר/אשכנז/דפי יסוד/דף|'+span+'}}')
+                (book/'text'/f'{page:03d}.txt').write_text('{{#קטע:ספר/אשכנז/דפי יסוד/דף|'+span+'}}',encoding='utf-8')
             with redirect_stderr(StringIO()):status=transcription._cli(['1','2','--sourcetexts',str(root)])
             self.assertEqual(status,1)
             self.assertFalse((out/'1.txt').exists())
-            self.assertEqual((out/'2.txt').read_text(),'אַלֶף\n')
+            self.assertEqual((out/'2.txt').read_text(encoding='utf-8'),'אַלֶף\n')
 
     def test_renamed_havdalah_span_keeps_both_nested_parts(self):
         foundation='קידוש והבדלה וסעודות שבת ויום טוב';old='ברכת המבדיל בין קודש לקודש'

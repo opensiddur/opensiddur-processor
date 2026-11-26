@@ -274,7 +274,7 @@ texts:
     urn: urn:x-opensiddur:text:prayer:kiddush/savri
     note: "the Kiddush's call to attention; Ashkenaz סברי מרנן"
   - opens: יהללוך יהוה אלהינו כל מעשיך
-    urn: urn:x-opensiddur:text:prayer:hallel/yehalelukha
+    urn: urn:x-opensiddur:text:prayer:hallel/yehallelukha
     note: "Hallel's closing blessing, worded otherwise than Birnbaum's"
   - opens: סברי מרנן ורבנן
     urn: urn:x-opensiddur:text:prayer:kiddush/savri

@@ -40,7 +40,7 @@ def validate(xml: Path | str,
             xml_str = xml
             xml_doc = etree.fromstring(xml)
         else:
-            with open(xml, "r") as f:
+            with open(xml, "r", encoding="utf-8") as f:
                 xml_str = f.read()
             xml_doc = etree.parse(str(xml))
         
@@ -122,7 +122,7 @@ def relaxng_validate(
         else:
             xml_content = etree.tostring(xml_doc, encoding='unicode', pretty_print=True)
         # Create temporary XML file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', encoding='utf-8') as xml_temp:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', encoding='utf-8', delete_on_close=False) as xml_temp:
             xml_temp.write(xml_content)
             xml_temp.flush()
             xml_temp.seek(0)
@@ -130,7 +130,7 @@ def relaxng_validate(
             # Handle schema input
             if isinstance(schema_file, str) and schema_file.strip().startswith('<'):
                 # Schema is provided as a string
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.rng', encoding='utf-8') as schema_temp:
+                with tempfile.NamedTemporaryFile(mode='w', suffix='.rng', encoding='utf-8', delete_on_close=False) as schema_temp:
                     schema_content = re.sub(r'^<\?xml[^>]*\?>\s*', '', schema_file)
                     schema_temp.write(schema_content)
                     schema_temp.flush()
@@ -180,7 +180,7 @@ def _rng_with_start(start_element: str) -> str:
     # make sure the new start exists. It may be named s/:/_/
 
     start_element_ref = start_element.replace(":", "_")
-    with open(SCHEMA_RNG_PATH, "r") as f:
+    with open(SCHEMA_RNG_PATH, "r", encoding="utf-8") as f:
         schema = f.read()
         # Replace the start element in the RelaxNG schema with the given start_element
         # This assumes the schema uses <start>...</start> as the entry point

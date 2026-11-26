@@ -37,7 +37,7 @@ Q = f"{{{MIQRA_NS}}}"
 SOF_PASUQ = "׃"
 
 #: The ta'am elyon strand. ``א`` is ta'am tachton, which is the reading MAM's own verse
-#: division follows; see the strand labels documented in the source's ``templates.tsv``.
+#: division follows; see the strand labels MAM-parsed documents (``mpplus_dualcant.html``).
 ELYON_STRAND = "ב"
 
 

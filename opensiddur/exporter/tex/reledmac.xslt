@@ -175,6 +175,9 @@
         <!-- For the logo in the distribution notice. -->
         <xsl:text>\usepackage{graphicx}&#10;</xsl:text>
         <xsl:text>\usepackage{hyperref}&#10;</xsl:text>
+        <!-- Printed folios restart at title leaves and at main matter. Name page
+             destinations with hyperref's independent shipout counter instead. -->
+        <xsl:text>\hypersetup{hypertexnames=false}&#10;</xsl:text>
         <!-- Headings go four deep (index > section > haftarah > rite), and f:heading-toc-level
              emits the fourth as \addcontentsline{toc}{paragraph}. The book class stops the
              table of contents at subsection, and hyperref takes its bookmark depth from that,
@@ -3396,7 +3399,15 @@ end
 
     <xsl:template match="tei:l" mode="leaves">
         <xsl:apply-templates select="node()" mode="leaves"/>
-        <xsl:if test="not(@p:part = ('first', 'middle'))">
+        <!-- A removed optional verse may leave only correspondence or page markers.
+             Keep those leaves, but do not spend a poetry row on their empty container.
+             A final split fragment still closes the line begun by its earlier parts. -->
+        <xsl:if test="not(@p:part = ('first', 'middle'))
+                      and (@p:part = 'last'
+                           or exists(.//tei:lb | .//tei:space | .//tei:gap
+                                     | .//tei:graphic | .//tei:ref[@type = 'page']
+                                     | .//j:conditional[@type = 'marked'] | .//j:endConditional)
+                           or f:sets-text(.))">
             <!-- Hard line break inside the current pstart -->
             <xsl:element name="tei:lb" namespace="http://www.tei-c.org/ns/1.0"/>
         </xsl:if>

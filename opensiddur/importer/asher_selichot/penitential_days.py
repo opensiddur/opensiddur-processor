@@ -35,8 +35,8 @@ J = 'http://jewishliturgy.org/ns/jlptei/2'
 
 
 def readings(source,day):
-    manifest=json.loads((source/(manifest_name(day)+'.json')).read_text())
-    units=[json.loads((source/name).read_text()) for name in manifest['readings']]
+    manifest=json.loads((source/(manifest_name(day)+'.json')).read_text(encoding="utf-8"))
+    units=[json.loads((source/name).read_text(encoding="utf-8")) for name in manifest['readings']]
     starts=('performance_instruction',) if day=='circumcision' else ('opening_instruction','weekday_amidah')
     ends=('zekhor_berit_avraham_circumcision_recension',) if day=='circumcision' else ('conclusion','conclusion_repeat')
     if not manifest['complete'] or units[0]['id'] not in starts or units[-1]['id'] not in ends:
@@ -72,7 +72,7 @@ def pizmon(parent, reading, lang, context):
         if lang=='he' and not stanza.get('prose'):
             # One call retains an unfinished verse across the printed page break.
             prepared=copy.deepcopy(fragments);cues=[]
-            def cue_token(match):
+            def cue_token(match, cues=cues):
                 cues.append((match.group(0),opening if opening_cue and match.group(0)==opening_cue else reading.get('refrain_expansions',{}).get(lang,{}).get(match.group(0),reading['refrain'][lang])))
                 return '__CUE_'+str(len(cues)-1)+'__|'
             for fragment in prepared:
@@ -230,7 +230,7 @@ def documents(source,day):
 
 def verify_evidence(source,units,day):
     folder=manifest_name(day)
-    records=json.loads((source.parent/(folder+'-proofreading.json')).read_text())['readings']
+    records=json.loads((source.parent/(folder+'-proofreading.json')).read_text(encoding="utf-8"))['readings']
     if [r['id'] for r in records]!=[u['id'] for u in units]:raise ValueError('Stale penitential day proofreading scope')
     for r in records:
         for key,prefix in [('initial_sha256','initial/'),('assembled_sha256','assembled-preocr/'),('working_sha256','')]:

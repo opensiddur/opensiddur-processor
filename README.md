@@ -63,10 +63,12 @@ Example: run the JPS 1917 importer:
 uv run python -m opensiddur.importer.jps1917.convert_wikisource
 ```
 
-Example: download Miqra al pi ha-Masorah from Google Sheets into sourcetexts:
+Example: download Miqra al pi ha-Masorah, as MAM-parsed plus JSON from MAM-basics, into
+sourcetexts, then convert it:
 
 ```bash
 uv run python -m opensiddur.importer.miqra_al_pi_hamasorah.download
+uv run python -m opensiddur.importer.miqra_al_pi_hamasorah.convert
 ```
 
 ## JLPTEI sources

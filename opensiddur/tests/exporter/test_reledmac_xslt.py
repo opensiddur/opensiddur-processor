@@ -3597,7 +3597,7 @@ class TestParallelHeadings(unittest.TestCase):
         English title in a Hebrew book Hebrew, so it was set \texthebrew and its words,
         each separately wrapped against the Hebrew around them, were laid out right to
         left: "Blessing After Meals" printed as "Meals After Blessing"."""
-        out = _transform(f"""<?xml version="1.0" encoding="UTF-8"?>
+        out = _transform("""<?xml version="1.0" encoding="UTF-8"?>
         <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0"
                  xmlns:p="http://jewishliturgy.org/ns/processing" xml:lang="he">
           <tei:text><tei:body>
@@ -5390,6 +5390,17 @@ class TestScanLinks(unittest.TestCase):
         return transform(self._paragraph(marked),
                          typography={"markers": {"scan_links": {"placement": placement}}}
                          ).split(r"\begin{document}")[1]
+
+    def test_source_page_link_survives_a_continuing_instruction(self):
+        from lxml import etree
+        from opensiddur.exporter.scan_links import mark_scan_links
+        root = etree.fromstring(self._document(
+            '<tei:note type="instruction">before '
+            '<tei:pb n="2" facs="https://scan.example/2"/>after</tei:note>').encode())
+        mark_scan_links(root)
+        out = transform(etree.tostring(root).decode(),
+                        typography={"markers": {"scan_links": {"placement": "inline"}}})
+        self.assertIn(r"before \OSScanLink{https://scan.example/2}after", out)
 
     def test_inline(self):
         self.assertIn(

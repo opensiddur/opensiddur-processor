@@ -68,6 +68,7 @@ def _write_manifest(path: Path, manifest: dict[str, Any]) -> None:
     path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 
@@ -150,6 +151,7 @@ def download_osp_compilation(
     metadata_path.write_text(
         yaml.safe_dump(metadata, allow_unicode=True, sort_keys=False),
         encoding="utf-8",
+        newline="\n",
     )
 
     files: list[dict[str, Any]] = [

@@ -10,8 +10,8 @@ from .check_first_day_pdf import latin_note_runs
 
 
 def check(tree,source_root=SOURCETEXTS_ROOT,expanded=False):
-    source=Path(source_root)/'asher_selichot/scan_reading';manifest=json.loads((source/'yom-kippur-katan.json').read_text())
-    units=[json.loads((source/name).read_text()) for name in manifest['readings']]
+    source=Path(source_root)/'asher_selichot/scan_reading';manifest=json.loads((source/'yom-kippur-katan.json').read_text(encoding="utf-8"))
+    units=[json.loads((source/name).read_text(encoding="utf-8")) for name in manifest['readings']]
     he,_,headings=glyph_rows(tree)
     en=glyph_rows(tree,minimum_font_size=10)[1];deltas=[]
     for poem in [u for u in units if u['kind']=='pizmon']:

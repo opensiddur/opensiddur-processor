@@ -57,6 +57,99 @@ class TestWhichBreaksAreCandidates(unittest.TestCase):
         self.assertEqual([], _marked(
             "<tei:p>words<tei:note>" + _pb("1") + "a note</tei:note> more</tei:p>"))
 
+    def test_a_break_within_a_visible_rubric_keeps_its_exact_position(self):
+        for kind in ("instruction", "description"):
+            with self.subTest(kind=kind):
+                root = _tree(f'<tei:note type="{kind}">before '
+                             + _pb("2") + '<tei:hi>after</tei:hi></tei:note><tei:p>prayer</tei:p>')
+                note = root.find(f".//{TEI}note")
+                mark_scan_links(root)
+                self.assertEqual(["2"], _linked(root))
+                pb = root.find(f".//{TEI}pb")
+                self.assertIs(note, pb.getparent())
+                self.assertEqual(f"{TEI}hi", pb.getnext().tag)
+
+    def test_rubric_page_break_inside_standoff_or_commentary_is_not_linked(self):
+        for wrapper in ("<tei:standOff>{}</tei:standOff>",
+                        '<tei:note type="commentary">{}</tei:note>'):
+            with self.subTest(wrapper=wrapper):
+                note = '<tei:note type="instruction">' + _pb("2") + "rubric</tei:note>"
+                self.assertEqual([], _marked(wrapper.format(note)))
+
+    def test_a_break_at_the_end_of_a_rubric_attaches_to_next_prayer(self):
+        root = _tree('<tei:note type="instruction">rubric' + _pb("2")
+                     + '</tei:note><tei:p>prayer</tei:p>')
+        mark_scan_links(root)
+        pb = root.find(f".//{TEI}pb")
+        self.assertEqual(["2"], _linked(root))
+        self.assertEqual(f"{TEI}p", pb.getparent().tag)
+        self.assertEqual("prayer", pb.tail)
+
+    def test_ordinary_note_words_do_not_keep_a_rubric_break(self):
+        root = _tree('<tei:note type="instruction">rubric' + _pb("2")
+                     + '<tei:note type="commentary">annotation</tei:note></tei:note>'
+                     + '<tei:p>prayer</tei:p>')
+        mark_scan_links(root)
+        self.assertEqual(f"{TEI}p", root.find(f".//{TEI}pb").getparent().tag)
+
+    def test_a_break_cannot_move_past_a_later_page_inside_a_rubric(self):
+        root = _tree(_pb("1") + '<tei:note type="instruction">rubric '
+                     + _pb("2") + 'continued</tei:note><tei:p>prayer</tei:p>')
+        first = root.find(f".//{TEI}pb")
+        parent = first.getparent()
+        mark_scan_links(root)
+        self.assertEqual(["1", "2"], _linked(root))
+        self.assertIs(parent, first.getparent())
+
+    def test_a_rubric_break_stays_a_barrier_after_it_moves_to_next_prayer(self):
+        root = _tree(_pb("1") + '<tei:note type="instruction">rubric '
+                     + _pb("2") + '</tei:note><tei:p>prayer</tei:p>')
+        mark_scan_links(root)
+        self.assertEqual(["1", "2"], _linked(root))
+
+    def test_an_edition_with_only_a_rubric_break_needs_no_ordinary_context(self):
+        self.assertEqual(["rubric"], _marked(
+            '<tei:note type="instruction">' + _pb("rubric", "1949 shabbat/opening")
+            + 'rubric words</tei:note>'))
+
+    def test_rubric_uses_all_its_groups_printings_when_an_earlier_page_selects_one(self):
+        inner = _transclude(
+            "urn:prayer", '<tei:note type="instruction">'
+            + _pb("r", "1949 chol/shacharit/b") + 'rubric</tei:note><tei:p>'
+            + _pb("s", "1949 chol/shacharit/b") + _pb("m", "1949 chol/minchah/a")
+            + 'words</tei:p>')
+        body = _transclude("urn:book", '<tei:p>' + _pb("e", "1949 chol/minchah/a")
+                           + 'earlier</tei:p>' + inner)
+        self.assertEqual(["e", "m"], _marked(body))
+
+    def test_many_transclusions_keep_their_own_printing_groups_alive(self):
+        body = "".join(
+            _transclude(f"urn:prayer:{n}", '<tei:p>' + _pb(f"p{n}") + 'prayer</tei:p>'
+                        + '<tei:note type="instruction">' + _pb(f"r{n}")
+                        + 'rubric</tei:note>') for n in range(40))
+        self.assertEqual([value for n in range(40) for value in (f"p{n}", f"r{n}")],
+                         _marked(body))
+
+    def test_rubric_printing_never_changes_a_later_groups_printing_choice(self):
+        shared = _transclude("urn:prayer", '<tei:p>' + _pb("a", "1949 chol/opening")
+                            + _pb("b", "1949 shabbat/opening") + 'words</tei:p>')
+        rubric = ('<tei:note type="instruction">' + _pb("rubric", "1949 shabbat/opening")
+                  + 'rubric words</tei:note>')
+        self.assertEqual(["a", "b"], _marked(shared))
+        self.assertEqual(["rubric", "a", "b"], _marked(rubric + shared))
+
+    def test_another_columns_rubric_break_does_not_pin_this_columns_break(self):
+        body = ('<p:parallel><p:parallelItem role="primary">' + _pb("1")
+                + '</p:parallelItem><p:parallelItem role="parallel">'
+                + '<tei:note type="instruction">before ' + _pb("2")
+                + 'after</tei:note></p:parallelItem></p:parallel>'
+                + '<p:parallel><p:parallelItem role="primary"><tei:p>prayer</tei:p>'
+                + '</p:parallelItem></p:parallel>')
+        root = _tree(body)
+        mark_scan_links(root)
+        first = next(pb for pb in root.iter(f"{TEI}pb") if pb.get("n") == "1")
+        self.assertEqual(f"{TEI}p", first.getparent().tag)
+
     def test_nothing_else_is_changed(self):
         root = _tree("<tei:p>" + _pb("1", facs=False) + "words</tei:p>")
         before = etree.tostring(root)
@@ -383,3 +476,150 @@ class TestTheContextTheEditionPrints(unittest.TestCase):
             + _transclude(SIDDUR + "regalim/musaf",
                           "<tei:p>" + _pb("615", "1949 festival musaf") + "Musaf</tei:p>"))
         self.assertEqual(["600", "615"], _marked(body))
+
+
+class TestPageChanges(unittest.TestCase):
+    def test_one_link_per_page_across_paragraphs_and_transclusions(self):
+        root = _tree(_transclude("urn:a", "<tei:p>" + _pb("1") + "first</tei:p>")
+                     + _transclude("urn:b", "<tei:p>" + _pb("1") + "second</tei:p>")
+                     + "<tei:p>" + _pb("2") + "third</tei:p>")
+        before = "".join(root.itertext())
+        mark_scan_links(root)
+        self.assertEqual(_linked(root), ["1", "2"])
+        self.assertEqual(len(list(root.iter(TEI+"pb"))), 3)
+        self.assertEqual("".join(root.itertext()), before)
+
+    def test_returning_to_an_earlier_page_needs_its_link_again(self):
+        self.assertEqual(_marked("".join("<tei:p>" + _pb(n) + "words</tei:p>"
+                                        for n in ("1", "2", "1"))), ["1", "2", "1"])
+
+    def test_scan_identity_overrides_repeated_printed_page_label(self):
+        body = "<tei:p>" + _pb("1") + "first</tei:p><tei:p>" + _pb("2").replace('n="2"', 'n="1"') + "second</tei:p>"
+        self.assertEqual(_marked(body), ["1", "1"])
+
+    def test_parallel_columns_have_independent_page_states(self):
+        def item(role, page):
+            return f'<p:parallelItem role="{role}"><tei:p>' + _pb(page) + 'words</tei:p></p:parallelItem>'
+        root = _tree('<p:parallel>' + item('primary', '1') + item('secondary', '1')
+                     + item('primary', '1') + item('secondary', '2') + '</p:parallel>')
+        mark_scan_links(root)
+        self.assertEqual(_linked(root), ['1', '1', '2'])
+
+    def test_a_conditional_link_does_not_hide_an_unconditional_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>' + _pb('1') + 'optional words</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'
+        body += '<tei:p>' + _pb('1') + 'required words</tei:p>'
+        self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_a_conditional_page_change_requires_a_link_after_the_scope(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>'
+        body += f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>' + _pb('2') + 'optional</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'
+        body += '<tei:p>' + _pb('1') + 'last</tei:p>'
+        self.assertEqual(_marked(body), ['1', '2', '1'])
+
+    def test_same_page_through_a_conditional_is_not_a_page_change(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>'
+        body += f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>' + _pb('1') + 'optional</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'
+        body += '<tei:p>' + _pb('1') + 'last</tei:p>'
+        self.assertEqual(_marked(body), ['1'])
+
+    def test_optional_rubric_cannot_hide_required_page_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        for condition in ('', f'<j:condition xmlns:j="{j}"/>'):
+            with self.subTest(condition=bool(condition)):
+                root = _tree('<tei:note type="instruction">' + condition + _pb('1')
+                             + 'optional instruction</tei:note><tei:p>' + _pb('1') + 'required</tei:p>')
+                mark_scan_links(root)
+                self.assertEqual(_linked(root), ['1', '1'])
+
+    def test_implicit_conditional_ends_at_parent_end_with_or_without_id(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        for identifier in ('', ' xml:id="optional"'):
+            with self.subTest(identifier=identifier):
+                body = f'<tei:div><j:conditional xmlns:j="{j}"{identifier}/>'
+                body += '<tei:p>' + _pb('1') + 'optional</tei:p></tei:div>'
+                body += '<tei:p>' + _pb('1') + 'required</tei:p>'
+                self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_unknown_end_marker_does_not_hide_a_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#absent"/>'
+        body += '<tei:p>' + _pb('1') + 'after unmatched end</tei:p>'
+        self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_nested_conditionals_preserve_both_paths(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        def start(key):
+            return f'<j:conditional xmlns:j="{j}" xml:id="{key}"/>'
+        def end(key):
+            return f'<j:endConditional xmlns:j="{j}" target="#{key}"/>'
+        body = '<tei:p>' + _pb('1') + 'first</tei:p>' + start('outer')
+        body += '<tei:p>' + _pb('2') + 'outer</tei:p>' + start('inner')
+        body += '<tei:p>' + _pb('3') + 'inner</tei:p>' + end('inner') + end('outer')
+        body += '<tei:p>' + _pb('1') + 'last</tei:p>'
+        self.assertEqual(_marked(body), ['1', '2', '3', '1'])
+
+    def test_editions_keep_independent_page_states(self):
+        body = '<tei:p>' + _pb('1', '1949') + 'first</tei:p>'
+        body += '<tei:p>' + _pb('2', '1965') + 'second</tei:p>'
+        body += '<tei:p>' + _pb('1', '1949') + 'still first edition page</tei:p>'
+        self.assertEqual(_marked(body), ['1', '2'])
+
+    def test_project_columns_and_shared_wrapper_do_not_share_page_state(self):
+        for projects in (('he-project', 'en-project'), (None, None)):
+            with self.subTest(projects=projects):
+                def item(role, project):
+                    attr = f' p:project="{project}"' if project else ''
+                    return f'<p:parallelItem role="{role}"{attr}><tei:p>' + _pb('1') + 'words</tei:p></p:parallelItem>'
+                body = '<p:transclude target="urn:book" p:project="he-project"><p:parallel>'
+                body += ''.join(item(role, project) for _ in range(2)
+                                for role, project in zip(('primary', 'secondary'), projects))
+                body += '</p:parallel></p:transclude>'
+                self.assertEqual(_marked(body), ['1', '1'])
+
+    def test_attached_duplicate_remains_in_tree_without_link_mark(self):
+        root = _tree('<tei:p>' + _pb('1') + 'first</tei:p>' + _pb('1') + '<tei:p>second</tei:p>')
+        mark_scan_links(root)
+        pages = list(root.iter(TEI+'pb'))
+        self.assertEqual(_linked(root), ['1'])
+        self.assertEqual(len(pages), 2)
+        self.assertEqual(pages[1].getparent().tag, TEI+'p')
+        self.assertEqual(pages[1].tail, 'second')
+        self.assertIsNone(pages[1].get(SCAN_LINK))
+
+    def test_electronic_compile_keeps_conditional_pair_through_transclusion(self):
+        import tempfile
+        from pathlib import Path
+        from opensiddur.exporter.linear import LinearData
+        from opensiddur.exporter.external_compiler import ExternalCompilerProcessor
+        from opensiddur.exporter.refdb import ReferenceDatabase
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            project = base/'sample'
+            project.mkdir()
+            wrapper = f'<tei:TEI xmlns:tei="{TEI_NS}" xmlns:j="{j}" xml:lang="he"><tei:text><tei:body>{{}}</tei:body></tei:text></tei:TEI>'
+            (project/'index.xml').write_text(wrapper.format('<j:transclude target="urn:x-opensiddur:text:prayer:sample"/>'), encoding='utf-8')
+            body = '<j:conditional xml:id="optional"><tei:fs type="opensiddur:holiday-aggregate"><tei:f name="shabbat"><tei:binary value="true"/></tei:f></tei:fs></j:conditional>'
+            body += '<tei:p>' + _pb('1') + 'optional</tei:p><j:endConditional target="#optional"/>'
+            body += '<tei:p>' + _pb('1') + 'required</tei:p>'
+            (project/'part.xml').write_text(wrapper.format('<tei:div corresp="urn:x-opensiddur:text:prayer:sample">'+body+'</tei:div>'), encoding='utf-8')
+            data = LinearData(defer_reader_settings=True, project_priority=["sample"])
+            data.xml_cache.base_path = base
+            with ReferenceDatabase(base/'refs.db') as db:
+                db.index_project('sample', base)
+                result = ExternalCompilerProcessor('sample', 'index.xml', linear_data=data, reference_database=db).process()[0]
+            start = next(result.iter('{'+j+'}conditional'))
+            end = next(result.iter('{'+j+'}endConditional'))
+            self.assertEqual(end.get('target'), '#'+start.get('{http://www.w3.org/XML/1998/namespace}id'))
+            mark_scan_links(result)
+            self.assertEqual(_linked(result), ['1', '1'])

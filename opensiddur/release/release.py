@@ -72,7 +72,7 @@ class Repository:
             raise ReleaseError(f"{' '.join(args)} failed ({result.returncode}).")
 
     def read(self, relative: str) -> str:
-        return (self.root / relative).read_text()
+        return (self.root / relative).read_text(encoding="utf-8")
 
     def write(self, relative: str, text: str) -> None:
         """Write a file, or, under --dry-run, only record what would be written."""
@@ -82,7 +82,7 @@ class Repository:
             logger.info("would write: %s (%d bytes)", relative, len(text))
             return
         logger.info("writing: %s", relative)
-        path.write_text(text)
+        path.write_text(text, encoding="utf-8")
 
     # --- read-only queries -------------------------------------------------
 

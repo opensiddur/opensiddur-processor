@@ -1189,6 +1189,18 @@ class TestScanLinks(unittest.TestCase):
         mark = ' p:scan-link="true"' if marked else ""
         return f'<tei:pb n="3v" ed="1822" facs="{self._URL}"{mark}/>'
 
+    def test_source_page_link_survives_a_continuing_instruction(self):
+        from opensiddur.exporter.scan_links import mark_scan_links
+        note = etree.fromstring(
+            f'<tei:note xmlns:tei="{TEI_NS}" type="instruction">before '
+            '<tei:pb n="2" facs="https://scan.example/2"/>after</tei:note>')
+        mark_scan_links(note)
+        out = _render(etree.tostring(note).decode(), **{"scan-links": "inline"})
+        link = out.find(".//h:a[@data-n='2']", NS)
+        self.assertIsNotNone(link)
+        self.assertEqual("https://scan.example/2", link.get("href"))
+        self.assertEqual("after", link.tail)
+
     def test_a_marked_break_links_to_its_scan(self):
         out = _render(f"<tei:p>{self._pb()}words</tei:p>", **{"scan-links": "margin"})
         link = out.find(".//h:a[@data-n='3v']", NS)
@@ -1248,11 +1260,12 @@ class TestScanLinkCss(unittest.TestCase):
 
     def test_margin_is_kept_inside_the_row_and_only_on_wide_screens(self):
         css = self._css(placement="margin")
-        margin = css[css.index("@media (min-width: 40.001rem) { .os-book"):]
+        margin = css[css.index("@media (min-width: 40.001rem) { @supports (float: inline-start) { .os-book"):]
         self.assertIn(".par { padding-inline: 1.6rem; }", margin)
         self.assertIn(".col { position: relative; --scan-link-offset: -1.6rem; }", margin)
-        self.assertIn(".scan-link-margin { position: absolute; "
-                      "inset-inline-start: var(--scan-link-offset); }", margin)
+        self.assertIn(".scan-link-margin { float: inline-start; clear: inline-start; width: 1em; ", margin)
+        self.assertIn("margin-inline-start: var(--scan-link-offset); ", margin)
+        self.assertIn("margin-inline-end: calc(-1em - var(--scan-link-offset)); }", margin)
 
 
 class TestRunInRubricTextSpace(unittest.TestCase):

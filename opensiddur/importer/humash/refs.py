@@ -107,7 +107,7 @@ OTHER_BOOKS: tuple[tuple[str, str], ...] = (
 )
 
 # Unvocalized Hebrew names for the books a haftarah or megillah is drawn from, for citations.
-# Matches the forms miqra_al_pi_hamasorah.convert_tsv.TANAKH_INDEX uses for the same books.
+# Matches the forms miqra_al_pi_hamasorah.convert.TANAKH_INDEX uses for the same books.
 SLUG_TO_HEBREW_OTHER_BOOK: dict[str, str] = {
     "joshua": "יהושע",
     "judges": "שופטים",
@@ -181,7 +181,7 @@ BOOK_NUMBER_TO_SLUG = {number: slug for number, (_, slug, _) in enumerate(TORAH_
 # every range here is stated in it. The sources are not: MAM gives the weekly aliyot in its own
 # numbering and hebcal gives everything else in the common printed editions', and in the
 # Decalogue and a handful of other chapters those differ from canonical. Each reference is
-# converted where it is read, by _parse_verse_position for MAM and parse_hebcal_ref for hebcal,
+# converted where it is read, by aliyot.read_markers for MAM and parse_hebcal_ref for hebcal,
 # so that nothing downstream has to carry a numbering at all.
 
 

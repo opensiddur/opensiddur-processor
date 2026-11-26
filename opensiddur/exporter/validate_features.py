@@ -63,7 +63,7 @@ def validate(project_directory: Path, projects: list[str] | None = None) -> int:
             continue
         for path in sorted(root.rglob("*.xml")):
             for line, problem in settings_problems(path):
-                print(f"{path.relative_to(project_directory)}:{line}: {problem}")
+                print(f"{path.relative_to(project_directory).as_posix()}:{line}: {problem}")
                 found += 1
     return found
 

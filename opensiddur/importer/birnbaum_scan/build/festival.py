@@ -105,7 +105,7 @@ def prayers(lang):
         # Every remaining parenthesis in these paragraphs is a Sabbath addition.
         if key in ('candles','vattitten','miqra','vehasi','kiddush_open','kiddush_close'):
             n=iter(range(20))
-            value=re.sub(r'\(([^()]*)\)',lambda m:conditional(key+'_shabbat_'+str(next(n)),
+            value=re.sub(r'\(([^()]*)\)',lambda m,key=key,n=n:conditional(key+'_shabbat_'+str(next(n)),
                 'On the Sabbath:',SHABBAT,m[1]),value)
         if key in SOURCES:value=f'<tei:seg source="{SOURCES[key]}">'+value+'</tei:seg>'
         if key=='vaykhulu':

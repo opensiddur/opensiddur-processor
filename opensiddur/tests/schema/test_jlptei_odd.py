@@ -84,7 +84,7 @@ class TestJlpteiOddConstraints(unittest.TestCase):
             "//tei:constraintSpec[@ident='subverse-constraints']//sch:assert/@test",
             namespaces=self.ns,
         )
-        self.assertIn("@n = 'a' or @n = 'b'", asserts)
+        self.assertIn("not(@corresp) or @n = 'a' or @n = 'b'", asserts)
         self.assertTrue(
             any("ends-with(@corresp" in a for a in asserts),
             "Expected @n and @corresp to be checked against each other",
@@ -303,6 +303,16 @@ class TestSubverseValidation(unittest.TestCase):
             with self.subTest(unit):
                 self.assertValidity(
                     False, f'<tei:milestone unit="{unit}" n="{n}"/>x', f"{unit} needs @corresp"
+                )
+
+    def test_bare_subverse_terminators_validate(self):
+        for unit, n in (("half-verse", "a"), ("verse-part", "tzapeh")):
+            with self.subTest(unit=unit):
+                self.assertValidity(
+                    True,
+                    f'<tei:milestone unit="{unit}" n="{n}" corresp="{self.VERSE}/{n}"/>'
+                    f'quoted words<tei:milestone unit="{unit}"/>unrelated words',
+                    f"a bare {unit} terminator must close the quotation without naming a new part",
                 )
 
     def test_a_well_formed_verse_part_validates(self):

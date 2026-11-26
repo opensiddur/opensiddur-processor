@@ -104,7 +104,7 @@ class TestAvotInstructionModes(unittest.TestCase):
                 (folder / 'text.xml').write_text(
                     '<root xmlns:tei="http://www.tei-c.org/ns/1.0" '
                     'xmlns:j="http://jewishliturgy.org/ns/jlptei/2"><tei:text>'
-                    + body + '</tei:text></root>')
+                    + body + '</tei:text></root>', encoding='utf-8')
                 settings = {f'chapter-{n}': False for n in range(1, 7)}
                 settings.update({'season': season, 'chapter-1': selected})
                 CompilerProcessor.load_init_settings(ld, yaml_to_declaration_entries({FS_AVOT: settings}))

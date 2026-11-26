@@ -7,7 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Distinct source-page links on the same output line remain separately clickable in
+  PDF and HTML margins. PDF symbols use nearby free positions within the page; HTML
+  symbols clear earlier margin links. Narrow-screen links remain inline.
+- The expanded maḥzor no longer pins the Complete Kaddish and ha-Motzi to Birnbaum, so a
+  volume's priorities choose their edition, as for its other prayers. The Half Kaddish of the
+  preparatory weekday Minchah and Kabbalat Shabbat's Mourner's Kaddish outside the Ten Days
+  stay pinned (`EXPANDED_EDITION_PINS`): they are said outside the Ten Days, and Heidenheim,
+  first in the volume's priorities, prints only the Ten Days Kaddish.
+- The expanded siddur no longer pins prayers to Birnbaum. Birnbaum pins some of its own
+  transclusions to itself (the Kaddish's parts among them), and the expanded siddur copied
+  them with the rest of Birnbaum's structure, so a volume could not take those prayers from
+  another edition by its priorities. The pins are now dropped, and a pinned structural unit
+  is expanded like any other.
+- The expanded siddur reads the right maftir on Shabbat Chol HaMoed Sukkot in Israel. It
+  chose the day's maftir by the Diaspora's count alone, so in Israel, where Chol HaMoed begins
+  a day earlier, it read the maftir of the day before: the first instead of the second when
+  that Shabbat is the third day of Sukkot, the third instead of the fourth on the fifth, the
+  fourth instead of the fifth on the sixth. It now follows hebcal's count in each place, as
+  the humash does.
+- Source-scan links no longer repeat at each paragraph or transcluded module while the
+  same column remains on the same source page. Returning to a different page keeps its
+  link; optional passages and instructions cannot hide a required later link.
+- Faults that Windows exposes. Python on Windows has no time-zone database of its own, and
+  `hdate` needs one when it is imported, so `tzdata` is now a dependency there; without it the
+  exporter could not start. The validator lets jing open its temporary files. Every text file
+  the package opens is now read and written as UTF-8 rather than in the locale's encoding,
+  which on Windows read the Hebrew in settings files and the Asher importer's sources as
+  mojibake and made the validator reject valid Hebrew files; a test keeps any new call from
+  leaving the encoding out. The page-break aligner for the 1822 Haggadah facsimile reads
+  pdftotext's output as UTF-8. `write_if_changed`, the Wikisource downloaders and the download
+  manifests write LF line endings, and `write_if_changed` compares bytes, so the Sefaria
+  download no longer fetches unchanged files again, even ones a Windows checkout gave CRLF
+  endings. The feature validator reports paths with forward slashes, as the naming check
+  does. The tests no longer assume POSIX paths, a UTF-8 locale, or that Saxon can open a
+  temporary file that is still open. On Windows the suite now fails only the tests that need
+  jing and the compiled schema.
+- The last verse of a book no longer runs on into the notes after the text. The passes that
+  place the `half-verse` and `verse-part` milestones ended a verse only at the next verse or
+  chapter milestone, so a book's last verse ran on past the end of `tei:text` into the notes
+  of its `tei:standOff`. In Miqra al pi ha-Masorah, Lamentations 5:22, Ruth 4:22 and Song of
+  Songs 8:14, which have no etnachta, were divided at an etnachta in a note, so that their
+  second half began inside the note; they are no longer divided. Proverbs 31:31 was not
+  divided, because the half-verse pass leaves undivided a verse of Psalms, Proverbs or Job
+  that has an ole, and a note has one; it is now divided at its etnachta. The WLC's books are
+  unchanged. A part that `VERSE_PARTS` declares for a book's last verse is no longer looked
+  for in the notes: one whose incipit only a note has is now reported as unplaceable, where
+  before it was placed inside the note. No part declared today is in a book's last verse. A
+  document that ends inside `tei:text` now raises `ValueError` instead of being read to its
+  end.
+
 ### Added
+- **The maftir of Shabbat Chol HaMoed Sukkot by the day.** The humash printed all five of
+  hebcal's maftirs for that Shabbat whatever a volume declared. Each is now printed with its own
+  citation under a condition on the day of Sukkot (`opensiddur:holiday` `sukkot`) and on
+  `opensiddur:israel`, following hebcal's numbering of the days of Chol HaMoed: the first
+  maftir is read on the third day of Sukkot in the Diaspora and on the second in Israel. A
+  volume that declares a date and a location prints only that Shabbat's maftir. One that
+  declares no location, with or without a date, still prints all five, each headed with its
+  day, since the day of a festival is derived only for a place.
 - **A scan viewer in the electronic book.** With `electronic.scan_viewer`
   (`full` | `vertical` | `horizontal`), a link to the scan of a page opens the scan inside the
   book: over the text, beside it or below it. It can be zoomed (buttons, wheel, pinch, keys) and
@@ -18,7 +77,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the time left, at most every 15 seconds. A slow step in the projects check no longer looks
   the same as a hung one.
 
+### Changed
+- **Miqra al pi ha-Masorah comes from MAM-parsed plus**, the JSON files of MAM-basics
+  (`MAM-parsed/plus/*.json`, pinned to a commit), instead of the TSV export of MAM's frozen
+  Google Sheet. `download` fetches them and MAM's `LICENSE.md` and records the commit in its
+  manifest; `convert` (formerly `convert_tsv`) walks the parsed templates with a closed dispatch
+  that rejects an unknown template; the humash reads its aliyot from the same files.
+  When GitHub rate-limits it, `download` waits as asked, at most a minute at a time; a
+  longer wait fails at once, saying when to try again. `convert` converts every book
+  before it writes any, so that a missing book or a rejected template stops it before anything
+  is written and `--only-book` writes the same file as a full run. `convert --check` reads and
+  converts the whole download without writing anything, for use after moving the pin. From the
+  same text the output is unchanged except that every file's source note (`tei:sourceDesc`)
+  names MAM-parsed plus instead of the Google Sheet, that the index also names the commit and
+  quotes MAM's credit to its editors and its attributions instead of the sheet's README tab,
+  and that words the wikitext front
+  end garbled are as MAM has them: the speaker headings of Job and the title of Proverbs 10:1,
+  the spaces documented in Deuteronomy 23:8, Ezra 2:69 and Nehemiah 3:2, 3:10 and 7:68, the
+  accents of the ten words with geresh or gershayim and telisha gedola, the inverted nuns of
+  Psalms 107, כׇּ֥ל in Psalms 35:10 and Proverbs 19:7, and the sheva of ירושלמה. Six qere-only
+  words in documented passages, which had become Wikisource links, are words again, and the
+  other 11 ketiv-only and qere-only forms have MAM's one pair of parentheses or brackets
+  instead of three. Deuteronomy 11:21's scroll-difference note is now marked before the sof
+  pasuq. With its title restored, Proverbs 10:1 carries the ole-we-yored of שְׁלֹ֫מֹ֥ה, so like
+  the WLC's it is no longer divided into half-verses (`proverbs/10/1/a` and `/b`): in the poetic
+  books a verse with ole-we-yored is not divided at the etnachta. `openpyxl` is no longer a
+  dependency. The sourcetexts commit that adds the download
+  needs the `.gitattributes` line `sources/miqra_al_pi_hamasorah/** -text`, since `download`
+  and `convert` compare the files byte for byte.
+
 ### Fixed
+- The monthly Sefaria update (`opensiddur.importer.sefaria.update`) no longer stops with a
+  traceback when Sefaria's new text makes a misprint correction or an alignment decision stale.
+  Such a leaf is reported for review, under its own heading, and its work is not converted. If a
+  conversion still fails on one, the report says so for that work and the other works are still
+  converted and reported.
 - Scan links no longer link pages of another printing among the pages of the one the book
   uses. In a Minchah Amidah, a blessing printed at Minchah with no page break inside it had
   been given the Shacharit page's link. Where the edition prints the unit around a text, only
@@ -33,6 +126,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The opening citation lists the passages, and each later passage opens with its own. The five
   maftirs of Shabbat Hol HaMoed Sukkot, of which a congregation reads the one for the day that
   Shabbat falls on, are no longer marked as repeating one another.
+- The second half of a verse (its `half-verse` milestone `b`) no longer begins a word late
+  where Miqra al pi ha-Masorah ends the first half with a line break. The pass that places the
+  milestones read a `tei:lb` as nothing at all, so a line break with no space beside it joined
+  the words on either side into one. Now a line break ends a word, unless it is marked
+  `break="no"`, as TEI marks one that falls inside a word. In the project as now imported,
+  3,606 verses, all but 23 of them in Psalms, Proverbs and Job, begin their second half one
+  word earlier (46 of them two words earlier), and 15 verses, in which line breaks joined every
+  word of the second half to the last word of the first, are divided where they were not.
 
 ### Added
 - **Links to the scans** (#303). `typography.markers.scan_links` sets a symbol (`↗` by default)

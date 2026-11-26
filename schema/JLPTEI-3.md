@@ -216,8 +216,15 @@ ranges as well as parallel rendering.
 
 A `tei:seg` remains appropriate for a bounded quotation carrying `source`, a
 language change, or other inline semantics. If that passage also needs a
-correspondence, place its milestone before the semantic span. Do not duplicate
-a canonical URN merely because the text is printed again elsewhere.
+correspondence, normally place its milestone before the semantic span. A short quotation
+inside a larger aligned liturgical part may instead keep its own **quote-context** chapter
+and verse milestones inside `tei:seg type="quotation"`: this keeps the inline phrase together
+in the parallel row. Keep the enclosing liturgical correspondence outside the span, retain
+canonical chapter/verse `@n` values, and close both inner scopes before the span ends. The
+quotation's contextual URNs identify only its bounded extent; they must not advertise a
+partial quotation as the canonical whole verse. Verify exact quoted-range resolution as
+well as both-language rendering. Do not duplicate a canonical URN merely because the text
+is printed again elsewhere.
 
 ### Terminating a scope
 
@@ -234,6 +241,11 @@ terminator in rule 3 closes such a scope explicitly:
 
 A terminator is not indexed, because only elements carrying `corresp` are, so it adds no
 URN mapping and cannot be referenced.
+
+This also applies to `half-verse` and `verse-part`. Their bare terminators have
+neither `corresp` nor `n`; a numbered or named subdivision still requires its
+canonical correspondence. A bare `verse` or `chapter` milestone cannot substitute
+for a subverse terminator, because bare milestones close only their own unit.
 
 **The unit must match exactly.** A bare milestone of some *other* unit does not terminate
 anything, which is what keeps `unit="edition-verse"` — which carries `n` and never
@@ -294,8 +306,9 @@ Two milestone units carry the two numberings, and they must not be confused:
 ```
 
 Because `edition-verse` carries no `@corresp`, the reference database and the parallel compiler — which look
-only at `@corresp` — ignore it entirely. Which numbering a reader sees is a rendering choice, driven by the
-`opensiddur:verse-numbering` setting.
+only at `@corresp` — ignore it entirely. Canonical verse-number visibility is a rendering choice:
+`typography.markers.verse_numbers` selects `shown` or `hidden`. Keep canonical `@n` values
+when hiding numbers; edition-number labels remain separate display markers.
 
 ### Rules
 
@@ -870,7 +883,9 @@ Two types of inclusions are supported. The intended type is indicated by the `ty
 * `external` (the default, when `type` is absent): The text and its XML hierarchy are to be included in place.
 * `inline`: The text is to be included in place. Any XML hierarchy (including paragraphs, line groups, etc)
   within the included text are excluded. Where the included text gives two readings of a word in a `tei:choice`,
-  only one is included: the `j:read` (qere), or the first `j:option`.
+  only one is included: the `j:read` (qere), or the `j:option` selected by a decided
+  `opensiddur:variant` setting. When no wording is decided, the first remaining option
+  is the inline fallback. A known false option is excluded before choosing that fallback.
 
 `target` attributes may reference ranges, such as `urn:x-opensiddur:text:bible:genesis/1/1-1/3`, as long as both ends are
 in one file and the end does not come before the start; the compiler reports either error. A range may start and end
@@ -1788,7 +1803,26 @@ kept with their rubrics.
 
 The feature set is open — a rite that is not listed below is still valid. Known rite names:
 `ashkenaz`, `sepharad`, `edot_hamizrach`, `teimani_baladi`, `teimani_shami`, `italiani`,
-`romaniote`, `nusach_ari`.
+`romaniote`, `nusach_ari`, `german`.
+
+`german` selects the German regional rite independently of the broader `ashkenaz`
+feature. For an edition's German/non-German ordering, test `german=true` and
+`german=false` respectively; leave it undefined to retain both labeled alternatives.
+Do not infer this regional choice from `ashkenaz` or from a different local custom.
+
+`opensiddur:practice/musaf-shabbat-responses` selects the community's Sabbath practice after each
+Musaf section's shofar direction. Its mutually exclusive symbol values are
+`omit_both` (neither Hayom Harat Olam nor Areshet Sefatenu), `hayom_only`
+(Hayom alone), `both_no_cantor_repeat`,
+`both_cantor_hayom` (both responses, with only Hayom repeated by the cantor),
+and `both_cantor_repeat`. This practice does not itself select a regional rite.
+Leave it undefined to retain labeled alternatives when the custom is unknown;
+encode any edition's explicit regional and weekday rules separately.
+Within `hayom_only`, the independent binary practice
+`musaf-hayom-only-cantor-repeat` selects the cantor's turn. The binary
+`musaf-areshet-cantor-repeat` selects the weekday Areshet repetition.
+Neither binary has a default: retain labeled alternatives where the book
+leaves the community's repetition custom undecided.
 
 A book also prints matter that is neither prayer nor commentary on it: a dedication, a
 preface, acknowledgements, an introduction, an epilogue or afterword, and any other prose

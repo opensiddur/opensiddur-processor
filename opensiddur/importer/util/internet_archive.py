@@ -371,11 +371,15 @@ def write_if_changed(path: Path, text: str) -> bool:
     These files are committed to a repository, so rewriting one with identical
     content is not free: it churns the working tree and turns a run that fetched
     nothing into a diff.
+
+    The bytes are compared, not the decoded text, because decoding turns CRLF into LF: a
+    file a Windows checkout gave CRLF endings would compare equal and never be rewritten,
+    and its SHA-256 would never match the LF text the manifest records.
     """
-    if path.is_file() and path.read_text(encoding="utf-8") == text:
+    if path.is_file() and path.read_bytes() == text.encode("utf-8"):
         return False
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    path.write_text(text, encoding="utf-8", newline="\n")
     return True
 
 

@@ -34,6 +34,15 @@ This repository has 3 parts:
 Any specifications for agents to build code should be stored in the specs/ directory.
 Specifications and plans for bug fixes are temporary working artifacts and must not be committed.
 
+**Scan digitization instructions.** Before transcribing, reviewing, regenerating or
+exporting a scanned edition, read
+[`specs/SCAN_DIGITIZATION_INSTRUCTIONS.md`](specs/SCAN_DIGITIZATION_INSTRUCTIONS.md).
+It records the reusable lessons from Heidenheim–Marmorstein, including review
+evidence, pointing questions, conditional recitation and export checks. For that
+edition, also read [`specs/MARMORSTEIN_ROSH_HASHANAH_1.md`](specs/MARMORSTEIN_ROSH_HASHANAH_1.md)
+and its current source review records; historical installment checkpoints are
+not the current acceptance status.
+
 ## Commands
 
 **Set up a fresh checkout or worktree** — run all three before trusting a test run:
@@ -70,6 +79,11 @@ uv run pytest
 **Run a single test file:**
 ```bash
 uv run pytest opensiddur/tests/exporter/test_compiler.py
+```
+
+**Lint** (CI runs this; the rules are in `pyproject.toml`):
+```bash
+uv run ruff check .
 ```
 
 **Run with coverage:**
@@ -209,7 +223,7 @@ The compiler uses a **processing context state machine** — see `specs/COMPILER
 - `jps1917/`: JPS 1917 Bible translation from Wikisource (MediaWiki → JLPTEI)
 - `birnbaum_siddur/`: Birnbaum ha-Siddur ha-Shalem, 1949, from three sources over one scan — Hebrew Wikisource (`wikisource.py`), English Wikisource (`en_wikisource.py`) and the Internet Archive's OCR (`internet_archive.py`), reconciled into `pages.json` by `correspondence.py` and sequenced by `download.py`
 - `wlc/`: Westminster Leningrad Codex (structured data → JLPTEI via XSLT)
-- `miqra_al_pi_hamasorah/`: Miqra al pi ha-Masorah (TSV/Wikidata → JLPTEI via XSLT)
+- `miqra_al_pi_hamasorah/`: Miqra al pi ha-Masorah (MAM-parsed plus JSON from MAM-basics → JLPTEI via XSLT)
 
 - `util/wikisource.py`, `util/wikisource_book.py`, `util/internet_archive.py`: shared, book-agnostic clients for the Action API and archive.org, and the per-page download/manifest loop above them. Both clients honour `Retry-After`, back off exponentially, pace serially and identify themselves with a reachable address.
 

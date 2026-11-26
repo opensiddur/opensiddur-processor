@@ -141,8 +141,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--output", type=Path, required=True, help="The file to write.")
     args = parser.parse_args(argv)
 
-    release = json.loads(args.release_json.read_text())
-    args.output.write_text(render_downloads(release, book_entries(args.settings_directory)))
+    release = json.loads(args.release_json.read_text(encoding="utf-8"))
+    args.output.write_text(render_downloads(release, book_entries(args.settings_directory)), encoding="utf-8")
     return 0
 
 

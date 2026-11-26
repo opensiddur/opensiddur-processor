@@ -118,8 +118,8 @@ def _subseq_ratio(needle: str, haystack: str) -> float:
 
 def _pdftotext_pages(pdf_path: Path) -> list[str]:
     output = subprocess.check_output(
-        ["pdftotext", "-layout", str(pdf_path), "-"],
-        text=True,
+        ["pdftotext", "-enc", "UTF-8", "-layout", str(pdf_path), "-"],
+        encoding="utf-8",
         errors="replace",
     )
     pages = output.split("\f")

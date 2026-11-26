@@ -44,10 +44,10 @@ def verify_compiled(tree):
 
 
 def readings(source):
-    manifest = json.loads((source/'erev-rosh-hashanah.json').read_text())
+    manifest = json.loads((source/'erev-rosh-hashanah.json').read_text(encoding="utf-8"))
     if not manifest['complete']:
         raise ValueError('Erev service must have a contiguous complete reading')
-    units=[json.loads((source/name).read_text()) for name in manifest['readings']]
+    units=[json.loads((source/name).read_text(encoding="utf-8")) for name in manifest['readings']]
     if units[0]['id']!='opening_instruction' or units[-1]['id']!='reader_kaddish':
         raise ValueError('Erev reading boundaries must end before Gedaliah')
     for lang,start in [('he',100),('en',101)]:
@@ -240,7 +240,7 @@ def verify_evidence(source, units):
     """A reading edit invalidates its older proofreading record, including initial evidence."""
     path=source.parent/'erev-rosh-hashanah-proofreading.json'
     if not path.exists():raise ValueError('Missing Erev proofreading provenance')
-    records=json.loads(path.read_text())['readings']
+    records=json.loads(path.read_text(encoding="utf-8"))['readings']
     if [r['id'] for r in records]!=[u['id'] for u in units]:raise ValueError('Erev proofreading scope is stale')
     for record in records:
         for key,prefix in [('initial_sha256','initial/'),('working_sha256','')]:

@@ -92,6 +92,18 @@ class Unplaceable:
 #: passage that stops in the middle of a verse needs a part declared at the point the
 #: *remainder* begins as well: `lo_yenakeh` exists to end `venakeh`.
 VERSE_PARTS: dict[tuple[str, int, int], tuple[tuple[str, dict[str, str]], ...]] = {
+    # Musaf quotes only the opening promise of protection, before the
+    # prophet continues with eating and subduing the sling-stones.
+    ("zechariah", 9, 15): (
+        ("adonai_tzevaot_yagen", {"he": "יהוה צבאות יגן עליהם"}),
+        ("veakhelu", {"he": "ואכלו"}),
+    ),
+    # The cantor's prayer quotes the growing shofar sound, stopping before
+    # "exceedingly" and the account of Moses speaking.
+    ("exodus", 19, 19): (
+        ("vayehi_qol", {"he": "ויהי קול"}),
+        ("meod", {"he": "מאד"}),
+    ),
     # Kiddush opens on the last two words of the sixth day rather than on the half-verse,
     # so that it does not begin with "and there was evening".
     ("genesis", 1, 31): (
@@ -100,12 +112,29 @@ VERSE_PARTS: dict[tuple[str, int, int], tuple[tuple[str, dict[str, str]], ...]] 
     # The Thirteen Attributes. They begin at the second יהוה — the first belongs to
     # "and the LORD passed by before him and proclaimed" — and end at ונקה, since
     # "he will by no means clear the guilty" is not among the attributes recited.
+    # notzer_chesed bounds the prefix before venakeh, so an edition quoting both
+    # clauses can mark each precisely rather than claiming the complete verse.
     ("exodus", 34, 6): (
         ("adonai_adonai", {"he": "יהוה יהוה אל"}),
     ),
     ("exodus", 34, 7): (
+        ("notzer_chesed", {"he": "נצר חסד"}),
         ("venakeh", {"he": "ונקה"}),
         ("lo_yenakeh", {"he": "לא ינקה"}),
+    ),
+    # The scroll-lifting formula appends only the closing words of this verse.
+    ("numbers", 9, 23): (
+        ("al_pi", {"he": "על פי יהוה ביד משה"}),
+    ),
+    # Entrance prayers quote these clauses without the rest of the verse.
+    ("psalms", 39, 13): (
+        ("shimah", {"he": "שמעה תפלתי"}),
+        ("ki_ger", {"he": "כי גר אנכי"}),
+    ),
+    # The qedushah divides the introductory call from the angels' response.
+    ("isaiah", 6, 3): (
+        ("veqara", {"he": "וקרא זה אל זה ואמר"}),
+        ("qadosh", {"he": "קדוש קדוש קדוש"}),
     ),
 }
 
@@ -131,6 +160,8 @@ def add_subverse_milestones(xml: str, *, language: str, project: str = "") -> st
             the failure this whole mechanism exists to prevent. The halves are not checked
             this way: no one declares them individually, and a verse the accents do not
             divide simply has no halves.
+        ValueError: if the document ends inside `tei:text`, so that its last verse has no
+            end.
     """
     xml, _ = insert_half_verses(xml, project=project)
     xml, unplaceable = insert_verse_parts(xml, language=language, project=project)
@@ -180,11 +211,16 @@ _MARKUP = re.compile(
 
 _ATTRIBUTE = re.compile(r"""([\w:.-]+)\s*=\s*("([^"]*)"|'([^']*)')""")
 
+# Text between whitespace and paseq. `_VerseText.tokens` also divides it where a line break
+# ends a word.
+_TOKEN = re.compile(f"[^\\s{PASEQ}]+")
+
 # The scanner works on source text, so it matches elements by the prefixed names both
 # importers write. TEI_NS and JLPTEI_NS below are the namespaces those prefixes are bound to.
 _CHOICE_TAG = "tei:choice"
 _READ_TAG = "j:read"
 _OPTION_TAG = "j:option"
+_LINE_BREAK_TAG = "tei:lb"
 _VERSE_MILESTONE_UNITS = _VERSE_TERMINATING_UNITS
 
 
@@ -193,13 +229,27 @@ def _attributes(attrs: str) -> dict[str, str]:
             for m in _ATTRIBUTE.finditer(attrs)}
 
 
+def _ends_a_word(match: re.Match[str]) -> bool:
+    """Whether a piece of markup is a line break that ends a word, as a space would.
+
+    Miqra al pi ha-Masorah writes no space beside most of the line breaks of its poetic
+    layout, so a line break has to end a word by itself. TEI marks one that falls inside a
+    word with `break="no"`, and that one does not.
+    """
+    return (
+        match.group("name") == _LINE_BREAK_TAG
+        and not match.group("close")
+        and _attributes(match.group("attrs") or "").get("break") != "no"
+    )
+
+
 @dataclass
 class _Run:
     """One run of character data in the source, and where it came from."""
 
     source: int      # offset of this run in the source text
     offset: int      # offset of this run within the verse's assembled text
-    text: str
+    text: str        # the character data, exactly as it stands in the source
     # Where a boundary at this run's very start must go instead, when the run sits inside an
     # element that may not be split: the offset of that element's start tag. None otherwise.
     before: int | None = None
@@ -215,16 +265,28 @@ class _VerseText:
     one string and written back through the offsets each run came from.
     """
 
-    def __init__(self, urn: str, opens_at: int, runs: list[_Run]):
+    def __init__(self, urn: str, opens_at: int, runs: list[_Run], breaks: list[int]):
         self.urn = urn
         self.opens_at = opens_at  # source offset just after the verse milestone
         self.runs = runs
         self.text = "".join(run.text for run in runs)
+        # Offsets in `text`, in order, at which a line break ends a word. Nothing is written
+        # there, so `text` stays exactly what the source has and `tokens()` divides at them.
+        self.breaks = breaks
         self.has_variant_reading = False
 
     def tokens(self) -> list[tuple[int, str]]:
-        """(offset, token) for each whitespace/paseq-delimited token, in reading order."""
-        return [(m.start(), m.group()) for m in re.finditer(f"[^\\s{PASEQ}]+", self.text)]
+        """(offset, token) for each token, in reading order.
+
+        A token is delimited by whitespace and paseq, and by a line break that ends a word,
+        at each of `breaks`.
+        """
+        bounds = [0, *self.breaks, len(self.text)]
+        return [
+            (match.start(), match.group())
+            for start, end in zip(bounds, bounds[1:])
+            for match in _TOKEN.finditer(self.text, start, end)
+        ]
 
     def source_offset(self, offset: int) -> int:
         """Where in the source a boundary at `offset` in the verse's text goes.
@@ -302,12 +364,17 @@ def _verses(xml: str) -> list[_VerseText]:
     """Every verse in the document, with the text that belongs to it.
 
     A verse runs from its milestone to the next milestone that closes it — the next verse, or
-    the next chapter. Only the milestones inside `tei:text` count: a header may quote a verse,
-    and quoting one is not carrying it.
+    the next chapter — or to the end of `tei:text`, so that the last verse does not take in
+    what follows the text, such as the notes of a `tei:standOff`. Only the milestones inside
+    `tei:text` count: a header may quote a verse, and quoting one is not carrying it.
+
+    Raises:
+        ValueError: if the document ends inside `tei:text`, so that the verse still open
+            there has no end.
     """
     verses: list[_VerseText] = []
-    current: _VerseText | None = None
     runs: list[_Run] = []
+    breaks: list[int] = []
     urn = ""
     opens_at = 0
     length = 0
@@ -318,12 +385,12 @@ def _verses(xml: str) -> list[_VerseText]:
     position = 0
 
     def close():
-        nonlocal current, runs, length, variant
+        nonlocal runs, breaks, length, variant
         if urn:
-            verse = _VerseText(urn, opens_at, runs)
+            verse = _VerseText(urn, opens_at, runs, breaks)
             verse.has_variant_reading = variant
             verses.append(verse)
-        runs, length, variant = [], 0, False
+        runs, breaks, length, variant = [], [], 0, False
 
     for match in _MARKUP.finditer(xml):
         data_start, data_end = position, match.start()
@@ -348,6 +415,13 @@ def _verses(xml: str) -> list[_VerseText]:
         if name is None:
             continue
 
+        # Line and paragraph boundaries separate words without changing source text.
+        # Inside a choice, only boundaries in the selected reading count.
+        if urn and (_ends_a_word(match) or
+                    (name == "tei:p" and match.group("close"))):
+            if choice is None or choice[1] <= match.start() < choice[2]:
+                breaks.append(length)
+
         if not match.group("close") and not match.group("empty"):
             if name == "tei:text":
                 in_text = True
@@ -359,6 +433,9 @@ def _verses(xml: str) -> list[_VerseText]:
                     variant = True
         elif match.group("close") and name == _CHOICE_TAG:
             choice = None
+        elif match.group("close") and name == "tei:text":
+            close()
+            urn, in_text = "", False
 
         if choice is not None and position >= skip_until:
             choice = None
@@ -377,10 +454,7 @@ def _verses(xml: str) -> list[_VerseText]:
             urn = ""
 
     if urn:
-        data = xml[position:]
-        if data:
-            runs.append(_Run(source=position, offset=length, text=data))
-        close()
+        raise ValueError(f"{urn}: the document ends inside tei:text")
 
     return verses
 

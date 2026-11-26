@@ -83,7 +83,7 @@ def prayers(lang):
         value=xml(raw)
         if key in ('vattitten_lanu','kadsheinu','kiddush','yk_candle_blessing'):
             n=iter(range(20))
-            value=re.sub(r'\(([^()]*)\)',lambda m:c(key+'_shabbat_'+str(next(n)),
+            value=re.sub(r'\(([^()]*)\)',lambda m,key=key,n=n:c(key+'_shabbat_'+str(next(n)),
                 'On the Sabbath:',SHABBAT,m[1]),value)
         if 'verse_refs' in r:
             chunks=[]

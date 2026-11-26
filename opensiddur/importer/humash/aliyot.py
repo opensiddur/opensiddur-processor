@@ -1,8 +1,9 @@
 """Read the weekly parshiyot and their aliyot out of Miqra al pi ha-Masorah.
 
-MAM marks the *start* of every reading division inline in the verse scaffolding of
-``sheets/torah.tsv``, in a ``{{מ:עלייה}}`` template nested inside the ``{{מ:פסוק}}`` that
-opens the verse:
+MAM marks the *start* of every reading division in the label of the verse it starts at: a
+``מ:עלייה`` template in the ``עלייה`` parameter of the verse label ``מ:פסוק``. In MAM-parsed
+plus the label is column D of the verse, sometimes as the target of a documentation note
+(``נוסח``). In MAM's wikitext:
 
     {{מ:פסוק|בראשית|א|א|סדר=א|עלייה={{מ:עלייה|א=בראשית|ב0=בראשית|ב1=ראשון|ב2=כהן}}}}
 
@@ -30,13 +31,19 @@ aliyah, does not shorten it. The one explicit end marker is ``ע"כ ישראל``
 
 from __future__ import annotations
 
-import csv
 import logging
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
-from opensiddur.importer.miqra_al_pi_hamasorah.convert_tsv import _hebrew_numeral_to_int
+from opensiddur.importer.miqra_al_pi_hamasorah.convert import load_source
+from opensiddur.importer.miqra_al_pi_hamasorah.miqra_plus import (
+    DOCUMENTATION_NOTE,
+    VERSE_LABEL,
+    PlusFormatError,
+    check_aliyah,
+    template_params,
+)
 from opensiddur.importer.humash.names import (
     PAIR_MEMBERS,
     slug_for_combined_hebrew,
@@ -60,7 +67,6 @@ from opensiddur.importer.humash.refs import (
     previous_verse,
     verses_in_chapter,
 )
-from opensiddur.importer.util.pages import miqra_al_pi_hamasorah_data_directory
 
 logger = logging.getLogger(__name__)
 
@@ -74,9 +80,6 @@ WEEKDAY_END = 'ע"כ ישראל'
 WEEKDAY_NUMBER = {name: str(index + 1) for index, name in enumerate(WEEKDAY_HONOURS)}
 
 MAFTIR = "מפטיר"
-
-_VERSE_TEMPLATE = re.compile(r"\{\{מ:פסוק\|([^{}]*?)(?=\||\}\})")
-_ALIYAH_TEMPLATE = re.compile(r"\{\{מ:עלייה\|([^{}]*)\}\}")
 
 
 @dataclass
@@ -148,51 +151,51 @@ class _Marker:
     params: dict[str, str]
 
 
-def _parse_template_params(body: str) -> dict[str, str]:
-    """Split ``a=1|b=2`` into a dict, ignoring positional parameters."""
-    params: dict[str, str] = {}
-    for part in body.split("|"):
-        key, sep, value = part.partition("=")
-        if sep:
-            params[key.strip()] = value.strip()
-    return params
+def _verse_label_aliyah(label_column: Any, where: str) -> dict[str, str] | None:
+    """The parameters of the aliyah marker in a verse's label column (column D), if any.
 
-
-def _parse_verse_position(scaffold: str) -> VerseRef | None:
-    """Read the book, chapter and verse out of the ``{{מ:פסוק}}`` that opens a row."""
-    match = re.search(r"\{\{מ:פסוק\|([^|]+)\|([^|]+)\|([^|}]+)", scaffold)
-    if not match:
+    The column is empty, or holds one ``מ:פסוק``, bare or as the target of a ``נוסח``.
+    """
+    if not isinstance(label_column, list) or len(label_column) > 1:
+        raise PlusFormatError(f"{where}: unexpected verse label column {label_column!r}")
+    if not label_column:
         return None
-    book = HEBREW_BOOK_TO_SLUG.get(match.group(1).strip())
-    if book is None:
+    name, params = template_params(label_column[0])
+    if name == DOCUMENTATION_NOTE:
+        name, params = template_params(params["1"])
+    if name != VERSE_LABEL:
+        raise PlusFormatError(f"{where}: the verse label column holds {name}")
+    if "עלייה" not in params:
         return None
-    chapter = _hebrew_numeral_to_int(match.group(2))
-    verse = _hebrew_numeral_to_int(match.group(3))
-    if chapter is None or verse is None:
-        return None
-    # MAM's own numbering, which the canonical URN space does not share in the Decalogue and
-    # a few other chapters. A marker names where an aliyah begins, so where MAM reads several
-    # canonical verses as one, the aliyah begins at the first of them.
-    return canonical_ref(NUMBERING_MASORAH, VerseRef(book, chapter, verse))
+    return {key: value.strip() for key, value in check_aliyah(params["עלייה"]).items()}
 
 
 def read_markers(sourcetexts_root: Path | None = None) -> list[_Marker]:
-    """Every aliyah marker in torah.tsv, in reading order."""
-    path = miqra_al_pi_hamasorah_data_directory(sourcetexts_root) / "sheets" / "torah.tsv"
+    """Every aliyah marker in MAM's Torah, in reading order.
+
+    The download is read through the converter's ``load_source``, with its checks: each file
+    against the manifest's SHA-256, no file that the manifest does not list, and the keys of
+    every plus file.
+    """
+    source = load_source(sourcetexts_root)
     markers: list[_Marker] = []
-    with open(path, encoding="utf-8", newline="") as handle:
-        for row in csv.reader(handle, delimiter="\t"):
-            if len(row) < 4:
-                continue
-            scaffold = row[3]
-            if "מ:עלייה" not in scaffold:
-                continue
-            ref = _parse_verse_position(scaffold)
-            if ref is None:
-                logger.warning("Could not locate the verse for an aliyah marker: %s", scaffold[:80])
-                continue
-            for body in _ALIYAH_TEMPLATE.findall(scaffold):
-                markers.append(_Marker(ref=ref, params=_parse_template_params(body)))
+    for name, book in HEBREW_BOOK_TO_SLUG.items():
+        book39 = source.book39s.get(name)
+        if book39 is None:
+            raise PlusFormatError(f"the MAM-parsed plus files have no {book}")
+        for chapter, verses in book39["chapters"].items():
+            for verse, columns in verses.items():
+                params = _verse_label_aliyah(columns[1], f"{book} {chapter}:{verse}")
+                if params is None:
+                    continue
+                # MAM's own numbering, which the canonical URN space does not share in the
+                # Decalogue and a few other chapters. A marker names where an aliyah begins,
+                # so where MAM reads several canonical verses as one, the aliyah begins at
+                # the first of them.
+                ref = canonical_ref(
+                    NUMBERING_MASORAH, VerseRef(book, int(chapter), int(verse))
+                )
+                markers.append(_Marker(ref=ref, params=params))
     return markers
 
 
@@ -230,7 +233,7 @@ def parse_parshiyot(sourcetexts_root: Path | None = None) -> list[Parsha]:
 def parse_readings(
     sourcetexts_root: Path | None = None,
 ) -> tuple[list[Parsha], list[CombinedParsha]]:
-    """The 54 weekly parshiyot and the seven combined readings, from one pass over the TSV."""
+    """The 54 weekly parshiyot and the seven combined readings, from one pass over MAM's Torah."""
     markers = read_markers(sourcetexts_root)
     parshiyot = _parse_parshiyot(markers, sourcetexts_root)
     return parshiyot, _parse_combined(markers, parshiyot, sourcetexts_root)

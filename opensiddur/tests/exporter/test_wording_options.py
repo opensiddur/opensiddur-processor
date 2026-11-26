@@ -47,7 +47,7 @@ class WordingOptionTest(unittest.TestCase):
                f'<tei:text><tei:body><tei:div xml:id="passage">{body}'
                '</tei:div></tei:body></tei:text></tei:TEI>')
         file = self.base/'x/test.xml'
-        file.write_text(xml)
+        file.write_text(xml, encoding='utf-8')
         data = LinearData(defer_reader_settings=electronic)
         data.xml_cache.base_path = self.base
         if initial is not None:
@@ -62,7 +62,7 @@ class WordingOptionTest(unittest.TestCase):
             cls = InlineCompilerProcessor if kind == 'inline' else ExternalCompilerProcessor
             result = cls('x', 'test.xml', f'//*[@xml:id="{start}"]', f'//*[@xml:id="{end}"]',
                          linear_data=data, reference_database=self.db).process()
-        self.assertEqual(file.read_text(), xml)  # compilation cannot edit the witness
+        self.assertEqual(file.read_text(encoding='utf-8'), xml)  # compilation cannot edit the witness
         if isinstance(result, list):
             root = etree.Element('result')
             root.extend(result)

@@ -15,9 +15,9 @@ from opensiddur.importer.util.internet_archive import (connect, download_file, f
 
 def regenerate(profile):
     ia = profile.source_directory / 'ia'
-    corrections = json.loads((profile.source_directory / 'page_corrections.json').read_text())
+    corrections = json.loads((profile.source_directory / 'page_corrections.json').read_text(encoding="utf-8"))
     result = derive_pages(profile.archive_identifier, (ia / 'scandata.xml').read_bytes(),
-                          json.loads((ia / 'page_numbers.json').read_text()), corrections)
+                          json.loads((ia / 'page_numbers.json').read_text(encoding="utf-8")), corrections)
     write_if_changed(profile.page_map, json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     return result
 

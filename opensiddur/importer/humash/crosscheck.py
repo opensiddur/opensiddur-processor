@@ -2,7 +2,8 @@
 
 The humash takes its weekly aliyot from Miqra al pi ha-Masorah, whose divisions agree with the
 MAM text the reader is looking at. hebcal records the same divisions separately, so comparing
-the two catches parse errors in the MAM wikitext that no internal consistency check could.
+the two catches errors in MAM's aliyah markers, or in reading them from MAM-parsed plus, that no
+internal consistency check could.
 
 Where the two genuinely differ they differ for a reason — the sources disagree about where a
 few aliyot begin, and hebcal notes the alternative in a third element of the range. Those are

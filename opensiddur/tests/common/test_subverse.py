@@ -79,6 +79,20 @@ class SubverseTestCase(unittest.TestCase):
         """The running text must come through untouched; only markup may be added."""
         self.assertEqual("".join(etree.fromstring(xml.encode()).itertext()), before)
 
+    def assertFollowsLineBreak(self, xml: str, corresp: str):
+        """The milestone carrying `corresp` stands directly after a `tei:lb`.
+
+        `scope()` and `assertTextUnchanged` read a line break as nothing, so they cannot tell
+        a milestone just after one from a milestone just before it.
+        """
+        root = etree.fromstring(xml.encode())
+        found = [m for m in root.iter(f"{{{TEI}}}milestone") if m.get("corresp") == corresp]
+        self.assertEqual(len(found), 1, f"expected exactly one {corresp}")
+        previous = found[0].getprevious()
+        self.assertIsNotNone(previous, f"nothing comes before {corresp}")
+        self.assertEqual(previous.tag, f"{{{TEI}}}lb")
+        self.assertFalse(previous.tail, f"text comes between the line break and {corresp}")
+
     def text_of(self, xml: str) -> str:
         return "".join(etree.fromstring(xml.encode()).itertext())
 
@@ -157,6 +171,108 @@ class TestHalfVerses(SubverseTestCase):
         self.assertEqual(self.scope(xml, f"{URN}exodus/34/7/a"), "נֹצֵר חֶסֶד וְחַטָּאָ֑ה")
         self.assertTextUnchanged(xml, before)
 
+    def test_a_line_break_between_words_separates_them(self):
+        """A line break ends a word as a space does, though nothing is written there.
+
+        Miqra al pi ha-Masorah writes no space beside most of the line breaks of its poetic
+        layout. Read as no space at all, the break here would join the last word of the first
+        half to the first word of the second, and the second half would open a word late.
+        """
+        xml = document(
+            f"<tei:p>{verse(f'{URN}psalms/2/1', '1')}"
+            "לָ֭מָּה רָגְשׁ֣וּ גוֹיִ֑ם"
+            '<tei:lb type="indent"/>'
+            "וּ֝לְאֻמִּ֗ים יֶהְגּוּ־רִֽיק׃</tei:p>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertEqual(self.scope(xml, f"{URN}psalms/2/1/a"), "לָ֭מָּה רָגְשׁ֣וּ גוֹיִ֑ם")
+        self.assertEqual(self.scope(xml, f"{URN}psalms/2/1/b"), "וּ֝לְאֻמִּ֗ים יֶהְגּוּ־רִֽיק׃")
+        # The milestone goes after the line break, before the word it opens.
+        self.assertFollowsLineBreak(xml, f"{URN}psalms/2/1/b")
+        self.assertTextUnchanged(xml, before)
+
+    def test_line_breaks_after_two_words_in_a_row_end_both(self):
+        """Line breaks after the word carrying the etnachta and the next word end both.
+
+        Job 12:4 as the importer writes it. Read as no space, the two line breaks would join
+        three words into one, and the second half would open two words late.
+        """
+        xml = document(
+            f"<tei:p>{verse(f'{URN}job/12/4', '4')}"
+            "שְׂחֹ֤ק לְרֵעֵ֨הוּ׀ אֶהְיֶ֗ה"
+            '<tei:lb type="indent"/>'
+            "קֹרֵ֣א לֶ֭אֱלוֹהַּ וַֽיַּעֲנֵ֑הוּ"
+            '<tei:lb type="indent"/>'
+            "שְׂ֝ח֗וֹק"
+            "<tei:lb/>"
+            "צַדִּ֥יק תָּמִֽים׃</tei:p>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertTrue(self.scope(xml, f"{URN}job/12/4/a").endswith("וַֽיַּעֲנֵ֑הוּ"))
+        self.assertTrue(self.scope(xml, f"{URN}job/12/4/b").startswith("שְׂ֝ח֗וֹק"))
+        self.assertFollowsLineBreak(xml, f"{URN}job/12/4/b")
+        self.assertTextUnchanged(xml, before)
+
+    def test_line_breaks_cannot_hide_the_second_half(self):
+        """A verse is divided even where only line breaks separate its second half's words.
+
+        Psalms 2:2 as the importer writes it. Read as no space, its line breaks would join
+        every word after the etnachta to the word carrying it, which would then seem to end
+        the verse, and a verse with nothing after its etnachta is not divided.
+        """
+        xml = document(
+            f"<tei:p>{verse(f'{URN}psalms/2/2', '2')}"
+            "יִ֥תְיַצְּב֨וּ׀ מַלְכֵי־אֶ֗רֶץ"
+            '<tei:lb type="indent"/>'
+            "וְרוֹזְנִ֥ים נֽוֹסְדוּ־יָ֑חַד"
+            '<tei:lb type="indent"/>'
+            "עַל־יְ֝הֹוָ֗ה"
+            "<tei:lb/>"
+            "וְעַל־מְשִׁיחֽוֹ׃</tei:p>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertEqual(
+            self.milestones(xml, "half-verse"),
+            [("a", f"{URN}psalms/2/2/a"), ("b", f"{URN}psalms/2/2/b")],
+        )
+        self.assertTrue(self.scope(xml, f"{URN}psalms/2/2/a").endswith("נֽוֹסְדוּ־יָ֑חַד"))
+        self.assertTrue(self.scope(xml, f"{URN}psalms/2/2/b").startswith("עַל־יְ֝הֹוָ֗ה"))
+        self.assertFollowsLineBreak(xml, f"{URN}psalms/2/2/b")
+        self.assertTextUnchanged(xml, before)
+
+    def test_a_line_break_marked_as_inside_a_word_does_not_end_it(self):
+        """A line break with break="no", as TEI marks one inside a word, does not end it.
+
+        Psalms 2:1 as the importer writes it, with such a line break put inside the word
+        carrying the etnachta, after the accent. Read as ending a word, it would put the
+        second half's milestone inside that word.
+        """
+        xml = document(
+            f"<tei:p>{verse(f'{URN}psalms/2/1', '1')}"
+            "לָ֭מָּה רָגְשׁ֣וּ גוֹיִ֑"
+            '<tei:lb break="no"/>'
+            "ם"
+            '<tei:lb type="indent"/>'
+            "וּ֝לְאֻמִּ֗ים יֶהְגּוּ־רִֽיק׃</tei:p>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertEqual(self.scope(xml, f"{URN}psalms/2/1/a"), "לָ֭מָּה רָגְשׁ֣וּ גוֹיִ֑ם")
+        self.assertEqual(self.scope(xml, f"{URN}psalms/2/1/b"), "וּ֝לְאֻמִּ֗ים יֶהְגּוּ־רִֽיק׃")
+        self.assertFollowsLineBreak(xml, f"{URN}psalms/2/1/b")
+        self.assertTextUnchanged(xml, before)
+
     def test_a_ketiv_is_not_read_as_a_word_of_its_own(self):
         """Descending into both readings would put the unpointed ketiv into the text.
 
@@ -175,6 +291,34 @@ class TestHalfVerses(SubverseTestCase):
 
         self.assertEqual(self.scope(xml, f"{URN}psalms/5/9/a"), "לְמַעַן שׁוֹרְרָ֑י")
         # The milestone goes before the choice, not inside either reading of it.
+        root = etree.fromstring(xml.encode())
+        half = [
+            m for m in root.iter(f"{{{TEI}}}milestone")
+            if m.get("corresp") == f"{URN}psalms/5/9/b"
+        ][0]
+        self.assertEqual(half.getnext().tag, f"{{{TEI}}}choice")
+        self.assertTextUnchanged(xml, before)
+
+    def test_a_line_break_opening_the_qere_ends_the_word_before_it(self):
+        """A line break at the start of the reading that is read ends the word before it.
+
+        Built from the end of Psalms 5:9 as the importer writes it, less a note's anchor, with
+        the line break that ends the first half moved from before the ketiv/qere to the start
+        of the qere. The second half still opens at the choice, so its milestone still goes
+        before the choice, rather than being refused as a boundary inside it.
+        """
+        xml = document(
+            f"<tei:p>{verse(f'{URN}psalms/5/9', '9')}"
+            "לְמַ֥עַן שׁוֹרְﬞרָ֑י"
+            "<tei:choice><j:written>הושר</j:written>"
+            '<j:read><tei:lb type="indent"/>הַיְשַׁ֖ר</j:read></tei:choice>'
+            " לְפָנַ֣י דַּרְכֶּֽךָ׃</tei:p>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertTrue(self.scope(xml, f"{URN}psalms/5/9/a").endswith("שׁוֹרְﬞרָ֑י"))
         root = etree.fromstring(xml.encode())
         half = [
             m for m in root.iter(f"{{{TEI}}}milestone")
@@ -271,6 +415,79 @@ class TestHalfVerses(SubverseTestCase):
         xml = self.half_verses(xml)
         self.assertEqual(self.milestones(xml, "half-verse"), [])
 
+    def test_milestones_after_tei_text_are_ignored(self):
+        """A note after the text may quote a verse, as a header may; it does not carry it."""
+        xml = (
+            f'<tei:TEI xmlns:tei="{TEI}" xml:lang="he">'
+            "<tei:text><tei:body><tei:p/></tei:body></tei:text>"
+            '<tei:standOff type="notes"><tei:note>'
+            f'<tei:milestone unit="verse" n="1" corresp="{URN}genesis/1/1"/>'
+            "בְּרֵאשִׁ֑ית בָּרָא"
+            "</tei:note></tei:standOff></tei:TEI>"
+        )
+        xml = self.half_verses(xml)
+        self.assertEqual(self.milestones(xml, "half-verse"), [])
+
+    def test_the_end_of_the_text_ends_the_last_verse(self):
+        """The notes of a tei:standOff after the text are not part of its last verse.
+
+        Lamentations 5:22 has no etnachta, but a note after the text has one. Read as part of
+        the verse, the note divided it, and the second half began inside the note.
+        """
+        xml = (
+            f'<tei:TEI xmlns:tei="{TEI}" xml:lang="he"><tei:text><tei:body>'
+            f"<tei:p>{verse(f'{URN}lamentations/5/22', '22')}"
+            "כִּ֚י אִם־מָאֹ֣ס מְאַסְתָּ֔נוּ קָצַ֥פְתָּ עָלֵ֖ינוּ עַד־מְאֹֽד׃"
+            "</tei:p></tei:body></tei:text>"
+            '<tei:standOff type="notes"><tei:note>'
+            '=ש1,ק-מ ומסורת-ל וטברנית<tei:hi rend="sup">*</tei:hi>ל!=מוֹעֲד֑וֹ (כתיב מלא וי"ו)'
+            "</tei:note></tei:standOff></tei:TEI>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertEqual(self.milestones(xml, "half-verse"), [])
+        self.assertTextUnchanged(xml, before)
+
+    def test_a_note_after_the_text_does_not_keep_the_last_verse_whole(self):
+        """An ole in a note does not stop the last verse of Proverbs from being divided.
+
+        Proverbs 31:31 has an etnachta and no ole, but a note after the text has an ole. Read
+        as part of the verse, the note kept the verse whole, as an ole of its own would.
+        """
+        xml = (
+            f'<tei:TEI xmlns:tei="{TEI}" xml:lang="he"><tei:text><tei:body>'
+            f"<tei:p>{verse(f'{URN}proverbs/31/31', '31')}"
+            "תְּנוּ־לָ֭הּ מִפְּרִ֣י יָדֶ֑יהָ וִיהַלְﬞל֖וּהָ בַשְּׁעָרִ֣ים מַעֲשֶֽׂיהָ׃"
+            "</tei:p></tei:body></tei:text>"
+            '<tei:standOff type="notes"><tei:note>'
+            '=א (במקף)<tei:hi rend="sup">*</tei:hi>דפוסים=כֶּ֫ן ה֥וּא'
+            "</tei:note></tei:standOff></tei:TEI>"
+        )
+        before = self.text_of(xml)
+
+        xml = self.half_verses(xml)
+
+        self.assertEqual(
+            self.milestones(xml, "half-verse"),
+            [("a", f"{URN}proverbs/31/31/a"), ("b", f"{URN}proverbs/31/31/b")],
+        )
+        self.assertEqual(
+            self.scope(xml, f"{URN}proverbs/31/31/a"), "תְּנוּ־לָ֭הּ מִפְּרִ֣י יָדֶ֑יהָ"
+        )
+        self.assertTextUnchanged(xml, before)
+
+    def test_a_document_that_ends_inside_tei_text_is_refused(self):
+        """A document cut off inside tei:text is refused rather than read to its end."""
+        xml = (
+            f'<tei:TEI xmlns:tei="{TEI}" xml:lang="he"><tei:text><tei:body>'
+            f"<tei:p>{verse(f'{URN}genesis/1/1')}"
+            "בְּרֵאשִׁ֑ית בָּרָא"
+        )
+        with self.assertRaisesRegex(ValueError, "ends inside tei:text"):
+            insert_half_verses(xml)
+
 
 class TestSourceIsPreserved(SubverseTestCase):
     """The pass splices into the source; it must not rewrite anything it did not add.
@@ -352,6 +569,17 @@ class TestVerseParts(SubverseTestCase):
             self.scope(xml, f"{URN}genesis/1/31/yom_hashishi"), "י֥וֹם הַשִּׁשִּֽׁי׃"
         )
 
+    def test_line_break_without_literal_space_still_separates_words(self):
+        xml = document(
+            f"<tei:p>{verse(f'{URN}genesis/1/31', '31')}"
+            'וַיְהִי־בֹקֶר<tei:lb type="indent"/>יוֹם הַשִּׁשִּׁי׃</tei:p>'
+        )
+        with patch.dict(VERSE_PARTS, self.PARTS, clear=True):
+            result = self.verse_parts(xml)
+        marker = '<tei:milestone unit="verse-part" n="yom_hashishi" corresp="'+URN+'genesis/1/31/yom_hashishi"/>'
+        self.assertEqual(result.replace(marker, ''), xml)
+        self.assertIn('<tei:lb type="indent"/>'+marker+'יוֹם', result)
+
     def test_an_incipit_that_is_not_there_is_reported(self):
         """A declared part that cannot be placed is the caller's problem to fail on."""
         xml = document(
@@ -364,6 +592,31 @@ class TestVerseParts(SubverseTestCase):
         self.assertEqual(len(unplaceable), 1)
         self.assertEqual(unplaceable[0].urn, f"{URN}genesis/1/31/yom_hashishi")
         self.assertEqual(self.milestones(xml, "verse-part"), [])
+
+    def test_an_incipit_only_in_a_note_after_the_text_is_reported(self):
+        """A note after the text is not part of the last verse, so no part is placed in it.
+
+        Lamentations 5:22 does not have the words כתיב מלא, but its note after the text does.
+        Read as part of the verse, the note took the part, and its milestone went inside the
+        note.
+        """
+        parts = {("lamentations", 5, 22): (("ketiv_male", {"he": "כתיב מלא"}),)}
+        xml = (
+            f'<tei:TEI xmlns:tei="{TEI}" xml:lang="he"><tei:text><tei:body>'
+            f"<tei:p>{verse(f'{URN}lamentations/5/22', '22')}"
+            "כִּ֚י אִם־מָאֹ֣ס מְאַסְתָּ֔נוּ קָצַ֥פְתָּ עָלֵ֖ינוּ עַד־מְאֹֽד׃"
+            "</tei:p></tei:body></tei:text>"
+            '<tei:standOff type="notes"><tei:note>'
+            '=ש1,ק-מ ומסורת-ל וטברנית<tei:hi rend="sup">*</tei:hi>ל!=מוֹעֲד֑וֹ (כתיב מלא וי"ו)'
+            "</tei:note></tei:standOff></tei:TEI>"
+        )
+
+        with patch.dict(VERSE_PARTS, parts, clear=True):
+            result, unplaceable = insert_verse_parts(xml, language="he")
+
+        self.assertEqual(len(unplaceable), 1)
+        self.assertEqual(unplaceable[0].urn, f"{URN}lamentations/5/22/ketiv_male")
+        self.assertEqual(self.milestones(result, "verse-part"), [])
 
     def test_an_incipit_beginning_inside_a_maqqef_group_is_reported(self):
         """The words a maqqef joins are read as one; nothing may be put between them.
@@ -382,6 +635,35 @@ class TestVerseParts(SubverseTestCase):
 
         self.assertEqual(len(unplaceable), 1)
         self.assertIn("word boundary", unplaceable[0].reason)
+
+    def test_an_incipit_is_found_across_a_line_break(self):
+        """A line break divides words for an incipit as it does for the halves.
+
+        Psalms 2:1 as the importer writes it, with one part declared on the two words either
+        side of its line break and one on the word after it. Read as no space, the line break
+        would join those two words into one, which neither incipit matches.
+        """
+        parts = {
+            ("psalms", 2, 1): (
+                ("goyim", {"he": "גוים ולאמים"}),
+                ("uleummim", {"he": "ולאמים"}),
+            ),
+        }
+        xml = document(
+            f"<tei:p>{verse(f'{URN}psalms/2/1', '1')}"
+            "לָ֭מָּה רָגְשׁ֣וּ גוֹיִ֑ם"
+            '<tei:lb type="indent"/>'
+            "וּ֝לְאֻמִּ֗ים יֶהְגּוּ־רִֽיק׃</tei:p>"
+        )
+        before = self.text_of(xml)
+
+        with patch.dict(VERSE_PARTS, parts, clear=True):
+            xml = self.verse_parts(xml)
+
+        self.assertEqual(self.scope(xml, f"{URN}psalms/2/1/goyim"), "גוֹיִ֑ם")
+        self.assertEqual(self.scope(xml, f"{URN}psalms/2/1/uleummim"), "וּ֝לְאֻמִּ֗ים יֶהְגּוּ־רִֽיק׃")
+        self.assertFollowsLineBreak(xml, f"{URN}psalms/2/1/uleummim")
+        self.assertTextUnchanged(xml, before)
 
     def test_a_language_that_declares_nothing_gets_nothing(self):
         """A translation carries no parts rather than failing for want of an incipit."""
@@ -420,7 +702,23 @@ class TestVerseParts(SubverseTestCase):
 
 
 class TestDeclaredVerseParts(SubverseTestCase):
-    """The parts VERSE_PARTS actually declares, against hand-written text for those verses."""
+    """The parts VERSE_PARTS actually declares, against hand-written verse texts."""
+
+    def test_scroll_lifting_uses_last_al_pi_not_the_earlier_occurrences(self):
+        text = 'עַל פִּי יְהוָה יַחֲנוּ וְעַל פִּי יְהוָה יִסָּעוּ אֶת מִשְׁמֶרֶת יְהוָה שָׁמָרוּ עַל פִּי יְהוָה בְּיַד מֹשֶׁה׃'
+        xml = self.verse_parts(document(f'<tei:p>{verse(URN+"numbers/9/23", "23")}{text}</tei:p>'))
+        self.assertEqual(self.scope(xml, URN+'numbers/9/23/al_pi'), 'עַל פִּי יְהוָה בְּיַד מֹשֶׁה׃')
+        self.assertTextUnchanged(xml, text)
+
+    def test_qedushah_call_and_response_remain_distinct_inside_one_verse(self):
+        call = 'וְקָרָא זֶה אֶל־זֶה וְאָמַר '
+        response = 'קָדוֹשׁ קָדוֹשׁ קָדוֹשׁ יְהוָה צְבָאוֹת מְלֹא כָל־הָאָרֶץ כְּבוֹדוֹ׃'
+        xml = document(f'<tei:p>{verse(URN+"isaiah/6/3", "3")}{call}{response}</tei:p>')
+        before = call + response
+        xml = self.verse_parts(xml)
+        self.assertEqual(self.scope(xml, URN+'isaiah/6/3/veqara'), call.strip())
+        self.assertEqual(self.scope(xml, URN+'isaiah/6/3/qadosh'), response)
+        self.assertTextUnchanged(xml, before)
 
     def test_the_thirteen_attributes(self):
         """They open at the second יהוה and close at ונקה, neither of them an accent."""
@@ -441,6 +739,8 @@ class TestDeclaredVerseParts(SubverseTestCase):
             self.scope(xml, f"{URN}exodus/34/6/adonai_adonai").startswith("יְהֹוָה׀יְהֹוָה אֵל")
         )
         # ... and closes here, one word past the etnachta of 34:7.
+        self.assertEqual(self.scope(xml, f"{URN}exodus/34/7/notzer_chesed"),
+                         'נֹצֵר חֶסֶד לָאֲלָפִים נֹשֵׂא עָוֺן וָפֶשַׁע וְחַטָּאָ֑ה')
         self.assertEqual(self.scope(xml, f"{URN}exodus/34/7/venakeh"), "וְנַקֵּה")
         self.assertTrue(
             self.scope(xml, f"{URN}exodus/34/7/lo_yenakeh").startswith("לֹא יְנַקֶּה")
@@ -483,6 +783,23 @@ class TestDeclaredVerseParts(SubverseTestCase):
         # The part sits inside the second half, which it neither ends nor is ended by.
         self.assertEqual(self.scope(xml, f"{URN}genesis/1/31/b"), "וַיְהִי־עֶרֶב וַיְהִי־בֹקֶר")
         self.assertEqual(self.scope(xml, f"{URN}genesis/1/31/yom_hashishi"), "יוֹם הַשִּׁשִּׁי׃")
+
+    def test_cantor_shofar_quote_excludes_meod_and_moses(self):
+        text = "וַיְהִי קוֹל הַשֹּׁפָר הוֹלֵךְ וְחָזֵק מְאֹד מֹשֶׁה יְדַבֵּר׃"
+        xml = document(f"<tei:p>{verse(f'{URN}exodus/19/19', '19')}{text}</tei:p>")
+        result = self.verse_parts(xml)
+        self.assertEqual(self.scope(result, f"{URN}exodus/19/19/vayehi_qol"),
+                         "וַיְהִי קוֹל הַשֹּׁפָר הוֹלֵךְ וְחָזֵק")
+        self.assertEqual("".join(etree.fromstring(result.encode()).itertext()), text)
+
+    def test_musaf_protection_quote_stops_before_prophetic_continuation(self):
+        xml = document('<tei:p>' + verse(f"{URN}zechariah/9/15", "15") +
+                       'יְהוָה צְבָאוֹת יָגֵן עֲלֵיהֶם וְאָכְלוּ וְכָבְשׁוּ אַבְנֵי קֶלַע</tei:p>')
+        result = self.verse_parts(xml)
+        self.assertEqual(self.scope(result, f"{URN}zechariah/9/15/adonai_tzevaot_yagen"),
+                         'יְהוָה צְבָאוֹת יָגֵן עֲלֵיהֶם')
+        self.assertEqual(self.scope(result, f"{URN}zechariah/9/15/veakhelu"),
+                         'וְאָכְלוּ וְכָבְשׁוּ אַבְנֵי קֶלַע')
 
     def test_no_declared_part_name_contains_a_dash(self):
         """A dash in the last component of a URN is what marks a range."""

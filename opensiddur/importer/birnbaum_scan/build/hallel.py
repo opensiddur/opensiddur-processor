@@ -29,7 +29,7 @@ def shared(lang,prayers):
     pattern=r'<tei:milestone unit="verse" corresp="('+re.escape(BIBLE)+r'psalms/(?:113|114|115|116|117|118)/\d+)"/>(.*?)(?=<tei:milestone unit="verse")'
     for original in prayers:
         p=dict(original)
-        def quote(match):
+        def quote(match, p=p):
             source,value=match.groups()
             local=p['urn']+'/quoted_'+source.split('psalms/')[1].replace('/','_')
             return marked(local,f'<tei:seg source="{source}">{value}</tei:seg>',unit='verse')
@@ -60,7 +60,7 @@ def prayers(lang):
                 body+='</tei:p>';paragraph_open=False
         if paragraph_open:body+='</tei:p>'
         result.append(dict(name='hallel_psalm_'+str(chapter)+'_text',urn=urn,title='Psalm '+str(chapter),first=rows[0]['page']+side,last=rows[-1]['page']+side,body=f'<tei:div corresp="{urn}">'+body+'</tei:div>'))
-    for key,address,title in [('opening','blessing','Blessing before Hallel'),('closing','yehalelukha','Yehallelukha')]:
+    for key,address,title in [('opening','blessing','Blessing before Hallel'),('closing','yehallelukha','Yehallelukha')]:
         row=next(r for r in ROWS if r['key']==key);urn=ROOT+'/'+address
         result.append(dict(name='hallel_'+address,urn=urn,title=title,first=row['page']+side,last=row['page']+side,body=f'<tei:div corresp="{urn}">'+pb(row['page']+side,sigil=SIGIL)+'<tei:p>'+xml(row[lang])+'</tei:p></tei:div>'))
     return result
@@ -91,7 +91,7 @@ def units(project):
             body+=instruction('Each verse is chanted twice:')+verses(118,26,29)
         else:body=transclude(BIBLE+'psalms/'+str(chapter))
         add('hallel_psalm_'+str(chapter),ROOT+'/psalm_'+str(chapter),'תהלים '+str(chapter),'Psalm '+str(chapter),first,last,body,printed=bool(side and chapter in (113,114,117)))
-    body=transclude(ROOT+'/blessing')+''.join(transclude(ROOT+'/psalm_'+str(c)) for c in range(113,119))+transclude(ROOT+'/yehalelukha')
+    body=transclude(ROOT+'/blessing')+''.join(transclude(ROOT+'/psalm_'+str(c)) for c in range(113,119))+transclude(ROOT+'/yehallelukha')
     add('hallel',ROOT,'הַלֵּל','HALLEL',565,573,body,printed=True)
     # On Rosh Hodesh during Hanukkah, full Hallel and Full Kaddish coexist.
     full='<j:any>'+holiday('rosh-hodesh',2)+feature(AGG,'yom-tov')+feature(AGG,'chol-hamoed')+'</j:any>'

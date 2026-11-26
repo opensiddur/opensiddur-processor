@@ -203,15 +203,15 @@ def main(argv=None):
             # page puts it: a day's last notes can fall below the next day's heading.
             path=args.source_root/'asher_selichot'/'scan_reading'/(day_name+'-day.json')
             if not path.exists():return ()
-            day=json.loads(path.read_text())
+            day=json.loads(path.read_text(encoding="utf-8"))
             openings=(re.split(r'[\u0590-\u05ff]',n['text'])[0].strip()[:25] for u in day['units']
                       for part in u.get('stanzas',[u]) for f in part['fragments'] for n in f['notes']['en'])
             return tuple(o for o in openings if len(o)>=8)
         for i,day_name in enumerate(['fourth','fifth','sixth','seventh'],3):
             if i>=len(days):break
             source=args.source_root/'asher_selichot'
-            data=json.loads((source/'scan_reading'/(day_name+'-day.json')).read_text())
-            scope=json.loads((source/(day_name+'-day-scope.json')).read_text())
+            data=json.loads((source/'scan_reading'/(day_name+'-day.json')).read_text(encoding="utf-8"))
+            scope=json.loads((source/(day_name+'-day-scope.json')).read_text(encoding="utf-8"))
             previous=['third','fourth','fifth','sixth'][i-3]
             portion=slice_day(tree,days[i],days[i+1] if i+1<len(days) else None,
                               trailing_note_texts=note_openings(day_name),prior_note_texts=note_openings(previous))

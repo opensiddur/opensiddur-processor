@@ -627,7 +627,7 @@ def validate_and_write_tei_file(
     is_valid, errors = validate(pretty_xml)
     if not is_valid:
         raise Exception(f"Errors in {file_name}: {errors}")
-    with open(out_path, "w") as f:
+    with open(out_path, "w", encoding="utf-8") as f:
         f.write(pretty_xml)
 
 def book_file(

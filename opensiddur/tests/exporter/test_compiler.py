@@ -315,7 +315,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
             with patch('opensiddur.exporter.compiler.UrnResolver.resolve_range', side_effect=mock_resolve_range):
                 with patch('opensiddur.exporter.compiler.UrnResolver.prioritize_range', side_effect=mock_prioritize_range):
                     processor = CompilerProcessor(project, file_name)
-                    result = processor.process()
+                    processor.process()
             
             # Verify InlineCompilerProcessor was instantiated
             MockInlineProcessor.assert_called_once()
@@ -376,7 +376,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
             with patch('opensiddur.exporter.compiler.UrnResolver.resolve_range', side_effect=mock_resolve_range):
                 with patch('opensiddur.exporter.compiler.UrnResolver.prioritize_range', side_effect=mock_prioritize_range):
                     processor = CompilerProcessor(project, file_name)
-                    result = processor.process()
+                    processor.process()
             
             # Verify ExternalCompilerProcessor was instantiated
             MockExternalProcessor.assert_called_once()
@@ -486,7 +486,7 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
             with patch('opensiddur.exporter.compiler.UrnResolver.resolve_range', side_effect=mock_resolve_range):
                 with patch('opensiddur.exporter.compiler.UrnResolver.prioritize_range', side_effect=mock_prioritize_range):
                     processor = CompilerProcessor(project, file_name)
-                    result = processor.process()
+                    processor.process()
             
             # Verify ExternalCompilerProcessor was called with resolved URNs
             MockExternalProcessor.assert_called_once()
@@ -747,7 +747,6 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
         
         # Verify that project and file_name are ONLY on root and p:transclude elements
         # Count occurrences of p:project attribute in the output (with namespace prefix)
-        import re
         project_attr_count = len(re.findall(r'p:project="', result_str))
         # Should be exactly 2: one on root, one on p:transclude
         self.assertEqual(project_attr_count, 2, "p:project attribute should only appear on root and p:transclude")
@@ -866,7 +865,6 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
         self.assertIn('Fragment text', result_str)
         
         # Verify that project and file_name are ONLY on root and p:transclude elements
-        import re
         project_attr_count = len(re.findall(r'p:project="', result_str))
         # Should be exactly 2: one on root, one on p:transclude
         self.assertEqual(project_attr_count, 2, "p:project attribute should only appear on root and p:transclude")
@@ -942,7 +940,6 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
                     processor = CompilerProcessor(project, file_name)
                     result = processor.process()
         
-        result_str = etree.tostring(result, encoding='unicode')
         
         # Check that external transclusion has correct language
         transclude_elem = result.xpath('.//p:transclude', namespaces={'p': 'http://jewishliturgy.org/ns/processing', 'tei': 'http://www.tei-c.org/ns/1.0'})
@@ -1061,7 +1058,6 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
                     processor = CompilerProcessor(project, file_name, linear_data=linear_data, reference_database=refdb)
                     result = processor.process()
         
-        result_str = etree.tostring(result, encoding='unicode')
         
         # Check that instructional note has correct language
         instructional_notes = result.xpath('.//tei:note[@type="instruction"]', namespaces={'tei': 'http://www.tei-c.org/ns/1.0'})
@@ -1169,7 +1165,6 @@ class TestCompilerProcessorWithFiles(unittest.TestCase):
                 processor = CompilerProcessor(project, file_name, linear_data=linear_data, reference_database=refdb)
                 result = processor.process()
         
-        result_str = etree.tostring(result, encoding='unicode')
         
         # Check that editorial note has correct language
         editorial_notes = result.xpath('.//tei:note[@type="editorial"]', namespaces={'tei': 'http://www.tei-c.org/ns/1.0'})
@@ -1928,7 +1923,6 @@ class TestCompilerProcessorAnnotations(unittest.TestCase):
 
     def test_editorial_note_with_xml_id_in_database(self):
         """Test that an editorial note that targets the xml:id of an element."""
-        urn = None
         
         # Create main file with instructional note with URN that won't be found in database
         project, file_name, xml = self._create_targeted_note_file("test_project", "main.xml", "Main Document", None, "note_id", 
