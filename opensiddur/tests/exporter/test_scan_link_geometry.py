@@ -141,6 +141,18 @@ class TestScanLinkGeometry(unittest.TestCase):
             for number in numbers:
                 self.assertFalse(link.overlaps(number), f"{link} is set on {number}")
 
+    def test_shared_bilingual_rubric_typesets_above_matching_columns(self):
+        note = ('<tei:note type="description"><tei:foreign xml:lang="he">חזן</tei:foreign>'
+                '<tei:foreign xml:lang="en">Reader</tei:foreign></tei:note>')
+        xml = _PARALLEL.replace('<tei:body>', '<tei:body><tei:div>' + note).replace(
+            '</tei:body>', '</tei:div></tei:body>')
+        links, words, log = self._margin(xml, parallel={"layout": "pairs"})
+        self.assertNotIn('! LaTeX Error:', log)
+        self.assertEqual(len(links), 2)
+        reader = next(w for w in words if w.text == 'Reader')
+        hebrew = next(w for w in words if any('א' <= c <= 'ת' for c in w.text))
+        self.assertLess(hebrew.x1, reader.x0)
+
     def test_a_hebrew_text_has_its_links_in_the_margin(self):
         links, words, log = self._margin(_SINGLE)
         self.assertEqual(["https://scan.example/page?n=1&size=1",
