@@ -2076,7 +2076,9 @@ class TestExternalCompilerParallelTransclude(unittest.TestCase):
             if self.project == "bad":
                 raise RuntimeError("fail this parallel project")
             self.root_language = "he"
-            return []
+            paragraph = etree.Element(f"{{{TEI_NS}}}p")
+            paragraph.text = "Counterpart text"
+            return [paragraph]
 
         with (
             patch.object(
