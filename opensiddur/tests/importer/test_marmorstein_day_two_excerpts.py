@@ -74,6 +74,28 @@ class ExcerptTests(unittest.TestCase):
         self.assertEqual(path.read_text(encoding='utf-8'), 'Retain until inputs current')
         self.assertFalse((self.base/'projects'/PROJECTS['he']/'invented_prayer.xml').exists())
 
+    def test_paired_witnesses_share_scope_with_independent_words_and_scan_links(self):
+        self.recipe['units'][0]['en'] = {
+            'scan_page': 24, 'printed_page': '9', 'citation': 'Psalms 7:2',
+            'content': ['An invented translation.']}
+        with patch('opensiddur.importer.marmorstein_rosh_hashanah_2.draft_prayers.validate',
+                   return_value=(True, [])):
+            self.run_builder()
+        documents = [etree.parse(str(self.base/'projects'/PROJECTS[lang]/'invented_prayer.xml'))
+                     for lang in ['he', 'en']]
+        for xpath in ['//t:body/t:div/@corresp', '//t:milestone[@unit="verse"]/@corresp']:
+            self.assertEqual(documents[0].xpath(xpath, namespaces=NS),
+                             documents[1].xpath(xpath, namespaces=NS))
+        self.assertIn('/page/n23', documents[1].xpath('string(//t:pb/@facs)', namespaces=NS))
+        self.assertEqual(documents[1].xpath('string(//t:body//t:seg)', namespaces=NS),
+                         'An invented translation.')
+        self.assertEqual(documents[1].xpath('string(//t:note//t:ref)', namespaces=NS), 'Psalms 7:2')
+
+    def test_empty_provenance_cannot_bypass_guard(self):
+        self.recipe['input_sha256'] = {}
+        with self.assertRaisesRegex(ValueError, 'at least one source input'):
+            self.run_builder()
+
     def test_schema_failure_does_not_remove_missing_counterpart(self):
         path = self.base/'projects'/PROJECTS['en']/'invented_prayer.xml'
         path.write_text('Retained on failed validation', encoding='utf-8')

@@ -70,6 +70,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     source = args.source_root/BOOK
     recipe = json.loads((source/'batches/maariv_s5_s24/draft_units.json').read_text(encoding='utf-8'))
+    if not recipe['input_sha256']:
+        raise ValueError('Draft excerpts must bind at least one source input')
     for relative, expected in recipe['input_sha256'].items():
         path = source/relative
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
