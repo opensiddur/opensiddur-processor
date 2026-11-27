@@ -598,6 +598,10 @@ class _TextWriter:
             self.parts.append(conditional_open(xml_id, "", negated_xml(pair.otherwise)))
         xml = phrase_xml(pair, self.lang, self.notes, phrase_urn(self.urn, number, self.clashes), label=labelled is None,
                          cuts=cuts)
+        if (self.lang != "he" and self.table is not None and not plain_text(pair.en).strip()
+                and (supplied := self.table.translation(plain_text(leading_label(pair.he)[1]))) is not None):
+            # (a phrase the English leaves untranslated, whose English the table gives)
+            xml += f"{editorial_note(supplied.note)}{esc(supplied.english)}"
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
         else:
@@ -683,7 +687,7 @@ class _TextWriter:
         found = tuple(words(hebrew))
         for replacement in self.table.replacements if self.table is not None else ():
             n = len(replacement.alternative)
-            if not replacement.english or replacement.when is None or not any(
+            if not replacement.english or replacement.when is None or esc(replacement.english) in xml or not any(
                     found[k:k + n] == replacement.alternative for k in range(len(found) - n + 1)):
                 continue
             xml_id = self.next_id("inline")

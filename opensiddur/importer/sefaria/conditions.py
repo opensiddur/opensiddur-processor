@@ -29,6 +29,8 @@ alternatives, as ``j:conditional``.
   חוננתנו in small type in the weekday Maariv Amidah): each transclusion of it is gated.
   With ``places`` (``siddur:`` URNs), only its transclusions there (המברך after the Maariv
   Besefer Chayyim that prints the custom's other closing).
+- ``translations``: the English of a phrase the English leaves empty (the Ten Days' ending of
+  Ledor Vador), set in the English project after an editorial note (``note``) saying whose it is.
 
 A rubric entry may say how far it governs: by default the next text (between texts) or the
 passage to the next rubric (inside one); with ``section: true``, everything to the next heading,
@@ -157,6 +159,9 @@ class LabelCondition:
     #: between texts, the label stays an instruction before the conditional, which takes no note
     #: (the label says when the text is skipped, the condition when it is said)
     instruction: bool = False
+    #: the label's letters, every one: a consonant skeleton drops the vav of כ"ו, which would
+    #: make the 26th of the month the 20th
+    letters: str = ""
 
 
 @dataclass(frozen=True)
@@ -185,6 +190,15 @@ class Replacement:
 
 
 @dataclass(frozen=True)
+class Translation:
+    """The English of a phrase the English leaves untranslated (``translations``), and the
+    editorial note saying where it comes from."""
+    hebrew: tuple[str, ...]
+    english: str
+    note: str
+
+
+@dataclass(frozen=True)
 class Conditions:
     rubrics: tuple[RubricCondition, ...] = ()
     labels: tuple[LabelCondition, ...] = ()
@@ -193,6 +207,7 @@ class Conditions:
     directives: tuple[re.Pattern[str], ...] = ()
     leaves: tuple[LeafGate, ...] = ()
     texts: tuple[TextGate, ...] = ()
+    translations: tuple[Translation, ...] = ()
     #: the leaf the table is scoped to (``in_leaf``): its rubrics for that leaf apply
     leaf: str | None = None
 
@@ -214,13 +229,19 @@ class Conditions:
         return gates
 
     def for_rubric(self, english: str) -> RubricCondition | None:
+        """The rubric ``english`` is: one scoped to this table's leaf before any for every leaf."""
         text = " ".join(english.split())
-        return next((r for r in self.rubrics if (not r.leaves or self.leaf in r.leaves) and r.pattern.search(text)),
-                    None)
+        return next((r for r in self.rubrics if self.leaf in r.leaves and r.pattern.search(text)),
+                    next((r for r in self.rubrics if not r.leaves and r.pattern.search(text)), None))
+
+    def translation(self, hebrew: str) -> Translation | None:
+        found = tuple(words(hebrew))
+        return next((t for t in self.translations if t.hebrew == found), None)
 
     def for_label(self, hebrew: str) -> LabelCondition | None:
         found = tuple(words(hebrew.rstrip(": ")))
-        return next((c for c in self.labels if c.label == found), None)
+        matched = [c for c in self.labels if c.label == found]
+        return next((c for c in matched if c.letters == _letters(hebrew)), matched[0] if matched else None)
 
     def for_inline(self, hebrew: str) -> LabelCondition | None:
         found = tuple(words(hebrew))
@@ -229,6 +250,12 @@ class Conditions:
     def replaced(self, alternative: str) -> Replacement | None:
         found = tuple(words(alternative))
         return next((r for r in self.replacements if r.alternative == found), None)
+
+
+def _letters(hebrew: str) -> str:
+    """The Hebrew letters of ``hebrew``, words apart: no points, marks or punctuation."""
+    return " ".join("".join(ch for ch in w if "\u05d0" <= ch <= "\u05ea") for w in hebrew.split()
+                    if any("\u05d0" <= ch <= "\u05ea" for ch in w))
 
 
 def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
@@ -264,7 +291,8 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
                                         bool(entry.get("section")) or until is not None, until,
                                         bool(entry.get("instead_of_previous")),
                                         bool(entry.get("until_included")),
-                                        bool(entry.get("instruction"))))
+                                        bool(entry.get("instruction")),
+                                        _letters(str(entry.get("label", "")))))
     replacements = [Replacement(tuple(words(str(e["alternative"]))), tuple(words(str(e.get("replaces") or ""))),
                                 e.get("when"), str(e.get("source") or ""), str(e.get("replaces_source") or ""),
                                 str(e.get("english") or ""), str(e.get("english_note") or ""))
@@ -286,8 +314,13 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
         condition_xml(entry.get("when"), where)
         texts.append(TextGate(str(entry["work"]), str(entry["urn"]), entry["when"], str(entry.get("note") or ""),
                               tuple(str(p) for p in entry.get("places") or ())))
+    translations = []
+    for n, entry in enumerate(data.get("translations") or (), start=1):
+        if not entry.get("hebrew") or not entry.get("english") or not entry.get("note"):
+            raise ConditionsError(f"{path.name} translations #{n}: hebrew, english and a note are needed")
+        translations.append(Translation(tuple(words(str(entry["hebrew"]))), str(entry["english"]), str(entry["note"])))
     return Conditions(tuple(rubrics), tuple(labels), tuple(inline), tuple(replacements), directives,
-                      tuple(leaves), tuple(texts))
+                      tuple(leaves), tuple(texts), translations=tuple(translations))
 
 
 def _pattern(text: Any, where: str) -> re.Pattern[str]:

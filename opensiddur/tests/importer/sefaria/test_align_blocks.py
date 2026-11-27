@@ -193,7 +193,7 @@ class TestSplitLeadingLabels(unittest.TestCase):
             ("מֶֽלֶךְ אֹהֵב צְדָקָה וּמִשְׁפָּט:", "Blessed are You, Adonoy, King, Lover of justice.", when),
         ])
 
-    def test_with_no_english_replacement_the_english_ending_is_left_whole(self):
+    def test_with_no_english_replacement_the_english_ending_is_still_said_otherwise(self):
         when = {"holiday-aggregate": {"aseret-ymei-tshuva": True}}
         he = ["לְדוֹר וָדוֹר נַגִּיד גָּדְלֶֽךָ. בָּרוּךְ אַתָּה יְהֹוָה הָאֵל הַקָּדוֹשׁ:",
               "<small>בעשי\"ת מסיים:</small> הַמֶּֽלֶךְ הַקָּדוֹשׁ:"]
@@ -202,10 +202,11 @@ class TestSplitLeadingLabels(unittest.TestCase):
         is_label = lambda text: text.rstrip(": ") == 'בעשי"ת מסיים'
         pairs = split_leading_labels(align_leaf(leaf(he, en)), is_label,
                                      lambda text: when if is_label(text) else None).pairs
-        self.assertEqual([(plain_text(p.en).strip(), p.otherwise) for p in pairs[:2]], [
-            ("From generation to generation we will declare Your greatness. Blessed are You, Adonoy, the Holy Almighty.",
-             None),
-            ("", when),
+        # (the English ending is set apart as the Hebrew is, so that it is not said in the Ten Days)
+        self.assertEqual([(plain_text(p.en).strip(), p.otherwise) for p in pairs[:3]], [
+            ("From generation to generation we will declare Your greatness. Blessed are You, Adonoy,", None),
+            ("the Holy Almighty.", when),
+            ("", None),
         ])
 
     def test_a_paragraph_that_is_all_ending_is_said_otherwise_whole(self):

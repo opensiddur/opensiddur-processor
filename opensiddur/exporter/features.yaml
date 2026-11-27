@@ -323,6 +323,10 @@ opensiddur:meal-context:
     mother-is-host: binary
     wife-and-children: binary
     zimmun: binary
+    # Whether the day's insertion in Grace (Retzeh, Ya'aleh Veyavo) was forgotten, so that the
+    # blessing said for it is said. No default: left undefined, the blessings stay in the book
+    # with their "if you forgot" instructions; false leaves them out.
+    forgot-insertion: binary
 
 opensiddur:practice:
   common: false

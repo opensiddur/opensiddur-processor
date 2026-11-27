@@ -91,6 +91,17 @@ class TestTable(unittest.TestCase):
         self.assertIsNone(conditions.for_inline("פלוני"))
         self.assertEqual(conditions.replaced("הַשָּׁלוֹם").replaces, ("שלם",))
 
+    def test_labels_whose_skeletons_agree_are_told_apart_by_their_letters(self):
+        conditions = table("""
+labels:
+  - label: 'כ ניסן'
+    when: {holiday: {omer: 5}}
+  - label: 'כ"ו ניסן'
+    when: {holiday: {omer: 11}}
+""")
+        self.assertEqual(conditions.for_label("כ ניסן").when, {"holiday": {"omer": 5}})
+        self.assertEqual(conditions.for_label("כ״ו נִיסָן:").when, {"holiday": {"omer": 11}})
+
     def test_a_bad_entry_is_an_error(self):
         with self.assertRaises(ConditionsError):
             table("rubrics:\n  - match: '('\n    when: {holiday: {purim: true}}\n")
@@ -137,6 +148,26 @@ rubrics:
         self.assertEqual(conditions.for_rubric(rubric).when, {"holiday-aggregate": {"yom-tov": True}})
         self.assertEqual(conditions.in_leaf("Grace").for_rubric(rubric).when, {"holiday-aggregate": {"yom-tov": True}})
         self.assertEqual(conditions.in_leaf("Haftarah").for_rubric(rubric).when, {"holiday-aggregate": {"shabbat": True}})
+        # ... wherever the table lists it
+        reordered = table("""
+rubrics:
+  - match: "^On Shabbos and Yom Tov say:"
+    when: {holiday-aggregate: {yom-tov: true}}
+  - match: "^On Shabbos and Yom Tov say:"
+    leaves: ["Haftarah"]
+    when: {holiday-aggregate: {shabbat: true}}
+""")
+        self.assertEqual(reordered.in_leaf("Haftarah").for_rubric(rubric).when, {"holiday-aggregate": {"shabbat": True}})
+        self.assertEqual(reordered.for_rubric(rubric).when, {"holiday-aggregate": {"yom-tov": True}})
+
+    def test_a_translation_is_found_by_its_hebrew(self):
+        conditions = table("translations:\n  - hebrew: 'בָּרוּךְ אַתָּה יְהֹוָה הַמֶּלֶךְ הַקָּדוֹשׁ'\n"
+                           "    english: 'Blessed are You, the Holy King.'\n    note: 'Ours.'\n")
+        found = conditions.translation("ברוך אתה יהוה המלך הקדוש:")
+        self.assertEqual((found.english, found.note), ("Blessed are You, the Holy King.", "Ours."))
+        self.assertIsNone(conditions.translation("ברוך אתה יהוה"))
+        with self.assertRaises(ConditionsError):
+            table("translations:\n  - hebrew: 'אָמֵן'\n    english: 'Amen'\n")
 
 
 class TestDirectivesAndLeaves(unittest.TestCase):

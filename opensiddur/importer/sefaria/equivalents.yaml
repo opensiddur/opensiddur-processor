@@ -35,6 +35,21 @@ texts:
   - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
     urn: urn:x-opensiddur:text:prayer:shema
     note: "the three paragraphs, joined below"
+  - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
+    leaf: ["Weekday / Shacharit / Blessings of the Shema / Shema", "Weekday / Maariv / Blessings of the Shema / Shema", "Shabbat / Maariv / Blessings of the Shema / Shema"]
+    ends: יהוה אלהיכם אמת
+    urn: urn:x-opensiddur:text:prayer:shema
+    note: "the Ashkenaz siddur's Shema, to the reader's repetition (as the weekday volume prints it): whole, not cut where ברוך שם כבוד opens"
+  - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
+    leaf: "Weekday / Maariv / Keri'at Shema al Hamita"
+    ends: אני יהוה אלהיכם
+    urn: urn:x-opensiddur:text:prayer:shema
+    note: "the Shema at bedtime, without the reader's repetition: whole, not cut where ברוך שם כבוד opens"
+  - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
+    leaf: "Weekday / Shacharit / Preparatory Prayers / Sovereignty of Heaven (**L'olam, Shema)"
+    ends: וכתבתם על מזזות ביתך ובשעריך
+    urn: urn:x-opensiddur:text:bible:deuteronomy/6/4-9
+    note: "the first verse and paragraph only, as the morning's preparatory prayers say it, whole: the verses, not the Shema of the services (which, printed first, would make every full Shema a variant of this one)"
   - opens: והוא רחום יכפר עון ולא ישחית והרבה להשיב אפו ולא יעיר כל חמתו יהוה הושיעה
     urn: urn:x-opensiddur:text:prayer:vehu_rachum
     note: "before Maariv; two verses (Psalms 78:38, 20:10) named by their incipit"
@@ -140,6 +155,15 @@ texts:
     leaf: "Weekday / Shacharit / Preparatory Prayers / Morning Blessings"
     urn: urn:x-opensiddur:text:prayer:birkhot_hashachar/sheasani_kirtzono
     note: "the blessing a woman says instead of שלא עשני אשה, as Birnbaum names it"
+  - opens: נחם יהוה אלהינו את אבלי ציון
+    leaf: "Weekday / Minchah / Amida / Rebuilding Jerusalem"
+    ends: ברוך אתה יהוה מנחם ציון ובונה ירושלים
+    urn: urn:x-opensiddur:text:prayer:amidah/nachem_hashem_eloheinu
+    note: "Nachem with its own ending; the everyday ending printed after it is another text, said otherwise"
+  - opens: ברוך אתה יהוה בונה ירושלים
+    leaf: "Weekday / Minchah / Amida / Rebuilding Jerusalem"
+    urn: urn:x-opensiddur:text:prayer:amidah/yerushalayim/seal
+    note: "the everyday ending after Nachem, as Birnbaum names it; gated on none of Tisha B'Av (texts in conditions.yaml)"
   - opens: בספר חיים ברכה ושלום ופרנסה טובה
     leaf: ["Weekday / Maariv / Amidah / Peace", "Shabbat / Maariv / Amidah / Peace"]
     ends: ברוך אתה יהוה עשה השלום

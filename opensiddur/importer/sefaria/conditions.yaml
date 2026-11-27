@@ -109,6 +109,11 @@ rubrics:
     when: {holiday-aggregate: {tal-umatar: false}}
   - match: "^The following psalm \\(27\\) is recited|^The following is recited here by some congregations from the first day of Elul"
     when: *elul_to_shemini_atzeret
+  - match: "^The following psalm \\(27\\) is recited|^The following is recited here by some congregations from the first day of Elul"
+    # Siddur Ashkenaz's L'David leaves: the psalm and the Mourner's Kaddish said after it
+    leaves: ["Weekday / Shacharit / Concluding Prayers / L'David", "Weekday / Maariv / L'David", "Shabbat / Maariv / L'David"]
+    when: *elul_to_shemini_atzeret
+    section: true
   - match: "^During the Ten Days of Penitence, continue at the asterisk|^Between Rosh Hashanah and Yom Kippur (the Chazzan )?continues? at the asterisk"
     # the ordinary closing it skips (הָאֵל הַקָּדוֹשׁ), to the rubric at the asterisk
     when: {none: [{holiday-aggregate: {aseret-ymei-tshuva: true}}]}
@@ -350,7 +355,28 @@ rubrics:
   - match: "^When eating at your own table"
     when: {none: [{meal-context: {guest: true}}]}
   - match: "^A guest says:"
-    when: {all: [{meal-context: {guest: true}}, {none: [*parents_host]}]}
+    # Siddur Ashkenaz's Hebrew: sons at their father's table say it too
+    when: {meal-context: {guest: true}}
+
+  # Grace's blessings for a forgotten Retzeh or Ya'aleh Veyavo: said if it was forgotten (left
+  # undefined, they stay in the book with their instructions), each on its own day
+  - match: "^The following blessings are said in the event you forgot to say"
+    when: &forgot {meal-context: {forgot-insertion: true}}
+    section: true
+  - match: "^If you forgot to say \\S+ on Shabbos:"
+    when: {all: [*forgot, {holiday-aggregate: {shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}]}]}
+  - match: "^If you forgot to say \\S+ \\S+ on Rosh Chodesh:"
+    when: {all: [*forgot, {holiday: {rosh-hodesh: true}}, {none: [{holiday-aggregate: {yom-tov: true}}]}]}
+  - match: "^If you forgot to say \\S+ \\S+ on Yom Tov:"
+    when: {all: [*forgot, {holiday-aggregate: {yom-tov: true}}, {none: [{holiday-aggregate: {shabbat: true}}, {holiday: {rosh-hashana: true}}]}]}
+  - match: "^If (a )?Yom Tov occurs on Shabbos and you forgot"
+    when: {all: [*forgot, {holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {shabbat: true}}, {none: [{holiday: {rosh-hashana: true}}]}]}
+  - match: "^If you forgot to say \\S+ \\S+ on Rosh Hashanah:"
+    when: {all: [*forgot, {holiday: {rosh-hashana: true}}, {none: [{holiday-aggregate: {shabbat: true}}]}]}
+  - match: "^If Rosh Hashanah occurs on Shabbos and you forgot"
+    when: {all: [*forgot, {holiday: {rosh-hashana: true}}, {holiday-aggregate: {shabbat: true}}]}
+  - match: "^If Rosh Chodesh occurs on Shabbos and you forgot"
+    when: {all: [*forgot, {holiday: {rosh-hodesh: true}}, {holiday-aggregate: {shabbat: true}}]}
 
   # -- What was eaten (מעין שלש) ----------------------------------------------------------------
   - match: "^The following blessing is said after eating cooked or baked foods prepared from any of the five species of grain|^After food prepared from the five grains, say:"
@@ -396,6 +422,105 @@ labels:
   - label: 'בעשי"ת מסיים'
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
     ending: true
+  # Siddur Ashkenaz dates each count of the Omer: the count is said on its day
+  - label: 'ט"ז ניסן'
+    when: {holiday: {omer: 1}}
+  - label: 'י"ז ניסן'
+    when: {holiday: {omer: 2}}
+  - label: 'י"ח ניסן'
+    when: {holiday: {omer: 3}}
+  - label: 'י"ט ניסן'
+    when: {holiday: {omer: 4}}
+  - label: 'כ ניסן'
+    when: {holiday: {omer: 5}}
+  - label: 'כ"א ניסן'
+    when: {holiday: {omer: 6}}
+  - label: 'כ"ב ניסן'
+    when: {holiday: {omer: 7}}
+  - label: 'כ"ג ניסן'
+    when: {holiday: {omer: 8}}
+  - label: 'כ"ד ניסן'
+    when: {holiday: {omer: 9}}
+  - label: 'כ"ה ניסן'
+    when: {holiday: {omer: 10}}
+  - label: 'כ"ו ניסן'
+    when: {holiday: {omer: 11}}
+  - label: 'כ"ז ניסן'
+    when: {holiday: {omer: 12}}
+  - label: 'כ"ח ניסן'
+    when: {holiday: {omer: 13}}
+  - label: 'כ"ט ניסן'
+    when: {holiday: {omer: 14}}
+  - label: 'ל ניסן'
+    when: {holiday: {omer: 15}}
+  - label: 'א אייר'
+    when: {holiday: {omer: 16}}
+  - label: 'ב אייר'
+    when: {holiday: {omer: 17}}
+  - label: 'ג אייר'
+    when: {holiday: {omer: 18}}
+  - label: 'ד אייר'
+    when: {holiday: {omer: 19}}
+  - label: 'ה אייר'
+    when: {holiday: {omer: 20}}
+  - label: 'ו אייר'
+    when: {holiday: {omer: 21}}
+  - label: 'ז אייר'
+    when: {holiday: {omer: 22}}
+  - label: 'ח אייר'
+    when: {holiday: {omer: 23}}
+  - label: 'ט אייר'
+    when: {holiday: {omer: 24}}
+  - label: 'י אייר'
+    when: {holiday: {omer: 25}}
+  - label: 'י"א אייר'
+    when: {holiday: {omer: 26}}
+  - label: 'י"ב אייר'
+    when: {holiday: {omer: 27}}
+  - label: 'י"ג אייר'
+    when: {holiday: {omer: 28}}
+  - label: 'י"ד אייר'
+    when: {holiday: {omer: 29}}
+  - label: 'ט"ו אייר'
+    when: {holiday: {omer: 30}}
+  - label: 'ט"ז אייר'
+    when: {holiday: {omer: 31}}
+  - label: 'י"ז אייר'
+    when: {holiday: {omer: 32}}
+  - label: 'י"ח אייר'
+    when: {holiday: {omer: 33}}
+  - label: 'י"ט אייר'
+    when: {holiday: {omer: 34}}
+  - label: 'כ אייר'
+    when: {holiday: {omer: 35}}
+  - label: 'כ"א אייר'
+    when: {holiday: {omer: 36}}
+  - label: 'כ"ב אייר'
+    when: {holiday: {omer: 37}}
+  - label: 'כ"ג אייר'
+    when: {holiday: {omer: 38}}
+  - label: 'כ"ד אייר'
+    when: {holiday: {omer: 39}}
+  - label: 'כ"ה אייר'
+    when: {holiday: {omer: 40}}
+  - label: 'כ"ו אייר'
+    when: {holiday: {omer: 41}}
+  - label: 'כ"ז אייר'
+    when: {holiday: {omer: 42}}
+  - label: 'כ"ח אייר'
+    when: {holiday: {omer: 43}}
+  - label: 'כ"ט אייר'
+    when: {holiday: {omer: 44}}
+  - label: 'א סיון'
+    when: {holiday: {omer: 45}}
+  - label: 'ב סיון'
+    when: {holiday: {omer: 46}}
+  - label: 'ג סיון'
+    when: {holiday: {omer: 47}}
+  - label: 'ד סיון'
+    when: {holiday: {omer: 48}}
+  - label: 'ה סיון'
+    when: {holiday: {omer: 49}}
   - label: 'נשים אומרות'
     # שעשני כרצונו, said by a woman instead of שלא עשני אשה (in parentheses)
     when: {person: {gender: female}}
@@ -562,6 +687,9 @@ leaves:
     leaf: "Weekday / Maariv / Counting The Omer"
     when: {holiday: {omer: [1, 49]}}
   - work: siddur_ashkenaz
+    leaf: "Shabbat / Maariv / Sefirat HaOmer"
+    when: {holiday: {omer: [1, 49]}}
+  - work: siddur_ashkenaz
     leaf: "Weekday / Shacharit / Keriat Hatorah / Removing The Torah From Ark / Vayhi Binsoa"
     when: *torah_reading_day
   - work: siddur_ashkenaz
@@ -605,6 +733,11 @@ texts:
     places: [urn:x-opensiddur:text:siddur:chol/arvit/shemoneh_esreh/shalom, urn:x-opensiddur:text:siddur:shabbat/arvit/shemoneh_esreh/shalom]
     when: {none: [{all: [{practice: {oseh-hashalom-aseret-ymei-tshuva: true}}, {holiday-aggregate: {aseret-ymei-tshuva: true}}]}]}
   - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:amidah/yerushalayim/seal
+    # printed after Nachem, which closes with its own ending on Tisha B'Av (Birnbaum's minchah_jerusalem_seal)
+    places: [urn:x-opensiddur:text:siddur:chol/minchah/shemoneh_esreh/binyan_yerushalayim]
+    when: {none: [{holiday: {tisha-bav: true}}]}
+  - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:amidah/attah_chonantanu
     # in small type; the night after Shabbat or a festival (Birnbaum's arvit_chonantanu)
     when:
@@ -637,17 +770,22 @@ texts:
     urn: urn:x-opensiddur:text:prayer:avinu_malkenu/kotvenu_selichah
     when: *ten_days
   - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/barekh
+    # the fast's lines, said instead of the Ten Days' (חדש, כתבנו) only outside them: Tzom Gedaliah
+    # says the Ten Days' lines (Birnbaum's avinu_malkenu)
+    when: &fast_not_ten_days {all: [*public_fast, {none: [*ten_days]}]}
+  - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_geullah
-    when: *public_fast
+    when: *fast_not_ten_days
   - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_parnasah
-    when: *public_fast
+    when: *fast_not_ten_days
   - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_zekhuyyot
-    when: *public_fast
+    when: *fast_not_ten_days
   - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_selichah
-    when: *public_fast
+    when: *fast_not_ten_days
 
 # Rubrics that read like conditions, reviewed: stage directions, where to turn, an explanation,
 # or a choice among blessings no setting makes (what you see, smell or eat). They stay
@@ -674,7 +812,6 @@ directives:
   - "^After Birkas Hamazon the \"Seven Berachos\" begin here"
   - "^After Birchas Hamazon, the leader says"
   - "^After kindling the lights"
-  - "^The following blessings are said in the event you forgot"
   - "^When seeing "
   - "^When you smell "
   - "^When putting on a new suit"
@@ -701,3 +838,11 @@ directives:
   - "^When Yom Tov occurs on weekdays see pages"
   - "^On Friday night, וַיְכֻלוּ , page 000"
   - "^On the first day of Pesach, the prayer for dew, page 000"
+
+# The English of phrases the English leaves empty, after an editorial note of whose it is.
+translations:
+  - hebrew: 'בָּרוּךְ אַתָּה יְהֹוָה הַמֶּֽלֶךְ הַקָּדוֹשׁ'
+    # Siddur Ashkenaz's Ledor Vador, after בעשי"ת מסיים: the English gives only the ordinary ending.
+    # Its translation of the same words in Attah Kadosh (as the user decided for עושה השלום).
+    english: "Blessed are You, Adonoy, the King, the Holy One."
+    note: "From the Metsudah English of this ending in Attah Kadosh; the English here does not translate it."

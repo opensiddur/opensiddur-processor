@@ -365,6 +365,24 @@ class TestConditionScopes(unittest.TestCase):
         self.assertNotIn("Who makes peace", text_body(self.URN, other, [1], "en", Notes("note"), conditions=table))
         self.assertNotIn("Who makes peace", text_body(self.URN, block, [1], "he", Notes("note"), conditions=table))
 
+    def test_an_untranslated_phrase_takes_the_english_the_table_gives(self):
+        from opensiddur.importer.sefaria.conditions import Conditions, Translation
+        from opensiddur.importer.util.incipit import words as incipit_words
+        table = Conditions(translations=(Translation(tuple(incipit_words("בָּרוּךְ אַתָּה יְהֹוָה הַמֶּלֶךְ הַקָּדוֹשׁ")),
+                                                     "Blessed are You, the Holy King.", "From elsewhere."),))
+        segments = [("<b>לְדוֹר</b> וָדוֹר", "From generation"), ("בָּרוּךְ אַתָּה יְהֹוָה הַמֶּלֶךְ הַקָּדוֹשׁ:", "")]
+        (block,) = blocks(segments)
+        en = parse(text_body(self.URN, block, [1, 2], "en", Notes("note"), conditions=table))
+        (note,) = en.xpath("//tei:note[@type='editorial']", namespaces=NS)
+        self.assertEqual((note.text, note.tail.strip()), ("From elsewhere.", "Blessed are You, the Holy King."))
+        self.assertEqual(note.xpath("preceding-sibling::tei:milestone[@unit='phrase'][1]/@corresp", namespaces=NS),
+                         [T + "metsudah:amidah/gevurot/2"])
+        # ... not where the English translates it, nor in the Hebrew project
+        segments[1] = ("בָּרוּךְ אַתָּה יְהֹוָה הַמֶּלֶךְ הַקָּדוֹשׁ:", "Blessed are You, the King.")
+        (block,) = blocks(segments)
+        self.assertNotIn("From elsewhere", text_body(self.URN, block, [1, 2], "en", Notes("note"), conditions=table))
+        self.assertNotIn("From elsewhere", text_body(self.URN, block, [1, 2], "he", Notes("note"), conditions=table))
+
     def test_replaced_words_that_open_the_next_phrase(self):
         # (בעשי"ת וּלְעֵלָּא מִכָּל) ends one phrase; the next opens with the words it replaces.
         segments = [("<b>לְעֵלָּא</b> (בעשי\"ת וּלְעֵלָּא מִכָּל)", "above"),
