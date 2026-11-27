@@ -1,5 +1,18 @@
 This file provides guidance to coding agents when working with code in this repository.
 
+## Source-reading questions
+
+Before asking the user an unresolved source-reading question, assign that
+individual question to its own dedicated agent reader with a preflighted enlarged
+source-image snippet and a neutral question. Do not give the reader a proposed
+answer or other readers' conclusions. Record its answer, confidence and visible
+evidence. Apply confident image-supported readings; ask the user only when the
+dedicated reader cannot confidently settle the case. For pointing questions,
+always display the enlarged snippet with the question, with the numbered question
+before the image. This adjudication does not replace the required independent
+full-page and encoding reviews. See
+[`specs/SCAN_DIGITIZATION_INSTRUCTIONS.md`](specs/SCAN_DIGITIZATION_INSTRUCTIONS.md).
+
 ## Project Overview
 
 The project derives from 3 repositories:

@@ -38,12 +38,32 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Images settle readings. OCR, familiar prayer wording and other editions are
   discovery aids, not substitutes for reading the page. Preserve pointing,
   abbreviations, punctuation, defective spelling, language and source order.
+- Preflight generated snippets before sending them for review. Fully decode
+  image files before parallel cropping, or use independent decoded images;
+  shared lazy decoders can corrupt crops. Inspect representative crops and
+  their upper/lower margins, and exclude failed image preparations from approval.
+  Approximate line coordinates do not establish page coverage. Check the first
+  and last actual source lines; before accepting any claim that text is absent,
+  inspect the complete page. Preserve rejected crop-based reviews as history.
 - Preserve immutable independent readings even after adjudication. Encode clear
   source mistakes with `tei:choice/tei:sic` and `tei:corr`, retaining the printed
   reading and an evidenced correction. Do not silently modernize archaic forms.
+  A legitimate lexical or orthographic alternative is ordinary source text, not
+  a mistake: difference from familiar prayer wording alone does not justify
+  `sic/corr`. For example, retain this edition’s לַעֲשׂוֹק without correction;
+  the user confirmed its sin spelling as a legitimate alternative.
+- Encode both logical characters where one printed dot serves as shin dot and
+  holam, following `BIRNBAUM_FROM_SCAN.md`'s combined-dot rule. User723 confirms
+  that case in שָׁלֹשׁ; it does not authorize adding absent vowels to other words
+  or to the Divine Name. Preserve a source Tetragrammaton without holam unless
+  a separate, explicit authorization or source reconstruction applies.
 - Distinguish an absent printed mark from an editorial normalization required by
   project conventions. Record the latter explicitly; do not describe it as a
   mark seen in the image. Preserve Divine Name semantics through transclusion.
+- When an authorized comparison reconstructs illegible pointing, record the
+  reconstruction, exact reference passage and witness. Keep the edition's
+  independently verified neighboring readings; damage alone is not a sic/corr
+  error, and a reconstructed mark must not be described as clearly printed.
 - Credit source authorship, translation, scan preparation and digitization
   separately, with their respective bibliography and licences.
 
@@ -69,6 +89,8 @@ to other editions; apply the edition-specific decisions below only to this book.
   omissions so neighboring translations cannot drift into untranslated text.
 - Leave missing English absent. Do not supply another translator, placeholder
   prayer text or empty counterpart merely to make parallel output symmetrical.
+  When a later batch adds a translation of the same canonical text, recheck earlier
+  untranslated occurrences: global URN reuse must not fill their documented gaps.
 - Put biblical citations in anchored citation notes, without enclosing
   parentheses in the generated links. Preserve their documentary forms in
   reading evidence. Citation notes are not recited prayer words.
@@ -78,6 +100,22 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Keep place-specific role directions, variants and settings in the service or
   structural occurrence, rather than embedding them in reusable prayer words.
   Review both an abbreviation and its expansion, including combined speakers.
+- Use edition-qualified URNs for transclusions; project/file pointers used in
+  bibliography are not transclusion targets. Check actual resolved ranges,
+  including the path-depth fallback for units outside the containment table;
+  do not infer a prayer-part's endpoint solely from its next same-unit marker.
+- Use `half-verse` and `verse-part` for registered subverses, with their own
+  terminators. Repeated or adapted quotations may retain bounded `seg/@source`
+  attribution without advertising another canonical verse witness. A prayer-part
+  identity must retain its established introduction as well as the quoted words.
+- Derive or verify bibliographic end pages through nested quotations and optional
+  spans. A span beginning with a page marker needs the following page's `facs`,
+  even when selected without its preceding source paragraph.
+- Put a condition's printed label inside its `j:conditional` note, so a decided
+  condition suppresses the label. Combine bilingual labels in that one note.
+  Keep speaker/how descriptions distinct from directives. In a shared expanded
+  sequence, deduplicate identical same-language facing-page rubrics; preserve
+  differing source roles. Omit scopes that have no counterpart content.
 
 ## Page directions and expanded recitation
 
@@ -140,10 +178,21 @@ to other editions; apply the edition-specific decisions below only to this book.
 - Persist answers against their question IDs and exact occurrences immediately.
   Consult that record before asking again. A corrected answer supersedes its
   earlier value without erasing the history.
+- When applying a reading, bind the occurrence to its verse or surrounding words
+  as well as its word index. A search for a bare word can skip an earlier
+  maqaf-linked occurrence and silently select a later one. Verify the indexed
+  context against the source crop before recording the application.
+- Give read-only reviewers the exact paths of adjudication records and complete,
+  tightly enlarged source crops. Do not rely on directory discovery or assume a
+  full-page image will display large enough to distinguish fine marks.
 - For defective Jerusalem with two vowels under lamed, encode the source patah
   or qamatz, then meteg U+05BD, CGJ U+034F, hiriq U+05B4. If a printed yod carries
   the hiriq, encode lamed + its vowel/meteg, then yod + hiriq, without that CGJ.
   Read patah versus qamatz from each occurrence.
+- Choose cantillation codepoints by the printed sign and placement, not only
+  Unicode character names. Postpositive zarqa uses U+05AE (named ZINOR);
+  U+0598 (named ZARQA) is used for above-letter tsinnorit. See
+  [Unicode's character-name anomaly note](https://www.unicode.org/notes/tn27/tn27-1.html#appA).
 - Bind approvals to the exact reading, realization, structure, settings and
   artifact hashes they cover. Changed text invalidates its previous approval.
   A mechanically proven unchanged payload may retain its approval only with an
@@ -168,13 +217,39 @@ to other editions; apply the edition-specific decisions below only to this book.
   module boundary. Track the unique facsimile URL per edition/column, not the
   printed label. Returning to an earlier page must produce a link again; hidden
   conditional content must not suppress the next visible link.
+  Full-width passages without a translation continue the primary source stream;
+  changing between columns and full width is not a source-page change. Test a
+  Hebrew-only gap between bilingual passages, including an optional page change
+  followed by a required return to the previous page.
 - Use `typography.markers.scan_links.placement: margin` for marginal backlinks
   when desired. Check both PDF outer margins and HTML gutters, including RTL,
   LTR, narrow displays, link targets and annotation bounds. Preserve source
   markers even when a renderer suppresses a redundant link.
+  Link counts alone cannot show that links are usable: distinct source pages
+  can occupy identical clickable rectangles on one generated line. Check
+  nonoverlap, full click-target size and page bounds in both output formats.
+- In buffered PDF text, resolve page parity at shipout rather than while building
+  paragraphs. Test multiple output pages, both margins, and whether each link
+  rectangle contains its visible symbol and clears the text. Distinguish the
+  normal PDF link padding from an actual glyph collision.
+- A whole-text facsimile attribute does not necessarily supply a page marker to
+  an independently transcluded subrange. Verify provenance within each borrowed
+  range, preserve source anchors and text tails, and retain the donor's words,
+  canonical scopes, credits and licence when exposing additional boundaries.
+- Shared bilingual rubrics must follow the actual column geometry. Match writing
+  direction, including Hebrew-script German, rather than exact language tags;
+  preserve each language and role. Check paragraph direction, both column orders,
+  indentation and left/center/right placement. Rubrics already inside a column
+  must not become page-wide boxes.
+- A structural heading must contain the text it titles, including transclusions.
+  An empty heading-only division followed by a sibling prayer misleads contents
+  and electronic navigation even if the printed page looks plausible.
 - Check a canonical range's opening provenance as well as internal page breaks:
   its source page marker may live on a documentary heading outside the selected
   range. Do not reset backlink state at every file to conceal that problem.
+  An ancestor's facs alone can be lost during extraction. Preserve the opening
+  source on each reusable verse span, and probe an interior verse after a page
+  break separately in each language.
 - Keep related subsections under a structural parent for bookmarks, contents
   and electronic navigation. Editorial wrappers need proper credit; preserve
   source headings and canonical text identities inside them.
@@ -182,12 +257,23 @@ to other editions; apply the edition-specific decisions below only to this book.
   synthetic regressions for reusable changes. Cover repeated page labels,
   missing/partial counterparts, conditional destinations, repeated transclusions
   and mixed ritual/navigation clauses. Test shared algorithms with invented data.
+- After creating or renaming projects, refresh the reference database before
+  exporting. Assert actual counterpart discovery and parallel output mode; a
+  warning about fallback to per-transclusion parallels can hide missing English
+  while a front-matter-only preview still looks correct.
+- Run `opensiddur.exporter.books --check` for new book profiles. Each profile
+  must declare `requires_processor`; passing feature validation alone does not
+  verify the book-profile contract.
 - Inspect documentary Hebrew, documentary parallel and expanded PDF/HTML.
   Verify actual links, direction, columns, notes, bookmarks and conditional
   alternatives. Record visual sampling separately from mechanical all-page QA.
 - Freeze complete reports and artifact hashes before final independent export
   review. A still-running test log or screenshots from an earlier artifact do
   not certify the current output. Re-render after relevant changes.
+- Record processor/project commits and input/settings hashes before running
+  acceptance checks, then verify unchanged inputs afterward. Keep reviewed
+  inputs frozen during independent review. For a metadata-only follow-up,
+  preserve explicit before/after equivalence evidence and review its scope.
 - After interrupted LaTeX builds, restore or rebuild a consistent auxiliary
   cache and rerun until references settle. PDF existence alone proves nothing.
 - Report accepted coverage from current evidence, including blanks. Distinguish
@@ -199,9 +285,12 @@ to other editions; apply the edition-specific decisions below only to this book.
 These decisions describe this edition, not every Ashkenaz maḥzor. The book
 specification and source records retain their detailed evidence and exceptions.
 
-- Keep the projects' shared title `prayerbook_for_the_new_year`, with edition
+- Keep the first-day projects' shared title `prayerbook_for_the_new_year`, with edition
   fields `heidenheim-1965-he` and `marmorstein-1965-en`. Use the actual book title
-  in presentation, never a historical “pilot installment” label.
+  in presentation, never a historical “pilot installment” label. Volume two uses
+  `prayerbook_for_the_new_year_second_day` for both languages, by user decision.
+  Separate physical-volume projects keep scan provenance and missing translations
+  distinct while reusing canonical prayer identities.
 - The expanded project is `machzor_expanded-opensiddur-he`; its structural root
   is `urn:x-opensiddur:text:siddur:machzor_expanded`.
 - Numeric-only biblical citations such as Ashrei's קמה refer to Psalms.
@@ -243,3 +332,96 @@ specification and source records retain their detailed evidence and exceptions.
 - Verify merge state, update the continuing checkout, and refresh the accepted
   artifact manifest before closeout. Use the managed archive operation and
   report remaining limitations without reopening settled source readings.
+
+### Citation marker attachment
+
+Inspect the position of every note marker beside its intended text anchor,
+including full-width RTL paragraphs. Correct numbering and note order alone
+do not prove attachment. When the default interlinear placement drifts, test
+the existing `typography.notes.anchor: superscript` setting and independently
+review the rebuilt configured outputs before accepting them. Record the chosen
+book setting and preserve the rejected-output evidence.
+
+### Dedicated readers before human pointing questions
+
+For each unresolved pointing question, give its own dedicated agent reader the
+preflighted enlarged source snippet and a neutral question. Do not supply the
+proposed answer or other readers' conclusions. Record the reader identity,
+image hash, answer, confidence and visible evidence for that occurrence.
+Resolve confident image-supported answers without asking the user; return only
+cases the dedicated reader cannot confidently settle, with the question before
+its enlarged image. Offer an open reading when candidate choices may be wrong.
+This question-level adjudication does not replace full-page independent reading,
+guideline/alignment/order review or the remaining acceptance gates.
+
+### Divine Name word boundaries
+
+Check the semantic markup as well as concatenated text. A substring search for
+two yods can wrongly mark an ordinary word such as בחיים without changing its
+visible letters. Identify actual Divine Name tokens, inspect surrounding words
+and legitimate attached prefixes, and review every generated `j:divineName`.
+Exact-text comparison alone cannot catch this error.
+
+### Small Rashi-script glyphs
+
+Inspect the complete letterform and surrounding type before treating a detached
+lower stroke as a vowel. A Rashi alef's detached lower limb can resemble a patah;
+a tight crop alone can conceal that distinction. Give a dedicated reader the
+enlarged word and wider font context. Resolve each occurrence independently and
+keep genuinely uncertain marks for human review.
+
+### Reused printings and electronic review
+
+- When several documentary printings share a canonical identity, keep the canonical
+  boundary outside the printing options, and select page provenance with the
+  corresponding words. Expose interior verse ranges independently of printed
+  paragraphs. Keep local printing declarations in the service that selects them.
+- Adding a later translation must not fill an earlier edition's translation gap.
+  Check earlier callers after adding shared providers, including a counterpart
+  whose selected conditions leave no visible content. Inspect the complete
+  generated correspondence graph, including contextual quotations and provider
+  fallbacks, rather than just newly registered roots.
+- In electronic-book QA, `content-visibility: auto` can omit off-screen rows from
+  `innerText` while the rows remain correctly available to the reader. Verify
+  conditional visibility through DOM nodes and computed styles, and scroll the
+  relevant section into view before claiming text is missing.
+- Preserve exact reviewed artifact hashes. A bounded correction after a review
+  needs an explicit amendment and refreshed affected exports; a historical
+  approval is not approval of a changed artifact.
+
+- If one language has an untranslated section ending, give the next paired
+  section an explicit shared transclusion boundary. Otherwise its English
+  preamble can align ahead of the untranslated Hebrew remainder. Check the
+  actual compiled and rendered transition in both column and mobile layouts.
+- Marker-only paragraph tails retain their scopes and running-head markers but
+  must not create a blank printed paragraph. Empty alignment carriers must not
+  create mobile divider rows. Preserve targets, page links, conditions, graphics
+  and unknown semantics; absence of text alone does not mean a node is disposable.
+- Adjacent bilingual rubric labels need bidi isolation and visual spacing. Keep
+  each language's source punctuation rather than changing the transcription to
+  repair a display problem.
+- A reviewer with read-only file access needs explicit screenshot filenames,
+  not only a QA summary or directory path. Supply a frozen inventory binding
+  PDFs, rendered pages, HTML, browser screenshots and reports to their hashes.
+
+- Name `encoding="utf-8"` on every importer text read/write, including JSON and
+  YAML settings. A locale default can silently corrupt Hebrew. Run the repository
+  `test_text_encoding.py` guard with focused importer tests before publishing.
+
+### Fine-mark absence and independent correction review
+
+Full-width bands can hide thin marks when the display scales them down. Before
+calling a vowel or meteg absent, inspect its complete word at a readable enlarged
+size. Distinguish a detached holam above a vav head from the head itself. A rule
+against supplying absent vowels is not evidence that the source omits them.
+Keep occurrence-specific image inventories; review corrections as critically as
+the initial readings, and retain rejected correction records.
+
+Separate a mark’s physical position from its logical Unicode attachment. In
+conventional Hebrew typography a holam belonging to the preceding letter may
+be shifted above a consonantal vav. For the usual pointed Tetragrammaton, retain
+the confirmed printed dot as `יְהֹוָה` (holam on the first he, qamatz on vav),
+not `יְהוָֹה` merely because the dot appears above vav’s head. This does not
+authorize supplying an absent dot or normalizing a demonstrated source anomaly.
+When readers disagree, review mark presence and logical attachment separately,
+and preserve the occurrence-specific evidence for both decisions.
