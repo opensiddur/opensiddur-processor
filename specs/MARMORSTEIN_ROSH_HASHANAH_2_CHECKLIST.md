@@ -237,9 +237,9 @@ misframed screenshots and provisional manifests remain historical evidence.
 - [x] Verify Hebrew-only150:6 repetition and KiVaSus, earlier translation gaps, and unchanged Night output prospectively.
 - [x] Implement and prospectively validate43 XML documents extending the existing Shacharit section.
 - [ ] Approve and write production XML only after current source and recipe approval hashes are bound.
-- [ ] Close independent guideline, alignment, order and conditional reviews.
-- [ ] Pass schema, names, features, registry, reference and affected-code checks.
+- [x] Independently approve current prospective code, guidelines, alignment and order; retain the two human source gates.
+- [x] Pass prospective schema, names, features, registry, reference,27-case settings matrix and37 affected-code tests plus16 subtests.
 - [ ] Independently approve frozen PDF/HTML with cross-batch and mixed-page provenance checks.
 - [ ] Record complete-scan acceptance before resuming82.
 
-Current accepted coverage is63/385; inventory and preliminary reading do not accept this batch.
+Current accepted coverage is63/385. The64–81 source sweep is conditionally approved; human1024/1025 and final production/export acceptance remain.
