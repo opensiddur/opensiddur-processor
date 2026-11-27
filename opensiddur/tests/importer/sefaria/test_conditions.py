@@ -84,6 +84,14 @@ class TestTable(unittest.TestCase):
         self.assertTrue(conditions.for_rubric("(When the Chazzan repeats the Shemoneh Esrei)").section)
         self.assertIsNone(conditions.for_rubric("During the Ten Days of Penitence, continue at the asterisk"))
 
+    def test_a_rubric_is_found_whichever_apostrophe_it_prints(self):
+        conditions = table("rubrics:\n  - match: \"^When eating at your parents' table\"\n"
+                           "    when: {meal-context: {guest: true}}\n"
+                           "directives:\n  - \"^On Tishah B'Av\"\n")
+        self.assertIsNotNone(conditions.for_rubric("When eating at your parents’ table, say:"))
+        self.assertIsNotNone(conditions.for_rubric("When eating at your parents' table, say:"))
+        self.assertTrue(conditions.is_directive("On Tishah B’Av this is omitted"))
+
     def test_labels_and_inline_alternatives_are_found_by_their_words(self):
         conditions = table()
         self.assertIsNotNone(conditions.for_label('לְר"ח:'))

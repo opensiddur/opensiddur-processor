@@ -322,6 +322,21 @@ class TestVariantParts(unittest.TestCase):
                                       "[@unit='verse'][1][not(@corresp)][following-sibling::j:conditional]",
                                       namespaces=NS)), 1)
 
+    def test_a_verse_opening_a_phrase_variants_leave_out_opens_inside_its_conditional(self):
+        # the services' Numbers 15:37, which the bedtime Shema prints in its own words
+        (block,) = blocks([("לְמַעַן יִרְבּוּ יְמֵיכֶם:", "That your days"), ("וַיֹּאמֶר יְהֹוָה:", "And God said")])
+        (later,) = blocks([("לְמַעַן יִרְבּוּ יְמֵיכֶם:", "That your days"),
+                           ("וַיֹּאמֶר יְהֹוָה אֶל משֶׁה אֱמֶת:", "And God said, true")])
+        first, second = T + "bible:deuteronomy/11/21", T + "bible:numbers/15/37"
+        variant = VariantPrinting("bedtime", later, [1, 3])
+        for lang in ("he", "en"):
+            body = parse(text_body(T + "prayer:shema", block, [1, 2], lang, Notes("note"), (variant,),
+                                   {(0, 0): first, (1, 0): second}, {first: 3, second: 2}))
+            (opening,) = body.xpath(f"//tei:milestone[@corresp='{second}']", namespaces=NS)
+            (before,) = opening.xpath("preceding-sibling::j:*[1]", namespaces=NS)
+            self.assertEqual((etree.QName(before).localname, before.xpath("string(.//tei:binary/@value)", namespaces=NS)),
+                             ("conditional", "false"))
+
 
 class TestConditionScopes(unittest.TestCase):
     """How far a condition reaches inside a text, and where its parts go."""

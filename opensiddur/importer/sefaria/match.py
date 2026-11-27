@@ -1532,8 +1532,11 @@ class _Decider:
             # A text chosen by its last words ends with them, though its first printing's words
             # and more would make the rest a variant's own (the Shabbat Shema, then the reader's
             # יְהֹוָה אֱלֹהֵיכֶם אֱמֶת).
+            # (Not where its first printing runs on past them: what follows is the text's own, a
+            # shortened last line -- the full Kaddish's עוֹשֶׂה שָׁלוֹם after its יְהֵא שְׁלָמָא.)
             chosen_end = choice.end(phrase_words)
-            if chosen_end is not None and (cut is None or chosen_end < cut):
+            runs_on = urn in self.printed and len(phrase_skeletons(self.printed[urn].block)) > (chosen_end or 0)
+            if chosen_end is not None and not runs_on and (cut is None or chosen_end < cut):
                 cut = chosen_end
         if cut is not None:
             block = self.cut(leaf, blocks, i, cut)

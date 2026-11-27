@@ -1037,6 +1037,10 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
         if position < skip:
             insert(number)  # (the transcluded text's own words: only after its last, a variant's)
             continue
+        # (a phrase that variants leave out is conditional, with a verse it opens: the verse is
+        # not opened where they print their own words instead)
+        xml_id = (writer.open_condition([(variant_urn(urn, name), False) for name in absent[number]])
+                  if absent.get(number) else None)
         if (position, 0) in verses:
             writer.verse(verses[(position, 0)])
             verse_words, verse_length = 0, verse_lengths.get(verses[(position, 0)])
@@ -1066,12 +1070,9 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
                 cuts.append((index, len(tokens), VERSE_END))
                 verse_open = False
             verse_words += len(words(token))
-        if absent.get(number):
-            xml_id = writer.open_condition([(variant_urn(urn, name), False) for name in absent[number]])
-            writer.phrase(pair, number, cuts, verse_open if cuts else None)
+        writer.phrase(pair, number, cuts, verse_open if cuts else None)
+        if xml_id is not None:
             writer.close_condition(xml_id)
-        else:
-            writer.phrase(pair, number, cuts, verse_open if cuts else None)
         ended = _verse_ended(plain_text(pair.he).rstrip(), verse_words, verse_length)
         # (a verse ended here is closed here, unless the next phrase, straight after, opens one,
         # whose milestone ends it: not across a heading or rubric between them, nor across a

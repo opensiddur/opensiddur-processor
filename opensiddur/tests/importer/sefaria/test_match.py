@@ -952,6 +952,21 @@ class TestKaddishParts(unittest.TestCase):
         self.assertEqual((shema.urn, len(shema.phrases)), (T + "prayer:shema", 3))
         self.assertNotEqual(reader.urn, T + "prayer:shema")
 
+    def test_a_text_chosen_by_its_last_words_keeps_a_shortened_line_its_first_printing_has(self):
+        from opensiddur.importer.sefaria.equivalents import Choice, Equivalents
+
+        table = Equivalents(texts=(Choice(tuple(words("יִתְגַּדַּל וְיִתְקַדַּשׁ")), T + "prayer:kaddish/shalem",
+                                          ends=tuple(words("וְעַל כָּל יִשְׂרָאֵל וְאִמְרוּ אָמֵן"))),))
+        first = ["יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא", "תִּתְקַבַּל צְלוֹתְהוֹן וּבָעוּתְהוֹן",
+                 "יְהֵא שְׁלָמָא רַבָּא עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל וְאִמְרוּ אָמֵן",
+                 "עוֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו הוּא יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל וְאִמְרוּ אָמֵן"]
+        # Its last line shortened: the first printing's own, which runs on past יְהֵא שְׁלָמָא.
+        later = [*first[:3], "עוֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו"]
+        outcome = decide_work("w", [("First", items(*first)), ("Later", items(*later))], IncipitIndex(), {}, set(),
+                              spellings=NO_SPELLINGS, equivalents=table, registered=set())
+        (kaddish,) = [r for r in outcome.decided if r.leaf == "Later"]
+        self.assertEqual((kaddish.urn, kaddish.kind), (T + "prayer:kaddish/shalem", "variant"))
+
 
 class TestParagraphLabels(unittest.TestCase):
     def test_a_label_set_apart_from_its_paragraph_introduces_nothing(self):

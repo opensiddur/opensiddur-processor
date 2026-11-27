@@ -215,7 +215,7 @@ class Conditions:
         return dataclasses.replace(self, leaf=leaf)
 
     def is_directive(self, english: str) -> bool:
-        text = " ".join(english.split())
+        text = _rubric_text(english)
         return any(p.search(text) for p in self.directives)
 
     def leaf_gate(self, work: str, leaf: str) -> LeafGate | None:
@@ -230,7 +230,7 @@ class Conditions:
 
     def for_rubric(self, english: str) -> RubricCondition | None:
         """The rubric ``english`` is: one scoped to this table's leaf before any for every leaf."""
-        text = " ".join(english.split())
+        text = _rubric_text(english)
         return next((r for r in self.rubrics if self.leaf in r.leaves and r.pattern.search(text)),
                     next((r for r in self.rubrics if not r.leaves and r.pattern.search(text)), None))
 
@@ -252,6 +252,12 @@ class Conditions:
     def replaced(self, alternative: str) -> Replacement | None:
         found = tuple(words(alternative))
         return next((r for r in self.replacements if r.alternative == found), None)
+
+
+def _rubric_text(english: str) -> str:
+    """A rubric as the table's patterns read it: its spaces collapsed and its apostrophes straight
+    (one volume prints "parents’ table", another "parents' table")."""
+    return " ".join(english.replace("\u2019", "'").split())
 
 
 def _letters(hebrew: str) -> str:
