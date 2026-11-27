@@ -71,7 +71,8 @@ definitions:
   shabbat_or_yom_tov: &shabbat_or_yom_tov
     any: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]
   elul_to_shemini_atzeret: &elul_to_shemini_atzeret
-    any: [{hebrew-date: {month: 6}}, {hebrew-date: {month: 7, day: [1, 22]}}]
+    # from the first day of Rosh Chodesh Elul (30 Av), as Birnbaum encodes it
+    any: [{hebrew-date: {month: 5, day: 30}}, {hebrew-date: {month: 6}}, {hebrew-date: {month: 7, day: [1, 22]}}]
   parents_host: &parents_host
     any: [{meal-context: {father-is-host: true}}, {meal-context: {mother-is-host: true}}]
   # The reader's repetition, with a minyan (Birnbaum's weekday_qedushah).
@@ -249,6 +250,7 @@ rubrics:
     when: {all: [*monday_or_thursday, *tachanun_said]}
   - match: "^On those Mondays and Thursdays when Tachanun is said"
     when: {all: [*monday_or_thursday, *tachanun_said]}
+    section: true  # the whole series of יהי רצון after it, each a text of its own
   - match: "^Tachanun is also omitted"
     # the book's list of days is printed garbled in the rubric before; Birnbaum's is used
     when: *tachanun_said
@@ -359,24 +361,41 @@ rubrics:
     when: {meal-context: {guest: true}}
 
   # Grace's blessings for a forgotten Retzeh or Ya'aleh Veyavo: said if it was forgotten (left
-  # undefined, they stay in the book with their instructions), each on its own day
-  - match: "^The following blessings are said in the event you forgot to say"
-    when: &forgot {meal-context: {forgot-insertion: true}}
+  # undefined, they stay in the book with their instructions), each on its own day. Each gate is a
+  # section: the linear volumes print a blessing's last words (וְהַזְּמַנִּים, …) as a text of
+  # their own after it. (The instruction before them all stays an instruction: a directive.)
+  # The Shabbat volume also prints the blessing for Rosh Chodesh on Shabbat, so there its Shabbat
+  # and Rosh Chodesh gates leave each other's day out; elsewhere both are said, the book having
+  # nothing else for that day.
+  - match: "^If you forgot to say \\S+ on Shabbos:"
+    leaves: ["Birchas Hamazon / Birchas Hamazon"]
+    when: {all: [&forgot {meal-context: {forgot-insertion: true}}, {holiday-aggregate: {shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}, {holiday: {rosh-hodesh: true}}]}]}
+    section: true
+  - match: "^If you forgot to say \\S+ \\S+ on Rosh Chodesh:"
+    leaves: ["Birchas Hamazon / Birchas Hamazon"]
+    when: {all: [*forgot, {holiday: {rosh-hodesh: true}}, {none: [{holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {shabbat: true}}]}]}
     section: true
   - match: "^If you forgot to say \\S+ on Shabbos:"
     when: {all: [*forgot, {holiday-aggregate: {shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}]}]}
+    section: true
   - match: "^If you forgot to say \\S+ \\S+ on Rosh Chodesh:"
     when: {all: [*forgot, {holiday: {rosh-hodesh: true}}, {none: [{holiday-aggregate: {yom-tov: true}}]}]}
+    section: true
   - match: "^If you forgot to say \\S+ \\S+ on Yom Tov:"
     when: {all: [*forgot, {holiday-aggregate: {yom-tov: true}}, {none: [{holiday-aggregate: {shabbat: true}}, {holiday: {rosh-hashana: true}}]}]}
+    section: true
   - match: "^If (a )?Yom Tov occurs on Shabbos and you forgot"
     when: {all: [*forgot, {holiday-aggregate: {yom-tov: true}}, {holiday-aggregate: {shabbat: true}}, {none: [{holiday: {rosh-hashana: true}}]}]}
+    section: true
   - match: "^If you forgot to say \\S+ \\S+ on Rosh Hashanah:"
     when: {all: [*forgot, {holiday: {rosh-hashana: true}}, {none: [{holiday-aggregate: {shabbat: true}}]}]}
+    section: true
   - match: "^If Rosh Hashanah occurs on Shabbos and you forgot"
     when: {all: [*forgot, {holiday: {rosh-hashana: true}}, {holiday-aggregate: {shabbat: true}}]}
+    section: true
   - match: "^If Rosh Chodesh occurs on Shabbos and you forgot"
     when: {all: [*forgot, {holiday: {rosh-hodesh: true}}, {holiday-aggregate: {shabbat: true}}]}
+    section: true
 
   # -- What was eaten (מעין שלש) ----------------------------------------------------------------
   - match: "^The following blessing is said after eating cooked or baked foods prepared from any of the five species of grain|^After food prepared from the five grains, say:"
@@ -642,6 +661,14 @@ leaves:
     when: {any: [*ten_days, *public_fast]}
     # the rubric is the text's heading: בתענית ציבור ובעשי"ת
   - work: siddur_ashkenaz
+    leaf: "Weekday / Shacharit / Pesukei D'Zimra / Psalm 100"
+    # Mizmor Letodah, which the book says is not said on Erev Pesach or Pesach: Birnbaum's days
+    when:
+      none:
+        - hebrew-date: {month: 1, day: 14}
+        - all: [{holiday-aggregate: {chol-hamoed: true}}, {holiday: {pesah: true}}]
+        - hebrew-date: {month: 7, day: 9}
+  - work: siddur_ashkenaz
     leaf: "Weekday / Shacharit / Post Amidah / Tachanun / V'hu Rachum"
     when: {all: [*monday_or_thursday, *tachanun_said]}
   - work: siddur_ashkenaz
@@ -681,8 +708,9 @@ leaves:
     when: *minchah_tachanun_said
   - work: siddur_ashkenaz
     leaf: "Weekday / Maariv / Additions for Motza'ei Shabbat / Vyehi Noam (includes v'atah kadosh)"
-    when: {all: [{holiday-aggregate: {motzaei-shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}]}]}
-    # Birnbaum's occasion_shabbat_conclusion
+    when: {all: [{holiday-aggregate: {motzaei-shabbat: true}}, {none: [{holiday-aggregate: {yom-tov: true}}, {motzaei-shabbat: {omit-vihi-noam: true}}]}]}
+    # Birnbaum's occasion_shabbat_conclusion and shabbat_minchah_motzaei_week (not before a
+    # festival in the week); Vihi Noam alone is not said on Tisha B'Av (texts)
   - work: siddur_ashkenaz
     leaf: "Weekday / Maariv / Counting The Omer"
     when: {holiday: {omer: [1, 49]}}
@@ -733,6 +761,17 @@ texts:
     places: [urn:x-opensiddur:text:siddur:chol/arvit/shemoneh_esreh/shalom, urn:x-opensiddur:text:siddur:shabbat/arvit/shemoneh_esreh/shalom]
     when: {none: [{all: [{practice: {oseh-hashalom-aseret-ymei-tshuva: true}}, {holiday-aggregate: {aseret-ymei-tshuva: true}}]}]}
   - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:amidah/birkat_petichah_lemeein_sheva
+    # the reader's alone: "מעין ז' יאמרו הקהל בלי פתיחה וחתימה. וכן היחיד אומרו" (Birnbaum gates the
+    # reader's Me'ein Sheva on a minyan)
+    when: {quorum: {minyan: true}}
+  - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:vihi_noam
+    # after Maariv at the end of Shabbat, not on Tisha B'Av (Birnbaum's shabbat_minchah_motzaei_vihi);
+    # the bedtime Vihi Noam is said
+    places: [urn:x-opensiddur:text:siddur:chol/arvit/motzaei_shabbat/vihi_noam]
+    when: {none: [{holiday: {tisha-bav: true}}]}
+  - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:amidah/yerushalayim/seal
     # printed after Nachem, which closes with its own ending on Tisha B'Av (Birnbaum's minchah_jerusalem_seal)
     places: [urn:x-opensiddur:text:siddur:chol/minchah/shemoneh_esreh/binyan_yerushalayim]
@@ -775,6 +814,9 @@ texts:
     # says the Ten Days' lines (Birnbaum's avinu_malkenu)
     when: &fast_not_ten_days {all: [*public_fast, {none: [*ten_days]}]}
   - work: siddur_ashkenaz
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_chayyim
+    when: *fast_not_ten_days
+  - work: siddur_ashkenaz
     urn: urn:x-opensiddur:text:prayer:avinu_malkenu/zokhrenu_geullah
     when: *fast_not_ten_days
   - work: siddur_ashkenaz
@@ -791,6 +833,7 @@ texts:
 # or a choice among blessings no setting makes (what you see, smell or eat). They stay
 # instructions.
 directives:
+  - "^The following blessings are said in the event you forgot to say"
   - "^After washing your hands, say:"
   - "^When wrapping the strap around the middle finger"
   - "^When reciting Shemoneh Esrei, you must adhere"

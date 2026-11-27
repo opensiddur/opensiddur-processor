@@ -241,7 +241,9 @@ class Conditions:
     def for_label(self, hebrew: str) -> LabelCondition | None:
         found = tuple(words(hebrew.rstrip(": ")))
         matched = [c for c in self.labels if c.label == found]
-        return next((c for c in matched if c.letters == _letters(hebrew)), matched[0] if matched else None)
+        # (labels that read alike but for a vav or yod -- כ"ו and כ -- are told apart by their
+        # letters; one that is neither is no label of theirs, rather than the first)
+        return next((c for c in matched if c.letters == _letters(hebrew)), matched[0] if len(matched) == 1 else None)
 
     def for_inline(self, hebrew: str) -> LabelCondition | None:
         found = tuple(words(hebrew))

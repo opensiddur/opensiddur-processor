@@ -1074,8 +1074,10 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
             writer.phrase(pair, number, cuts, verse_open if cuts else None)
         ended = _verse_ended(plain_text(pair.he).rstrip(), verse_words, verse_length)
         # (a verse ended here is closed here, unless the next phrase, straight after, opens one,
-        # whose milestone ends it: not across a heading or rubric between them)
-        straight_on = at + 1 < len(block.pairs) and is_phrase(block.pairs[at + 1])
+        # whose milestone ends it: not across a heading or rubric between them, nor across a
+        # variant's own words set after this phrase)
+        straight_on = (at + 1 < len(block.pairs) and is_phrase(block.pairs[at + 1])
+                       and not any(number in by_anchor for _, by_anchor in passages))
         if writer.verse_open and ended and not ((position + 1, 0) in verses and straight_on):
             writer.end_phrase()
             writer.verse(None)

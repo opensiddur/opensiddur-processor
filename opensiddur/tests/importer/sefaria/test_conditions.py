@@ -101,6 +101,10 @@ labels:
 """)
         self.assertEqual(conditions.for_label("כ ניסן").when, {"holiday": {"omer": 5}})
         self.assertEqual(conditions.for_label("כ״ו נִיסָן:").when, {"holiday": {"omer": 11}})
+        # spelled like neither: not guessed
+        self.assertIsNone(conditions.for_label("כי ניסן"))
+        # one label of its skeleton is found whatever its spelling
+        self.assertIsNotNone(table("labels:\n  - label: 'כ\"ו ניסן'\n    when: {holiday: {omer: 11}}\n").for_label("כו ניסן"))
 
     def test_a_bad_entry_is_an_error(self):
         with self.assertRaises(ConditionsError):

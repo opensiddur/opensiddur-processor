@@ -1528,6 +1528,13 @@ class _Decider:
                     self.candidate_cut = None
                     urn = self.another_candidate(block_words, phrase_words, evidence)
                     cut = self.candidate_cut
+        if choice is not None and choice.ends and urn == choice.urn:
+            # A text chosen by its last words ends with them, though its first printing's words
+            # and more would make the rest a variant's own (the Shabbat Shema, then the reader's
+            # יְהֹוָה אֱלֹהֵיכֶם אֱמֶת).
+            chosen_end = choice.end(phrase_words)
+            if chosen_end is not None and (cut is None or chosen_end < cut):
+                cut = chosen_end
         if cut is not None:
             block = self.cut(leaf, blocks, i, cut)
             text = block_text(block)

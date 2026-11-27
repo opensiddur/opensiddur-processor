@@ -307,6 +307,21 @@ class TestVariantParts(unittest.TestCase):
         self.assertEqual(marks[:4], [("prayer", blessed), ("phrase", T + "metsudah:shema/3"), ("prayer", None),
                                      ("phrase", T + "metsudah:shema/4")])
 
+    def test_a_verse_ended_before_a_variants_own_words_closes_before_them(self):
+        # the Shabbat Shema: Deuteronomy 11:21, the bedtime printing's own third paragraph, then
+        # the services' Numbers 15:37
+        (block,) = blocks([("לְמַעַן יִרְבּוּ יְמֵיכֶם:", "That your days"), ("וַיֹּאמֶר יְהֹוָה:", "And God said")])
+        (later,) = blocks([("לְמַעַן יִרְבּוּ יְמֵיכֶם:", "That your days"),
+                           ("וַיֹּאמֶר יְהֹוָה אֶל משֶׁה אֱמֶת:", "And God said, true")])
+        first, second = T + "bible:deuteronomy/11/21", T + "bible:numbers/15/37"
+        variant = VariantPrinting("bedtime", later, [1, 3])
+        he = parse(text_body(T + "prayer:shema", block, [1, 2], "he", Notes("note"), (variant,),
+                             {(0, 0): first, (1, 0): second}, {first: 3, second: 2}))
+        self.assertEqual(he.xpath(f"count(//tei:milestone[@corresp='{second}'])", namespaces=NS), 1)
+        self.assertEqual(len(he.xpath(f"//tei:milestone[@corresp='{first}']/following-sibling::tei:milestone"
+                                      "[@unit='verse'][1][not(@corresp)][following-sibling::j:conditional]",
+                                      namespaces=NS)), 1)
+
 
 class TestConditionScopes(unittest.TestCase):
     """How far a condition reaches inside a text, and where its parts go."""

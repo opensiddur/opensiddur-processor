@@ -36,15 +36,15 @@ texts:
     urn: urn:x-opensiddur:text:prayer:shema
     note: "the three paragraphs, joined below"
   - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
-    leaf: ["Weekday / Shacharit / Blessings of the Shema / Shema", "Weekday / Maariv / Blessings of the Shema / Shema", "Shabbat / Maariv / Blessings of the Shema / Shema"]
-    ends: יהוה אלהיכם אמת
-    urn: urn:x-opensiddur:text:prayer:shema
-    note: "the Ashkenaz siddur's Shema, to the reader's repetition (as the weekday volume prints it): whole, not cut where ברוך שם כבוד opens"
-  - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
-    leaf: "Weekday / Maariv / Keri'at Shema al Hamita"
+    leaf: ["Weekday / Shacharit / Blessings of the Shema / Shema", "Weekday / Maariv / Blessings of the Shema / Shema", "Shabbat / Maariv / Blessings of the Shema / Shema", "Weekday / Maariv / Keri'at Shema al Hamita"]
     ends: אני יהוה אלהיכם
     urn: urn:x-opensiddur:text:prayer:shema
-    note: "the Shema at bedtime, without the reader's repetition: whole, not cut where ברוך שם כבוד opens"
+    note: "the Ashkenaz siddur's Shema, whole, not cut where ברוך שם כבוד opens; it ends with the third paragraph, so that אמת and the reader's repetition after it (and their instructions) are the services' alone, not the bedtime Shema's"
+  - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
+    leaf: "Shabbat / Maariv / Blessings of the Shema / Shema"
+    ends: אני יהוה אלהיכם יש לצרף אלהיכם לאמת אמת
+    urn: urn:x-opensiddur:text:prayer:shema
+    note: "here אמת and its note share the third paragraph's last phrase, so the Shema is cut after them; the reader's repetition after it is the service's own"
   - opens: שמע ישראל יהוה אלהינו יהוה אחד ברוך שם כבוד
     leaf: "Weekday / Shacharit / Preparatory Prayers / Sovereignty of Heaven (**L'olam, Shema)"
     ends: וכתבתם על מזזות ביתך ובשעריך
@@ -131,6 +131,15 @@ texts:
     urn: urn:x-opensiddur:text:prayer:amidah/tefillah/seal
   - opens: הרחמן הוא ישלח לנו את אליהו
     urn: urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishlach_lanu
+  - opens: הרחמן הוא ישלח לנו ברכה מרובה
+    urn: urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/yishlach_berakhah
+    note: "Birnbaum's name; Elijah's HaRachaman, which opens alike, is yishlach_lanu"
+  - opens: הרחמן הוא יחדש עלינו את השנה הזאת
+    urn: urn:x-opensiddur:text:prayer:birkat_hamazon/harachaman/rh
+    note: "Rosh Hashanah's, not Rosh Chodesh's (את החדש הזה), as Birnbaum names them"
+  - opens: עשה למען טבוחים על יחודך
+    urn: urn:x-opensiddur:text:prayer:avinu_malkenu/aseh_tevuchim
+    note: "not עשה למען הרוגים, which the line before it is"
   - opens: לעמתם ברוך יאמרו
     urn: urn:x-opensiddur:text:prayer:amidah/qedushah/leummatam
   - opens: ברשות מרנן ורבנן

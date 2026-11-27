@@ -23529,6 +23529,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:yehi_ratzon_shekol_tippah/quotation/isaiah/63/9", "status": "context", "kind": "quotation", "label_en": "Bounded scriptural quotation in yehi_ratzon_shekol_tippah — Isaiah63:9", "note": "Source-verified first-day volume completion. Structural and quotation identities do not create new prayer identities.", "references": "urn:x-opensiddur:text:bible:isaiah/63/9"}
 {"urn": "urn:x-opensiddur:text:prayer:reshit_chakhmah_yirat", "status": "canonical", "label_he": "רֵאשִׁית חָכְמָה יִרְאַת יְהֹוָה, שֵֽׂכֶל טוֹב", "label_en": "reshit chakhmah yirat"}
 {"urn": "urn:x-opensiddur:text:prayer:leshem_yichud_qudsha", "status": "canonical", "label_he": "לְשֵׁם יִחוּד קוּדְשָׁא בְּרִיךְ הוּא וּשְׁכִינְתֵּהּ", "label_en": "leshem yichud qudsha"}
+{"urn": "urn:x-opensiddur:text:prayer:emet_adonai_eloheikhem", "status": "canonical", "label_he": "אֱ֯מֶת יְהֹוָה אֱלֹהֵיכֶם֯ אֱ֯מֶת:", "label_en": "emet adonai eloheikhem"}
 {"urn": "urn:x-opensiddur:text:prayer:vayehi_binsoa", "status": "canonical", "label_he": "וַיְהִי בִּנְ֒סֹֽעַ הָאָרֹן וַיּֽאמֶר משֶׁה קוּמָה", "label_en": "vayehi binsoa"}
 {"urn": "urn:x-opensiddur:text:prayer:amidah/shalom/besefer_chayyim_hamevarekh", "status": "canonical", "label_he": "בְּסֵֽפֶר חַיִּים בְּרָכָה וְשָׁלוֹם וּפַרְנָסָה טוֹבָה", "label_en": "amidah/shalom/besefer chayyim hamevarekh"}
 {"urn": "urn:x-opensiddur:text:prayer:yiru_eineinu_veyismach", "status": "canonical", "label_he": "יִרְאוּ עֵינֵֽינוּ וְיִשְׂמַח לִבֵּֽנוּ וְתָגֵל נַפְשֵֽׁנוּ", "label_en": "yiru eineinu veyismach"}
@@ -23540,6 +23541,7 @@
 {"urn": "urn:x-opensiddur:text:prayer:vayyomer_adonai_el", "status": "canonical", "label_he": "וַיֹּֽאמֶר יְהֹוָה אֶל הַשָּׂטָן יִגְעַר יְהֹוָה", "label_en": "vayyomer adonai el"}
 {"urn": "urn:x-opensiddur:text:prayer:lishuatekha_qivviti_adonai", "status": "canonical", "label_he": "לִישׁוּעָתְ֒ךָ קִוִּיתִי יְהֹוָה קִוִּיתִי יְהֹוָה לִישׁוּעָתְ֒ךָ", "label_en": "lishuatekha qivviti adonai"}
 {"urn": "urn:x-opensiddur:text:prayer:beshem_adonai_elohei", "status": "canonical", "label_he": "בְּשֵׁם יְהֹוָה אֱלֺהֵי יִשְׂרָאֵל מִימִינִי מִיכָאֵל", "label_en": "beshem adonai elohei"}
+{"urn": "urn:x-opensiddur:text:prayer:adonai_eloheikhem_emet", "status": "canonical", "label_he": "יְהֹוָה אֱלֹהֵיכֶם֯ אֱ֯מֶת:", "label_en": "adonai eloheikhem emet"}
 {"urn": "urn:x-opensiddur:text:prayer:hallel/barukh_haba", "status": "canonical", "label_he": "בָּרוּךְ הַבָּא בְּשֵׁם יְהֹוָה בֵּרַכְנוּכֶם מִבֵּית", "label_en": "hallel/barukh haba"}
 {"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/shemini_atzeret", "status": "canonical", "label_he": "שְׁמִינִי עֲצֶֽרֶת הַחַג הַזֶּה", "label_en": "yaaleh veyavo/shemini atzeret"}
 {"urn": "urn:x-opensiddur:text:prayer:yaaleh_veyavo/rosh_hashanah", "status": "canonical", "label_he": "הַזִּכָּרוֹן הַזֶּה", "label_en": "yaaleh veyavo/rosh hashanah"}

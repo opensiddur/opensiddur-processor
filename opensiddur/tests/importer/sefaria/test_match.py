@@ -933,6 +933,24 @@ class TestKaddishParts(unittest.TestCase):
         self.assertEqual([r.urn.rsplit(":", 1)[-1] for r in outcome.decided][-1], "kaddish/chatzi")
         self.assertEqual(len(outcome.decided), 2)
 
+    def test_a_text_chosen_by_its_last_words_ends_with_them_in_a_variant_printing(self):
+        from opensiddur.importer.sefaria.equivalents import Choice, Equivalents
+
+        table = Equivalents(texts=(Choice(tuple(words("שְׁמַע יִשְׂרָאֵל")), T + "prayer:shema",
+                                          ends=tuple(words("אֲנִי יְהֹוָה אֱלֹהֵיכֶם"))),
+                                   Choice(tuple(words("שְׁמַע יִשְׂרָאֵל")), T + "prayer:shema", leaf="Later",
+                                          ends=tuple(words("אֲנִי יְהֹוָה אֱלֹהֵיכֶם הֶעָרָה אֱמֶת"))),))
+        first = ["שְׁמַע יִשְׂרָאֵל יְהֹוָה אֱלֹהֵינוּ יְהֹוָה אֶחָד", "וְאָהַבְתָּ אֵת יְהֹוָה אֱלֹהֶיךָ בְּכָל לְבָבְךָ",
+                 "וַיֹּאמֶר יְהֹוָה אֶל מֹשֶׁה לֵּאמֹר אֲנִי יְהֹוָה אֱלֹהֵיכֶם"]
+        # The later printing's last phrase goes on with a note and אֱמֶת, then the reader's few
+        # words: the first printing's and more, which a variant would keep; but the text ends
+        # where it was chosen to.
+        later = [*first[:2], first[2] + " הֶעָרָה אֱמֶת", "יְהֹוָה אֱלֹהֵיכֶם אֱמֶת"]
+        outcome = decide_work("w", [("First", items(*first)), ("Later", items(*later))], IncipitIndex(), {}, set(),
+                              spellings=NO_SPELLINGS, equivalents=table, registered=set())
+        shema, reader = [r for r in outcome.decided if r.leaf == "Later"]
+        self.assertEqual((shema.urn, len(shema.phrases)), (T + "prayer:shema", 3))
+        self.assertNotEqual(reader.urn, T + "prayer:shema")
 
 
 class TestParagraphLabels(unittest.TestCase):
