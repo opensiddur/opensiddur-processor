@@ -416,3 +416,12 @@ size. Distinguish a detached holam above a vav head from the head itself. A rule
 against supplying absent vowels is not evidence that the source omits them.
 Keep occurrence-specific image inventories; review corrections as critically as
 the initial readings, and retain rejected correction records.
+
+Separate a mark’s physical position from its logical Unicode attachment. In
+conventional Hebrew typography a holam belonging to the preceding letter may
+be shifted above a consonantal vav. For the usual pointed Tetragrammaton, retain
+the confirmed printed dot as `יְהֹוָה` (holam on the first he, qamatz on vav),
+not `יְהוָֹה` merely because the dot appears above vav’s head. This does not
+authorize supplying an absent dot or normalizing a demonstrated source anomaly.
+When readers disagree, review mark presence and logical attachment separately,
+and preserve the occurrence-specific evidence for both decisions.
