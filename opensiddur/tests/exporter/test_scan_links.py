@@ -505,6 +505,37 @@ class TestPageChanges(unittest.TestCase):
         mark_scan_links(root)
         self.assertEqual(_linked(root), ['1', '1', '2'])
 
+    def test_primary_page_continues_across_full_width_translation_gap(self):
+        def paired():
+            return ('<p:parallel><p:parallelItem role="primary" p:project="he-project">'
+                    '<tei:p>'+_pb('1')+'Hebrew</tei:p></p:parallelItem>'
+                    '<p:parallelItem role="parallel" p:project="en-project">'
+                    '<tei:p>'+_pb('2')+'English</tei:p></p:parallelItem></p:parallel>')
+        root = _tree('<p:transclude target="urn:book" p:project="he-project">'+paired()
+                     +'<tei:p>'+_pb('1')+'Hebrew-only</tei:p>'+paired()+'</p:transclude>')
+        before = ''.join(root.itertext())
+        mark_scan_links(root)
+        self.assertEqual(_linked(root),['1','2'])
+        self.assertEqual(len(list(root.iter(TEI+'pb'))),5)
+        self.assertEqual(''.join(root.itertext()),before)
+
+    def test_full_width_page_change_is_remembered_when_primary_column_resumes(self):
+        body = '<p:transclude target="urn:book" p:project="he-project">'
+        body += '<tei:p>'+_pb('1')+'first</tei:p>'
+        body += '<p:parallel><p:parallelItem role="primary" p:project="he-project"><tei:p>'+_pb('1')+'same</tei:p></p:parallelItem></p:parallel>'
+        body += '<tei:p>'+_pb('2')+'full-width new page</tei:p>'
+        body += '<p:parallel><p:parallelItem role="primary" p:project="he-project"><tei:p>'+_pb('2')+'same new page</tei:p></p:parallelItem></p:parallel></p:transclude>'
+        self.assertEqual(_marked(body),['1','2'])
+
+    def test_conditional_full_width_page_change_preserves_required_primary_link(self):
+        j = 'http://jewishliturgy.org/ns/jlptei/2'
+        item='<p:parallel><p:parallelItem role="primary" p:project="he-project"><tei:p>'+_pb('1')+'required</tei:p></p:parallelItem></p:parallel>'
+        body = '<p:transclude target="urn:book" p:project="he-project">'+item
+        body += f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
+        body += '<tei:p>'+_pb('2')+'optional full width</tei:p>'
+        body += f'<j:endConditional xmlns:j="{j}" target="#optional"/>'+item+'</p:transclude>'
+        self.assertEqual(_marked(body),['1','2','1'])
+
     def test_a_conditional_link_does_not_hide_an_unconditional_link(self):
         j = 'http://jewishliturgy.org/ns/jlptei/2'
         body = f'<j:conditional xmlns:j="{j}" xml:id="optional"/>'
