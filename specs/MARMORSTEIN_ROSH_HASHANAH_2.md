@@ -5,11 +5,9 @@ Each page batch must complete its source, encoding, order and presentation gates
 before acceptance is recorded and the next batch begins.
 
 Current acceptance is recorded in the source repository's `progress.json` and
-the active per-batch checklist. The morning installment covers scans25–45 of385,
-through the study passages before Barukh She-amar, with documentary source
-printings and one expanded recitation sequence. Its final acceptance record is
-`batches/morning_s25_s45/acceptance.json` when all gates have closed. Startup
-checkpoints below are historical.
+the latest per-batch `acceptance.json`. Those records determine current coverage;
+startup and installment checkpoints below are historical. Each new batch keeps
+its own checklist and closes every gate before it advances accepted coverage.
 
 ## Scope and source
 
@@ -237,3 +235,13 @@ separate equivalence evidence.
 Final code, condition-matrix, schema/reference and PDF/HTML presentation approvals
 are bound to frozen inputs in the source batch ledger. Excerpt and historical
 checkpoint approvals do not replace that complete-batch acceptance record.
+
+
+### Source character and quotation conventions
+
+In the generated volume-two witnesses, encode the printed two-dot Hebrew verse
+ending with ASCII `:`, matching the already accepted day-one and day-two
+projects. Preserve raw reader codepoints in immutable evidence and record this
+character-level normalization. Preserve the printed wording; an unmatched
+English quotation mark confirmed from the image is an explicit `sic/corr`
+choice, with the source omission retained in the apparatus.

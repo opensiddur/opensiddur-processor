@@ -224,3 +224,22 @@ accepted artifacts are unchanged;94 focused tests and26 subtests pass. The
 app-protected primary fix checkout remains clean at merged main. Remaining merge
 order: processor331, then projects110. Earlier source proposals,
 misframed screenshots and provisional manifests remain historical evidence.
+
+## Closing Pesuqei deZimrah installment: scans64–81
+
+- [x] Scope18 physical pages from Yehi Khevod through Nishmat; Yishtabach on82 starts the next batch.
+- [x] Cache and fully decode originals, overlapping bands and fine-point strips outside Git.
+- [x] Identify shared Hebrew/English physical scans80–81; do not infer language from parity.
+- [x] Complete primary and blind independent image readings (user-selected Sol/medium fallback after Claude output blocks).
+- [ ] Close source adjudication: human questions1024 and1025 remain; source-closure reader is checking the complete batch.
+- [x] Preserve biblical citations as notes and English linkage cues as evidence in the prospective recipe.
+- [x] Audit174 actual correspondences using canonical Bible and registered-context/numeric-descendant rules; no new identities.
+- [x] Verify Hebrew-only150:6 repetition and KiVaSus, earlier translation gaps, and unchanged Night output prospectively.
+- [x] Implement and prospectively validate43 XML documents extending the existing Shacharit section.
+- [ ] Approve and write production XML only after current source and recipe approval hashes are bound.
+- [ ] Close independent guideline, alignment, order and conditional reviews.
+- [ ] Pass schema, names, features, registry, reference and affected-code checks.
+- [ ] Independently approve frozen PDF/HTML with cross-batch and mixed-page provenance checks.
+- [ ] Record complete-scan acceptance before resuming82.
+
+Current accepted coverage is63/385; inventory and preliminary reading do not accept this batch.
