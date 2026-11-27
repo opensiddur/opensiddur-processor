@@ -384,3 +384,18 @@ keep genuinely uncertain marks for human review.
 - Preserve exact reviewed artifact hashes. A bounded correction after a review
   needs an explicit amendment and refreshed affected exports; a historical
   approval is not approval of a changed artifact.
+
+- If one language has an untranslated section ending, give the next paired
+  section an explicit shared transclusion boundary. Otherwise its English
+  preamble can align ahead of the untranslated Hebrew remainder. Check the
+  actual compiled and rendered transition in both column and mobile layouts.
+- Marker-only paragraph tails retain their scopes and running-head markers but
+  must not create a blank printed paragraph. Empty alignment carriers must not
+  create mobile divider rows. Preserve targets, page links, conditions, graphics
+  and unknown semantics; absence of text alone does not mean a node is disposable.
+- Adjacent bilingual rubric labels need bidi isolation and visual spacing. Keep
+  each language's source punctuation rather than changing the transcription to
+  repair a display problem.
+- A reviewer with read-only file access needs explicit screenshot filenames,
+  not only a QA summary or directory path. Supply a frozen inventory binding
+  PDFs, rendered pages, HTML, browser screenshots and reports to their hashes.
