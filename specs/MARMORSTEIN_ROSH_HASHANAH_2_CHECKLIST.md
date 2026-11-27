@@ -185,3 +185,32 @@ Historical counts and pending gates above describe their earlier checkpoints.
 Final PDF/HTML and complete-scan acceptance are recorded in the source batch
 checklist and hash-bound acceptance record, not inferred from generation or these
 implementation milestones. Next material begins at scan46 after that gate closes.
+
+
+## Pesuqei deZimrah installment: scans46–63
+
+- [x] Cache and inventory the18 physical pages; verify the boundary before
+      Yehi Khevod on scan64 (64–65 are preview pages, outside this batch).
+- [x] Preserve three primary image-reading records and a canonical identity audit.
+- [ ] Complete blind independent reading. Claude completed46–51; its service
+      blocked outputs52–63. Preserve those failures and obtain the requested
+      replacement reviewer choice before counting the remaining readings.
+- [ ] Reconcile wording, fine marks and paratext against enlarged images;
+      use one neutral dedicated reader per unresolved question before the user.
+- [ ] Approve complete source readings and bind literal witness recipes to them.
+- [ ] Reuse existing prayer/Bible URNs, retaining earlier canonical providers and
+      literal contextual quotations where a verse is printed again. Do not claim
+      the Chronicles16:8–36 excerpt as a complete chapter witness.
+- [ ] Preserve the Hebrew-only Psalm91:16 repeat and absent English Psalm136:25;
+      prove that new counterparts do not fill earlier untranslated occurrences.
+- [ ] Append documentary and shared expanded sequences inside Shacharit, with
+      repeated canonical calls where recitation requires them and no fake heading.
+- [ ] Complete independent encoding/guideline/alignment/order/condition review.
+- [ ] Pass schema, naming, feature, registry, refdb and affected-code checks.
+- [ ] Freeze and independently approve documentary Hebrew, documentary parallel
+      and expanded PDF/HTML, including all page links and cross-batch transitions.
+- [ ] Record complete-scan acceptance before advancing beyond scan63.
+
+Source gate status and immutable evidence live in
+`batches/pesuqei_s46_s63/checklist.json` in the volume-two source directory.
+Accepted coverage remains45/385 while these gates remain open.
