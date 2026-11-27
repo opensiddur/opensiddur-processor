@@ -219,7 +219,8 @@ files and the reviewed exports remain byte-identical. All source, guideline,
 alignment, order and presentation gates are closed. Accepted coverage is63/385,
 with322 scans remaining; resume at scan64 (Yehi Khevod).
 
-Exporter PR349 has independent approval and green CI. It removes redundant scan
-backlinks across full-width translation gaps; merge349 before processor331 and
-projects110. It is still open, not a completed merge. Earlier source proposals,
+Exporter PR349 is merged, integrated and closed out. Its reviewed code and all
+accepted artifacts are unchanged;94 focused tests and26 subtests pass. The
+app-protected primary fix checkout remains clean at merged main. Remaining merge
+order: processor331, then projects110. Earlier source proposals,
 misframed screenshots and provisional manifests remain historical evidence.
