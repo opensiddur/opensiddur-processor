@@ -340,19 +340,21 @@ def _unfold_labels(nodes: tuple[Node, ...], is_label: Callable[[str], bool]) -> 
     return tuple(unfolded)
 
 
-def _unparenthesize_label(nodes: tuple[Node, ...], is_label: Callable[[str], bool]) -> tuple[Node, ...]:
+def _unparenthesize_label(nodes: tuple[Node, ...], is_label: Callable[[str], bool],
+                          styles: Collection[str] = ("small",), hebrew: bool = True) -> tuple[Node, ...]:
     """A known condition label and the words it governs printed together in parentheses
     (``(<small>נשים אומרות:</small> בָּרוּךְ ... שֶׁעָשַֽׂנִי כִּרְצוֹנוֹ:)``), as the label printed
-    before its words: the parentheses only set the alternative apart, which the label then does."""
+    before its words: the parentheses only set the alternative apart, which the label then does.
+    In English (not ``hebrew``), its instruction in ``styles`` ("(<i>A woman says:</i> ...)")."""
     content = [k for k, n in enumerate(nodes) if not (isinstance(n, Text) and not n.text.strip())]
     if len(content) < 3:
         return nodes
     first, label, last = nodes[content[0]], nodes[content[1]], nodes[content[-1]]
     if not (isinstance(first, Text) and first.text.strip() == "(" and isinstance(label, Styled)
-            and label.style == "small" and isinstance(last, Text) and last.text.rstrip().endswith(")")):
+            and label.style in styles and isinstance(last, Text) and last.text.rstrip().endswith(")")):
         return nodes
     text = plain_text(label.children)
-    if not text.rstrip().endswith(":") or is_pointed(text) or not is_label(text):
+    if not text.rstrip().endswith(":") or (hebrew and (is_pointed(text) or not is_label(text))):
         return nodes
     closed = last.text.rstrip()[:-1]
     return (nodes[:content[0]] + nodes[content[1]:content[-1]]
@@ -447,7 +449,11 @@ def split_leading_labels(alignment: Alignment, is_label: Callable[[str], bool] =
     the ending it replaces is set apart (``_replaced_endings``)."""
     pairs: list[Pair] = []
     for pair in alignment.pairs:
-        unfolded = _unfold_labels(_unparenthesize_label(pair.he, is_label), is_label)
+        unparenthesized = _unparenthesize_label(pair.he, is_label)
+        if unparenthesized != pair.he:
+            # (and its English instruction, set apart in its parentheses alike)
+            pair = dataclasses.replace(pair, en=_unparenthesize_label(pair.en, is_label, ("italic", "small"), hebrew=False))
+        unfolded = _unfold_labels(unparenthesized, is_label)
         if unfolded != pair.he:
             pair = dataclasses.replace(pair, he=unfolded)
         he = split_leading(pair.he, {"small"}, hebrew=True)

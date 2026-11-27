@@ -124,6 +124,21 @@ rubrics:
         self.assertFalse(tachanun.instead_of_previous)
 
 
+    def test_a_rubric_for_some_leaves_is_matched_only_in_them_before_the_rest(self):
+        conditions = table("""
+rubrics:
+  - match: "^On Shabbos and Yom Tov say:"
+    leaves: ["Haftarah"]
+    when: {holiday-aggregate: {shabbat: true}}
+  - match: "^On Shabbos and Yom Tov say:"
+    when: {holiday-aggregate: {yom-tov: true}}
+""")
+        rubric = "On Shabbos and Yom Tov say:"
+        self.assertEqual(conditions.for_rubric(rubric).when, {"holiday-aggregate": {"yom-tov": True}})
+        self.assertEqual(conditions.in_leaf("Grace").for_rubric(rubric).when, {"holiday-aggregate": {"yom-tov": True}})
+        self.assertEqual(conditions.in_leaf("Haftarah").for_rubric(rubric).when, {"holiday-aggregate": {"shabbat": True}})
+
+
 class TestDirectivesAndLeaves(unittest.TestCase):
     def test_reviewed_directives_are_known(self):
         conditions = table()

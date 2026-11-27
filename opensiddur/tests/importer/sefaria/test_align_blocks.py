@@ -233,9 +233,11 @@ class TestSplitLeadingLabels(unittest.TestCase):
     def test_a_label_inside_the_parentheses_of_its_words_is_set_apart(self):
         he = "(<small>נשים אומרות:</small> בָּרוּךְ אַתָּה שֶׁעָשַֽׂנִי כִּרְצוֹנוֹ:)"
         women = lambda text: text.rstrip(": ") == "נשים אומרות"  # noqa: E731
-        pairs = split_leading_labels(align_leaf(leaf([he], ["x"])), women).pairs
+        pairs = split_leading_labels(align_leaf(leaf([he], ["(<i>A woman says:</i> Blessed are You.)"])), women).pairs
         self.assertEqual([(plain_text(p.he).strip(), p.paragraph_label) for p in pairs],
                          [("נשים אומרות:", True), ("בָּרוּךְ אַתָּה שֶׁעָשַֽׂנִי כִּרְצוֹנוֹ:", False)])
+        # ... and its English instruction alike
+        self.assertEqual([plain_text(p.en).strip() for p in pairs], ["A woman says:", "Blessed are You."])
         # ... but not a label the table does not know, nor one in parentheses of its own
         for other, known in ((he, lambda text: False), ("(<small>נשים אומרות:</small>) בָּרוּךְ אַתָּה", women)):
             with self.subTest(he=other):

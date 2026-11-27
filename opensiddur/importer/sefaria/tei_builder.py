@@ -233,6 +233,12 @@ def rubric_condition(table: Conditions, pair: Pair):
     label = table.for_label(plain_text(pair.he))
     if label is None and pair.he_kind is HebrewKind.LABEL:
         return table.for_rubric(plain_text(pair.en))
+    if label is not None and plain_text(pair.en).strip():
+        # A label whose English is a rubric for the same days that says how far it governs
+        # (לסכות, "On Sukkos say:" through סֻכַּת דָּוִד הַנּוֹפָלֶת): the rubric.
+        rubric = table.for_rubric(plain_text(pair.en))
+        if rubric is not None and rubric.through and rubric.when == label.when:
+            return rubric
     return label
 
 
@@ -517,9 +523,10 @@ class _TextWriter:
         # [id, depth, parenthesized, to close, the words that end it, the words so far,
         #  the paragraph a paragraph's label governs: the first after it, "next" until known,
         #  the phrase before said instead of the passage, if it ends alike (``_said_otherwise``),
-        #  where the passage begins and the editorial note of its source]
+        #  where the passage begins and the editorial note of its source, its condition]
         self.calendars.append([xml_id, len(self.open_variants), None, False, through, [],
-                               "next" if pair.paragraph_label else None, otherwise, (len(self.parts), source)])
+                               "next" if pair.paragraph_label else None, otherwise, (len(self.parts), source),
+                               when])
 
     def close_calendar(self, *, everything: bool = False) -> None:
         """Close the condition rubric's conditional opened at this level (or, with
@@ -593,6 +600,8 @@ class _TextWriter:
                          cuts=cuts)
         if self.lang == "he":
             xml = self.inline_conditions(self._carried(xml))
+        else:
+            xml = self._untranslated(xml, hebrew)
         self.last_phrase_at = len(self.parts)
         self.last_phrase_words = words(hebrew)
         self.parts.append(xml)
@@ -625,6 +634,10 @@ class _TextWriter:
                 # An alternative in parentheses with no abbreviation, whose condition the table gives.
                 replacement = self.table.replaced(inner)
                 if replacement is None or replacement.when is None:
+                    return match.group(0)
+                if any(entry[9] == replacement.when for entry in self.calendars):
+                    # (a condition rubric for the same days governs it already: the book's
+                    # parenthesis is its rubric's passage, not a second condition)
                     return match.group(0)
                 xml_id = self.next_id("inline")
                 return (f'<j:conditional xml:id="{xml_id}" type="marked">{condition_xml(replacement.when)}'
@@ -661,6 +674,23 @@ class _TextWriter:
             return xml
         self.pending = self._unreplaced_at_end(out)
         return self._sources(out)
+
+    def _untranslated(self, xml: str, hebrew: str) -> str:
+        """An English phrase, with the English the table gives (``Replacement.english``) of each
+        alternative its Hebrew prints and the English does not translate -- after its words, a
+        marked conditional on the alternative's condition, with the editors' note that the
+        English is theirs."""
+        found = tuple(words(hebrew))
+        for replacement in self.table.replacements if self.table is not None else ():
+            n = len(replacement.alternative)
+            if not replacement.english or replacement.when is None or not any(
+                    found[k:k + n] == replacement.alternative for k in range(len(found) - n + 1)):
+                continue
+            xml_id = self.next_id("inline")
+            note = editorial_note(replacement.english_note) if replacement.english_note else ""
+            xml += (f' <j:conditional xml:id="{xml_id}" type="marked">{condition_xml(replacement.when)}'
+                    f'</j:conditional>{note}{esc(replacement.english)}<j:endConditional target="#{xml_id}"/>')
+        return xml
 
     def _sources(self, xml: str) -> str:
         """An editorial note of the source of each inline alternative whose replacement names one,
@@ -718,6 +748,8 @@ class _TextWriter:
     def _replace(self, xml: str, replacement) -> str:
         """The words an inline alternative replaces, beside it -- after it or before it --
         conditional on its condition being false."""
+        if not replacement.replaces:
+            return xml  # (an alternative said in addition, or whose replaced words are not printed)
         for match in _INLINE.finditer(xml):
             if xml[match.end():].lstrip().startswith('<j:conditional xml:id="inline_') and "<j:none>" in \
                     xml[match.end():match.end() + 400].split("</j:conditional>", 1)[0]:
@@ -987,7 +1019,7 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
     insert(None)
     numbers = iter(phrase_numbers)
     position = -1
-    for pair in block.pairs:
+    for at, pair in enumerate(block.pairs):
         if not is_phrase(pair):
             if position + 1 >= skip:
                 if writer.verse_open and verse_length is None:
@@ -1037,7 +1069,10 @@ def text_body(urn: str, block: TextBlock, phrase_numbers: list[int], lang: str, 
         else:
             writer.phrase(pair, number, cuts, verse_open if cuts else None)
         ended = _verse_ended(plain_text(pair.he).rstrip(), verse_words, verse_length)
-        if writer.verse_open and ended and (position + 1, 0) not in verses:
+        # (a verse ended here is closed here, unless the next phrase, straight after, opens one,
+        # whose milestone ends it: not across a heading or rubric between them)
+        straight_on = at + 1 < len(block.pairs) and is_phrase(block.pairs[at + 1])
+        if writer.verse_open and ended and not ((position + 1, 0) in verses and straight_on):
             writer.end_phrase()
             writer.verse(None)
         insert(number)

@@ -35,6 +35,7 @@ passage to the next rubric (inside one); with ``section: true``, everything to t
 or, with ``until``, to the rubric that matches it. With ``instead_of_previous: true`` (between
 texts), the text before the rubric is what is said otherwise, and is conditional on the opposite.
 Inside a text, ``through`` (Hebrew words) ends the passage with the phrase that ends with them.
+A rubric with ``leaves`` applies only in those leaves, where it is matched before the others.
 A label standing between texts may say the same, but for ``through``.
 A rubric's ``source`` is an editorial note, set inside its passage's conditional, of where the
 passage comes from (Grace's מִגְדּוֹל, II Samuel 22:51); ``otherwise_source``, of the phrase said
@@ -50,6 +51,7 @@ range), or a string (a symbol).
 
 from __future__ import annotations
 
+import dataclasses
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -127,6 +129,9 @@ class RubricCondition:
     #: the source of the phrase said instead of it (``otherwise_source``)
     source: str = ""
     otherwise_source: str = ""
+    #: the leaves it applies in, if not every leaf (another meaning of the same words there): it
+    #: is matched only in a table scoped to one of them (``Conditions.in_leaf``), before the rest
+    leaves: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -173,6 +178,10 @@ class Replacement:
     #: editorial notes of the sources of the alternative and of the words it replaces
     source: str = ""
     replaces_source: str = ""
+    #: the English of an alternative the English leaves untranslated, ours, and our editorial note
+    #: saying so: set in the English project after the phrase that has the alternative
+    english: str = ""
+    english_note: str = ""
 
 
 @dataclass(frozen=True)
@@ -184,6 +193,11 @@ class Conditions:
     directives: tuple[re.Pattern[str], ...] = ()
     leaves: tuple[LeafGate, ...] = ()
     texts: tuple[TextGate, ...] = ()
+    #: the leaf the table is scoped to (``in_leaf``): its rubrics for that leaf apply
+    leaf: str | None = None
+
+    def in_leaf(self, leaf: str) -> Conditions:
+        return dataclasses.replace(self, leaf=leaf)
 
     def is_directive(self, english: str) -> bool:
         text = " ".join(english.split())
@@ -201,7 +215,8 @@ class Conditions:
 
     def for_rubric(self, english: str) -> RubricCondition | None:
         text = " ".join(english.split())
-        return next((r for r in self.rubrics if r.pattern.search(text)), None)
+        return next((r for r in self.rubrics if (not r.leaves or self.leaf in r.leaves) and r.pattern.search(text)),
+                    None)
 
     def for_label(self, hebrew: str) -> LabelCondition | None:
         found = tuple(words(hebrew.rstrip(": ")))
@@ -234,7 +249,8 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
                                        bool(entry.get("instead_of_previous")),
                                        tuple(words(str(entry.get("through") or ""))),
                                        bool(entry.get("until_included")),
-                                       str(entry.get("source") or ""), str(entry.get("otherwise_source") or "")))
+                                       str(entry.get("source") or ""), str(entry.get("otherwise_source") or ""),
+                                       tuple(str(leaf) for leaf in entry.get("leaves") or ())))
     labels, inline = [], []
     for kind, found in (("labels", labels), ("inline", inline)):
         for n, entry in enumerate(data.get(kind) or (), start=1):
@@ -250,7 +266,8 @@ def load_conditions(path: Path = CONDITIONS_FILE) -> Conditions:
                                         bool(entry.get("until_included")),
                                         bool(entry.get("instruction"))))
     replacements = [Replacement(tuple(words(str(e["alternative"]))), tuple(words(str(e.get("replaces") or ""))),
-                                e.get("when"), str(e.get("source") or ""), str(e.get("replaces_source") or ""))
+                                e.get("when"), str(e.get("source") or ""), str(e.get("replaces_source") or ""),
+                                str(e.get("english") or ""), str(e.get("english_note") or ""))
                     for e in data.get("replacements") or ()]
     directives = tuple(_pattern(m, f"{path.name} directives #{n}")
                        for n, m in enumerate(data.get("directives") or (), start=1))

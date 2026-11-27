@@ -6,7 +6,7 @@ from pathlib import Path
 from lxml import etree
 
 from opensiddur.common.validate_names import Spellings
-from opensiddur.importer.sefaria.convert import ConvertError, convert_work, load_structure
+from opensiddur.importer.sefaria.convert import ConvertError, convert_work, load_structure, marked_verses
 from opensiddur.importer.util.incipit import IncipitIndex, words
 
 from .support import BLESSINGS, MORNING, STRUCTURE, WORK, make_source, write_structure, write_work_dir
@@ -33,6 +33,18 @@ class TestLoadStructure(unittest.TestCase):
             path = write_structure(Path(tmp) / "s.yaml", doubled)
             with self.assertRaisesRegex(ConvertError, "placed twice"):
                 load_structure(WORK, make_source(), path)
+
+
+class TestMarkedVerses(unittest.TestCase):
+    def test_a_verse_is_marked_once_at_its_first_place_with_english(self):
+        psalm, exodus = "urn:x-opensiddur:text:bible:psalms/145/1", "urn:x-opensiddur:text:bible:exodus/15/18"
+        quoted = {
+            # quoted first where the English is missing, then translated in another text
+            psalm: [(False, "A", 1, (0, 0)), (True, "B", 7, (2, 0)), (True, "B", 7, (5, 0))],
+            # never translated: its first place
+            exodus: [(False, "A", 1, (3, 0)), (False, "B", 7, (4, 0))],
+        }
+        self.assertEqual(marked_verses(quoted), {("B", 7): {(2, 0): psalm}, ("A", 1): {(3, 0): exodus}})
 
 
 class TestVariants(unittest.TestCase):

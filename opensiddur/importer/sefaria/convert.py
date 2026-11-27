@@ -193,16 +193,13 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
             record = decisions.records[(work.key, leaf, block.first_index)]
             if record.kind not in ("existing", "new"):
                 continue
+            phrases = block.phrases
             for place, urn in sorted(scripture_verses(block, index, record.urn).items()):
                 if urn == record.urn or record.urn.startswith(urn + "/") or urn.startswith(record.urn + "/"):
                     continue  # the text is that verse (or chapter): its URN is already on the division
-                english = bool(plain_text(block.phrases[place[0]].en).strip())
+                english = bool(plain_text(phrases[place[0]].en).strip())
                 quoted.setdefault(urn, []).append((english, leaf, block.first_index, place))
-    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = {}
-    for urn, places in quoted.items():
-        # (a verse repeated, even within one text, is marked once)
-        _, leaf, first, place = next((p for p in places if p[0]), places[0])
-        verses.setdefault((leaf, first), {})[place] = urn
+    verses = marked_verses(quoted)
     lengths = {urn: n for found in verses.values() for urn in found.values()
                if (n := verse_length(urn, index)) is not None}
     for (leaf, first), found in verses.items():
@@ -215,6 +212,19 @@ def plan_work(work: Work, source: WorkSource, *, index: IncipitIndex,
                 lengths[urn] = count
     return WorkPlan(work, source, structure, alignments, items, decisions, verses, lengths,
                     conditions, clashes, equivalents.openings())
+
+
+def marked_verses(quoted: dict[str, list[tuple[bool, str, int, tuple[int, int]]]]
+                  ) -> dict[tuple[str, int], dict[tuple[int, int], str]]:
+    """Where each verse is marked, by text (its leaf and first segment), then its place in it:
+    ``quoted`` gives, for each verse in the project's order, where it is quoted -- with English
+    there or not, the leaf, the text's first segment, the place. A verse, repeated even within one
+    text, is marked once: at its first place with English, or else its first."""
+    verses: dict[tuple[str, int], dict[tuple[int, int], str]] = {}
+    for urn, places in quoted.items():
+        _, leaf, first, place = next((p for p in places if p[0]), places[0])
+        verses.setdefault((leaf, first), {})[place] = urn
+    return verses
 
 
 def placed_rubrics(items: list[Item], conditions: Conditions) -> list[Item]:
@@ -456,15 +466,15 @@ def build_project(plan: WorkPlan, lang: str, info: SourceInfo) -> ProjectFiles:
             notes = Notes(prefix="note")
             body = text_body(record.urn, item, numbers, lang, notes, tuple(variants),
                              plan.verses.get((leaf.path, item.first_index)), plan.verse_lengths,
-                             plan.conditions, plan.clashes,
+                             plan.conditions.in_leaf(leaf.path), plan.clashes,
                              transcluded.get(record.urn))
             english = next((plain_text(p.en) for p in item.phrases if plain_text(p.en)), "")
             title = record.incipit if lang == "he" else f"{leaf.title_en}: {english[:60]}".rstrip(": ")
             out.add(file_stem(record.urn, plan.clashes), document(document_header(work, lang, title), body, lang, notes))
         urn = siddur_urn(place)
         notes = Notes(prefix="note")
-        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations, plan.conditions,
-                         leading, plan.conditions.text_gates(work.key, urn))
+        body = leaf_body(urn, titles[leaf.path], items, text_urns, lang, notes, declarations,
+                         plan.conditions.in_leaf(leaf.path), leading, plan.conditions.text_gates(work.key, urn))
         title = titles[leaf.path][1 if lang == "he" else 0]
         out.add(file_stem(urn), document(document_header(work, lang, title), body, lang, notes))
     out.add("index", document(index_header(work, lang, info), index_body(work, children.get((), []), lang, gates), lang))

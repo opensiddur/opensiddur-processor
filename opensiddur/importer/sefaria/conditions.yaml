@@ -89,6 +89,11 @@ definitions:
 
 rubrics:
   # -- Seasons ----------------------------------------------------------------------------------
+  - match: "^\\(?\\*?Between Rosh Hashanah and Yom Kippur,? substitute\\b"
+    # a substitute for the words before it, where the two end alike (הָאֵל הַקָּדוֹשׁ, then
+    # "substitute:" הַמֶּלֶךְ הַקָּדוֹשׁ): those are said otherwise
+    when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
+    instead_of_previous: true
   - match: "^\\(?\\*?During the Ten Days of Penitence(,)? (add|say|continue here)\\b|^\\*?During the Ten Days of Penitence:|^\\(?\\*?Between Rosh Hashanah and Yom Kippur,? (add|substitute)\\b"
     when: {holiday-aggregate: {aseret-ymei-tshuva: true}}
   - match: "^The following five prayers are said during the Ten Days of Penitence"
@@ -132,9 +137,15 @@ rubrics:
   - match: "^On Purim:"
     when: {holiday: {purim-observed: true}}
   - match: "^\\(?On Shabbos and Yom Tov say:"
+    # the festival Haftarah's closing, said only on Yom Tov: "Shabbos and Yom Tov" is a Yom Tov
+    # (or Chol Hamoed) on Shabbos; the closing before it (... וְהַזְּמַנִּים) is said otherwise
+    leaves: ["Reading of the Torah / Berachos for the Haftarah"]
+    when: {holiday-aggregate: {shabbat: true}}
+    instead_of_previous: true
+  - match: "^\\(?On Shabbos and Yom Tov say:"
     when: {any: [{holiday-aggregate: {shabbat: true}}, {holiday-aggregate: {yom-tov: true}}]}
-    # Grace's מִגְדּוֹל, and the Haftarah's closing (to its parenthesis): the phrase before, where
-    # it ends alike (מַגְדִּיל ... מַלְכּוֹ; ... וְהַזְּמַנִּים), is said otherwise
+    # Grace's מִגְדּוֹל: the phrase before, where it ends alike (מַגְדִּיל ... מַלְכּוֹ), is said
+    # otherwise
     through: "מִגְדּוֹל יְשׁוּעוֹת מַלְכּוֹ"
     instead_of_previous: true
     # no verse is marked: neither is quoted exactly (the user's decision); the editors note both
@@ -144,7 +155,7 @@ rubrics:
     when: {holiday-aggregate: {shabbat: true}}
   - match: "^On (the )?Yom Tov say:|^On Yom Tov conclude with this berachah|^On Yom Tov, the Chazzan begins here"
     when: {holiday-aggregate: {yom-tov: true}}
-  - match: "^On Rosh Hash(o|a)n(ah?|o) say:"
+  - match: "^On Rosh Hash(o|a)n(ah?|oh?) say:"
     when: {holiday: {rosh-hashana: true}}
   - match: "^On Sukkos say:"
     # Grace's הרחמן for Sukkot, one sentence: the הרחמן after it is said every day
@@ -460,8 +471,11 @@ replacements:
     # Siddur Ashkenaz's Maariv Besefer Chayyim, in parentheses and untranslated: the closing of
     # those whose custom it is, said in the Ten Days instead of המברך (gated in `texts`). Birnbaum
     # says it as the Ten Days' closing (prayer:amidah/shalom/besefer_chayyim); Metsudah, only by
-    # that custom.
+    # that custom. The Metsudah English leaves it untranslated: the English is ours (the user's
+    # decision), so that the English, too, has a closing where המברך is not said.
     when: {all: [{practice: {oseh-hashalom-aseret-ymei-tshuva: true}}, {holiday-aggregate: {aseret-ymei-tshuva: true}}]}
+    english: "Blessed are You, Adonoy, Who makes peace."
+    english_note: "Translated by the editors; the Metsudah English does not translate this closing."
 
 # Leaves the book says when to say only in a rubric at the end of the leaf before.
 leaves:

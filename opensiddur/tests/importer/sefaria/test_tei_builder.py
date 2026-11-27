@@ -131,6 +131,23 @@ class TestTextBody(unittest.TestCase):
         (close,) = en.xpath("//tei:milestone[@unit='verse'][not(@corresp)]", namespaces=NS)
         self.assertEqual(len(close.xpath("preceding::tei:note[@type='instruction']", namespaces=NS)), 1)
 
+    def test_a_verse_ended_before_a_heading_closes_there_though_the_next_opens_another(self):
+        # the six remembrances: Deuteronomy 25:19, a description, then Deuteronomy 9:7
+        (block,) = blocks([
+            ("<b>וְהָיָה</b> בְּהָנִיחַ לֹא תִּשְׁכָּח:", "And it shall be"),
+            ("<small>זכירת מעשה העגל</small>", ""),
+            ("זְכֹר אַל תִּשְׁכַּח:", "Remember"),
+        ])
+        first, second = T + "bible:deuteronomy/25/19", T + "bible:deuteronomy/9/7"
+        for lang in ("he", "en"):
+            body = parse(text_body(T + "prayer:x", block, [1, 2], lang, Notes("note"), (),
+                                   {(0, 0): first, (1, 0): second}, {first: 4, second: 3}))
+            marks = [m.get("corresp") for m in body.xpath("//tei:milestone[@unit='verse']", namespaces=NS)]
+            self.assertEqual(marks, [first, None, second, None])
+            if lang == "he":  # (the description, before the next verse's milestone)
+                (close, _) = body.xpath("//tei:milestone[@unit='verse'][not(@corresp)]", namespaces=NS)
+                self.assertEqual(close.xpath("following-sibling::*[1]/@type", namespaces=NS), ["instruction"])
+
     def test_a_verse_that_opens_and_ends_inside_a_phrase_is_marked_there(self):
         (block,) = blocks([
             ("<b>אַחַת</b> שְׁתַּיִם: שָׁלֹשׁ אַרְבַּע חָמֵשׁ: שֵׁשׁ", "One, two. Three, four, five. Six"),
@@ -328,6 +345,26 @@ class TestConditionScopes(unittest.TestCase):
         plain = [("<b>מָגֵן</b> אָבוֹת <small>(שֶׁאֵין כָּמוֹהוּ)</small>", "Shield")]
         self.assertEqual(self.body(plain, [1], "he").xpath("//j:conditional", namespaces=NS), [])
 
+    def test_an_untranslated_alternative_takes_the_editors_english(self):
+        from opensiddur.importer.sefaria.conditions import Conditions, Replacement
+        from opensiddur.importer.util.incipit import words as incipit_words
+        custom = {"practice": {"oseh-hashalom-aseret-ymei-tshuva": True}}
+        table = Conditions(replacements=(Replacement(tuple(incipit_words("בָּרוּךְ אַתָּה יְהֹוָה עֹשֶׂה הַשָּׁלוֹם")), (),
+                                                     custom, english="Blessed are You, Adonoy, Who makes peace.",
+                                                     english_note="Translated by the editors."),))
+        segments = [("<b>בְּסֵפֶר</b> חַיִּים וּלְשָׁלוֹם: (בָּרוּךְ אַתָּה יְהֹוָה עֹשֶׂה הַשָּׁלוֹם:)", "In the book of life and peace.")]
+        (block,) = blocks(segments)
+        en = parse(text_body(self.URN, block, [1], "en", Notes("note"), conditions=table))
+        (marked,) = en.xpath("//j:conditional[@type='marked']", namespaces=NS)
+        self.assertEqual(marked.xpath("tei:fs/tei:f/@name", namespaces=NS), ["oseh-hashalom-aseret-ymei-tshuva"])
+        (note,) = en.xpath("//tei:note[@type='editorial']", namespaces=NS)
+        self.assertEqual((note.text, note.tail), ("Translated by the editors.", "Blessed are You, Adonoy, Who makes peace."))
+        self.assertIn("In the book of life and peace.", "".join(en.itertext()))
+        # ... not where the Hebrew does not print the alternative, nor in the Hebrew project
+        (other,) = blocks([("<b>בְּסֵפֶר</b> חַיִּים וּלְשָׁלוֹם:", "In the book of life")])
+        self.assertNotIn("Who makes peace", text_body(self.URN, other, [1], "en", Notes("note"), conditions=table))
+        self.assertNotIn("Who makes peace", text_body(self.URN, block, [1], "he", Notes("note"), conditions=table))
+
     def test_replaced_words_that_open_the_next_phrase(self):
         # (בעשי"ת וּלְעֵלָּא מִכָּל) ends one phrase; the next opens with the words it replaces.
         segments = [("<b>לְעֵלָּא</b> (בעשי\"ת וּלְעֵלָּא מִכָּל)", "above"),
@@ -484,6 +521,23 @@ class TestConditions(unittest.TestCase):
         # ... but not a phrase before that does not end alike (the Shabbos volume prints מַגְדִּיל after)
         shabbat = [weekday[0], ("וּלְחַיֵּי הָעוֹלָם הַבָּא,", "and life"), *weekday[2:]]
         self.assertNotIn("{not", body(shabbat))
+
+    def test_a_label_whose_english_rubric_says_how_far_it_governs_goes_so_far(self):
+        # Grace in the Shabbos volume: <small>לסכות</small> beside "On Sukkos say:"
+        from opensiddur.importer.sefaria.conditions import Conditions, LabelCondition, RubricCondition
+        from opensiddur.importer.util.incipit import words as incipit_words
+        sukkot = {"holiday": {"sukkot": True}}
+        table = Conditions(rubrics=(RubricCondition(re.compile("^On Sukkos say:"), sukkot,
+                                                    through=tuple(incipit_words("סֻכַּת דָּוִד הַנּוֹפָלֶת"))),),
+                           labels=(LabelCondition(tuple(incipit_words("לסוכות")), sukkot),))
+        (block,) = blocks([("<b>הָרַחֲמָן</b> הוּא", "May"), ("<small>לסכות</small>", "<small>On Sukkos say:</small>"),
+                           ("הָרַחֲמָן הוּא יָקִים לָנוּ", "raise up"), ("אֶת סֻכַּת דָּוִד הַנּוֹפָלֶת:", "the Tabernacle"),
+                           ("הָרַחֲמָן הוּא יְזַכֵּנוּ", "make us worthy")])
+        he = parse(text_body(self.URN, block, [1, 2, 3, 4], "he", Notes("note"), conditions=table))
+        after = he.xpath("//tei:milestone[@unit='phrase'][@corresp][preceding-sibling::j:endConditional]/@corresp",
+                         namespaces=NS)
+        self.assertEqual([a.rsplit("/", 1)[-1] for a in after], ["4"])
+        self.assertEqual(he.xpath("string(//j:conditional/tei:note)", namespaces=NS), "לסכות")
 
     def test_a_parenthesized_passage_ends_where_its_parenthesis_closes(self):
         segments = [("<b>אַתָּה גִבּוֹר</b> לְעוֹלָם", "x"), ("", "<small>During the Ten Days add:</small>"),
