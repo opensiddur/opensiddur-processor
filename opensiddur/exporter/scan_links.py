@@ -294,7 +294,10 @@ def _suppress_repeated_pages(root: etree.ElementBase) -> None:
             group = _group(node)
             project = ((column.get(_PROJECT) if column is not None else None)
                        or (group.get(_PROJECT) if group is not None else None))
-            role = column.get("role") if column is not None else None
+            # Unpaired text continues the primary reading stream. Leaving its
+            # role unset would give it a fresh page state whenever a translation
+            # gap switches the layout between columns and full width.
+            role = column.get("role") if column is not None else "primary"
             key = (project, role, _parse(node).edition)
             page = node.get("facs")
             if states.get(key) == frozenset({page}):
