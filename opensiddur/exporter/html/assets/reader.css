@@ -101,7 +101,7 @@ span:is(.div, .lg, .list, .item, .label, .head, .doc-title) { display: block; }
 .rubric { color: var(--accent); }
 /* Adjacent language labels are independent bidi runs, including their punctuation. */
 .rubric > .foreign { unicode-bidi: isolate; }
-.rubric > .foreign + .foreign { margin-inline-start: 0.6em; }
+.rubric > .foreign + .foreign { margin-inline: 0.3em; }
 
 .note-ref {
   font: inherit;
