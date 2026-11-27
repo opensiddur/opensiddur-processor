@@ -215,3 +215,13 @@ implementation milestones. Next material begins at scan46 after that gate closes
 Source gate status and immutable evidence live in
 `batches/pesuqei_s46_s63/checklist.json` in the volume-two source directory.
 Accepted coverage remains45/385 while these gates remain open.
+
+The scans46–63 source/recipe has independent approval except question1023
+(the scan62 maqaf). All34 prospective XML documents validate, and the actual
+27-case conditional matrix preserves the Hebrew-only Psalm91 ending repeat
+and Psalm136:25 without neighboring English drift. Production generation and
+complete-scan acceptance remain gated on the human reading and final exports.
+Exporter PR349 fixes redundant backlinks across full-width translation gaps;
+its code review and588tests passed, with final expanded export closure pending.
+`ACTIVE_REVIEW.json` identifies current source payloads; earlier working readings
+and rejected compositions are historical evidence. Accepted coverage is45/385.

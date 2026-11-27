@@ -140,3 +140,22 @@ directions; the expanded entry inserts the prayers in recitation order.
 Recipes bind approved raw readings and source-approval hashes. Correct earlier
 unsupported normalizations through the recorded source amendment before taking
 a new template snapshot.
+
+
+The scans46–63 continuation has its own source-bound recipe and independent
+source/structure approval. After those gates close, append it below Shacharit:
+
+```bash
+uv run python -m opensiddur.importer.marmorstein_rosh_hashanah_2.pesuqei \
+  --source-root /path/to/sourcetexts/sources \
+  --project-directory /path/to/opensiddur-projects/project
+```
+
+This stage follows `morning`; rerun it after regenerating the earlier service.
+It preserves earlier canonical providers and literal repeated quotations, and
+keeps the Hebrew-only Psalm91 ending separate from its first bilingual recitation.
+The repeated canonical call has a dedicated translation-availability setting.
+Reviewed parallel profiles select only this volume's translator, preserving the
+missing English Psalm136:25 and earlier translation gaps. Frozen service templates
+and existing-output checks prevent silently replacing later edits. Generation
+requires matching source, recipe and settings hashes; it does not accept scans.

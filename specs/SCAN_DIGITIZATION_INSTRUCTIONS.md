@@ -217,6 +217,10 @@ to other editions; apply the edition-specific decisions below only to this book.
   module boundary. Track the unique facsimile URL per edition/column, not the
   printed label. Returning to an earlier page must produce a link again; hidden
   conditional content must not suppress the next visible link.
+  Full-width passages without a translation continue the primary source stream;
+  changing between columns and full width is not a source-page change. Test a
+  Hebrew-only gap between bilingual passages, including an optional page change
+  followed by a required return to the previous page.
 - Use `typography.markers.scan_links.placement: margin` for marginal backlinks
   when desired. Check both PDF outer margins and HTML gutters, including RTL,
   LTR, narrow displays, link targets and annotation bounds. Preserve source
@@ -403,3 +407,12 @@ keep genuinely uncertain marks for human review.
 - Name `encoding="utf-8"` on every importer text read/write, including JSON and
   YAML settings. A locale default can silently corrupt Hebrew. Run the repository
   `test_text_encoding.py` guard with focused importer tests before publishing.
+
+### Fine-mark absence and independent correction review
+
+Full-width bands can hide thin marks when the display scales them down. Before
+calling a vowel or meteg absent, inspect its complete word at a readable enlarged
+size. Distinguish a detached holam above a vav head from the head itself. A rule
+against supplying absent vowels is not evidence that the source omits them.
+Keep occurrence-specific image inventories; review corrections as critically as
+the initial readings, and retain rejected correction records.
