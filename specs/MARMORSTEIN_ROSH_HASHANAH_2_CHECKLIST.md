@@ -192,9 +192,10 @@ implementation milestones. Next material begins at scan46 after that gate closes
 - [x] Cache and inventory the18 physical pages; verify the boundary before
       Yehi Khevod on scan64 (64–65 are preview pages, outside this batch).
 - [x] Preserve three primary image-reading records and a canonical identity audit.
-- [ ] Complete blind independent reading. Claude completed46–51; its service
-      blocked outputs52–63. Preserve those failures and obtain the requested
-      replacement reviewer choice before counting the remaining readings.
+- [x] Complete blind independent reading. Claude completed46–51; its service
+      blocked outputs52–63. The user selected GPT-6.2 Sol at medium effort,
+      whose two frozen image-only readings cover52–63. Preserve both failed
+      Claude attempts; localized uncertainties remain for source adjudication.
 - [ ] Reconcile wording, fine marks and paratext against enlarged images;
       use one neutral dedicated reader per unresolved question before the user.
 - [ ] Approve complete source readings and bind literal witness recipes to them.
