@@ -3871,6 +3871,19 @@ class TestParallelParagraphSpacing(unittest.TestCase):
             self.assertIn(r"\InsertMark{OSchapter}", side)
             self.assertIn('55', side)
 
+    def test_marker_tail_lookahead_stops_at_next_parallel_row(self):
+        first = ('<tei:p p:part="last">Hello</tei:p><tei:p p:part="first">'
+                 '<tei:milestone unit="verse"/><tei:milestone unit="chapter" n="55"/></tei:p>')
+        xml = self._parallel(first, first)
+        next_row = ('<p:parallel><p:parallelItem role="primary" xml:lang="he"><tei:p>Next</tei:p></p:parallelItem>'
+                    '<p:parallelItem role="parallel" xml:lang="en"><tei:p>Next</tei:p></p:parallelItem></p:parallel>')
+        xml = xml.replace('</tei:body>', next_row+'</tei:body>')
+        out = _transform(xml, layout="pairs")
+        for side in self._sides(out):
+            self.assertNotIn(r"\OSKeepSep", side)
+        self.assertIn('Hello', out)
+        self.assertIn('Next', out)
+
     def test_a_real_paragraph_after_marker_prefix_keeps_its_separator(self):
         primary = ('<tei:p>שלום</tei:p><tei:p><tei:milestone unit="chapter" n="55"/>'
                    'עולם</tei:p>')

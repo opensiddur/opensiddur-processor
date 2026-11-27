@@ -2591,12 +2591,17 @@ end
                 <xsl:when test="self::f:para-break">
                     <!-- Paragraph boundary: end current pstart, but don't open a new
                          one until we see actual content. -->
+                    <xsl:variable name="following" as="node()*" select="subsequence($leaves, position() + 1)"/>
+                    <xsl:variable name="row-end" as="xs:integer" select="(
+                        for $i in 1 to count($following) return
+                            if ($following[$i]/self::f:block-break) then $i else (),
+                        count($following))[1]"/>
                     <xsl:choose>
                         <!-- A split paragraph can leave only end scopes and running-head
                              markers after this boundary. Keep those markers, but do not
                              separate them from the words with an empty printed line. -->
                         <xsl:when test="$single-pstart and not($align-verses) and
-                            (every $n in subsequence($leaves, position() + 1) satisfies
+                            (every $n in subsequence($following, 1, $row-end) satisfies
                                 (f:is-structural-space($n)
                                  or $n/self::f:para-break or $n/self::f:block-break
                                  or $n/self::tei:milestone[@unit = 'chapter'
