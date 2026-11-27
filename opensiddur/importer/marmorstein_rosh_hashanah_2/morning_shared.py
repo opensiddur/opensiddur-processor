@@ -334,7 +334,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     source = args.source_root/BOOK
     batch = source/'batches/morning_s25_s45'
-    recipe = json.loads((batch/'shared_printings.json').read_text())
+    recipe = json.loads((batch/'shared_printings.json').read_text(encoding='utf-8'))
     readings = approved_readings(batch, recipe)
     units = {u['stem']: u for u in readings['units']}
     documents, features = shared_documents(recipe, units)

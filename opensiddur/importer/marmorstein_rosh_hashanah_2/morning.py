@@ -260,22 +260,22 @@ def write_profiles(settings_directory):
     he = settings_directory/PROJECTS['he']
     for variant in ['documentary_hebrew', 'documentary_parallel']:
         path = he/(variant+'.yaml')
-        values = yaml.safe_load(path.read_text())
+        values = yaml.safe_load(path.read_text(encoding='utf-8'))
         values['requires_processor'] = '>=0.9.0.dev0'
         values['book']['title'] = 'Prayerbook for the New Year — second day'
         values['description'] = 'Second-day volume. Current per-scan acceptance is recorded in the source batch ledger.'
-        path.write_text(yaml.safe_dump(values, sort_keys=False, allow_unicode=True))
+        path.write_text(yaml.safe_dump(values, sort_keys=False, allow_unicode=True), encoding='utf-8')
     path = settings_directory/EXPANDED/'second_day_evening.yaml'
-    values = yaml.safe_load(path.read_text())
+    values = yaml.safe_load(path.read_text(encoding='utf-8'))
     values['requires_processor'] = '>=0.9.0.dev0'
-    path.write_text(yaml.safe_dump(values, sort_keys=False, allow_unicode=True))
+    path.write_text(yaml.safe_dump(values, sort_keys=False, allow_unicode=True), encoding='utf-8')
     values = deepcopy(values)
     values['book']['file_name'] = 'second_day_morning.xml'
     values['book']['title'] = 'Prayerbook for the New Year — second-day morning prayers'
     values['description'] = 'Expanded second-day morning sequence using source-attested printings and canonical prayer transclusions.'
     values['declarations']['opensiddur:service-time']['maariv'] = False
     values['declarations']['opensiddur:service-time']['shaharit'] = True
-    (path.parent/'second_day_morning.yaml').write_text(yaml.safe_dump(values, sort_keys=False, allow_unicode=True))
+    (path.parent/'second_day_morning.yaml').write_text(yaml.safe_dump(values, sort_keys=False, allow_unicode=True), encoding='utf-8')
 
 
 def main(argv=None):
@@ -284,10 +284,10 @@ def main(argv=None):
     parser.add_argument('--project-directory',type=Path,default=PROJECT_DIRECTORY)
     args=parser.parse_args(argv)
     batch=args.source_root/BOOK/'batches/morning_s25_s45'
-    plan=json.loads((batch/'morning_order.json').read_text())
+    plan=json.loads((batch/'morning_order.json').read_text(encoding='utf-8'))
     units={u['stem']:u for u in approved_readings(batch,plan)['units']}
-    shared=json.loads((batch/'shared_printings.json').read_text())
-    features=json.loads((batch/'shared_features.json').read_text())
+    shared=json.loads((batch/'shared_printings.json').read_text(encoding='utf-8'))
+    features=json.loads((batch/'shared_features.json').read_text(encoding='utf-8'))
     index=etree.parse(str(args.project_directory/EXPANDED/'index.xml')).getroot()
     documents = []
     for lang in ('he', 'en'):

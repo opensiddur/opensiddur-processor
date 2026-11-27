@@ -399,3 +399,7 @@ keep genuinely uncertain marks for human review.
 - A reviewer with read-only file access needs explicit screenshot filenames,
   not only a QA summary or directory path. Supply a frozen inventory binding
   PDFs, rendered pages, HTML, browser screenshots and reports to their hashes.
+
+- Name `encoding="utf-8"` on every importer text read/write, including JSON and
+  YAML settings. A locale default can silently corrupt Hebrew. Run the repository
+  `test_text_encoding.py` guard with focused importer tests before publishing.
