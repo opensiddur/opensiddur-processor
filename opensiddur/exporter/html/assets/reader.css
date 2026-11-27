@@ -99,6 +99,9 @@ span:is(.div, .lg, .list, .item, .label, .head, .doc-title) { display: block; }
 /* ── Rubrics and notes ───────────────────────────────────────────────── */
 
 .rubric { color: var(--accent); }
+/* Adjacent language labels are independent bidi runs, including their punctuation. */
+.rubric > .foreign { display: inline-block; unicode-bidi: isolate; }
+.rubric > .foreign + .foreign { margin-inline: 0.3em; }
 
 .note-ref {
   font: inherit;
@@ -147,7 +150,6 @@ html { overflow-anchor: none; }
 .par.os-near { content-visibility: visible; }
 /* A row with no words in either column -- a page break, an anchor -- is laid out always: it is
    tiny, and taken off screen to have a row's height it would leave blank space to scroll. */
-.par:not(:has(> .col:not(.col-empty))) { content-visibility: visible; }
 .par-primary_last > .col-primary { order: 2; }
 .col { min-width: 0; }
 .col > .div, .col .div { margin: 0; }
@@ -155,6 +157,11 @@ html { overflow-anchor: none; }
   .par { grid-template-columns: 1fr; row-gap: 0.4rem; contain-intrinsic-size: auto 6.5rem; }
   .col-parallel { padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); }
 }
+/* Marker-only rows keep their anchors and scan controls, without paragraph/grid
+   spacing or a mobile divider that would pretend they contain another reading. */
+.par:not(:has(> .col:not(.col-empty))) { content-visibility: visible; row-gap: 0; }
+.par:not(:has(> .col:not(.col-empty))) > .col { padding-bottom: 0; border-bottom: 0; }
+.par:not(:has(> .col:not(.col-empty))) > .col :is(p, .ab, .div) { margin-block: 0; }
 /* One column at a time, as the reader chooses (Settings, Columns): data-columns on <html> names
    the column shown. A row whose shown column has no words keeps the other, which is all it
    has. Absent, as without scripts, both are shown. */
