@@ -196,32 +196,30 @@ implementation milestones. Next material begins at scan46 after that gate closes
       blocked outputs52–63. The user selected GPT-6.2 Sol at medium effort,
       whose two frozen image-only readings cover52–63. Preserve both failed
       Claude attempts; localized uncertainties remain for source adjudication.
-- [ ] Reconcile wording, fine marks and paratext against enlarged images;
+- [x] Reconcile wording, fine marks and paratext against enlarged images;
       use one neutral dedicated reader per unresolved question before the user.
-- [ ] Approve complete source readings and bind literal witness recipes to them.
-- [ ] Reuse existing prayer/Bible URNs, retaining earlier canonical providers and
+- [x] Approve complete source readings and bind literal witness recipes to them.
+- [x] Reuse existing prayer/Bible URNs, retaining earlier canonical providers and
       literal contextual quotations where a verse is printed again. Do not claim
       the Chronicles16:8–36 excerpt as a complete chapter witness.
-- [ ] Preserve the Hebrew-only Psalm91:16 repeat and absent English Psalm136:25;
+- [x] Preserve the Hebrew-only Psalm91:16 repeat and absent English Psalm136:25;
       prove that new counterparts do not fill earlier untranslated occurrences.
-- [ ] Append documentary and shared expanded sequences inside Shacharit, with
+- [x] Append documentary and shared expanded sequences inside Shacharit, with
       repeated canonical calls where recitation requires them and no fake heading.
-- [ ] Complete independent encoding/guideline/alignment/order/condition review.
-- [ ] Pass schema, naming, feature, registry, refdb and affected-code checks.
-- [ ] Freeze and independently approve documentary Hebrew, documentary parallel
+- [x] Complete independent encoding/guideline/alignment/order/condition review.
+- [x] Pass schema, naming, feature, registry, refdb and affected-code checks.
+- [x] Freeze and independently approve documentary Hebrew, documentary parallel
       and expanded PDF/HTML, including all page links and cross-batch transitions.
-- [ ] Record complete-scan acceptance before advancing beyond scan63.
+- [x] Record complete-scan acceptance before advancing beyond scan63.
 
-Source gate status and immutable evidence live in
-`batches/pesuqei_s46_s63/checklist.json` in the volume-two source directory.
-Accepted coverage remains45/385 while these gates remain open.
+Source acceptance and exact artifact hashes are recorded in
+`batches/pesuqei_s46_s63/acceptance.json`. The human confirms question1023's
+printed maqaf, already present in the provisional text; all34 production XML
+files and the reviewed exports remain byte-identical. All source, guideline,
+alignment, order and presentation gates are closed. Accepted coverage is63/385,
+with322 scans remaining; resume at scan64 (Yehi Khevod).
 
-The scans46–63 source/recipe has independent approval except question1023
-(the scan62 maqaf). All34 prospective XML documents validate, and the actual
-27-case conditional matrix preserves the Hebrew-only Psalm91 ending repeat
-and Psalm136:25 without neighboring English drift. Production generation and
-complete-scan acceptance remain gated on the human reading and final exports.
-Exporter PR349 fixes redundant backlinks across full-width translation gaps;
-its code review and588tests passed, with final expanded export closure pending.
-`ACTIVE_REVIEW.json` identifies current source payloads; earlier working readings
-and rejected compositions are historical evidence. Accepted coverage is45/385.
+Exporter PR349 has independent approval and green CI. It removes redundant scan
+backlinks across full-width translation gaps; merge349 before processor331 and
+projects110. It is still open, not a completed merge. Earlier source proposals,
+misframed screenshots and provisional manifests remain historical evidence.
